@@ -497,6 +497,53 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
 
 ![sycgen T-sweep (partial renders refresh in place)](figs_writeup/fig_sycgen_shuffle_tsweep.png)
 
+  > ## ✅ SPARSITY-MATCHED SHUFFLE ABLATION — DELIVERED 02:30 07-29, and it is a NEGATIVE we pre-committed to publishing
+  >
+  > **`figs_writeup/tab_sycgen_shuffle_matched.md`.** 624 rows, 24
+  > cells, 3 seeds, pre-registered in `sycgen/SHUFFLE_MATCHED_CARD.md`
+  > **before any cell ran**. Cost $2.12. PTR.
+  >
+  > **Verdict (b): ARCHITECTURAL, NOT LEARNED.** A **randomly
+  > initialised** TXC is *more* order-sensitive than the trained one in
+  > **11 of 12 (T, seed) cells**. 15 of 16 combinations return (b) or
+  > (c); **not one returns (a)**.
+  >
+  > | T | trained gap | untrained-twin gap |
+  > |---|---|---|
+  > | 2 | +0.1114 | +0.1671 |
+  > | 4 | +0.0231 | +0.1375 |
+  > | 8 | +0.0504 | +0.0820 |
+  > | 16 | +0.0618 | +0.0267 |
+  >
+  > **All three instrument gates PASS** — shuffle-live 24/24 against
+  > exact binomial bands, pooled gap ≡ 0 (6.53e-09 over 288 rows), SAE
+  > `l0` permutation-invariance predicted then measured (0 violations).
+  > **Pooled's zero certifies nothing** (a mean is permutation-invariant
+  > arithmetically and returns PASS on a dead shuffle); the input-side
+  > identity-row count is what certifies the instrument.
+  >
+  > **⚑ BUDGET CONFOUND — carry it at equal prominence.** The twin runs
+  > at `l0` = 8.00 against the trained model's 5.44–7.86, **up to
+  > 1.47×**. Hub cross-check: the twin's excess gap **tracks its budget
+  > advantage** (Spearman +0.80, n=4) and **reverses at T=16**, where
+  > the budgets nearly match (1.02×) — which is the signature a budget
+  > artifact leaves. **(b) is carried by T=2/4/8; at the one T with a
+  > near-matched comparison the direction flips toward (a) and fails its
+  > own 3/3 sign test.**
+  >
+  > **WHAT WE CAN SAY:** *the ordered−shuffled gap is not evidence of
+  > learned temporal structure* — which is what the binding quote-form
+  > has said since 04:16 07-28. **WHAT WE CANNOT SAY:** that training
+  > *reduces* order-sensitivity; the comparison that would show it is
+  > the one the budget confounds. **This does NOT say the TXC fails** —
+  > ordered recovery still rises 0.499 → 0.578 across T against the
+  > twin's 0.222 → 0.058. It says the **shuffle gap is the wrong
+  > evidence** for it.
+  >
+  > **Next $0 step:** re-run the twin at the trained model's realized
+  > `l0` instead of `k_pos`-full. That removes the confound and is the
+  > only way T=16 resolves.
+
   **Table:** `figs_writeup/tab_sycgen_shuffle_tsweep.md` —
   generated from the overlay/twin/summary jsons (ordered/shuffled
   mean±sd per T, gap, twin-gap control, anchor row, binding

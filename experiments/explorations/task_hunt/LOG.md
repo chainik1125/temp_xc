@@ -39589,3 +39589,44 @@ one the budget confounds.
 trained model's realized `l0` instead of `k_pos`-full.** That
 removes the confound entirely and is the only way T=16's flip gets
 resolved. **Not tonight — the pods are down and the ledger is closed.**
+
+## 2026-07-29 02:31 BST — HUB: shuffle result LANDED on the handover surfaces; **and one caveat mac-d raised is MINE to fix**
+
+**Landed per standing-orders §6:** `REBUTTAL_HANDOFF.md` §6 carries
+the verdict, the trained-vs-twin table, all three gate receipts, **the
+budget confound at equal prominence with my Spearman +0.80
+cross-check**, and the what-we-can/cannot-say split.
+`tab_sycgen_shuffle_tsweep.md` now points at the authoritative matched
+result and is explicitly **superseded for the order question** while
+its own numbers stand as the unmatched T-sweep. Audit clean.
+
+**⚑ THE REVIEWER RESPONSE NEEDS NO CHANGE, AND I CHECKED RATHER THAN
+ASSUMED:** it makes a **level** claim at matched sparsity (TXC above
+both baselines, improving with window size) and **says nothing about
+shuffle or order-sensitivity.** The (b) verdict does not contradict it.
+
+**⚑ BUT THAT IS A DECISION FOR HAN AND DMITRY, NOT FOR ME AT 02:4x.**
+Reviewer 1 asks *"what evidence shows the improvement is specifically
+due to temporal aggregation?"* **We now hold a negative that is
+directly responsive** — the ordered−shuffled gap is not evidence of
+learned order-use. **My recommendation, for their call:** do not
+volunteer it in a 10,000-character response, because the sycgen
+paragraph makes no order claim and the space is better spent; **but be
+ready to give it straight if asked, and never let the response imply
+the gap is learned.** Flagged rather than actioned — **hiding it would
+be indefensible, and spending 15% of the response pre-empting a
+question nobody asked would be poor advocacy. That trade-off is
+theirs.**
+
+**⚑ AND A CAVEAT MAC-D RAISED IS MINE.** Their STATUS caveat 4: *"`mono
+NO` is expected, and my precondition was mis-specified. I inherited it
+from item 6 where the interpolated quantity was RECOVERY."* **Correct,
+and the precondition is mine** — I built the bracket-and-interpolate
+rule for `gen_sycgen_budget_table.py`, where monotonicity of
+**recovery** in budget is verified and load-bearing. **A GAP need not
+be monotone in budget**, so interpolating one is unjustified. mac-d
+inherited a rule that was sound in its original context and unsound in
+theirs, **and they caught it themselves and marked it "not yet
+fixed."** For the shuffle table the bracket is a **range**, not an
+interpolated point — recorded so the next reader does not treat the
+budget table's rule as general.

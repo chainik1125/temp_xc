@@ -10,6 +10,20 @@ _Generated from `sycgen/results/{sycgen_shuffle_overlay,sycgen_twin_overlay,sycg
 | 16 | 0.5922 ± 0.0074 | 0.5296 ± 0.0268 | +0.0626 | +0.0958 |
 | 1 (anchor) | per-token BatchTopK SAE: 0.4819 ± 0.0101 | ≡ ordered (identity by construction) | — | — |
 
+> ## ✅ SUPERSEDED FOR THE ORDER QUESTION (02:31 07-29) — the sparsity-matched run has answered it
+>
+> **`figs_writeup/tab_sycgen_shuffle_matched.md` is the authoritative
+> shuffle result.** It ran at matched sparsity with the instrument
+> gates this table never had, and its verdict is **(b) ARCHITECTURAL,
+> NOT LEARNED**: a randomly-initialised TXC is *more* order-sensitive
+> than the trained one in 11 of 12 cells.
+>
+> **This table's numbers stand as recorded** — they are the T-sweep at
+> the original (unmatched) sparsity — **but do not quote them as
+> evidence about learned order-use.** The binding quote-form below
+> already said the claim is the LEVEL story; the matched run is why
+> that was the right call.
+
 > ## ⚑ ADDED 00:5x 07-29 — the "shuffled" arm is only PARTLY shuffled at small T, and the T=2 cell is half ordered
 >
 > `shuffle_within_window` draws an **independent `randperm(T)` per row**
