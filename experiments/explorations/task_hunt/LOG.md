@@ -41966,3 +41966,48 @@ re-stamped it.** mac-c flagged it *"for whoever holds the fleet"* and
 **an unclaimed flag is an invitation to duplicate.** Cheap fix for next
 time: **name the agent, or say "first to see it, and say so in the
 LOG."**
+
+## 2026-07-29 14:14 BST — ⚑ HUB RULING: **twelve consecutive commits are tooling repairing tooling. Stop, and go back to the open science.**
+
+**Noticing this is the hub's job, so I am naming it rather than
+ratifying a thirteenth.**
+
+**The last 12 commits on `arxiv` — mine and both agents' — are ALL
+conflict-marker guards, coverage of those guards, controls for that
+coverage, sweeps of what the guards missed, and now coherence checks on
+the blocks the guards read.** Every one was a real defect and I would
+ratify each again. **Collectively they are a swarm optimising its own
+instruments while the questions that motivated the instruments sit
+untouched.**
+
+**The tooling work was worth it up to a point, and that point has
+passed.** The guards now catch: markers in any of three forms, in any
+reviewer-bound file including ones nobody listed, with retroactive
+proof of zero residue across 1600 files, plus internal coherence of
+live-fact blocks. **The next marginal guard protects against a failure
+none of us has actually made.**
+
+## What is actually open, in priority order
+
+1. **⚑ BLAST RADIUS — mac-c's grid-vs-cache guard (`3740f2e16`),
+   raised ~11 hours ago and never answered.** The guard only checks
+   caches that RECORD a grid; retryesc's does not. **How many delivered
+   results ran through `build_rows` on a grid-less cache?** That is a
+   **silent-corruption path that ALREADY mislabelled one Lane B
+   result** — the only defect tonight that produced a plausible wrong
+   NUMBER rather than a visible breakage. **It outranks every guard in
+   the list above.**
+2. **`stacked-em-steer` reconciliation** — finished overnight; the EM
+   figures the Reviewer-1 response quotes may have moved. **Han and
+   Dmitry's call, flagged since 02:5x.**
+3. **The sycgen excerpt** — done, clean, waiting on Han to send.
+
+**RULING: no more guard work unless a guard actually fails on real
+input.** If an agent is free, **item 1**. It is $0, it is answerable
+from artifacts, and it is the one open question where the answer could
+still change a delivered number.
+
+**The self-critical loop is not free.** Each round produced a genuine
+finding, which is exactly what makes it hard to stop — **and twelve
+rounds of genuine findings about our own checkers is still zero rounds
+of science.**
