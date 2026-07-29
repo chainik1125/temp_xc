@@ -55,10 +55,31 @@ SKIP = ("experiments/explorations/task_hunt/LOG.md",)
 STRUCK = re.compile(r"~~.+?~~", re.S)
 
 
-def classify(text: str, phrase: str) -> tuple[list, list]:
-    """(live, quoted) line numbers for each occurrence of phrase."""
+def classify(text: str, phrase: str) -> tuple[list, list, list]:
+    """(live, quoted, quote_only) line numbers for each occurrence of phrase.
+
+    ``quote_only`` is the subset of ``quoted`` that was spared **solely**
+    because it sits inside a ``>`` block — not struck, no correction marker
+    nearby. Those are the ones the operator has to read.
+
+    ⚑ WHY THAT SUBSET IS TRACKED (mac-d, 12:3x 07-29). Treating ``>`` as
+    "quoted, not asserted" is right when a blockquote quotes a claim in
+    order to refute it. It is WRONG when a document uses blockquotes as
+    **callout boxes** — and `REBUTTAL_HANDOFF.md` does exactly that, so its
+    most emphatic, most load-bearing guidance is entirely inside ``>``.
+    Sweeping it for a refuted budget-artifact reading returned
+    ``live 0 … clean`` while the text was live guidance on a SHIPPING
+    surface.
+
+    That is the **unsafe** direction: the newline-key and control-ref
+    failures produce a *silent control*, which this tool already warns
+    about loudly. This one produces a confident **clean**. Semantics are
+    left unchanged — a blockquote genuinely is a quotation more often than
+    not — and the ambiguity is surfaced as a warning instead, which is what
+    the rest of this tool does: *only the operator can judge*.
+    """
     struck_spans = [(m.start(), m.end()) for m in STRUCK.finditer(text)]
-    live, quoted = [], []
+    live, quoted, quote_only = [], [], []
     for m in re.finditer(re.escape(phrase), text, re.I):
         i = m.start()
         ln = text[:i].count("\n") + 1
@@ -73,7 +94,9 @@ def classify(text: str, phrase: str) -> tuple[list, list]:
         window = "\n".join(lines_all[max(0, ln - 3): ln + 2])
         near_corr = bool(CORRECTION.search(window))
         (quoted if (in_struck or in_quote or near_corr) else live).append(ln)
-    return live, quoted
+        if in_quote and not in_struck and not near_corr:
+            quote_only.append(ln)
+    return live, quoted, quote_only
 
 
 def files(paths: list[str]):
@@ -99,8 +122,10 @@ def main(argv: list[str]) -> int:
     paths = argv[1:] or DEFAULT_PATHS
 
     total_live = total_quoted = 0
+    quote_only_sites: list[str] = []
+    quote_only_n = 0
     for f in files(paths):
-        live, quoted = classify(f.read_text(), phrase)
+        live, quoted, quote_only = classify(f.read_text(), phrase)
         if live or quoted:
             rel = f.relative_to(ROOT)
             if live:
@@ -108,6 +133,9 @@ def main(argv: list[str]) -> int:
             if quoted:
                 print(f"  · quoted {rel}: lines {quoted} (struck / blockquote / "
                       f"correction line)")
+            if quote_only:
+                quote_only_sites.append(f"{rel}: lines {quote_only}")
+                quote_only_n += len(quote_only)
         total_live += len(live)
         total_quoted += len(quoted)
 
@@ -120,6 +148,20 @@ def main(argv: list[str]) -> int:
     if "\n" in phrase:
         print("** KEY SPANS A NEWLINE — the control is line-based and cannot "
               "fire. Choose a key contained on a single line.")
+    # ⚑ Blockquote-as-CALLOUT, the one failure mode that reports a confident
+    # `clean` instead of a silent control (mac-d, 12:3x 07-29). A `>` block
+    # is treated as quotation, but REBUTTAL_HANDOFF.md uses `>` for emphasis
+    # boxes, so its most load-bearing guidance is inside one — and a refuted
+    # budget-artifact reading swept `live 0 … clean` while shipping.
+    if quote_only_sites:
+        print(f"** {quote_only_n} "
+              f"occurrence(s) spared ONLY by sitting in a `>` block — no "
+              f"strike, no correction marker nearby. If the document uses "
+              f"blockquotes as CALLOUT BOXES (REBUTTAL_HANDOFF.md does), "
+              f"these are ASSERTED, not quoted, and a `clean` result here "
+              f"is unsafe. READ them:")
+        for s in quote_only_sites:
+            print(f"     {s}")
     # --- the control: the phrase must be findable on a ref that predates the fix
     ctrl = subprocess.run(["git", "grep", "-c", "-i", phrase, ref],
                           cwd=ROOT, capture_output=True, text=True)
