@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import copy
+import importlib
 import csv
 import json
 import math
@@ -38,6 +39,91 @@ def latest_by_cell(rows: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
         if cell_id:
             latest[str(cell_id)] = row
     return latest
+
+
+def correct_colored_zero_candidate_chance(
+    rows: list[dict[str, Any]], config: dict[str, Any]
+) -> list[dict[str, Any]]:
+    """Correct chance adjustment when a hard DC mask creates zero candidates.
+
+    The repository evaluator counts every flattened decoder slice when drawing
+    its random-dictionary chance floor. A DC-removed spectral model retains
+    zeroed DC parameters for shape compatibility, so that count is too large.
+    Raw squared-cosine recovery is unaffected; only the chance adjustment is
+    recomputed with the number of nonzero candidate slices.
+    """
+    from temp_bench.core.config import load_datasource
+    from temp_bench.evals.colored_recovery import (
+        _candidate_directions,
+        _empirical_chance,
+    )
+
+    model_specs = {str(model["name"]): model for model in config["models"]}
+    task_specs = {str(task["name"]): task for task in config["tasks"]}
+    receipts: list[dict[str, Any]] = []
+    for model_name, model_spec in model_specs.items():
+        hparams = model_spec.get("hparams", {})
+        if hparams.get("dc_mode") != "remove":
+            continue
+        relevant = [
+            row
+            for row in rows
+            if row.get("phase") == "full"
+            and row.get("status") == "ok"
+            and row.get("model") == model_name
+            and "colored_rec_sq" in row.get("metrics", {})
+        ]
+        if not relevant:
+            continue
+        task_name = str(relevant[0]["task"])
+        task = task_specs[task_name]
+        data_spec = load_datasource(str(task["datasource"]))
+        d_in = int((data_spec.params or {})["d_in"])
+        n_sources = int((data_spec.params or {})["N"])
+        module_name, class_name = str(model_spec["class_path"]).split(":", 1)
+        cls = getattr(importlib.import_module(module_name), class_name)
+        model = cls(
+            d_in=d_in,
+            d_sae=int(task["d_sae"]),
+            T=int(task["T"]),
+            k_pos=int(task["k_pos"]),
+            **hparams,
+        )
+        candidates = _candidate_directions(model)
+        effective_candidates = int((candidates.norm(dim=1) > 1e-8).sum().item())
+        total_candidates = int(candidates.shape[0])
+        if effective_candidates == total_candidates:
+            continue
+        chance, chance_std = _empirical_chance(
+            effective_candidates,
+            d_in,
+            n_sources,
+        )
+        for row in relevant:
+            metrics = row["metrics"]
+            reported = float(metrics["colored_rec_adj"])
+            rec_sq = float(metrics["colored_rec_sq"])
+            corrected = (rec_sq - chance) / max(1.0 - chance, 1e-9)
+            metrics["colored_rec_adj_reported"] = reported
+            metrics["colored_chance_reported"] = float(metrics["colored_chance"])
+            metrics["colored_chance_std_reported"] = float(
+                metrics["colored_chance_std"]
+            )
+            metrics["colored_rec_adj"] = corrected
+            metrics["colored_chance"] = chance
+            metrics["colored_chance_std"] = chance_std
+        receipts.append(
+            {
+                "task": task_name,
+                "model": model_name,
+                "rows_corrected": len(relevant),
+                "total_candidates": total_candidates,
+                "effective_nonzero_candidates": effective_candidates,
+                "corrected_chance": chance,
+                "reason": "hard DC mask leaves zero decoder slices",
+            }
+        )
+    return receipts
 
 
 def expected_full_keys(config: dict[str, Any]) -> set[tuple[str, str, int]]:
@@ -357,6 +443,7 @@ def run_analysis(
 ) -> dict[str, Any]:
     config = json.loads(config_path.read_text())
     raw_rows = read_jsonl(results_path)
+    metric_corrections = correct_colored_zero_candidate_chance(raw_rows, config)
     main_integrity = validate_panel(raw_rows, config)
     if require_complete and not main_integrity["complete"]:
         raise RuntimeError(
@@ -374,6 +461,9 @@ def run_analysis(
     if control_config_path is not None and control_results_path is not None:
         control_config = json.loads(control_config_path.read_text())
         control_rows = read_jsonl(control_results_path)
+        metric_corrections.extend(
+            correct_colored_zero_candidate_chance(control_rows, control_config)
+        )
         control_integrity = validate_panel(control_rows, control_config)
         if require_complete and not control_integrity["complete"]:
             raise RuntimeError(
@@ -432,6 +522,7 @@ def run_analysis(
         "task_winners": task_winners,
         "aggregates": aggregates,
         "l0_match_report": l0_matches,
+        "metric_corrections": metric_corrections,
         "resume_sensitivity": {
             "definition": "fresh_mean includes only rows with training.start_step == 0",
             "resumed_start_steps": dict(

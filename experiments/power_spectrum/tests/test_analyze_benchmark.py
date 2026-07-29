@@ -8,6 +8,11 @@ import pytest
 from experiments.power_spectrum.code import analyze_benchmark
 
 
+OVERNIGHT_CONFIG = (
+    Path(__file__).resolve().parents[1] / "configs" / "overnight.json"
+)
+
+
 def _config() -> dict:
     return {
         "run_name": "test",
@@ -148,3 +153,28 @@ def test_analysis_merges_matched_control_and_pairs_against_main(tmp_path: Path) 
     )
     assert control["delta_vs_txc_pre"] == pytest.approx(0.5)
     assert control["delta_vs_spectral_v1"] == pytest.approx(0.1)
+
+
+def test_colored_chance_correction_excludes_zeroed_dc_candidates() -> None:
+    config = json.loads(OVERNIGHT_CONFIG.read_text())
+    row = {
+        "phase": "full",
+        "status": "ok",
+        "task": "colored",
+        "model": "v2_remove_dc",
+        "metrics": {
+            "colored_rec_sq": 0.5,
+            "colored_rec_adj": 0.25,
+            "colored_chance": 1.0 / 3.0,
+            "colored_chance_std": 0.01,
+        },
+    }
+
+    receipts = analyze_benchmark.correct_colored_zero_candidate_chance(
+        [row], config
+    )
+
+    assert receipts[0]["total_candidates"] == 256
+    assert receipts[0]["effective_nonzero_candidates"] == 192
+    assert row["metrics"]["colored_rec_adj_reported"] == 0.25
+    assert row["metrics"]["colored_rec_adj"] != 0.25
