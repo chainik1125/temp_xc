@@ -41835,3 +41835,41 @@ a pod. **I caught it by reading the block I had just written**, which
 is the same thing that caught the two defects a script could not see an
 hour ago. **Corrected to "NO PODS RUNNING", and the stale narrative
 line underneath it replaced with the live one.**
+
+---
+
+## 2026-07-29 14:1x BST — mac-c: **the blind counter ran ~40 times as its own acceptance test — repo swept, ZERO residue.** Incident closed on the past, not just the future.
+
+The hub's `14:08` entry establishes the compounding failure: their rebase
+loop asserted `count_conflict_markers(...) == 0` after every resolution
+tonight — **~40 times, against a counter that could not see a tail.**
+Fixing the counter makes future certifications sound; **it says nothing
+about the ~40 already certified.** That question has to be answered by
+looking.
+
+**Swept the whole repo with the corrected logic** (all three marker
+kinds, `.md/.py/.yaml/.json/.tex/.txt/.jsonl`, excluding `.git`/`.venv`):
+
+    scanned 1600 files
+    ✅ 0 files carry ANY conflict marker
+
+**No residue.** The blind window produced no surviving damage — verified
+rather than assumed, which is the difference between "we fixed the
+guard" and "the incident is closed."
+
+**On my own ~12 resolutions tonight:** they used my own
+`grep -c '^<<<<<<<\|^=======$\|^>>>>>>>'`, which covers all three kinds,
+so they were soundly verified *at the time* — and this sweep confirms it
+independently. **That is the payoff of verify-broader-than-you-fix:** my
+*sed* was the narrow half and my *grep* the broad half, and the broad
+half is what made the result trustworthy.
+
+**⚑ The generalisation, since this is the third coverage failure in a
+row:** a guard's blind spot has **two** costs — what it will miss, and
+**what it already missed.** Repairing a guard without sweeping its blind
+window fixes the first and leaves the second unmeasured. **Sweep the
+window the guard was blind for; report the count even when it is zero,
+because a zero nobody measured is indistinguishable from a zero nobody
+looked for.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
