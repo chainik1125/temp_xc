@@ -409,6 +409,15 @@ For every non-TXC baseline, subscripts give the selected k independently at each
      ADDED ON THE `arxiv` BRANCH (mac-local, 2026-07-29): sycgen.
      Source branch `dmitry-txcwins-10h` is NOT modified.
      Everything between these markers is new.
+
+     LaTeX CONVENTION IN THIS SECTION: every backslash is DOUBLED --
+     \\begin{array}, \\mathrm{...}, and rows end in \\\\ . The markdown
+     renderer consumes one backslash before the math engine sees it, so a
+     single \begin{array}{lcccc} loses its command and leaves stray braces,
+     which reports as "Extra close brace or missing open brace" and the
+     table does not render. Match the neighbouring tables, not raw LaTeX.
+     Verified by rendering all 32 math blocks of this section with KaTeX
+     after applying the markdown unescape: 0 failures.
      ============================================================ -->
 
 ### Real-model task with a per-token-silent state (new)
@@ -421,29 +430,29 @@ the TXC against a **pooled** SAE (mean of the per-token codes over the window)
 and the **stacked** SAE (concatenation) at **matched measured sparsity** --
 sweeping $k$ on both baselines and evaluating each at the TXC's own realized
 $L_0$ per window, interpolating between the two bracketing $k$. Three training
-seeds; Llama-3.1-8B, layer 14, $d_{\mathrm{SAE}}=2048$.
+seeds; Llama-3.1-8B, layer 14, $d_{\\mathrm{SAE}}=2048$.
 
 $$
-\begin{array}{lcccc}
-&\mathrm{TXC}&\mathrm{Pooled}&\mathrm{Stacked}&\mathrm{TXC}\ L_0/\mathrm{win}\\
-T{=}2&.499&.485&.468&5.66\\
-T{=}4&.523&.488&.412&6.35\\
-T{=}8&.537&.467&.149^{*}&6.94\\
-T{=}16&\mathbf{.577}&.486^{*}&.314^{*}&7.82\\
-\mathrm{per\text{-}token\ SAE}&.482&-&-&-
-\end{array}
+\\begin{array}{lcccc}
+&\\mathrm{TXC}&\\mathrm{Pooled}&\\mathrm{Stacked}&\\mathrm{TXC}\\ L_0/\\mathrm{win}\\\\
+T{=}2&.499&.485&.468&5.66\\\\
+T{=}4&.523&.488&.412&6.35\\\\
+T{=}8&.537&.467&.149^{*}&6.94\\\\
+T{=}16&\\mathbf{.577}&.486^{*}&.314^{*}&7.82\\\\
+\\mathrm{per\\!-\\!token\\ SAE}&.482&-&-&-
+\\end{array}
 $$
 
-$^{*}$ the baseline cannot operate as sparsely as the TXC at that window, so
+${}^{*}$ the baseline cannot operate as sparsely as the TXC at that window, so
 the figure shown is its score at a **higher** budget and the comparison is
 conservative; at $T{=}16$ the cheapest pooled configuration costs
-$1.43\times$ the TXC's budget and still scores $0.091$ below it. We report
+$1.43\\times$ the TXC's budget and still scores $0.091$ below it. We report
 this as a **narrow positive**: the TXC is above pooled at $T{=}8$ and
 $T{=}16$, and at $T{=}2$ and $T{=}4$ the gap is smaller than the across-seed
 spread, which at $n{=}3$ we report as indistinguishable rather than as a win
 (we do not claim a significance test at this $n$). We do
-**not** count the stacked arm at $T\ge8$, where $T\cdot
-d_{\mathrm{SAE}}=32{,}768$ input dimensions against $1{,}024$ windows make its
+**not** count the stacked arm at $T\\ge8$, where $T\\cdot
+d_{\\mathrm{SAE}}=32{,}768$ input dimensions against $1{,}024$ windows make its
 collapse a probe-capacity artifact rather than an architectural one.
 <!-- ===================== END ADDED (sycgen) ===================== -->
 

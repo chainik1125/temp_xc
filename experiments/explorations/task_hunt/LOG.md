@@ -37683,3 +37683,62 @@ hour after withdrawing exactly that kind of guess on the k-grid. With
 24 cells the plausible shapes are one 8-GPU pod (3 cells each) or one
 12-GPU pod (2 each); **the measurement decides, and phase 1's shared
 cache still argues for a single multi-GPU pod over many pods.**
+
+## 2026-07-29 01:20 BST — HUB: **the sycgen table did not render — I wrote raw LaTeX into a section whose convention is DOUBLE-ESCAPED**
+
+Han: *"the .md file says Extra close brace or missing open brace and the
+table is not rendered correctly."* **Mine. Fixed and render-verified.**
+
+**CAUSE — a convention I did not read before writing next to it.** The
+OpenReview copy-paste section escapes **every backslash twice**:
+`\\begin{array}`, `\\mathrm{...}`, rows ending `\\\\`,
+inline `$1/11\\approx0.09$`. **The markdown renderer consumes one
+backslash before the math engine sees it**, so the doubled form arrives
+as valid LaTeX. I wrote **single**-escaped raw LaTeX, which arrives as
+`begin{array}{lcccc}` — command gone, braces orphaned — **exactly the
+"Extra close brace" Han saw.** The three pre-existing tables were all
+doubled and I did not look at one before writing a fourth.
+
+**Two further errors of mine, found on the way:**
+
+- `\\mathrm{per\\text{-}token...}` — `\\text{}` nested inside
+  `\\mathrm{}`. House style for a hyphen there is `\\!-\\!`
+  (cf. `\\mathrm{HH\\!-\\!RLHF}` in the same file).
+- `$^{*}$` opening the footnote — **a superscript with no base**,
+  invalid LaTeX. Now `${}^{*}$`. And the only `^{*}` in the whole
+  document were mine, so there was no precedent to copy — I invented a
+  construct instead of reusing one.
+
+**VERIFIED BY RENDERING, NOT BY READING.** Installed KaTeX and rendered
+**every math block in the paste section after applying the markdown
+unescape**: **32 blocks, 0 failures.** Also compared my block's escape
+profile against a neighbouring table mechanically — `begin` doubled
+1/1, single 0/0; row separators 4-backslash 5/4, 2-backslash 0/0;
+`mathrm` doubled 8/8, single 0/0. **Identical convention.**
+
+**⚑ THE FIRST RENDER TEST LOOKED LIKE IT EXONERATED ME AND IT WAS
+MEASURING THE WRONG THING.** Run against the raw file, KaTeX passed my
+block and *failed the three pre-existing ones* — the opposite of the
+truth, because raw KaTeX sees the doubled form as invalid and the
+single form as valid, while **the browser sees the unescaped form**. I
+had a green result pointing at other people's work. **Modelling the
+markdown unescape step is what inverted it.** A renderer that does not
+reproduce the delivery path is not a test of the delivery path — the
+same defect as the scratchpad copy of `handoff_audit.py` an hour ago,
+which "failed" because `ROOT` resolved elsewhere.
+
+**Also caught by an assert I had put in for exactly this:** my fix
+script sliced `s.index(START)` to `s.index(END)`, and `END`
+matches an **earlier** marker (the summary bullet), so the slice was
+**empty and the "fix" silently changed nothing**. `assert block !=
+before` fired. **The guard I added after the heredoc incident paid for
+itself within the hour.**
+
+**Convention now recorded in the file itself**, above the block, with
+the failure mode spelled out — so the next editor matches the
+neighbours instead of writing correct LaTeX that renders as garbage.
+
+**Unchanged and re-verified:** paste block **6,979 / 10,000** chars;
+**0 links, 0 images, 0 URLs**; numbers identical
+(.499/.485/.468, .523/.488/.412, .537/.467/.149, .577/.486/.314);
+**Dmitry's branch still `b1027b608`.**
