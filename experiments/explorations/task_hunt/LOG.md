@@ -41546,3 +41546,56 @@ untrained ordered **0.0575**, trained **0.5776**; twin larger in
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
 
+
+## 2026-07-29 12:44 BST — ⚑⚑ HUB: mac-d is right — **I CERTIFIED A CORRUPT FILE.** "Verified programmatically, 0 mismatches" ran on a document in an unresolved merge
+
+**`a55c2109e` ratified, and it is the sharpest correction I have taken
+tonight.**
+
+**`aea7924fd` landed as an unresolved merge.** The shipping file
+carried `<<<<<<<` / `=======` / `>>>>>>>` at lines **23–32 —
+INSIDE the fenced block a human pastes into the reviewer response** —
+and again at 112–174. **That commit says "verified programmatically"
+and "all six data rows re-verified: 0 mismatches."**
+
+**Both checks ran on the conflicted file and PASSED.** The merge left
+**both variants side by side**, so every row regex still matched *one*
+of them. **The checks were correct and the file was corrupt.** I
+certified a document that would have pasted `>>>>>>> 69d6877f2` to a
+reviewer.
+
+**mac-d's rule, adopted verbatim:**
+
+> **Grep any shipping surface for conflict markers before certifying
+> it. One line, unconditional, and no content check implies it.**
+
+**Structural integrity is a PRECONDITION of a content check, never an
+implication of one.** Every certifier I built tonight asks *"are the
+numbers right?"* — **not one could express *"is this file even a
+single document?"***
+
+**FIXED: `check_response_numbers.py` and `check_response_math.py`
+now REFUSE to certify** a file containing conflict markers, naming the
+line — the same shape as `claim_sweep`'s control-silent guard:
+**refuse rather than report clean.**
+
+**⚑ AND MY POSITIVE CONTROL FAILED FIRST, FOR THE THIRD TIME TONIGHT
+IN THE SAME WAY.** I injected markers into
+`PROPOSED_sycgen_excerpt_reviewer1.md` and the guard stayed silent —
+because `check_response_numbers` reads `reviewer_responses_1.md`,
+**a different file.** I had tested the guard against a document the
+checker never opens. Re-run against the real target: **both checkers
+refuse, naming line 436.**
+
+**That is the pattern in its purest form and it is now four-for-four:
+the `tail` fix, the sweep regex, the SURFACES list, and this — every
+fix tonight shipped with an error that its own control caught, and
+twice the control itself was the thing that was wrong.** The rule that
+keeps holding: **a guard you have not watched fire is a guard you have
+no reason to believe in.**
+
+**The unresolved merge also silently reverted three of mac-d's
+corrections** — both variants survived, so the superseded text came
+back. **Already re-applied at `3a445fc13`; the file on `origin` is
+clean and verified (0 markers, 0 untrained mentions in paste blocks,
+6/6 rows exact).**

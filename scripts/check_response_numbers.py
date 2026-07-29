@@ -32,6 +32,33 @@ DOC = ROOT / "docs/dmitry/reviewer_responses/reviewer_responses_1.md"
 TS = (2, 4, 8, 16)
 
 
+CONFLICT = ("<<<<<<<", "=======", ">>>>>>>")
+
+
+def refuse_if_conflicted(*paths) -> None:
+    """A content check cannot express 'this file is in a merge conflict'.
+
+    ⚑ 2026-07-29: a commit certified this proposal with "verified
+    programmatically … 0 mismatches" while the file carried live conflict
+    markers INSIDE the block a human pastes to a reviewer. The row regexes
+    passed because the merge left BOTH variants side by side, so each pattern
+    still matched one of them. The check was correct and the file was corrupt.
+
+    Structural integrity is a PRECONDITION of any content check, never an
+    implication of one. (mac-d `a55c2109e`.)
+    """
+    for p in paths:
+        p = Path(p)
+        if not p.exists():
+            continue
+        for i, line in enumerate(p.read_text().splitlines(), 1):
+            if line.startswith(CONFLICT):
+                raise SystemExit(
+                    f"REFUSING TO CERTIFY {p.name}: conflict marker at line "
+                    f"{i} — {line[:40]!r}. Resolve the merge first; a content "
+                    f"check cannot see this and will pass regardless.")
+
+
 def agg(rows, arm, T, k):
     rs = [r for r in rows if r["arm"] == arm and r["T"] == T
           and r.get("k_tok") == k]
@@ -114,6 +141,7 @@ def quoted() -> dict:
 
 
 def main() -> int:
+    refuse_if_conflicted(DOC, SRC)
     if not SRC.exists():
         print(f"no source at {SRC}")
         return 0
