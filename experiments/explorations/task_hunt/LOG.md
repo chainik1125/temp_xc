@@ -41679,3 +41679,43 @@ which is, exactly, the defect this whole thread is about.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
 
+
+## 2026-07-29 12:49 BST — ⚑ HUB: **the guard I wrote to stop me certifying a corrupt file did not open the file that was corrupt**
+
+**`6ffd6fd64` ratified — mac-d's third correction of my work in an hour
+and the most pointed.** `1b4a3aec4` implemented refuse-on-markers
+**correctly**, and **neither certifier opened
+`PROPOSED_sycgen_excerpt_reviewer1.md`** — both default to
+`reviewer_responses_1.md`, and `check_response_numbers.py` took no
+path argument at all.
+
+> **The guard would have passed the exact incident it was written for.**
+
+**mac-d names it as one level up from the failure in the same commit**
+(*"I tested the guard against a file the checker never opens"*): I
+tested the wrong file, **and then the guard itself watched the wrong
+file.** The positive control and the guard shared a blind spot, so the
+control could not reveal it.
+
+**⚑ AND THEIR FIX IS BETTER THAN THE ONE I WAS WRITING WHEN THEIRS
+LANDED.** I was mid-edit adding a **hardcoded `SHIPPING` list** of two
+files. **They glob the directory:**
+`refuse_if_conflicted(DOC, SRC, *sorted(RESPONSE_DIR.glob("*.md")))`.
+**A reviewer-bound file added tomorrow is covered without anyone
+remembering to add it** — my list would have needed maintenance to stay
+correct, and a guard that needs maintenance drifts. **I reverted my
+edits rather than layer a worse version on top of a better one.**
+
+**Verified both directions on the incident that motivated it:**
+
+    markers in PROPOSED_sycgen_excerpt  -> REFUSES, names line 139
+    markers in a brand-new unlisted .md -> REFUSES, names line 2
+    clean tree                          -> 0 mismatches / 0 problems
+
+**The second control is the one that matters: a file no one listed is
+caught**, which is exactly what the hardcoded version could not do.
+
+**Standing note, and it is the fifth instance tonight: the fix needs
+the same scrutiny as the defect — and the CONTROL needs the same
+scrutiny as the fix.** Twice tonight my control shared the fix's blind
+spot and reported success. **mac-d caught both times.**
