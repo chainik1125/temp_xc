@@ -98,6 +98,83 @@
    "n_train": 11994,
    "n_test": 4494,
    "wall_s": 4.3
+  },
+  "RECENCY_age/T16/actxmean_mlp": {
+   "acc_test": 0.40698710083961487,
+   "per_class": [
+    0.45260345935821533,
+    0.3504672944545746,
+    0.4178905189037323
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 24.4
+  },
+  "RECENCY_age/T32/visible_evidence_floor": {
+   "acc_test": 0.4926568865776062,
+   "per_class": [
+    0.4779706299304962,
+    1.0,
+    0.0
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.1
+  },
+  "RECENCY_age/T32/actxmean_linear": {
+   "acc_test": 0.41499778628349304,
+   "per_class": [
+    0.4612817168235779,
+    0.3384512662887573,
+    0.44526034593582153
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 4.8
+  },
+  "RECENCY_age/T32/actxmean_mlp": {
+   "acc_test": 0.4327992796897888,
+   "per_class": [
+    0.5026702284812927,
+    0.3324432671070099,
+    0.46328437328338623
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 24.9
+  },
+  "RECENCY_age/T32/actxmean_foreign_linear": {
+   "acc_test": 0.3696039021015167,
+   "per_class": [
+    0.3851802349090576,
+    0.3391188383102417,
+    0.38451269268989563
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 4.6
+  },
+  "RECENCY_age/T64/visible_evidence_floor": {
+   "acc_test": 0.6081441640853882,
+   "per_class": [
+    0.8244325518608093,
+    1.0,
+    0.0
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 0.2
+  },
+  "RECENCY_age/T64/actxmean_linear": {
+   "acc_test": 0.46595460176467896,
+   "per_class": [
+    0.5240320563316345,
+    0.38117489218711853,
+    0.4926568865776062
+   ],
+   "n_train": 11994,
+   "n_test": 4494,
+   "wall_s": 4.7
   }
  }
 }

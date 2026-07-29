@@ -205,3 +205,32 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# ---------------------------------------------------------------------------
+# PRE-REGISTRATION ADDENDUM — written 02:2x BST, BEFORE the retryesc_gen
+# numbers existed (the run was in flight; evalage was already reported).
+#
+# The original card fixed the per-corpus analysis but never said how to
+# COMBINE two corpora, and the obvious choice is a trap:
+#
+#   ⚑ DO NOT POOL THE TWO CORPORA INTO ONE SPEARMAN.
+#     evalage sits systematically higher than retryesc_gen on BOTH axes
+#     (its per-token signal is ~2.4x stronger). Pooling would therefore
+#     report a high rank correlation driven by the BETWEEN-corpus offset
+#     — a corpus effect wearing the costume of a within-corpus law. It
+#     would look like strong confirmation of my own hypothesis and would
+#     mean almost nothing. This is the same shape as every in-sample
+#     instrument that inverted tonight.
+#
+#   RULE, fixed now:
+#     * A1 is assessed WITHIN each corpus separately; both Spearmans are
+#       reported side by side, never pooled and never averaged.
+#     * A2's ratio range is reported per corpus. If the two ranges do not
+#       overlap, the "constant multiplier" reading is DEAD even if both
+#       correlations are +1.
+#     * A3 (the kill condition) is the one criterion that DOES apply
+#       across corpora: ANY face on EITHER corpus with tok_excess <= 0.02
+#       and arm_excess >= 0.05 refutes A1 outright.
+#     * If retryesc's Spearman is materially below evalage's, the honest
+#       report is "holds on one corpus, not the other" — NOT an average.
+# ---------------------------------------------------------------------------
