@@ -15,7 +15,6 @@ import pandas as pd
 POWER_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_INPUT = POWER_ROOT / "results" / "overnight_remote" / "benchmark_analysis.json"
 DEFAULT_FIGURES = POWER_ROOT / "figures"
-DEFAULT_RESULTS = POWER_ROOT / "results" / "overnight_remote"
 
 MODELS = (
     "txc_pre",
@@ -33,7 +32,7 @@ MODEL_LABELS = {
     "txc_post": "TXC-post",
     "spectral_v1": "Spectral v1",
     "v2_remove_dc": "−DC",
-    "v2_dominance": "Dominance",
+    "v2_dominance": "Band flatten.",
     "v2_freq_matryoshka": "Freq-Mat.",
     "v2_combined": "Combined",
     "v2_global": "Global top-k",
@@ -106,10 +105,18 @@ def plot_primary(frame: pd.DataFrame, output: Path) -> None:
     plt.close(fig)
 
 
-def plot_deltas(frame: pd.DataFrame, output: Path) -> None:
-    variants = [model for model in MODELS if model != "txc_pre"]
+def plot_deltas(
+    frame: pd.DataFrame,
+    output: Path,
+    *,
+    baseline: str = "txc_pre",
+) -> None:
+    if baseline not in MODELS:
+        raise ValueError(f"unknown baseline {baseline!r}")
+    variants = [model for model in MODELS if model != baseline]
+    delta_column = f"delta_vs_{baseline}"
     table = (
-        frame.pivot(index="model", columns="task", values="delta_vs_txc_pre")
+        frame.pivot(index="model", columns="task", values=delta_column)
         .reindex(index=variants, columns=TASKS)
         .astype(float)
     )
@@ -133,7 +140,10 @@ def plot_deltas(frame: pd.DataFrame, output: Path) -> None:
         np.arange(len(variants)), [MODEL_LABELS[model] for model in variants]
     )
     axis.tick_params(axis="x", rotation=25)
-    axis.set_title("Paired primary-metric delta versus equal-support TXC-pre")
+    axis.set_title(
+        "Paired primary-metric delta versus "
+        f"{MODEL_LABELS[baseline]}"
+    )
     colorbar = fig.colorbar(image, ax=axis, pad=0.02)
     colorbar.set_label("Recovery delta")
     fig.tight_layout()
@@ -188,7 +198,6 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
     parser.add_argument("--figures-dir", type=Path, default=DEFAULT_FIGURES)
-    parser.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS)
     return parser.parse_args()
 
 
@@ -210,10 +219,13 @@ def main() -> None:
             "expected three paired seeds per cell: "
             f"{wrong_n.to_dict(orient='records')}"
         )
-    args.results_dir.mkdir(parents=True, exist_ok=True)
-    frame.to_csv(args.results_dir / "benchmark_aggregate.csv", index=False)
     plot_primary(frame, args.figures_dir / "benchmark_primary_metrics.png")
     plot_deltas(frame, args.figures_dir / "benchmark_delta_vs_txc_pre.png")
+    plot_deltas(
+        frame,
+        args.figures_dir / "benchmark_delta_vs_spectral_v1.png",
+        baseline="spectral_v1",
+    )
     plot_recovery_nmse(frame, args.figures_dir / "benchmark_recovery_nmse.png")
     print(
         frame.pivot(index="model", columns="task", values="mean")
