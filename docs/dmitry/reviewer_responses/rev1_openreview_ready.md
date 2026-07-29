@@ -28,20 +28,20 @@ To prove that the TXC uses temporal information, we introduce a synthetic task w
 
 For h = 2, recovery below three steps is bounded at the chance accuracy of 1/11 ≈ 0.09. All methods satisfy this ceiling. Beyond the threshold, TXC accuracy improves from 0.15 at W = 3 to near-perfect recovery, 0.96, at W = 10.
 
-**Secret-recovery accuracy** (parentheses give the selected k):
+**Secret-recovery accuracy:**
 
 | Architecture | W = 1 | W = 2 | W = 3 | W = 4 | W = 5 | W = 10 |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Chance | 0.09 | 0.09 | 0.09 | 0.09 | 0.09 | 0.09 |
-| SAE | 0.10 (2) | 0.10 (10) | 0.10 (1) | 0.09 (2) | 0.09 (1) | 0.10 (10) |
-| Stacked SAE | 0.10 (2) | 0.09 (5) | 0.10 (1) | 0.10 (2) | 0.10 (10) | 0.11 (5) |
-| T-SAE | — | 0.10 (5) | 0.10 (5) | 0.10 (2) | 0.10 (2) | 0.12 (2) |
-| TFA | — | 0.10 (2) | 0.10 (2) | 0.10 (10) | 0.10 (1) | 0.09 (2) |
+| SAE | 0.10 | 0.10 | 0.10 | 0.09 | 0.09 | 0.10 |
+| Stacked SAE | 0.10 | 0.09 | 0.10 | 0.10 | 0.10 | 0.11 |
+| T-SAE | — | 0.10 | 0.10 | 0.10 | 0.10 | 0.12 |
+| TFA | — | 0.10 | 0.10 | 0.10 | 0.10 | 0.09 |
 | TXC, k = 1 | 0.10 | 0.09 | 0.13 | 0.19 | 0.29 | 0.63 |
 | TXC, k = 2 | 0.10 | 0.09 | **0.15** | **0.32** | **0.56** | 0.91 |
 | TXC, k = 5 | 0.09 | 0.09 | 0.10 | 0.10 | 0.16 | **0.96** |
 
-For every non-TXC baseline, parentheses give the selected k independently at each window size. We sweep k over {1, 2, 5, 10, 20} and choose the best k.
+For every non-TXC baseline, we sweep k over {1, 2, 5, 10, 20} and report the best accuracy independently at each window size.
 
 ### Seed dependence
 

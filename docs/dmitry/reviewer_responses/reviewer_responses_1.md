@@ -72,22 +72,22 @@ In the synthetic setting, we prove that temporal information is responsible for 
 
 For the $h=2$, recovery is bounded to chance accuracy is $1/11=0.091$ below *3* steps. All methods satisfy this ceiling; beyond the threshold, the TXC improves from $0.15$ at $W=3$ to near perfect recovery, $0.96$ at $W=10$.
 
-**Secret-recovery accuracy** (parentheses give the selected k):
+**Secret-recovery accuracy:**
 
 | Architecture | W = 1 | W = 2 | W = 3 | W = 4 | W = 5 | W = 10 |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Chance | 0.091 | 0.091 | 0.091 | 0.091 | 0.091 | 0.091 |
-| SAE, best k | 0.099 (2) | 0.095 (10) | 0.10 (1) | 0.092 (2) | 0.094 (1) | 0.095 (10) |
-| Stacked SAE, best k | 0.10 (2) | 0.092 (5) | 0.10 (1) | 0.097 (2) | 0.098 (10) | 0.11 (5) |
-| T-SAE, best k | — | 0.095 (5) | 0.10 (5) | 0.096 (2) | 0.10 (2) | 0.12 (2) |
-| TFA, best k | — | 0.096 (2) | 0.10 (2) | 0.10 (10) | 0.098 (1) | 0.094 (2) |
+| SAE, best k | 0.099 | 0.095 | 0.10 | 0.092 | 0.094 | 0.095 |
+| Stacked SAE, best k | 0.10 | 0.092 | 0.10 | 0.097 | 0.098 | 0.11 |
+| T-SAE, best k | — | 0.095 | 0.10 | 0.096 | 0.10 | 0.12 |
+| TFA, best k | — | 0.096 | 0.10 | 0.10 | 0.098 | 0.094 |
 | TXC, k = 1 | 0.10 | 0.091 | 0.13 | 0.19 | 0.29 | 0.63 |
 | TXC, k = 2 | 0.098 | 0.087 | **0.15** | **0.32** | **0.56** | 0.91 |
 | TXC, k = 5 | 0.092 | 0.088 | 0.097 | 0.097 | 0.16 | **0.96** |
 
-For every non-TXC baseline, parentheses give the selected k independently at
-each window size. We sweep k ∈ {1, 2, 5, 10} for SAE and Stacked SAE, and
-k ∈ {1, 2, 5, 10, 20} for T-SAE and TFA. Results use episode-disjoint
+For every non-TXC baseline, we select the best k independently at each window
+size. We sweep k ∈ {1, 2, 5, 10} for SAE and Stacked SAE, and k ∈ {1, 2, 5,
+10, 20} for T-SAE and TFA. Results use episode-disjoint
 representation-training, probe-training, and validation sets, with one
 evaluation window per episode.
 
@@ -319,21 +319,21 @@ For h = 2, recovery below three steps is bounded at the chance accuracy of
 accuracy improves from 0.15 at W = 3 to near-perfect recovery, 0.96, at
 W = 10.
 
-**Secret-recovery accuracy** (parentheses give the selected k):
+**Secret-recovery accuracy:**
 
 | Architecture | W = 1 | W = 2 | W = 3 | W = 4 | W = 5 | W = 10 |
 | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
 | Chance | 0.09 | 0.09 | 0.09 | 0.09 | 0.09 | 0.09 |
-| SAE | 0.10 (2) | 0.10 (10) | 0.10 (1) | 0.09 (2) | 0.09 (1) | 0.10 (10) |
-| Stacked SAE | 0.10 (2) | 0.09 (5) | 0.10 (1) | 0.10 (2) | 0.10 (10) | 0.11 (5) |
-| T-SAE | — | 0.10 (5) | 0.10 (5) | 0.10 (2) | 0.10 (2) | 0.12 (2) |
-| TFA | — | 0.10 (2) | 0.10 (2) | 0.10 (10) | 0.10 (1) | 0.09 (2) |
+| SAE | 0.10 | 0.10 | 0.10 | 0.09 | 0.09 | 0.10 |
+| Stacked SAE | 0.10 | 0.09 | 0.10 | 0.10 | 0.10 | 0.11 |
+| T-SAE | — | 0.10 | 0.10 | 0.10 | 0.10 | 0.12 |
+| TFA | — | 0.10 | 0.10 | 0.10 | 0.10 | 0.09 |
 | TXC, k = 1 | 0.10 | 0.09 | 0.13 | 0.19 | 0.29 | 0.63 |
 | TXC, k = 2 | 0.10 | 0.09 | **0.15** | **0.32** | **0.56** | 0.91 |
 | TXC, k = 5 | 0.09 | 0.09 | 0.10 | 0.10 | 0.16 | **0.96** |
 
-For every non-TXC baseline, parentheses give the selected k independently at
-each window size. We sweep k over {1, 2, 5, 10, 20} and choose the best k.
+For every non-TXC baseline, we sweep k over {1, 2, 5, 10, 20} and report the
+best accuracy independently at each window size.
 
 
 <!-- ============================================================
