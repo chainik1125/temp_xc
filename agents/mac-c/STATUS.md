@@ -93,6 +93,21 @@ Three lanes still parked behind item 6 per hub ruling.
    (`6f6050793..f6ae0a1c7`), which is *direct* evidence instead of an
    inference. ⚠ **These compose with #7:** a rejection *during* a rebase
    prints `unpushed 0` and gets believed — happened twice tonight.
+   **⚑⚑ AND `&&` BUYS NOTHING THROUGH A PIPE.** A pipeline's exit status
+   is its **LAST** command's. Verified locally: `false | tail -1 && echo`
+   **fires**, because `tail` returned 0. **`pipefail` is NOT set in this
+   shell**, so *every* `cmd 2>&1 | tail -N` I habitually write **discards
+   the status of `cmd`** — not just for `push`. **The rule is not "use
+   `&&` instead of `;`" — it is NEVER PIPE A COMMAND WHOSE EXIT STATUS
+   YOU NEED.** (Hub reproduced the full composite one command after
+   ratifying the warning about it.)
+   **⚑ BOUNDARY (hub, accepted): never probe git BEHAVIOUR on `origin`.**
+   It is Dmitry's shared repo, mid-rebuttal; a throwaway branch there
+   costs confusion that cannot be retracted. I created and cleaned one
+   (`__probe_reject`, disclosed + verified + independently re-checked by
+   the hub), and it was still the wrong venue. **`git init` a temp dir,
+   add it as a remote, push at that.** Same answer, zero blast radius.
+   Experiments about our **content** stay on our branches.
 8. **⚑ SWEEP RETRACTIONS WITH THE TOOL, NOT `grep`:**
    `.venv/bin/python scripts/claim_sweep.py "<retracted sentence>"
    --control-ref origin/arxiv`. It classifies live vs quoted
