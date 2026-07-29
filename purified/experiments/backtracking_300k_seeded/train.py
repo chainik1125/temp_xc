@@ -161,6 +161,11 @@ def main() -> int:
             f"unexpected activation cache contract: shape={acts_np.shape}, dtype={acts_np.dtype}"
         )
     acts = torch.from_numpy(np.ascontiguousarray(acts_np)).clone()
+    if torch.cuda.is_available():
+        # The 4 GB cache fits comfortably beside every production model on
+        # A40/H100. Keeping it on the pinned worker GPU removes an ~80 MB
+        # host-to-device transfer and CPU gather from every training step.
+        acts = acts.cuda()
     n_sequences, sequence_length, d_in = acts.shape
 
     set_seed(args.seed)
@@ -183,9 +188,13 @@ def main() -> int:
     def batch_iter(n: int) -> torch.Tensor:
         sequence_indices = sampler.integers(0, n_sequences, size=n)
         position_indices = sampler.integers(0, sequence_length - window_size + 1, size=n)
-        sequence_index = torch.from_numpy(sequence_indices.astype(np.int64, copy=False))
-        position_index = torch.from_numpy(position_indices.astype(np.int64, copy=False))
-        offsets = torch.arange(window_size, dtype=torch.int64)
+        sequence_index = torch.as_tensor(
+            sequence_indices.astype(np.int64, copy=False), device=acts.device
+        )
+        position_index = torch.as_tensor(
+            position_indices.astype(np.int64, copy=False), device=acts.device
+        )
+        offsets = torch.arange(window_size, dtype=torch.int64, device=acts.device)
         # This is bit-for-bit equal to the historical per-row copy loop, but
         # avoids 1,024 Python-level tensor assignments on every training step.
         return acts[
