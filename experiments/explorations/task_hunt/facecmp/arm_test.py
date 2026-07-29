@@ -153,6 +153,26 @@ def build_rows(key: str):
     tag = TOK_TAG[key]
     z = np.load(GRIDS / GRID_PAT.format(tag=tag))
     c = np.load(CACHE_ROOT / key / "tokens.npz")
+    # ⚑ GRID-vs-CACHE AGREEMENT GUARD (mac-c 2026-07-29 02:5x). A caller
+    # can override CACHE_ROOT without overriding GRIDS/GRID_PAT —
+    # `lane_b_errorbar.py` reads only FACECMP_CACHE_ROOT and does exactly
+    # that. The pairing then goes UNDETECTED: `doc_idx` indexes the
+    # cache's corpus, docs beyond it map to -1, and `elig`'s
+    # `rows_flat >= 0` filters them out BEFORE the
+    # `assert (rows_all >= 0).all()` below — so a mismatch yields a
+    # smaller but entirely plausible-looking run on the overlap, with
+    # activations from one corpus and labels from another.
+    # Strictly additive: only checks caches that record their grid, so
+    # every frozen run that was correct still passes.
+    _meta = CACHE_ROOT / key / "acts_meta.json"
+    if _meta.exists():
+        _m = json.loads(_meta.read_text())
+        _want = GRID_PAT.format(tag=tag)
+        if _m.get("grid") and _m["grid"] != _want:
+            raise AssertionError(
+                f"GRID/CACHE MISMATCH: cache {CACHE_ROOT} was built from "
+                f"{_m['grid']!r} but GRID_PAT resolves to {_want!r}. "
+                f"Set at.GRIDS and at.GRID_PAT together with at.CACHE_ROOT.")
     ids, doc_idx, n_prefix = c["ids"], c["doc_idx"], int(c["n_prefix"])
     content = ids.shape[1] - n_prefix
     off, first, mask = z["doc_off"], z["event_first"], z["event_mask"]
