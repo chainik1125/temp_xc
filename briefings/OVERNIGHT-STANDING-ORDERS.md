@@ -120,6 +120,31 @@ paste block, **no links, no images, no plots**, and inline `$…$` must
 **never wrap across a line** — that last one is what broke the table
 twice and it is invisible on inspection.
 
+**⚑ VOICE — Han, 01:5x: *"rebuttal responses must be written in clear,
+plain language, NO AGENTIC JARGON."*** The reviewer has not read our
+LOG and does not share our vocabulary. **Every internal term is a cost
+to them and a tell that the text was not written for them.**
+
+| do not write | write |
+|---|---|
+| `sycgen`, task codenames | describe the data in a clause |
+| "per-token-silent state" | "not visible in any single token" |
+| "budget", "l0 budget" | "sparsity" |
+| "seed spread" | "variation across seeds" |
+| "matched measured `realized_l0_per_window`" | "read off at the sparsity the TXC actually uses" |
+| "narrow positive", "outcome (d)" | say what the numbers show |
+| "real-model task" | "real world task" (the document's own phrase) |
+
+**Match the document's existing register**, which is declarative:
+*"beyond the threshold, the TXC improves from 0.154 at W=3 to near
+perfect recovery, 0.956 at W=10."* State what was done and what the
+numbers are. **Caveats belong in clauses, not paragraphs** — hedging
+competes with the claim for the same sentence and both lose.
+
+**Check before pushing:** internal terms must appear **zero** times in
+the *rendered* text (HTML comments do not render and may keep them for
+our own bookkeeping).
+
 **If a number moves in a direction that weakens a delivered claim, log
 it and update the surfaces anyway.** *A sound verdict, never a win.*
 

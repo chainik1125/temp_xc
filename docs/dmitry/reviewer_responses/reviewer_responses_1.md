@@ -359,14 +359,16 @@ $$
      section's DOUBLE-backslash convention, for pasting only.
      ============================================================ -->
 
-## New real-model task: sycophancy-under-challenge (sycgen)
+## A new real world task: how long since the user last challenged the model
 
-We add a real world task whose state is not visible in any single token: in a
-sycophancy-under-challenge corpus, the label is the number of tokens since the
-user last challenged the assistant. We compare against pooled and stacked SAEs
-at matched sparsity, sweeping $k$ on both baselines and evaluating each at the
-TXC's own measured $L_0$ per window. Three seeds; Llama-3.1-8B layer 14,
-$d_{\text{SAE}}=2048$. The per-token SAE reaches $0.482$.
+We add a real world task in which the quantity being probed is not visible in
+any single token. The data is multi-turn dialogue where the user repeatedly
+questions the model's answers, and the label at each position is the number of
+tokens since the user last challenged it. We compare the TXC against a pooled
+SAE (the mean of the per-token codes across the window) and a stacked SAE (the
+same codes concatenated), matched on sparsity: we sweep $k$ for both baselines
+and read each one off at the sparsity the TXC actually uses. Three seeds;
+Llama-3.1-8B, layer 14, $d_{\text{SAE}}=2048$. A per-token SAE reaches $0.482$.
 
 $$
 \begin{array}{l|cccc}
@@ -385,10 +387,10 @@ $$
 
 The TXC improves with window size, from $0.499$ at $T{=}2$ to $0.577$ at
 $T{=}16$, and is above both baselines at every window size; at $T{=}2$ and
-$T{=}4$ its margin over pooled is within the seed spread. Starred entries mark
-baselines that cannot reach the TXC's sparsity, so they are scored at a higher
-budget than the TXC. Stacked's collapse at $T\ge8$ reflects its input
-dimension of $T\cdot d_{\text{SAE}}$ rather than the architecture.
+$T{=}4$ the margin over the pooled SAE is smaller than the variation across
+seeds. Starred entries are baselines that cannot run as sparsely as the TXC,
+so they are read off at a higher sparsity and the comparison favours them. The
+stacked SAE's drop at $T\ge8$ comes from its input growing to $T\cdot d_\text{SAE}$, not from the architecture.
 
 <!-- ===================== END ADDED (sycgen) ===================== -->
 
@@ -458,14 +460,16 @@ For every non-TXC baseline, subscripts give the selected k independently at each
      after applying the markdown unescape: 0 failures.
      ============================================================ -->
 
-### A real world task with per-token-silent state
+### A new real world task: how long since the user last challenged the model
 
-We add a real world task whose state is not visible in any single token: in a
-sycophancy-under-challenge corpus, the label is the number of tokens since the
-user last challenged the assistant. We compare against pooled and stacked SAEs
-at matched sparsity, sweeping $k$ on both baselines and evaluating each at the
-TXC's own measured $L_0$ per window. Three seeds; Llama-3.1-8B layer 14,
-$d_{\\text{SAE}}=2048$. The per-token SAE reaches $0.482$.
+We add a real world task in which the quantity being probed is not visible in
+any single token. The data is multi-turn dialogue where the user repeatedly
+questions the model's answers, and the label at each position is the number of
+tokens since the user last challenged it. We compare the TXC against a pooled
+SAE (the mean of the per-token codes across the window) and a stacked SAE (the
+same codes concatenated), matched on sparsity: we sweep $k$ for both baselines
+and read each one off at the sparsity the TXC actually uses. Three seeds;
+Llama-3.1-8B, layer 14, $d_{\\text{SAE}}=2048$. A per-token SAE reaches $0.482$.
 
 $$
 \\begin{array}{l|cccc}
@@ -484,10 +488,10 @@ $$
 
 The TXC improves with window size, from $0.499$ at $T{=}2$ to $0.577$ at
 $T{=}16$, and is above both baselines at every window size; at $T{=}2$ and
-$T{=}4$ its margin over pooled is within the seed spread. Starred entries mark
-baselines that cannot reach the TXC's sparsity, so they are scored at a higher
-budget than the TXC. Stacked's collapse at $T\\ge8$ reflects its input
-dimension of $T\\cdot d_{\\text{SAE}}$ rather than the architecture.
+$T{=}4$ the margin over the pooled SAE is smaller than the variation across
+seeds. Starred entries are baselines that cannot run as sparsely as the TXC,
+so they are read off at a higher sparsity and the comparison favours them. The
+stacked SAE's drop at $T\\ge8$ comes from its input growing to $T\\cdot d_\\text{SAE}$, not from the architecture.
 
 <!-- ===================== END ADDED (sycgen) ===================== -->
 
