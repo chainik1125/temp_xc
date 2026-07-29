@@ -1,8 +1,13 @@
 # ICLR 2027 / arXiv revision plan
 
 **Recorded:** 2026-07-29  
-**Status:** Team direction proposed by Dmitry after the NeurIPS responses,
-not yet a frozen experiment contract.
+**Status:** Earlier broad revision sketch retained for provenance. Its
+GPU-heavy two-week sequence is superseded by the July 29 reading-first plan.
+
+The July 29 one-on-one refined the immediate experiment contract and moved the
+next week into literature-review mode. See the
+[Backtracking closeout and Temporal Screen pivot](temporal-screen/july29-plan.md)
+for the current execution and research sequence.
 
 ## Deadline contract
 
@@ -84,7 +89,12 @@ order-invariant, globally supervised, or underpowered. Dictionary training
 starts only after the raw temporal opportunity gate passes. This is the main
 protection against task cherry-picking.
 
-## Two-week internal push
+## Superseded two-week internal push
+
+The sequence below is retained as the initial proposal, not the active
+schedule. The July 29 one-on-one replaced its first week of task screening and
+dictionary experiments with literature review, task inventory, and Temporal
+Screen design.
 
 1. **Days 1--2: freeze the scientific contract.** Choose the exact regular-TXC
    nonlinearity, write the screen thresholds, lock task/seed/window grids, and
