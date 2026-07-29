@@ -36,7 +36,7 @@ paper's own protocols, one training seed (42), window T=5.
    Notably the same cell at T=4 scored 0.512 — the win is T-sensitive.
    Follow-up (2026-07-29): the EM *steering* cell also ran, through the
    paper's own Wang stage-4 pipeline on the same weights. Same-grid
-   comparison: stacked Δalign|coh≥70 = 13.6 vs TXC 17.1 (TXC 1.26×),
+   comparison: stacked Δalign|coh≥70 = 13.3 vs TXC 17.1 (TXC 1.29×, headline-finalist convention),
    but on the pipeline's peak-align criterion the ordering reverses
    (stacked 69.3 vs TXC 74.6, lower = stronger; SAE-arditi 68.5 wins) —
    EM steering differences sit within summary-convention sensitivity,
@@ -62,7 +62,7 @@ paper's own protocols, one training seed (42), window T=5.
 | C3 probing | mean AUC, 38 tasks | 0.8694 | 0.89 (TXC) | 0.8026 |
 | C6 EM detection | PR-AUC @ S=16 | 0.6516† | 0.54 (TXC) | 0.3442 |
 | RLHF decomposition | pref AUC @ k=20 | 0.602 | 0.61 | **0.6174** |
-| C6 EM steering | Δalign\|coh≥70 (same grid) | 13.6 | 17.1 (TXC) | n/a |
+| C6 EM steering | Δalign\|coh≥70 (same grid) | 13.3 | 17.1 (TXC) | n/a |
 
 † see finding 3. Floor note: the untrained RLHF floor (0.6174)
 *exceeds* both the trained stacked cell (0.602) and the 0.61 headline —
