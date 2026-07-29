@@ -228,7 +228,7 @@ matrix.**
   (`<arch_id>__seed42.pt`, incl. `agentic_txc_02`) +
   `temp-bench-models` (c3 cells) — see COMPOSITION_AUDIT §3.
 
-## 5. FLEET MAP — snapshot **12:23 BST 07-29, API-verified**
+## 5. FLEET MAP — snapshot **14:07 BST 07-29, API-verified**
 
 This section dates fast. **Live sources: `agents/<id>/STATUS.md` + the
 LOG tail** — trust those over this snapshot if they disagree.
@@ -251,16 +251,14 @@ is durable on origin + HF; their containers are not.
 M5 Pro / 18 cores / **48 GB unified** (mac-d, `96e34816a`). Agent count
 is **not** machine count; plan concurrency accordingly.
 
-### Pods now (API-verified 12:23 07-29 — **re-query with `scripts/pod_inventory.py`; the set turns over in minutes**)
+### Pods now (API-verified 14:07 07-29 — **re-query with `scripts/pod_inventory.py`; the set turns over in minutes**)
 
-**1 RUNNING, $0.00/h — ALL unattributed. Agent GPU spend $0.00/h.**
+**NO PODS RUNNING. $0.00/h — agent and unattributed alike.** Every pod
+from the overnight, ours and Dmitry's, has been terminated.
 
-    total $0.00/h   ours $0.00/h   unattributed $0.00/h
-
-**`stacked-em-steer` and `mats-lenctl-h100` have TERMINATED since the
-last stamp.** ⚑ `stacked-em-steer` was reviewer 1's requested
-Stacked-SAE-on-EM baseline — **the quoted EM figures may have moved;
-check before freezing that section** (hub watch, LOG 02:5x).
+**⚑ `stacked-em-steer` ran reviewer 1's Stacked-SAE-on-EM baseline and
+has finished — the quoted EM figures may have moved; check before
+freezing that section** (hub watch, LOG 02:5x).
 
 **⚑ Read this list with `scripts/pod_inventory.py`, never through
 `tail`.** A truncated read at 01:47 dropped a row and reported a
