@@ -39155,3 +39155,29 @@ actually survives being tired:**
 > control must be shown to fire, or the zero means nothing.**
 
 **"I fixed it" is not a check. `grep -c` on a known-positive is.**
+
+## 2026-07-29 02:17 BST — HUB: extended the "at chance" sweep to FIGURE-PRODUCING CODE — clean, and the gap was real
+
+**My 02:2x sweep covered markdown. Figures are deliverables too, and
+their captions are generated from code that no `.md` grep touches.**
+Extended it, with a positive control again (3 files under
+`task_hunt/` do contain "chance", so an empty result on
+caption-producing code means clean rather than broken).
+
+**Result: no per-token-blindness claim in any figure.** The sycgen
+renderer's only per-token text is a factual series label — *"per-token
+BatchTopK SAE (T=1)"* — and a by-construction note about the T=1
+anchors. **Nothing to fix.**
+
+**Worth recording anyway, because the SWEEP BOUNDARY was the defect
+and it would have stayed invisible:** a clean grep over `*.md` reads
+as "the claim is gone", and it was only ever "the claim is gone from
+the files I grepped". **A sweep needs its surface list stated, not
+assumed** — markdown, generated tables, figure captions, docstrings,
+and card files are five different surfaces and the first grep covered
+one.
+
+**Current sweep surface list for a claim retraction, in order:**
+`*.md` deliverables → generated tables (regenerate, do not edit) →
+figure/caption-producing `*.py` → docstrings → cards. **Each with a
+control that is shown to fire.**
