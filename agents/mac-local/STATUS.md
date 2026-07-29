@@ -116,8 +116,11 @@ Now **4 non-convention pods at $9.41/h** (was 3 at $3.87/h):
 | `stacked-em-steer` | 2.99 (H100) | **NEW** |
 | `tsae-paper-widthmatch-probing` | 0.44 (A40) | was already up |
 
-`mats-gap-code-h100` and `tsae-paper-widthmatch-em` are **gone**. Total
-fleet incl. mac-d's A40 = **$9.85/h**. **Never touched** (house rule:
+**⚑ CORRECTED 02:0x — an earlier read used `tail -8` and lost a row.**
+**5 unattributed pods = $12.40/h ≈ $298/day** (`mats-lenctl-h100`,
+`reviewer-btk-tsae-300k`, `reviewer-headline-multiseed`,
+`stacked-em-steer`, `tsae-paper-widthmatch-probing`). Ours: $2.20/h.
+Total fleet **$14.60/h**. Use `scripts/pod_inventory.py` — never `tail`. **Never touched** (house rule:
 agents do not modify pods they did not spin up). **Han's call, still
 pending** — and it is now ~**$226/day**, not ~$93.
 

@@ -38758,3 +38758,50 @@ dissolved into a bookkeeping error instead of producing this.**
 strong?** Exactly where the upper-edge measurement predicted the
 binding constraint would sit. **Neither of tonight's two instruments
 measures it.**
+
+## 2026-07-29 02:03 BST — ⚑ HUB CORRECTION: **I reported a pod as GONE that was still running, and under-reported the unattributed burn by $3/h.** `tail -8` did it
+
+**My 01:47 entry is WRONG and is corrected here.** It said
+*"`reviewer-btk-tsae-300k` **gone**, `mats-lenctl-h100` new. Still 4
+pods, still **$9.41/h**."*
+
+**Full untruncated query just now — 7 RUNNING pods:**
+
+    mac-d-sycshuffle-0729           $0.44  OURS
+    mac-d-sycshuffle8-0729          $1.76  OURS
+    mats-lenctl-h100                $2.99  unattributed
+    reviewer-btk-tsae-300k          $2.99  unattributed   <- NEVER LEFT
+    reviewer-headline-multiseed     $2.99  unattributed
+    stacked-em-steer                $2.99  unattributed
+    tsae-paper-widthmatch-probing   $0.44  unattributed
+
+    total $14.60/h   ours $2.20/h   UNATTRIBUTED $12.40/h
+
+**CAUSE: I piped the listing through `tail -8` and the top row fell
+off.** `reviewer-btk-tsae-300k` never stopped running. **Unattributed
+is $12.40/h ≈ $298/day, not the $9.41/h ≈ $226/day I reported to
+Han** — a $3/h under-report on the one number he has to decide about.
+
+**⚑ AND THE NARRATIVE I BUILT ON IT WAS EXACTLY BACKWARDS.** I wrote:
+*"third distinct composition tonight at a near-constant total — which is
+exactly why the standing check is to diff the SET, not the sum. A stable
+number here means nothing."* **The total was constant BECAUSE THE SET
+WAS CONSTANT.** The sum was the only trustworthy thing on my screen and
+the set-diff was the corrupted part. **I used a real methodological
+lesson to explain an artifact of my own display**, which is worse than
+having no lesson — it made a truncation look like a finding, and made
+the finding sound principled.
+
+**The tell was there and I walked past it:** the total read $14.60/h at
+01:46 while my per-pod rows summed to $11.61. **I quoted both numbers
+in the same entry and did not add them up.** A total that disagrees with
+its own itemisation is a truncated list every time.
+
+**FIX: `scripts/pod_inventory.py`** — prints the RUNNING count and
+**every** row, sums only RUNNING, reads the key from **stdin** (never
+argv). **Never `tail` a list whose length you do not control.**
+
+**What is unchanged:** the 01:2x entry ($3.87 → $9.41 with three new
+H100s) was from an untruncated query and stands. **The pods remain
+untouched** — house rule holds regardless of what they cost. **Han's
+decision is now about $298/day.**
