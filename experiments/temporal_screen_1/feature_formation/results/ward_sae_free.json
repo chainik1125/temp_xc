@@ -1,0 +1,3635 @@
+{
+  "caveat": "Event-aligned observational calibration; a causal formation claim requires checkpoint branching and attention intervention.",
+  "curves": {
+    "positionwise_local": [
+      {
+        "auc": 0.6643183337046112,
+        "log_loss_gain_nats": 0.03747534284190779,
+        "offset": -64
+      },
+      {
+        "auc": 0.60208286923591,
+        "log_loss_gain_nats": 0.005055416093624698,
+        "offset": -60
+      },
+      {
+        "auc": 0.629998329249276,
+        "log_loss_gain_nats": 0.022197225262709064,
+        "offset": -56
+      },
+      {
+        "auc": 0.602723323680107,
+        "log_loss_gain_nats": 0.006895335548707249,
+        "offset": -52
+      },
+      {
+        "auc": 0.6394102249944309,
+        "log_loss_gain_nats": 0.019680850972920605,
+        "offset": -48
+      },
+      {
+        "auc": 0.5721068166629539,
+        "log_loss_gain_nats": -0.007018598234945106,
+        "offset": -44
+      },
+      {
+        "auc": 0.5765760748496324,
+        "log_loss_gain_nats": 0.0010748849630446422,
+        "offset": -40
+      },
+      {
+        "auc": 0.6075824237023836,
+        "log_loss_gain_nats": -0.0005762595537218695,
+        "offset": -36
+      },
+      {
+        "auc": 0.5586711962575184,
+        "log_loss_gain_nats": -0.018564667487596664,
+        "offset": -32
+      },
+      {
+        "auc": 0.66043383827133,
+        "log_loss_gain_nats": 0.03964077699043134,
+        "offset": -31
+      },
+      {
+        "auc": 0.6324348407217644,
+        "log_loss_gain_nats": 0.013527920811916783,
+        "offset": -30
+      },
+      {
+        "auc": 0.5591306527066162,
+        "log_loss_gain_nats": -0.013454978598413492,
+        "offset": -29
+      },
+      {
+        "auc": 0.6354004232568501,
+        "log_loss_gain_nats": 0.014558409888350998,
+        "offset": -28
+      },
+      {
+        "auc": 0.6064685898863889,
+        "log_loss_gain_nats": 0.0006450506208076634,
+        "offset": -27
+      },
+      {
+        "auc": 0.6491005791935843,
+        "log_loss_gain_nats": 0.033592515863299144,
+        "offset": -26
+      },
+      {
+        "auc": 0.6673396079304967,
+        "log_loss_gain_nats": 0.042207471438180266,
+        "offset": -25
+      },
+      {
+        "auc": 0.6148362664290488,
+        "log_loss_gain_nats": 0.006856375365365652,
+        "offset": -24
+      },
+      {
+        "auc": 0.5995071285364224,
+        "log_loss_gain_nats": 0.005576566294270946,
+        "offset": -23
+      },
+      {
+        "auc": 0.6364446424593451,
+        "log_loss_gain_nats": 0.023554235971854576,
+        "offset": -22
+      },
+      {
+        "auc": 0.6487942748941857,
+        "log_loss_gain_nats": 0.026128585735817,
+        "offset": -21
+      },
+      {
+        "auc": 0.6294414123412787,
+        "log_loss_gain_nats": 0.0235235724113948,
+        "offset": -20
+      },
+      {
+        "auc": 0.6293161060369792,
+        "log_loss_gain_nats": 0.01931803374341945,
+        "offset": -19
+      },
+      {
+        "auc": 0.6058142125194921,
+        "log_loss_gain_nats": 0.004190675991774029,
+        "offset": -18
+      },
+      {
+        "auc": 0.6341195143684563,
+        "log_loss_gain_nats": 0.015194259247448882,
+        "offset": -17
+      },
+      {
+        "auc": 0.6640259523279126,
+        "log_loss_gain_nats": 0.040510571413203245,
+        "offset": -16
+      },
+      {
+        "auc": 0.5907774560035642,
+        "log_loss_gain_nats": -0.0011531212733193463,
+        "offset": -15
+      },
+      {
+        "auc": 0.6548089775005569,
+        "log_loss_gain_nats": 0.027204164307636503,
+        "offset": -14
+      },
+      {
+        "auc": 0.5982819113388282,
+        "log_loss_gain_nats": 0.009837534409655069,
+        "offset": -13
+      },
+      {
+        "auc": 0.5781075963466251,
+        "log_loss_gain_nats": -0.006617973688793244,
+        "offset": -12
+      },
+      {
+        "auc": 0.5532969480953441,
+        "log_loss_gain_nats": -0.016442445911177828,
+        "offset": -11
+      },
+      {
+        "auc": 0.592295054577857,
+        "log_loss_gain_nats": 0.0008672483748949356,
+        "offset": -10
+      },
+      {
+        "auc": 0.6257379149030964,
+        "log_loss_gain_nats": 0.016290472364393738,
+        "offset": -9
+      },
+      {
+        "auc": 0.5707980619291602,
+        "log_loss_gain_nats": -0.007182967668488138,
+        "offset": -8
+      },
+      {
+        "auc": 0.6112023836043662,
+        "log_loss_gain_nats": 0.014414207647282407,
+        "offset": -7
+      },
+      {
+        "auc": 0.6509244820672756,
+        "log_loss_gain_nats": 0.0334312014563255,
+        "offset": -6
+      },
+      {
+        "auc": 0.658763087547338,
+        "log_loss_gain_nats": 0.032155829943180225,
+        "offset": -5
+      },
+      {
+        "auc": 0.6319336155045667,
+        "log_loss_gain_nats": 0.011017546723236848,
+        "offset": -4
+      },
+      {
+        "auc": 0.6479310536867898,
+        "log_loss_gain_nats": 0.019732055168410922,
+        "offset": -3
+      },
+      {
+        "auc": 0.7636026954778347,
+        "log_loss_gain_nats": 0.10465190013187298,
+        "offset": -2
+      },
+      {
+        "auc": 0.852946090443306,
+        "log_loss_gain_nats": 0.21364421500153413,
+        "offset": -1
+      },
+      {
+        "auc": 0.824793940744041,
+        "log_loss_gain_nats": 0.1769026158791407,
+        "offset": 0
+      },
+      {
+        "auc": 0.790181554912007,
+        "log_loss_gain_nats": 0.1362045846861245,
+        "offset": 1
+      },
+      {
+        "auc": 0.6746909111160615,
+        "log_loss_gain_nats": 0.04664365040066809,
+        "offset": 2
+      },
+      {
+        "auc": 0.6889897527288928,
+        "log_loss_gain_nats": 0.05288935932348704,
+        "offset": 3
+      },
+      {
+        "auc": 0.7248134328358209,
+        "log_loss_gain_nats": 0.07540513161174145,
+        "offset": 4
+      },
+      {
+        "auc": 0.6642626420138115,
+        "log_loss_gain_nats": 0.03446030630759345,
+        "offset": 5
+      },
+      {
+        "auc": 0.6345928937402538,
+        "log_loss_gain_nats": 0.015006558178493501,
+        "offset": 6
+      },
+      {
+        "auc": 0.6290098017375808,
+        "log_loss_gain_nats": 0.013161699345094036,
+        "offset": 7
+      },
+      {
+        "auc": 0.6523167743372689,
+        "log_loss_gain_nats": 0.03082582663602418,
+        "offset": 8
+      },
+      {
+        "auc": 0.6302071730897749,
+        "log_loss_gain_nats": 0.020070897469938287,
+        "offset": 9
+      },
+      {
+        "auc": 0.6605312987302294,
+        "log_loss_gain_nats": 0.03478523316178117,
+        "offset": 10
+      },
+      {
+        "auc": 0.6416935843172198,
+        "log_loss_gain_nats": 0.023459529064988383,
+        "offset": 11
+      },
+      {
+        "auc": 0.6075267320115838,
+        "log_loss_gain_nats": 0.00800530231794705,
+        "offset": 12
+      },
+      {
+        "auc": 0.6669219202494987,
+        "log_loss_gain_nats": 0.03782588458565683,
+        "offset": 13
+      },
+      {
+        "auc": 0.6074710403207841,
+        "log_loss_gain_nats": 0.011786014224476338,
+        "offset": 14
+      },
+      {
+        "auc": 0.6410113611049231,
+        "log_loss_gain_nats": 0.026389857752985302,
+        "offset": 15
+      },
+      {
+        "auc": 0.580613722432613,
+        "log_loss_gain_nats": -0.0021899000437748395,
+        "offset": 16
+      }
+    ],
+    "positionwise_window6": [
+      {
+        "auc": 0.7268879483181111,
+        "log_loss_gain_nats": 0.04159930308211246,
+        "offset": -44
+      },
+      {
+        "auc": 0.7154433058587659,
+        "log_loss_gain_nats": 0.01333965935800041,
+        "offset": -40
+      },
+      {
+        "auc": 0.6930134773891736,
+        "log_loss_gain_nats": -0.0087673480927567,
+        "offset": -36
+      },
+      {
+        "auc": 0.675192136333259,
+        "log_loss_gain_nats": -0.0518135536765324,
+        "offset": -32
+      },
+      {
+        "auc": 0.6808726887948318,
+        "log_loss_gain_nats": -0.0597781354715573,
+        "offset": -31
+      },
+      {
+        "auc": 0.6770995767431499,
+        "log_loss_gain_nats": -0.04696927867073408,
+        "offset": -30
+      },
+      {
+        "auc": 0.6677294497660948,
+        "log_loss_gain_nats": -0.054279101072150615,
+        "offset": -29
+      },
+      {
+        "auc": 0.6776008019603477,
+        "log_loss_gain_nats": -0.048973916110960025,
+        "offset": -28
+      },
+      {
+        "auc": 0.6560202717754511,
+        "log_loss_gain_nats": -0.06492303792568566,
+        "offset": -27
+      },
+      {
+        "auc": 0.7011305413232346,
+        "log_loss_gain_nats": -0.018603269031323033,
+        "offset": -26
+      },
+      {
+        "auc": 0.6889897527288927,
+        "log_loss_gain_nats": -0.03301084488143613,
+        "offset": -25
+      },
+      {
+        "auc": 0.662118511918022,
+        "log_loss_gain_nats": -0.0826488716022461,
+        "offset": -24
+      },
+      {
+        "auc": 0.6837686567164178,
+        "log_loss_gain_nats": -0.05250957040038806,
+        "offset": -23
+      },
+      {
+        "auc": 0.6977194252617509,
+        "log_loss_gain_nats": -0.016589018251208176,
+        "offset": -22
+      },
+      {
+        "auc": 0.7088438404989974,
+        "log_loss_gain_nats": -0.011539575085728226,
+        "offset": -21
+      },
+      {
+        "auc": 0.6943779238137671,
+        "log_loss_gain_nats": -0.03295715389878162,
+        "offset": -20
+      },
+      {
+        "auc": 0.6780602584094453,
+        "log_loss_gain_nats": -0.04710005237858583,
+        "offset": -19
+      },
+      {
+        "auc": 0.6558531967030519,
+        "log_loss_gain_nats": -0.09930216132099234,
+        "offset": -18
+      },
+      {
+        "auc": 0.6630791935843172,
+        "log_loss_gain_nats": -0.08904832754905401,
+        "offset": -17
+      },
+      {
+        "auc": 0.6951715304076632,
+        "log_loss_gain_nats": -0.023998633195726593,
+        "offset": -16
+      },
+      {
+        "auc": 0.6885024504343953,
+        "log_loss_gain_nats": -0.030824908447563026,
+        "offset": -15
+      },
+      {
+        "auc": 0.7022026063711293,
+        "log_loss_gain_nats": -0.01289066233581937,
+        "offset": -14
+      },
+      {
+        "auc": 0.7102361327689909,
+        "log_loss_gain_nats": 0.003860660569022567,
+        "offset": -13
+      },
+      {
+        "auc": 0.6974548897304522,
+        "log_loss_gain_nats": -0.025289295204955486,
+        "offset": -12
+      },
+      {
+        "auc": 0.6984294943194476,
+        "log_loss_gain_nats": -0.01685385520052296,
+        "offset": -11
+      },
+      {
+        "auc": 0.6735074626865671,
+        "log_loss_gain_nats": -0.053987009858820656,
+        "offset": -10
+      },
+      {
+        "auc": 0.6909668077522835,
+        "log_loss_gain_nats": -0.027458179754640932,
+        "offset": -9
+      },
+      {
+        "auc": 0.6984712630875475,
+        "log_loss_gain_nats": -0.00813464201363101,
+        "offset": -8
+      },
+      {
+        "auc": 0.7012001559367342,
+        "log_loss_gain_nats": -0.003946313108406874,
+        "offset": -7
+      },
+      {
+        "auc": 0.7438878369347295,
+        "log_loss_gain_nats": 0.05647661342087351,
+        "offset": -6
+      },
+      {
+        "auc": 0.7516011361104923,
+        "log_loss_gain_nats": 0.07502137173015144,
+        "offset": -5
+      },
+      {
+        "auc": 0.7543021831142794,
+        "log_loss_gain_nats": 0.07159813810911342,
+        "offset": -4
+      },
+      {
+        "auc": 0.7407551793272443,
+        "log_loss_gain_nats": 0.036330482134829034,
+        "offset": -3
+      },
+      {
+        "auc": 0.7842921586099354,
+        "log_loss_gain_nats": 0.10146661006881497,
+        "offset": -2
+      },
+      {
+        "auc": 0.8657273334818446,
+        "log_loss_gain_nats": 0.2208220941531206,
+        "offset": -1
+      },
+      {
+        "auc": 0.8867231009133438,
+        "log_loss_gain_nats": 0.25789459758395455,
+        "offset": 0
+      },
+      {
+        "auc": 0.888741924704834,
+        "log_loss_gain_nats": 0.2689610523251815,
+        "offset": 1
+      },
+      {
+        "auc": 0.9027762307863667,
+        "log_loss_gain_nats": 0.30104273513933394,
+        "offset": 2
+      },
+      {
+        "auc": 0.9097376921363333,
+        "log_loss_gain_nats": 0.3144035820949146,
+        "offset": 3
+      },
+      {
+        "auc": 0.9188432835820896,
+        "log_loss_gain_nats": 0.3344799197040717,
+        "offset": 4
+      },
+      {
+        "auc": 0.8835486745377589,
+        "log_loss_gain_nats": 0.2597477178521743,
+        "offset": 5
+      },
+      {
+        "auc": 0.8490476720873246,
+        "log_loss_gain_nats": 0.19638167851703187,
+        "offset": 6
+      },
+      {
+        "auc": 0.7951520383158833,
+        "log_loss_gain_nats": 0.11257329346473877,
+        "offset": 7
+      },
+      {
+        "auc": 0.7681694141234128,
+        "log_loss_gain_nats": 0.06370964190361494,
+        "offset": 8
+      },
+      {
+        "auc": 0.7517264424147917,
+        "log_loss_gain_nats": 0.03652821177983112,
+        "offset": 9
+      },
+      {
+        "auc": 0.7214023167743373,
+        "log_loss_gain_nats": -0.0009765088585140802,
+        "offset": 10
+      },
+      {
+        "auc": 0.7287257741145021,
+        "log_loss_gain_nats": 0.017118267983919244,
+        "offset": 11
+      },
+      {
+        "auc": 0.709776676319893,
+        "log_loss_gain_nats": 0.002193192328507787,
+        "offset": 12
+      },
+      {
+        "auc": 0.7145661617286702,
+        "log_loss_gain_nats": 6.652948851826324e-05,
+        "offset": 13
+      },
+      {
+        "auc": 0.7309116729783917,
+        "log_loss_gain_nats": 0.014957132128478712,
+        "offset": 14
+      },
+      {
+        "auc": 0.7339468701269771,
+        "log_loss_gain_nats": 0.008625139334938137,
+        "offset": 15
+      },
+      {
+        "auc": 0.7078135442192024,
+        "log_loss_gain_nats": -0.021003710683673793,
+        "offset": 16
+      }
+    ],
+    "transported_local": [
+      {
+        "auc": 0.5922950545778569,
+        "log_loss_gain_nats": 0.01564755133099882,
+        "offset": -64
+      },
+      {
+        "auc": 0.49554466473602143,
+        "log_loss_gain_nats": -0.030371879604579877,
+        "offset": -60
+      },
+      {
+        "auc": 0.5263282468255737,
+        "log_loss_gain_nats": -0.01493828032035227,
+        "offset": -56
+      },
+      {
+        "auc": 0.5192554020940077,
+        "log_loss_gain_nats": -0.022649610234932616,
+        "offset": -52
+      },
+      {
+        "auc": 0.46835319670305187,
+        "log_loss_gain_nats": -0.046955110811099376,
+        "offset": -48
+      },
+      {
+        "auc": 0.5366451325462241,
+        "log_loss_gain_nats": -0.013538299602187664,
+        "offset": -44
+      },
+      {
+        "auc": 0.5372020494542215,
+        "log_loss_gain_nats": -0.018466423378821206,
+        "offset": -40
+      },
+      {
+        "auc": 0.47340721764312765,
+        "log_loss_gain_nats": -0.036754326179904484,
+        "offset": -36
+      },
+      {
+        "auc": 0.5278458453998663,
+        "log_loss_gain_nats": -0.018940669428813672,
+        "offset": -32
+      },
+      {
+        "auc": 0.5124610158164402,
+        "log_loss_gain_nats": -0.0303230312875441,
+        "offset": -31
+      },
+      {
+        "auc": 0.4978976386723101,
+        "log_loss_gain_nats": -0.029210004489995445,
+        "offset": -30
+      },
+      {
+        "auc": 0.5474075517932724,
+        "log_loss_gain_nats": -0.011514877759773223,
+        "offset": -29
+      },
+      {
+        "auc": 0.5149114502116284,
+        "log_loss_gain_nats": -0.024290475035362857,
+        "offset": -28
+      },
+      {
+        "auc": 0.5229310536867899,
+        "log_loss_gain_nats": -0.01730797819544805,
+        "offset": -27
+      },
+      {
+        "auc": 0.5016150590331923,
+        "log_loss_gain_nats": -0.029087405536762145,
+        "offset": -26
+      },
+      {
+        "auc": 0.4873579861884607,
+        "log_loss_gain_nats": -0.04423595320688889,
+        "offset": -25
+      },
+      {
+        "auc": 0.5278319224771664,
+        "log_loss_gain_nats": -0.01376172825940769,
+        "offset": -24
+      },
+      {
+        "auc": 0.5086461349966584,
+        "log_loss_gain_nats": -0.021524235868435104,
+        "offset": -23
+      },
+      {
+        "auc": 0.5509718200044554,
+        "log_loss_gain_nats": 0.0003380427610690795,
+        "offset": -22
+      },
+      {
+        "auc": 0.519603475161506,
+        "log_loss_gain_nats": -0.020110631924985856,
+        "offset": -21
+      },
+      {
+        "auc": 0.5575434395188237,
+        "log_loss_gain_nats": -0.0036569022838071064,
+        "offset": -20
+      },
+      {
+        "auc": 0.5392347961684117,
+        "log_loss_gain_nats": -0.008043436246879976,
+        "offset": -19
+      },
+      {
+        "auc": 0.547727779015371,
+        "log_loss_gain_nats": -0.008748703714760775,
+        "offset": -18
+      },
+      {
+        "auc": 0.5506933615504567,
+        "log_loss_gain_nats": -0.012064670612778605,
+        "offset": -17
+      },
+      {
+        "auc": 0.56667687680998,
+        "log_loss_gain_nats": -0.004364786779282981,
+        "offset": -16
+      },
+      {
+        "auc": 0.5869347293383826,
+        "log_loss_gain_nats": 0.003587945613438892,
+        "offset": -15
+      },
+      {
+        "auc": 0.5521134996658498,
+        "log_loss_gain_nats": -0.004557931937262283,
+        "offset": -14
+      },
+      {
+        "auc": 0.6006905769659167,
+        "log_loss_gain_nats": 0.015186993128550208,
+        "offset": -13
+      },
+      {
+        "auc": 0.5592977277790154,
+        "log_loss_gain_nats": -0.0006030984289135954,
+        "offset": -12
+      },
+      {
+        "auc": 0.561455780797505,
+        "log_loss_gain_nats": -0.004188414734093593,
+        "offset": -11
+      },
+      {
+        "auc": 0.5805441078191134,
+        "log_loss_gain_nats": 0.008650209368387562,
+        "offset": -10
+      },
+      {
+        "auc": 0.5440521274225886,
+        "log_loss_gain_nats": -0.003703265433238956,
+        "offset": -9
+      },
+      {
+        "auc": 0.5493985297393629,
+        "log_loss_gain_nats": -0.0058246771838645905,
+        "offset": -8
+      },
+      {
+        "auc": 0.5439685898863891,
+        "log_loss_gain_nats": -0.01157929311299355,
+        "offset": -7
+      },
+      {
+        "auc": 0.5297532858097572,
+        "log_loss_gain_nats": -0.017933481766005177,
+        "offset": -6
+      },
+      {
+        "auc": 0.5641289819558921,
+        "log_loss_gain_nats": 0.0036141957339631547,
+        "offset": -5
+      },
+      {
+        "auc": 0.5579750501225217,
+        "log_loss_gain_nats": 0.0024564589296075523,
+        "offset": -4
+      },
+      {
+        "auc": 0.5709512140788594,
+        "log_loss_gain_nats": 0.00422700095195383,
+        "offset": -3
+      },
+      {
+        "auc": 0.5575016707507241,
+        "log_loss_gain_nats": -0.002943327504784543,
+        "offset": -2
+      },
+      {
+        "auc": 0.6538622187569615,
+        "log_loss_gain_nats": 0.032159835961076744,
+        "offset": -1
+      },
+      {
+        "auc": 0.4289930942303408,
+        "log_loss_gain_nats": -0.05845888869932703,
+        "offset": 0
+      },
+      {
+        "auc": 0.43374081087101807,
+        "log_loss_gain_nats": -0.06201107359120972,
+        "offset": 1
+      },
+      {
+        "auc": 0.43385219425261756,
+        "log_loss_gain_nats": -0.06607375730500886,
+        "offset": 2
+      },
+      {
+        "auc": 0.42501113833815996,
+        "log_loss_gain_nats": -0.061986763593812944,
+        "offset": 3
+      },
+      {
+        "auc": 0.4629093339273781,
+        "log_loss_gain_nats": -0.03807463687688073,
+        "offset": 4
+      },
+      {
+        "auc": 0.5171251949209178,
+        "log_loss_gain_nats": -0.02469551144144211,
+        "offset": 5
+      },
+      {
+        "auc": 0.5167353530853196,
+        "log_loss_gain_nats": -0.02607595752548153,
+        "offset": 6
+      },
+      {
+        "auc": 0.49644965471151703,
+        "log_loss_gain_nats": -0.0323524179369693,
+        "offset": 7
+      },
+      {
+        "auc": 0.48836043662285583,
+        "log_loss_gain_nats": -0.032489814385267324,
+        "offset": 8
+      },
+      {
+        "auc": 0.5149253731343284,
+        "log_loss_gain_nats": -0.022282959744112207,
+        "offset": 9
+      },
+      {
+        "auc": 0.46888226776564934,
+        "log_loss_gain_nats": -0.03301108091670679,
+        "offset": 10
+      },
+      {
+        "auc": 0.5073373802628648,
+        "log_loss_gain_nats": -0.027314147566774638,
+        "offset": 11
+      },
+      {
+        "auc": 0.5069614613499666,
+        "log_loss_gain_nats": -0.02342915288231806,
+        "offset": 12
+      },
+      {
+        "auc": 0.5511528179995544,
+        "log_loss_gain_nats": -0.0035843978735132787,
+        "offset": 13
+      },
+      {
+        "auc": 0.5334150144798396,
+        "log_loss_gain_nats": -0.009481454656462218,
+        "offset": 14
+      },
+      {
+        "auc": 0.48152428157718863,
+        "log_loss_gain_nats": -0.0290603310788331,
+        "offset": 15
+      },
+      {
+        "auc": 0.45724270438850523,
+        "log_loss_gain_nats": -0.044216970783491294,
+        "offset": 16
+      }
+    ],
+    "transported_window6": [
+      {
+        "auc": 0.5944809534417465,
+        "log_loss_gain_nats": -0.017098141191194016,
+        "offset": -44
+      },
+      {
+        "auc": 0.5211210737357985,
+        "log_loss_gain_nats": -0.08727539819032615,
+        "offset": -40
+      },
+      {
+        "auc": 0.505012252171976,
+        "log_loss_gain_nats": -0.0986238184840198,
+        "offset": -36
+      },
+      {
+        "auc": 0.5353224548897304,
+        "log_loss_gain_nats": -0.06418202508706417,
+        "offset": -32
+      },
+      {
+        "auc": 0.5435509022053909,
+        "log_loss_gain_nats": -0.07485341843354765,
+        "offset": -31
+      },
+      {
+        "auc": 0.5429661394519938,
+        "log_loss_gain_nats": -0.07548732095305788,
+        "offset": -30
+      },
+      {
+        "auc": 0.5652706616172867,
+        "log_loss_gain_nats": -0.07553406511737948,
+        "offset": -29
+      },
+      {
+        "auc": 0.5687235464468702,
+        "log_loss_gain_nats": -0.07536886568010526,
+        "offset": -28
+      },
+      {
+        "auc": 0.5282774560035642,
+        "log_loss_gain_nats": -0.1061748723185989,
+        "offset": -27
+      },
+      {
+        "auc": 0.5057501670750724,
+        "log_loss_gain_nats": -0.13636461391131272,
+        "offset": -26
+      },
+      {
+        "auc": 0.5177238805970149,
+        "log_loss_gain_nats": -0.1359106313055285,
+        "offset": -25
+      },
+      {
+        "auc": 0.48880597014925364,
+        "log_loss_gain_nats": -0.15368092862510052,
+        "offset": -24
+      },
+      {
+        "auc": 0.517306192916017,
+        "log_loss_gain_nats": -0.12721892962853842,
+        "offset": -23
+      },
+      {
+        "auc": 0.5515287369124527,
+        "log_loss_gain_nats": -0.09462814304253342,
+        "offset": -22
+      },
+      {
+        "auc": 0.5503731343283582,
+        "log_loss_gain_nats": -0.09584780399289317,
+        "offset": -21
+      },
+      {
+        "auc": 0.5431053686789931,
+        "log_loss_gain_nats": -0.08337544405652719,
+        "offset": -20
+      },
+      {
+        "auc": 0.5528792604143462,
+        "log_loss_gain_nats": -0.07454519077691724,
+        "offset": -19
+      },
+      {
+        "auc": 0.5733738026286478,
+        "log_loss_gain_nats": -0.06243030873546329,
+        "offset": -18
+      },
+      {
+        "auc": 0.565020049008688,
+        "log_loss_gain_nats": -0.07050837544940325,
+        "offset": -17
+      },
+      {
+        "auc": 0.6047143016261973,
+        "log_loss_gain_nats": -0.023164589918846068,
+        "offset": -16
+      },
+      {
+        "auc": 0.5978503007351303,
+        "log_loss_gain_nats": -0.04407335672273338,
+        "offset": -15
+      },
+      {
+        "auc": 0.5834539986633995,
+        "log_loss_gain_nats": -0.05888853202662281,
+        "offset": -14
+      },
+      {
+        "auc": 0.6450768545333037,
+        "log_loss_gain_nats": -0.0011809743390625016,
+        "offset": -13
+      },
+      {
+        "auc": 0.6259746045889953,
+        "log_loss_gain_nats": -0.021713458939891406,
+        "offset": -12
+      },
+      {
+        "auc": 0.6081950323011805,
+        "log_loss_gain_nats": -0.030558351709629505,
+        "offset": -11
+      },
+      {
+        "auc": 0.601679104477612,
+        "log_loss_gain_nats": -0.024294490315127648,
+        "offset": -10
+      },
+      {
+        "auc": 0.634996658498552,
+        "log_loss_gain_nats": 0.00547574660561001,
+        "offset": -9
+      },
+      {
+        "auc": 0.6284946535976832,
+        "log_loss_gain_nats": -0.004464747644274292,
+        "offset": -8
+      },
+      {
+        "auc": 0.5584205836489196,
+        "log_loss_gain_nats": -0.05584093988532324,
+        "offset": -7
+      },
+      {
+        "auc": 0.5667604143461795,
+        "log_loss_gain_nats": -0.05721068174259236,
+        "offset": -6
+      },
+      {
+        "auc": 0.5875612608598797,
+        "log_loss_gain_nats": -0.051602546970971,
+        "offset": -5
+      },
+      {
+        "auc": 0.5738889507685453,
+        "log_loss_gain_nats": -0.06530247336929429,
+        "offset": -4
+      },
+      {
+        "auc": 0.6087658721318779,
+        "log_loss_gain_nats": -0.026166912290933597,
+        "offset": -3
+      },
+      {
+        "auc": 0.59168244597906,
+        "log_loss_gain_nats": -0.046338476140608154,
+        "offset": -2
+      },
+      {
+        "auc": 0.6278124303853865,
+        "log_loss_gain_nats": -0.01665966848144218,
+        "offset": -1
+      },
+      {
+        "auc": 0.5405017821341056,
+        "log_loss_gain_nats": -0.0915326132016605,
+        "offset": 0
+      },
+      {
+        "auc": 0.482930496769882,
+        "log_loss_gain_nats": -0.1438449695572036,
+        "offset": 1
+      },
+      {
+        "auc": 0.4474270438850524,
+        "log_loss_gain_nats": -0.20343240744664115,
+        "offset": 2
+      },
+      {
+        "auc": 0.39680329694809535,
+        "log_loss_gain_nats": -0.2523381040630833,
+        "offset": 3
+      },
+      {
+        "auc": 0.4423730229449766,
+        "log_loss_gain_nats": -0.19871759981029602,
+        "offset": 4
+      },
+      {
+        "auc": 0.48671753174426374,
+        "log_loss_gain_nats": -0.1575928195386953,
+        "offset": 5
+      },
+      {
+        "auc": 0.5137836934729338,
+        "log_loss_gain_nats": -0.12239464886976881,
+        "offset": 6
+      },
+      {
+        "auc": 0.5255207173089775,
+        "log_loss_gain_nats": -0.10301945253132228,
+        "offset": 7
+      },
+      {
+        "auc": 0.5296697482735576,
+        "log_loss_gain_nats": -0.11041357836985877,
+        "offset": 8
+      },
+      {
+        "auc": 0.5264953218979729,
+        "log_loss_gain_nats": -0.10941680175921309,
+        "offset": 9
+      },
+      {
+        "auc": 0.5148975272889285,
+        "log_loss_gain_nats": -0.11746653399124218,
+        "offset": 10
+      },
+      {
+        "auc": 0.47290599242593007,
+        "log_loss_gain_nats": -0.14083009723048845,
+        "offset": 11
+      },
+      {
+        "auc": 0.497507796836712,
+        "log_loss_gain_nats": -0.11362137566668007,
+        "offset": 12
+      },
+      {
+        "auc": 0.5276926932501671,
+        "log_loss_gain_nats": -0.08871390908390053,
+        "offset": 13
+      },
+      {
+        "auc": 0.5402790153709067,
+        "log_loss_gain_nats": -0.07089251122151297,
+        "offset": 14
+      },
+      {
+        "auc": 0.5445394297170862,
+        "log_loss_gain_nats": -0.07394582668439165,
+        "offset": 15
+      },
+      {
+        "auc": 0.5104561149476499,
+        "log_loss_gain_nats": -0.09645714504340974,
+        "offset": 16
+      }
+    ]
+  },
+  "discovery_band": [
+    -13,
+    -8
+  ],
+  "layer": 10,
+  "method": "SAE-free fixed-random-projection formation calibration",
+  "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+  "offsets": [
+    -64,
+    -60,
+    -56,
+    -52,
+    -48,
+    -44,
+    -40,
+    -36,
+    -32,
+    -31,
+    -30,
+    -29,
+    -28,
+    -27,
+    -26,
+    -25,
+    -24,
+    -23,
+    -22,
+    -21,
+    -20,
+    -19,
+    -18,
+    -17,
+    -16,
+    -15,
+    -14,
+    -13,
+    -12,
+    -11,
+    -10,
+    -9,
+    -8,
+    -7,
+    -6,
+    -5,
+    -4,
+    -3,
+    -2,
+    -1,
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "pairing": {
+    "event": "first usable genuine-backtracking sentence",
+    "median_absolute_separation": 160.0,
+    "n_pairs": 268,
+    "neutral_after_fraction": 0.5597014925373134,
+    "neutral_exclusion_radius_tokens": 96,
+    "preferred_separation_tokens": 160,
+    "records": [
+      {
+        "category": "basic_logic",
+        "event_position": 240,
+        "n_events": 18,
+        "neutral_minus_event": 397,
+        "neutral_position": 637,
+        "qid": "basic_logic_000",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 565,
+        "n_events": 3,
+        "neutral_minus_event": 160,
+        "neutral_position": 725,
+        "qid": "basic_logic_001",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 929,
+        "n_events": 13,
+        "neutral_minus_event": -160,
+        "neutral_position": 769,
+        "qid": "basic_logic_002",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 700,
+        "n_events": 7,
+        "neutral_minus_event": -160,
+        "neutral_position": 540,
+        "qid": "basic_logic_003",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 426,
+        "n_events": 14,
+        "neutral_minus_event": 305,
+        "neutral_position": 731,
+        "qid": "basic_logic_004",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 912,
+        "n_events": 8,
+        "neutral_minus_event": -160,
+        "neutral_position": 752,
+        "qid": "basic_logic_005",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 345,
+        "n_events": 40,
+        "neutral_minus_event": -160,
+        "neutral_position": 185,
+        "qid": "basic_logic_006",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 348,
+        "n_events": 12,
+        "neutral_minus_event": -160,
+        "neutral_position": 188,
+        "qid": "basic_logic_007",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 396,
+        "n_events": 8,
+        "neutral_minus_event": 167,
+        "neutral_position": 563,
+        "qid": "basic_logic_008",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 758,
+        "n_events": 24,
+        "neutral_minus_event": 506,
+        "neutral_position": 1264,
+        "qid": "basic_logic_009",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 761,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 921,
+        "qid": "basic_logic_010",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 665,
+        "n_events": 3,
+        "neutral_minus_event": -160,
+        "neutral_position": 505,
+        "qid": "basic_logic_011",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 610,
+        "n_events": 7,
+        "neutral_minus_event": -160,
+        "neutral_position": 450,
+        "qid": "basic_logic_012",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 663,
+        "n_events": 9,
+        "neutral_minus_event": 160,
+        "neutral_position": 823,
+        "qid": "basic_logic_013",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 657,
+        "n_events": 6,
+        "neutral_minus_event": 187,
+        "neutral_position": 844,
+        "qid": "basic_logic_014",
+        "sequence_tokens": 2005
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 168,
+        "n_events": 18,
+        "neutral_minus_event": -104,
+        "neutral_position": 64,
+        "qid": "basic_logic_015",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 457,
+        "n_events": 14,
+        "neutral_minus_event": -160,
+        "neutral_position": 297,
+        "qid": "basic_logic_016",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 704,
+        "n_events": 22,
+        "neutral_minus_event": 327,
+        "neutral_position": 1031,
+        "qid": "basic_logic_017",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 426,
+        "n_events": 12,
+        "neutral_minus_event": -160,
+        "neutral_position": 266,
+        "qid": "basic_logic_018",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 970,
+        "n_events": 9,
+        "neutral_minus_event": -160,
+        "neutral_position": 810,
+        "qid": "basic_logic_019",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 665,
+        "n_events": 6,
+        "neutral_minus_event": -160,
+        "neutral_position": 505,
+        "qid": "basic_logic_020",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 726,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 886,
+        "qid": "basic_logic_021",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 310,
+        "n_events": 13,
+        "neutral_minus_event": -160,
+        "neutral_position": 150,
+        "qid": "basic_logic_022",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 639,
+        "n_events": 13,
+        "neutral_minus_event": 416,
+        "neutral_position": 1055,
+        "qid": "basic_logic_023",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 66,
+        "n_events": 18,
+        "neutral_minus_event": 96,
+        "neutral_position": 162,
+        "qid": "basic_logic_024",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 603,
+        "n_events": 4,
+        "neutral_minus_event": -160,
+        "neutral_position": 443,
+        "qid": "basic_logic_025",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 458,
+        "n_events": 20,
+        "neutral_minus_event": 686,
+        "neutral_position": 1144,
+        "qid": "basic_logic_026",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 620,
+        "n_events": 10,
+        "neutral_minus_event": -160,
+        "neutral_position": 460,
+        "qid": "basic_logic_027",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 713,
+        "n_events": 22,
+        "neutral_minus_event": 668,
+        "neutral_position": 1381,
+        "qid": "basic_logic_028",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "basic_logic",
+        "event_position": 1036,
+        "n_events": 5,
+        "neutral_minus_event": -160,
+        "neutral_position": 876,
+        "qid": "basic_logic_029",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 218,
+        "n_events": 2,
+        "neutral_minus_event": 160,
+        "neutral_position": 378,
+        "qid": "geometry_000",
+        "sequence_tokens": 1500
+      },
+      {
+        "category": "geometry",
+        "event_position": 149,
+        "n_events": 4,
+        "neutral_minus_event": 121,
+        "neutral_position": 270,
+        "qid": "geometry_001",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 153,
+        "n_events": 5,
+        "neutral_minus_event": 238,
+        "neutral_position": 391,
+        "qid": "geometry_002",
+        "sequence_tokens": 1695
+      },
+      {
+        "category": "geometry",
+        "event_position": 218,
+        "n_events": 2,
+        "neutral_minus_event": 160,
+        "neutral_position": 378,
+        "qid": "geometry_003",
+        "sequence_tokens": 1500
+      },
+      {
+        "category": "geometry",
+        "event_position": 212,
+        "n_events": 2,
+        "neutral_minus_event": -148,
+        "neutral_position": 64,
+        "qid": "geometry_004",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 149,
+        "n_events": 4,
+        "neutral_minus_event": 160,
+        "neutral_position": 309,
+        "qid": "geometry_005",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 17,
+        "neutral_minus_event": -160,
+        "neutral_position": 279,
+        "qid": "geometry_006",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 153,
+        "n_events": 5,
+        "neutral_minus_event": 238,
+        "neutral_position": 391,
+        "qid": "geometry_007",
+        "sequence_tokens": 1695
+      },
+      {
+        "category": "geometry",
+        "event_position": 493,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 653,
+        "qid": "geometry_008",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 1069,
+        "n_events": 4,
+        "neutral_minus_event": 160,
+        "neutral_position": 1229,
+        "qid": "geometry_009",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 18,
+        "neutral_minus_event": -160,
+        "neutral_position": 279,
+        "qid": "geometry_010",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 153,
+        "n_events": 5,
+        "neutral_minus_event": 238,
+        "neutral_position": 391,
+        "qid": "geometry_011",
+        "sequence_tokens": 1695
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 10,
+        "neutral_minus_event": -160,
+        "neutral_position": 279,
+        "qid": "geometry_012",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 388,
+        "n_events": 16,
+        "neutral_minus_event": 560,
+        "neutral_position": 948,
+        "qid": "geometry_013",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 9,
+        "neutral_minus_event": -160,
+        "neutral_position": 279,
+        "qid": "geometry_014",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 19,
+        "neutral_minus_event": -160,
+        "neutral_position": 279,
+        "qid": "geometry_015",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 149,
+        "n_events": 7,
+        "neutral_minus_event": 270,
+        "neutral_position": 419,
+        "qid": "geometry_016",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 479,
+        "n_events": 26,
+        "neutral_minus_event": 288,
+        "neutral_position": 767,
+        "qid": "geometry_017",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 149,
+        "n_events": 3,
+        "neutral_minus_event": 160,
+        "neutral_position": 309,
+        "qid": "geometry_018",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 218,
+        "n_events": 2,
+        "neutral_minus_event": 160,
+        "neutral_position": 378,
+        "qid": "geometry_019",
+        "sequence_tokens": 1500
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 10,
+        "neutral_minus_event": 160,
+        "neutral_position": 599,
+        "qid": "geometry_020",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 149,
+        "n_events": 7,
+        "neutral_minus_event": 270,
+        "neutral_position": 419,
+        "qid": "geometry_021",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 15,
+        "neutral_minus_event": -160,
+        "neutral_position": 279,
+        "qid": "geometry_022",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 11,
+        "neutral_minus_event": 160,
+        "neutral_position": 599,
+        "qid": "geometry_023",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 12,
+        "neutral_minus_event": 160,
+        "neutral_position": 599,
+        "qid": "geometry_024",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 481,
+        "n_events": 4,
+        "neutral_minus_event": 160,
+        "neutral_position": 641,
+        "qid": "geometry_025",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 12,
+        "neutral_minus_event": -160,
+        "neutral_position": 279,
+        "qid": "geometry_026",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 153,
+        "n_events": 5,
+        "neutral_minus_event": 238,
+        "neutral_position": 391,
+        "qid": "geometry_027",
+        "sequence_tokens": 1695
+      },
+      {
+        "category": "geometry",
+        "event_position": 439,
+        "n_events": 12,
+        "neutral_minus_event": 160,
+        "neutral_position": 599,
+        "qid": "geometry_028",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "geometry",
+        "event_position": 445,
+        "n_events": 19,
+        "neutral_minus_event": -160,
+        "neutral_position": 285,
+        "qid": "geometry_029",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 177,
+        "n_events": 28,
+        "neutral_minus_event": -113,
+        "neutral_position": 64,
+        "qid": "probability_000",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 200,
+        "n_events": 16,
+        "neutral_minus_event": 466,
+        "neutral_position": 666,
+        "qid": "probability_001",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 279,
+        "n_events": 14,
+        "neutral_minus_event": 151,
+        "neutral_position": 430,
+        "qid": "probability_002",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 136,
+        "n_events": 9,
+        "neutral_minus_event": 96,
+        "neutral_position": 232,
+        "qid": "probability_003",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 122,
+        "n_events": 25,
+        "neutral_minus_event": 590,
+        "neutral_position": 712,
+        "qid": "probability_004",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 255,
+        "n_events": 31,
+        "neutral_minus_event": 1140,
+        "neutral_position": 1395,
+        "qid": "probability_005",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 224,
+        "n_events": 11,
+        "neutral_minus_event": -160,
+        "neutral_position": 64,
+        "qid": "probability_006",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 720,
+        "n_events": 11,
+        "neutral_minus_event": 160,
+        "neutral_position": 880,
+        "qid": "probability_007",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 270,
+        "n_events": 16,
+        "neutral_minus_event": -160,
+        "neutral_position": 110,
+        "qid": "probability_008",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 348,
+        "n_events": 18,
+        "neutral_minus_event": 234,
+        "neutral_position": 582,
+        "qid": "probability_009",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 270,
+        "n_events": 21,
+        "neutral_minus_event": 105,
+        "neutral_position": 375,
+        "qid": "probability_010",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 241,
+        "n_events": 10,
+        "neutral_minus_event": 281,
+        "neutral_position": 522,
+        "qid": "probability_011",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 445,
+        "n_events": 25,
+        "neutral_minus_event": -160,
+        "neutral_position": 285,
+        "qid": "probability_012",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 219,
+        "n_events": 11,
+        "neutral_minus_event": 287,
+        "neutral_position": 506,
+        "qid": "probability_013",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 177,
+        "n_events": 22,
+        "neutral_minus_event": -113,
+        "neutral_position": 64,
+        "qid": "probability_014",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 319,
+        "n_events": 7,
+        "neutral_minus_event": -160,
+        "neutral_position": 159,
+        "qid": "probability_015",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 242,
+        "n_events": 12,
+        "neutral_minus_event": 160,
+        "neutral_position": 402,
+        "qid": "probability_016",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 358,
+        "n_events": 9,
+        "neutral_minus_event": 672,
+        "neutral_position": 1030,
+        "qid": "probability_017",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 219,
+        "n_events": 10,
+        "neutral_minus_event": 327,
+        "neutral_position": 546,
+        "qid": "probability_018",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 270,
+        "n_events": 18,
+        "neutral_minus_event": -160,
+        "neutral_position": 110,
+        "qid": "probability_019",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 1042,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 1202,
+        "qid": "probability_020",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 270,
+        "n_events": 14,
+        "neutral_minus_event": -160,
+        "neutral_position": 110,
+        "qid": "probability_021",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 708,
+        "n_events": 11,
+        "neutral_minus_event": -160,
+        "neutral_position": 548,
+        "qid": "probability_022",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 270,
+        "n_events": 15,
+        "neutral_minus_event": 115,
+        "neutral_position": 385,
+        "qid": "probability_023",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 279,
+        "n_events": 11,
+        "neutral_minus_event": 151,
+        "neutral_position": 430,
+        "qid": "probability_024",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 345,
+        "n_events": 16,
+        "neutral_minus_event": 330,
+        "neutral_position": 675,
+        "qid": "probability_025",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 279,
+        "n_events": 12,
+        "neutral_minus_event": -160,
+        "neutral_position": 119,
+        "qid": "probability_026",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 236,
+        "n_events": 11,
+        "neutral_minus_event": 303,
+        "neutral_position": 539,
+        "qid": "probability_027",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 269,
+        "n_events": 38,
+        "neutral_minus_event": -160,
+        "neutral_position": 109,
+        "qid": "probability_028",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "probability",
+        "event_position": 269,
+        "n_events": 28,
+        "neutral_minus_event": -160,
+        "neutral_position": 109,
+        "qid": "probability_029",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "arithmetic",
+        "event_position": 269,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 429,
+        "qid": "arithmetic_003",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "arithmetic",
+        "event_position": 153,
+        "n_events": 1,
+        "neutral_minus_event": 160,
+        "neutral_position": 313,
+        "qid": "arithmetic_005",
+        "sequence_tokens": 538
+      },
+      {
+        "category": "arithmetic",
+        "event_position": 971,
+        "n_events": 1,
+        "neutral_minus_event": 160,
+        "neutral_position": 1131,
+        "qid": "arithmetic_007",
+        "sequence_tokens": 1820
+      },
+      {
+        "category": "arithmetic",
+        "event_position": 86,
+        "n_events": 17,
+        "neutral_minus_event": 272,
+        "neutral_position": 358,
+        "qid": "arithmetic_009",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "arithmetic",
+        "event_position": 160,
+        "n_events": 7,
+        "neutral_minus_event": 160,
+        "neutral_position": 320,
+        "qid": "arithmetic_010",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "arithmetic",
+        "event_position": 280,
+        "n_events": 15,
+        "neutral_minus_event": -160,
+        "neutral_position": 120,
+        "qid": "arithmetic_019",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "arithmetic",
+        "event_position": 1316,
+        "n_events": 2,
+        "neutral_minus_event": -160,
+        "neutral_position": 1156,
+        "qid": "arithmetic_021",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "arithmetic",
+        "event_position": 70,
+        "n_events": 3,
+        "neutral_minus_event": 315,
+        "neutral_position": 385,
+        "qid": "arithmetic_027",
+        "sequence_tokens": 692
+      },
+      {
+        "category": "arithmetic",
+        "event_position": 960,
+        "n_events": 6,
+        "neutral_minus_event": -160,
+        "neutral_position": 800,
+        "qid": "arithmetic_029",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 361,
+        "n_events": 10,
+        "neutral_minus_event": -160,
+        "neutral_position": 201,
+        "qid": "counting_000",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 372,
+        "n_events": 7,
+        "neutral_minus_event": 98,
+        "neutral_position": 470,
+        "qid": "counting_001",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 239,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 399,
+        "qid": "counting_002",
+        "sequence_tokens": 1796
+      },
+      {
+        "category": "counting",
+        "event_position": 130,
+        "n_events": 17,
+        "neutral_minus_event": 160,
+        "neutral_position": 290,
+        "qid": "counting_003",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 235,
+        "n_events": 13,
+        "neutral_minus_event": -160,
+        "neutral_position": 75,
+        "qid": "counting_004",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 583,
+        "n_events": 27,
+        "neutral_minus_event": -160,
+        "neutral_position": 423,
+        "qid": "counting_005",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 216,
+        "n_events": 17,
+        "neutral_minus_event": 160,
+        "neutral_position": 376,
+        "qid": "counting_006",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 477,
+        "n_events": 27,
+        "neutral_minus_event": -160,
+        "neutral_position": 317,
+        "qid": "counting_007",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 441,
+        "n_events": 8,
+        "neutral_minus_event": -160,
+        "neutral_position": 281,
+        "qid": "counting_008",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 87,
+        "n_events": 10,
+        "neutral_minus_event": 160,
+        "neutral_position": 247,
+        "qid": "counting_009",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 223,
+        "n_events": 13,
+        "neutral_minus_event": -159,
+        "neutral_position": 64,
+        "qid": "counting_010",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 197,
+        "n_events": 13,
+        "neutral_minus_event": -133,
+        "neutral_position": 64,
+        "qid": "counting_011",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 229,
+        "n_events": 21,
+        "neutral_minus_event": -160,
+        "neutral_position": 69,
+        "qid": "counting_012",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 142,
+        "n_events": 20,
+        "neutral_minus_event": 376,
+        "neutral_position": 518,
+        "qid": "counting_013",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 90,
+        "n_events": 30,
+        "neutral_minus_event": 812,
+        "neutral_position": 902,
+        "qid": "counting_014",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 373,
+        "n_events": 12,
+        "neutral_minus_event": -160,
+        "neutral_position": 213,
+        "qid": "counting_015",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 76,
+        "n_events": 22,
+        "neutral_minus_event": 96,
+        "neutral_position": 172,
+        "qid": "counting_016",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 620,
+        "n_events": 11,
+        "neutral_minus_event": -160,
+        "neutral_position": 460,
+        "qid": "counting_017",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 450,
+        "n_events": 85,
+        "neutral_minus_event": -96,
+        "neutral_position": 354,
+        "qid": "counting_018",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 334,
+        "n_events": 7,
+        "neutral_minus_event": -160,
+        "neutral_position": 174,
+        "qid": "counting_019",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 239,
+        "n_events": 20,
+        "neutral_minus_event": -160,
+        "neutral_position": 79,
+        "qid": "counting_020",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 310,
+        "n_events": 8,
+        "neutral_minus_event": 160,
+        "neutral_position": 470,
+        "qid": "counting_021",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 310,
+        "n_events": 11,
+        "neutral_minus_event": -160,
+        "neutral_position": 150,
+        "qid": "counting_022",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 1224,
+        "n_events": 3,
+        "neutral_minus_event": 160,
+        "neutral_position": 1384,
+        "qid": "counting_023",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 257,
+        "n_events": 17,
+        "neutral_minus_event": -160,
+        "neutral_position": 97,
+        "qid": "counting_024",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 486,
+        "n_events": 27,
+        "neutral_minus_event": -96,
+        "neutral_position": 390,
+        "qid": "counting_025",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 210,
+        "n_events": 26,
+        "neutral_minus_event": -146,
+        "neutral_position": 64,
+        "qid": "counting_026",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 168,
+        "n_events": 8,
+        "neutral_minus_event": 393,
+        "neutral_position": 561,
+        "qid": "counting_027",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 239,
+        "n_events": 19,
+        "neutral_minus_event": 160,
+        "neutral_position": 399,
+        "qid": "counting_028",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "counting",
+        "event_position": 254,
+        "n_events": 44,
+        "neutral_minus_event": 134,
+        "neutral_position": 388,
+        "qid": "counting_029",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 422,
+        "n_events": 37,
+        "neutral_minus_event": -160,
+        "neutral_position": 262,
+        "qid": "number_theory_000",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 419,
+        "n_events": 10,
+        "neutral_minus_event": -160,
+        "neutral_position": 259,
+        "qid": "number_theory_001",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 608,
+        "n_events": 2,
+        "neutral_minus_event": 160,
+        "neutral_position": 768,
+        "qid": "number_theory_002",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 608,
+        "n_events": 1,
+        "neutral_minus_event": -160,
+        "neutral_position": 448,
+        "qid": "number_theory_003",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 657,
+        "n_events": 14,
+        "neutral_minus_event": -160,
+        "neutral_position": 497,
+        "qid": "number_theory_004",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 394,
+        "n_events": 6,
+        "neutral_minus_event": 130,
+        "neutral_position": 524,
+        "qid": "number_theory_005",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 463,
+        "n_events": 1,
+        "neutral_minus_event": 160,
+        "neutral_position": 623,
+        "qid": "number_theory_006",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 608,
+        "n_events": 1,
+        "neutral_minus_event": 160,
+        "neutral_position": 768,
+        "qid": "number_theory_007",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 608,
+        "n_events": 1,
+        "neutral_minus_event": 160,
+        "neutral_position": 768,
+        "qid": "number_theory_008",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 204,
+        "n_events": 4,
+        "neutral_minus_event": -140,
+        "neutral_position": 64,
+        "qid": "number_theory_009",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 394,
+        "n_events": 13,
+        "neutral_minus_event": 130,
+        "neutral_position": 524,
+        "qid": "number_theory_010",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 204,
+        "n_events": 6,
+        "neutral_minus_event": 339,
+        "neutral_position": 543,
+        "qid": "number_theory_011",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 204,
+        "n_events": 4,
+        "neutral_minus_event": -140,
+        "neutral_position": 64,
+        "qid": "number_theory_012",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 911,
+        "n_events": 10,
+        "neutral_minus_event": -160,
+        "neutral_position": 751,
+        "qid": "number_theory_013",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 625,
+        "n_events": 1,
+        "neutral_minus_event": -160,
+        "neutral_position": 465,
+        "qid": "number_theory_014",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 204,
+        "n_events": 4,
+        "neutral_minus_event": 223,
+        "neutral_position": 427,
+        "qid": "number_theory_015",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 396,
+        "n_events": 6,
+        "neutral_minus_event": -160,
+        "neutral_position": 236,
+        "qid": "number_theory_016",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 1302,
+        "n_events": 8,
+        "neutral_minus_event": -160,
+        "neutral_position": 1142,
+        "qid": "number_theory_017",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 422,
+        "n_events": 35,
+        "neutral_minus_event": 320,
+        "neutral_position": 742,
+        "qid": "number_theory_018",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 462,
+        "n_events": 3,
+        "neutral_minus_event": 160,
+        "neutral_position": 622,
+        "qid": "number_theory_019",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 1300,
+        "n_events": 5,
+        "neutral_minus_event": -160,
+        "neutral_position": 1140,
+        "qid": "number_theory_020",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 608,
+        "n_events": 2,
+        "neutral_minus_event": 160,
+        "neutral_position": 768,
+        "qid": "number_theory_021",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 625,
+        "n_events": 1,
+        "neutral_minus_event": -160,
+        "neutral_position": 465,
+        "qid": "number_theory_022",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 608,
+        "n_events": 2,
+        "neutral_minus_event": -160,
+        "neutral_position": 448,
+        "qid": "number_theory_023",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 210,
+        "n_events": 7,
+        "neutral_minus_event": 164,
+        "neutral_position": 374,
+        "qid": "number_theory_024",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 396,
+        "n_events": 5,
+        "neutral_minus_event": 308,
+        "neutral_position": 704,
+        "qid": "number_theory_025",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 342,
+        "n_events": 9,
+        "neutral_minus_event": -160,
+        "neutral_position": 182,
+        "qid": "number_theory_026",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 528,
+        "n_events": 3,
+        "neutral_minus_event": -160,
+        "neutral_position": 368,
+        "qid": "number_theory_027",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 204,
+        "n_events": 4,
+        "neutral_minus_event": -140,
+        "neutral_position": 64,
+        "qid": "number_theory_028",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "number_theory",
+        "event_position": 204,
+        "n_events": 3,
+        "neutral_minus_event": 223,
+        "neutral_position": 427,
+        "qid": "number_theory_029",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 248,
+        "n_events": 25,
+        "neutral_minus_event": 160,
+        "neutral_position": 408,
+        "qid": "set_theory_000",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 455,
+        "n_events": 11,
+        "neutral_minus_event": -160,
+        "neutral_position": 295,
+        "qid": "set_theory_001",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 95,
+        "n_events": 8,
+        "neutral_minus_event": 96,
+        "neutral_position": 191,
+        "qid": "set_theory_002",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 234,
+        "n_events": 8,
+        "neutral_minus_event": -160,
+        "neutral_position": 74,
+        "qid": "set_theory_003",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 505,
+        "n_events": 12,
+        "neutral_minus_event": 344,
+        "neutral_position": 849,
+        "qid": "set_theory_004",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 246,
+        "n_events": 11,
+        "neutral_minus_event": -160,
+        "neutral_position": 86,
+        "qid": "set_theory_005",
+        "sequence_tokens": 1143
+      },
+      {
+        "category": "set_theory",
+        "event_position": 243,
+        "n_events": 2,
+        "neutral_minus_event": -160,
+        "neutral_position": 83,
+        "qid": "set_theory_006",
+        "sequence_tokens": 974
+      },
+      {
+        "category": "set_theory",
+        "event_position": 476,
+        "n_events": 63,
+        "neutral_minus_event": -96,
+        "neutral_position": 380,
+        "qid": "set_theory_007",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 283,
+        "n_events": 14,
+        "neutral_minus_event": 196,
+        "neutral_position": 479,
+        "qid": "set_theory_009",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 424,
+        "n_events": 6,
+        "neutral_minus_event": -160,
+        "neutral_position": 264,
+        "qid": "set_theory_010",
+        "sequence_tokens": 1999
+      },
+      {
+        "category": "set_theory",
+        "event_position": 253,
+        "n_events": 4,
+        "neutral_minus_event": -160,
+        "neutral_position": 93,
+        "qid": "set_theory_013",
+        "sequence_tokens": 1345
+      },
+      {
+        "category": "set_theory",
+        "event_position": 263,
+        "n_events": 3,
+        "neutral_minus_event": -160,
+        "neutral_position": 103,
+        "qid": "set_theory_014",
+        "sequence_tokens": 1043
+      },
+      {
+        "category": "set_theory",
+        "event_position": 322,
+        "n_events": 9,
+        "neutral_minus_event": 160,
+        "neutral_position": 482,
+        "qid": "set_theory_015",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 373,
+        "n_events": 2,
+        "neutral_minus_event": -160,
+        "neutral_position": 213,
+        "qid": "set_theory_016",
+        "sequence_tokens": 1190
+      },
+      {
+        "category": "set_theory",
+        "event_position": 380,
+        "n_events": 16,
+        "neutral_minus_event": -160,
+        "neutral_position": 220,
+        "qid": "set_theory_018",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 481,
+        "n_events": 36,
+        "neutral_minus_event": 269,
+        "neutral_position": 750,
+        "qid": "set_theory_020",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 243,
+        "n_events": 6,
+        "neutral_minus_event": 195,
+        "neutral_position": 438,
+        "qid": "set_theory_021",
+        "sequence_tokens": 688
+      },
+      {
+        "category": "set_theory",
+        "event_position": 263,
+        "n_events": 3,
+        "neutral_minus_event": 302,
+        "neutral_position": 565,
+        "qid": "set_theory_022",
+        "sequence_tokens": 1043
+      },
+      {
+        "category": "set_theory",
+        "event_position": 373,
+        "n_events": 2,
+        "neutral_minus_event": -160,
+        "neutral_position": 213,
+        "qid": "set_theory_025",
+        "sequence_tokens": 1166
+      },
+      {
+        "category": "set_theory",
+        "event_position": 559,
+        "n_events": 11,
+        "neutral_minus_event": -160,
+        "neutral_position": 399,
+        "qid": "set_theory_026",
+        "sequence_tokens": 1998
+      },
+      {
+        "category": "set_theory",
+        "event_position": 534,
+        "n_events": 33,
+        "neutral_minus_event": 1358,
+        "neutral_position": 1892,
+        "qid": "set_theory_027",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "set_theory",
+        "event_position": 123,
+        "n_events": 11,
+        "neutral_minus_event": 247,
+        "neutral_position": 370,
+        "qid": "set_theory_029",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 622,
+        "n_events": 2,
+        "neutral_minus_event": -160,
+        "neutral_position": 462,
+        "qid": "sequences_000",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 545,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 705,
+        "qid": "sequences_001",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 545,
+        "n_events": 10,
+        "neutral_minus_event": 148,
+        "neutral_position": 693,
+        "qid": "sequences_002",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 714,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 874,
+        "qid": "sequences_003",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 545,
+        "n_events": 6,
+        "neutral_minus_event": -160,
+        "neutral_position": 385,
+        "qid": "sequences_004",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 545,
+        "n_events": 5,
+        "neutral_minus_event": -160,
+        "neutral_position": 385,
+        "qid": "sequences_005",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 1001,
+        "n_events": 13,
+        "neutral_minus_event": 153,
+        "neutral_position": 1154,
+        "qid": "sequences_006",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 1363,
+        "n_events": 25,
+        "neutral_minus_event": 570,
+        "neutral_position": 1933,
+        "qid": "sequences_007",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 807,
+        "n_events": 5,
+        "neutral_minus_event": -160,
+        "neutral_position": 647,
+        "qid": "sequences_008",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 446,
+        "n_events": 12,
+        "neutral_minus_event": 390,
+        "neutral_position": 836,
+        "qid": "sequences_009",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 1802,
+        "n_events": 3,
+        "neutral_minus_event": -160,
+        "neutral_position": 1642,
+        "qid": "sequences_010",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 729,
+        "n_events": 16,
+        "neutral_minus_event": 262,
+        "neutral_position": 991,
+        "qid": "sequences_011",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 466,
+        "n_events": 2,
+        "neutral_minus_event": -160,
+        "neutral_position": 306,
+        "qid": "sequences_012",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 957,
+        "n_events": 25,
+        "neutral_minus_event": 160,
+        "neutral_position": 1117,
+        "qid": "sequences_013",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 632,
+        "n_events": 2,
+        "neutral_minus_event": 160,
+        "neutral_position": 792,
+        "qid": "sequences_014",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 780,
+        "n_events": 9,
+        "neutral_minus_event": -160,
+        "neutral_position": 620,
+        "qid": "sequences_015",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 849,
+        "n_events": 18,
+        "neutral_minus_event": 160,
+        "neutral_position": 1009,
+        "qid": "sequences_016",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 1397,
+        "n_events": 6,
+        "neutral_minus_event": 160,
+        "neutral_position": 1557,
+        "qid": "sequences_017",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 634,
+        "n_events": 6,
+        "neutral_minus_event": 285,
+        "neutral_position": 919,
+        "qid": "sequences_018",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 632,
+        "n_events": 2,
+        "neutral_minus_event": 160,
+        "neutral_position": 792,
+        "qid": "sequences_019",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 945,
+        "n_events": 3,
+        "neutral_minus_event": -160,
+        "neutral_position": 785,
+        "qid": "sequences_020",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 1175,
+        "n_events": 4,
+        "neutral_minus_event": -160,
+        "neutral_position": 1015,
+        "qid": "sequences_021",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 507,
+        "n_events": 2,
+        "neutral_minus_event": -160,
+        "neutral_position": 347,
+        "qid": "sequences_022",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 622,
+        "n_events": 2,
+        "neutral_minus_event": 160,
+        "neutral_position": 782,
+        "qid": "sequences_023",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 545,
+        "n_events": 7,
+        "neutral_minus_event": -160,
+        "neutral_position": 385,
+        "qid": "sequences_024",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 1001,
+        "n_events": 15,
+        "neutral_minus_event": -160,
+        "neutral_position": 841,
+        "qid": "sequences_025",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 1079,
+        "n_events": 8,
+        "neutral_minus_event": -160,
+        "neutral_position": 919,
+        "qid": "sequences_026",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 545,
+        "n_events": 5,
+        "neutral_minus_event": 148,
+        "neutral_position": 693,
+        "qid": "sequences_027",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 466,
+        "n_events": 3,
+        "neutral_minus_event": 160,
+        "neutral_position": 626,
+        "qid": "sequences_028",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "sequences",
+        "event_position": 466,
+        "n_events": 3,
+        "neutral_minus_event": 160,
+        "neutral_position": 626,
+        "qid": "sequences_029",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 14,
+        "neutral_minus_event": 268,
+        "neutral_position": 347,
+        "qid": "inequalities_000",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 412,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 572,
+        "qid": "inequalities_001",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 7,
+        "neutral_minus_event": 429,
+        "neutral_position": 508,
+        "qid": "inequalities_002",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 10,
+        "neutral_minus_event": 431,
+        "neutral_position": 510,
+        "qid": "inequalities_003",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 412,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 572,
+        "qid": "inequalities_004",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 8,
+        "neutral_minus_event": 429,
+        "neutral_position": 508,
+        "qid": "inequalities_005",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 350,
+        "n_events": 7,
+        "neutral_minus_event": -160,
+        "neutral_position": 190,
+        "qid": "inequalities_006",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 231,
+        "n_events": 9,
+        "neutral_minus_event": 215,
+        "neutral_position": 446,
+        "qid": "inequalities_007",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 9,
+        "neutral_minus_event": 397,
+        "neutral_position": 476,
+        "qid": "inequalities_008",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 5,
+        "neutral_minus_event": -157,
+        "neutral_position": 64,
+        "qid": "inequalities_009",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 5,
+        "neutral_minus_event": 397,
+        "neutral_position": 476,
+        "qid": "inequalities_010",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 412,
+        "n_events": 3,
+        "neutral_minus_event": -160,
+        "neutral_position": 252,
+        "qid": "inequalities_011",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 6,
+        "neutral_minus_event": 287,
+        "neutral_position": 508,
+        "qid": "inequalities_012",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 14,
+        "neutral_minus_event": 397,
+        "neutral_position": 476,
+        "qid": "inequalities_013",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 6,
+        "neutral_minus_event": -157,
+        "neutral_position": 64,
+        "qid": "inequalities_014",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 7,
+        "neutral_minus_event": -157,
+        "neutral_position": 64,
+        "qid": "inequalities_015",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 9,
+        "neutral_minus_event": 612,
+        "neutral_position": 691,
+        "qid": "inequalities_016",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 6,
+        "neutral_minus_event": 226,
+        "neutral_position": 447,
+        "qid": "inequalities_017",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 7,
+        "neutral_minus_event": 160,
+        "neutral_position": 381,
+        "qid": "inequalities_018",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 8,
+        "neutral_minus_event": 160,
+        "neutral_position": 381,
+        "qid": "inequalities_019",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 6,
+        "neutral_minus_event": 160,
+        "neutral_position": 381,
+        "qid": "inequalities_020",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 13,
+        "neutral_minus_event": 984,
+        "neutral_position": 1063,
+        "qid": "inequalities_021",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 20,
+        "neutral_minus_event": 251,
+        "neutral_position": 330,
+        "qid": "inequalities_022",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 216,
+        "n_events": 15,
+        "neutral_minus_event": 183,
+        "neutral_position": 399,
+        "qid": "inequalities_023",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 3,
+        "neutral_minus_event": -157,
+        "neutral_position": 64,
+        "qid": "inequalities_024",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 79,
+        "n_events": 7,
+        "neutral_minus_event": 238,
+        "neutral_position": 317,
+        "qid": "inequalities_025",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 823,
+        "n_events": 2,
+        "neutral_minus_event": -160,
+        "neutral_position": 663,
+        "qid": "inequalities_026",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 632,
+        "n_events": 4,
+        "neutral_minus_event": 160,
+        "neutral_position": 792,
+        "qid": "inequalities_027",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 6,
+        "neutral_minus_event": -157,
+        "neutral_position": 64,
+        "qid": "inequalities_028",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "inequalities",
+        "event_position": 221,
+        "n_events": 7,
+        "neutral_minus_event": 226,
+        "neutral_position": 447,
+        "qid": "inequalities_029",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 510,
+        "n_events": 1,
+        "neutral_minus_event": -160,
+        "neutral_position": 350,
+        "qid": "algebra_word_problems_000",
+        "sequence_tokens": 1261
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 825,
+        "n_events": 5,
+        "neutral_minus_event": -160,
+        "neutral_position": 665,
+        "qid": "algebra_word_problems_001",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 259,
+        "n_events": 16,
+        "neutral_minus_event": -160,
+        "neutral_position": 99,
+        "qid": "algebra_word_problems_002",
+        "sequence_tokens": 1549
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 948,
+        "n_events": 1,
+        "neutral_minus_event": -160,
+        "neutral_position": 788,
+        "qid": "algebra_word_problems_003",
+        "sequence_tokens": 1411
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 73,
+        "n_events": 35,
+        "neutral_minus_event": 160,
+        "neutral_position": 233,
+        "qid": "algebra_word_problems_005",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 212,
+        "n_events": 17,
+        "neutral_minus_event": -148,
+        "neutral_position": 64,
+        "qid": "algebra_word_problems_006",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 119,
+        "n_events": 25,
+        "neutral_minus_event": 152,
+        "neutral_position": 271,
+        "qid": "algebra_word_problems_007",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 617,
+        "n_events": 18,
+        "neutral_minus_event": 1162,
+        "neutral_position": 1779,
+        "qid": "algebra_word_problems_008",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 182,
+        "n_events": 14,
+        "neutral_minus_event": 515,
+        "neutral_position": 697,
+        "qid": "algebra_word_problems_009",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 425,
+        "n_events": 3,
+        "neutral_minus_event": 258,
+        "neutral_position": 683,
+        "qid": "algebra_word_problems_010",
+        "sequence_tokens": 1094
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 531,
+        "n_events": 26,
+        "neutral_minus_event": 408,
+        "neutral_position": 939,
+        "qid": "algebra_word_problems_011",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 507,
+        "n_events": 35,
+        "neutral_minus_event": -160,
+        "neutral_position": 347,
+        "qid": "algebra_word_problems_012",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 882,
+        "n_events": 1,
+        "neutral_minus_event": -160,
+        "neutral_position": 722,
+        "qid": "algebra_word_problems_014",
+        "sequence_tokens": 1470
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 190,
+        "n_events": 21,
+        "neutral_minus_event": 444,
+        "neutral_position": 634,
+        "qid": "algebra_word_problems_015",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 1017,
+        "n_events": 8,
+        "neutral_minus_event": -160,
+        "neutral_position": 857,
+        "qid": "algebra_word_problems_016",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 500,
+        "n_events": 15,
+        "neutral_minus_event": -160,
+        "neutral_position": 340,
+        "qid": "algebra_word_problems_017",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 215,
+        "n_events": 30,
+        "neutral_minus_event": -151,
+        "neutral_position": 64,
+        "qid": "algebra_word_problems_018",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 218,
+        "n_events": 21,
+        "neutral_minus_event": 490,
+        "neutral_position": 708,
+        "qid": "algebra_word_problems_019",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 792,
+        "n_events": 1,
+        "neutral_minus_event": -160,
+        "neutral_position": 632,
+        "qid": "algebra_word_problems_020",
+        "sequence_tokens": 1121
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 397,
+        "n_events": 7,
+        "neutral_minus_event": 160,
+        "neutral_position": 557,
+        "qid": "algebra_word_problems_021",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 939,
+        "n_events": 31,
+        "neutral_minus_event": -160,
+        "neutral_position": 779,
+        "qid": "algebra_word_problems_022",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 247,
+        "n_events": 58,
+        "neutral_minus_event": 199,
+        "neutral_position": 446,
+        "qid": "algebra_word_problems_023",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 273,
+        "n_events": 49,
+        "neutral_minus_event": 160,
+        "neutral_position": 433,
+        "qid": "algebra_word_problems_024",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 314,
+        "n_events": 8,
+        "neutral_minus_event": 160,
+        "neutral_position": 474,
+        "qid": "algebra_word_problems_026",
+        "sequence_tokens": 2000
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 193,
+        "n_events": 1,
+        "neutral_minus_event": 160,
+        "neutral_position": 353,
+        "qid": "algebra_word_problems_027",
+        "sequence_tokens": 817
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 577,
+        "n_events": 5,
+        "neutral_minus_event": 160,
+        "neutral_position": 737,
+        "qid": "algebra_word_problems_028",
+        "sequence_tokens": 1850
+      },
+      {
+        "category": "algebra_word_problems",
+        "event_position": 261,
+        "n_events": 11,
+        "neutral_minus_event": 160,
+        "neutral_position": 421,
+        "qid": "algebra_word_problems_029",
+        "sequence_tokens": 2000
+      }
+    ],
+    "same_rollout_neutral": true
+  },
+  "representation": {
+    "dimensions": 32,
+    "kind": "fixed Rademacher projection",
+    "projection_sha256": "5bf8f350786ae23681abef93b61de8c9b40b7d4cddf8ab034f10757832458278"
+  },
+  "summaries": {
+    "positionwise_local": {
+      "completion_90_offset": -1,
+      "midpoint_50_offset": -1,
+      "onset_10_offset": -64,
+      "peak_offset": -1,
+      "peak_value": 0.21364421500153413,
+      "positive_area": 1.8306593853099389,
+      "rise_time_tokens": 63
+    },
+    "positionwise_window6": {
+      "completion_90_offset": 2,
+      "midpoint_50_offset": -1,
+      "onset_10_offset": -44,
+      "peak_offset": 4,
+      "peak_value": 0.3344799197040717,
+      "positive_area": 2.890815905411362,
+      "rise_time_tokens": 46
+    },
+    "transported_local": {
+      "completion_90_offset": -1,
+      "midpoint_50_offset": -1,
+      "onset_10_offset": -64,
+      "peak_offset": -1,
+      "peak_value": 0.032159835961076744,
+      "positive_area": 0.10151578511004467,
+      "rise_time_tokens": 63
+    },
+    "transported_window6": {
+      "completion_90_offset": -9,
+      "midpoint_50_offset": -9,
+      "onset_10_offset": -9,
+      "peak_offset": -9,
+      "peak_value": 0.00547574660561001,
+      "positive_area": 0.00547574660561001,
+      "rise_time_tokens": 0
+    }
+  }
+}
