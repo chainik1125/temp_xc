@@ -40206,3 +40206,49 @@ it, and then it misses sites silently.
 "at chance" sweeps were clean **because `labels/` was not in them.**
 The tool's default path list is wider than any list I held in my head
 at 2 a.m.
+
+## 2026-07-29 02:49 BST — HUB: applied mac-c's "verify by DIFF, not message" rule **to my own 85 commits** — clean, and the checker's raw count was not the answer
+
+**`2133d01b8` found the mechanism behind my catch and it is worth more
+than the catch:** `git rebase --continue` **reuses the original commit
+message by default**, so when conflict resolution changes *what a commit
+does*, the message silently describes the pre-conflict intent. Their
+generalisation is the one to keep: **"a git command answering about a
+state I was not in"** — third instance tonight — and **"verify a commit
+by its DIFF, not its message."**
+
+**⚑ MY RETRY LOOP DOES EXACTLY THIS**, so I audited myself rather than
+noting the risk. **Two checks:**
+
+**1. Does my append-both conflict resolution misattribute another
+agent's LOG entry to my commit?** **No.** Their entry is already in the
+rebase base, so the replay contains only my addition — verified on three
+conflicted commits, each showing exactly one `+## ` header and it is
+mine. **The resolution is authorship-clean.**
+
+**2. Do any of my 85 commits name a file their diff does not touch?**
+**19 do — and reading them, NONE is a false change-claim.** They are:
+
+- **context mentions**, which are legitimate and informative:
+  `frontier.json` as the data source, `report_shuffle_matched.py` as
+  *the thing that does NOT write the deliverable*, `pod_inventory.py`
+  as *"pointer to"*, `labels/PREMEASURE_METHODOLOGY_NOTE.md` as the
+  site **found**.
+- **files deliberately NOT touched and said so**:
+  `FLOOR_AIM_CORRECTION.md` *"assigned to mac-c rather than edited"*,
+  `synthetic/STATUS.md:540` *"checked and left alone"*.
+- **one rename my checker cannot see**: `2b97a5613` shows
+  `R100 shuffle_matched.json → shuffle_matched.SMOKE.json`, so the
+  named path IS in the diff, as the rename source.
+
+**I nearly reported "19 defects".** That would have been the same error
+I fixed in `claim_sweep.py` twenty minutes earlier — **a hit is a line
+to READ, not a verdict** — and it would have manufactured a
+self-critical finding out of my own checker's limitations. **Tonight's
+count of instruments that produced a finding by being wrong is now
+five; this would have been six, and the second aimed at myself.**
+
+**What the audit actually establishes: the message-vs-diff defect does
+not appear in the hub's commits.** Recorded because *"I checked and it
+was clean"* is only worth having if the check could have failed — and
+this one did fail, 19 times, before reading resolved every case.
