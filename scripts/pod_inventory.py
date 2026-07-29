@@ -15,7 +15,11 @@ every row, and let the caller scroll.
       -d '{"query":"query { myself { pods { id name desiredStatus costPerHr } } }"}' \
       https://api.runpod.io/graphql | .venv/bin/python scripts/pod_inventory.py
 
-Reads stdin so the key is never an argument (process listings leak argv).
+⚑ STDIN IS THE API **RESPONSE**, NOT THE KEY. Pipe `curl` output in, exactly
+as above — the key travels in the env var that `curl` reads, and never reaches
+this script at all (process listings leak argv). Spelled out because the hub
+piped the key itself in at 15:2x 07-29 and got a bare `JSONDecodeError`, which
+looks like an auth failure and is not one.
 Only RUNNING pods are summed — EXITED records carry a costPerHr and summing
 them once produced "128 pods, $109.03/h".
 """

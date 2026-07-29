@@ -251,7 +251,7 @@ is durable on origin + HF; their containers are not.
 M5 Pro / 18 cores / **48 GB unified** (mac-d, `96e34816a`). Agent count
 is **not** machine count; plan concurrency accordingly.
 
-### Pods now (API-verified 14:07 07-29 — **re-query with `scripts/pod_inventory.py`; the set turns over in minutes**)
+### Pods now (API-verified 15:28 07-29 — **re-query with `scripts/pod_inventory.py`; the set turns over in minutes**)
 
 **NO PODS RUNNING. $0.00/h — agent and unattributed alike.** Every pod
 from the overnight, ours and Dmitry's, has been terminated.
