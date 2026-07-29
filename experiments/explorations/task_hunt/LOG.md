@@ -40860,3 +40860,52 @@ card and my briefing, control firing. **The one remaining live hit is
 the known false positive I decided not to chase** — my own §7
 withdrawal, whose correction wording is not in the regex, and widening
 it further would be fitting the tool to my own prose.
+
+## 2026-07-29 03:55 BST — HUB ratifies `242a0dbaa`: **an agent DECLINED authorised compute because its own pre-registration made the spend uninformative**
+
+**Ratified, and the reasoning is the deliverable.**
+
+### The re-verification corrects a mistake I also made tonight
+
+They re-checked the table **from the raw shard JSON by a separate
+path** — explicitly *"not by regenerating and diffing a file against
+itself, the byte-identity mistake I made earlier tonight."* All four T
+match to **5e-5**; pooled `max|gap|` recomputes to the printed
+**6.53e-09**.
+
+**⚑ I MADE THE SAME MISTAKE AND CALLED IT VERIFICATION.** At 02:1x I
+reported `tab_sycgen_budget_matched.md` *"regenerates byte-identical"*
+as evidence it was current. **That establishes DETERMINISM, not
+CORRECTNESS** — the generator reproducing its own output says nothing
+about whether the generator is right. It was the correct check for the
+question I was asking (**is this file stale?**) and would have been
+worthless for the question it resembles (**is this number right?**).
+**Those two are easy to conflate at 2 a.m. and they are not the same
+check.**
+
+### Declining the n=5 extension — both reasons stated, not left implicit
+
+1. **The costing premise changed.** Card §5b costed n=5 as a **free
+   rider** on a pod *"already up and otherwise idle."* **That pod is
+   terminated**, so standalone it is **10 trainings + a 7.59 GB cache
+   rebuild, ≈$6–8 over 1.5 h** — *"a new spend decision, not
+   'completing the card'."* **A plan costed under one condition is not
+   automatically funded under another**, and the honest move is to
+   re-price it rather than inherit the old number.
+2. **Their own frozen rule caps its value.** §5b fixed the n=5 test at
+   **5/5 sign agreement — STRICTER than 3/3** — so **T=2/4 (already
+   3/3, carrying the verdict) cannot be strengthened**, and T=8/16 (at
+   2/3) are **unlikely to become determinate**. Expected return:
+   *"still indeterminate, better sized."*
+
+**⇒ RULING: the decline is correct and I am recording it as a
+CONSIDERED DECLINE, not an omission.** Outcome (d) sizing has been on
+my open list since the item-6 pre-registration; **it now leaves that
+list with a reason rather than sitting on it as debt.**
+
+**The general point is one I want on the record at the end of this
+night:** Han authorised up to **20 H100s**; the lane spent **$2.12**,
+then **$0.44**, and then **declined the last increment because the
+agent's own pre-registered threshold made it uninformative.**
+**Authorisation is a ceiling, not a target, and a pre-registration that
+constrains your own future spending is doing exactly what it is for.**

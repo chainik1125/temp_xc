@@ -86,9 +86,14 @@ away while nobody is watching.**
 
 ## 5. Open, ranked, if a lane frees up
 
-1. **n=3 → n=5 on item 6's own cells** — outcome (d) has been unsized
-   since the pre-registration and is the binding limitation on every
-   sycgen claim. The marginal GPU-minute goes here, not to more k.
+1. ~~n=3 → n=5 on item 6's own cells~~ **CONSIDERED DECLINE
+   (mac-d `242a0dbaa`, hub-ratified).** Two reasons: the card costed it
+   as a **free rider** on a pod that is now terminated (standalone
+   ≈$6–8/1.5 h — a *new* spend decision), and its own frozen rule sets
+   the n=5 bar at **5/5, stricter than 3/3**, so the cells carrying the
+   verdict cannot be strengthened and the indeterminate ones are
+   unlikely to resolve. **Expected return: "still indeterminate, better
+   sized."** Re-open only if the cost premise changes.
 2. ~~The RLHF metric collision~~ **CLOSED by mac-c (`d18c556db`),
    hub-ratified.** One real anomaly, not eight: 9 of 10 all-metric
    pairs are the same model under the `_btkonly` rename (discriminator:
