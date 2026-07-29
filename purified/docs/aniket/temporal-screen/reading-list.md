@@ -1210,28 +1210,34 @@ activation probe class is explicit and finite.
 
 ## What to read this week
 
-### Four-hour minimum packet
+### Five-paper packet
 
-1. **Cagnetta et al.** for the lag-decay, conditional-entropy, and finite-data
-   horizon picture.
-2. **O'Connor and Andreas** for refit ablations and usable context
-   information.
-3. **Xu et al. plus Hewitt et al.** for the probe-class-dependent and
-   conditional-information formulation.
-4. **Altmann et al.** for the topical-burstiness counterexample.
-5. **Skrill and Norman-Haignere** for an intervention-based activation
-   timescale measurement.
-6. **Chien et al. and Keshishian et al.** for paired-prefix relaxation and
-   Temporal Context Invariance.
+1. **Cagnetta et al., _Deriving Neural Scaling Laws from the statistics of
+   natural language_.** Read for the lag-decay, conditional-entropy, sampling
+   floor, and finite-data horizon picture that motivates the project.
+2. **O'Connor and Andreas, _What Context Features Can Transformer Language
+   Models Use?_** Read for the closest existing experimental template:
+   retrain matched predictors on graduated context ablations and measure
+   usable information rather than raw correlation.
+3. **Hewitt et al., _Conditional probing: measuring usable information
+   beyond a baseline_.** Read for the central screen statistic: what ordered
+   history predicts beyond the anchor token and the complete
+   order-invariant multiset.
+4. **Altmann et al., _On the origin of long-range correlations in texts_.**
+   Read for the decisive counterexample: topical burstiness can create
+   long-range power without useful order, so a correlation tail cannot pass
+   a task.
+5. **Skrill and Norman-Haignere, _Large language models transition from
+   integrating across position-yoked, exponential windows to
+   structure-yoked, power-law windows_.** Read for the most transferable
+   activation-side intervention: perturb an earlier token and measure the
+   resulting integration window across layers and structural boundaries.
 
-### Second pass
-
-Read Jiao et al., Watson and Wright, Berrett et al., Khandelwal et al.,
-Belletti et al., Dahlhaus, Diebold and Inoue, and the benchmark-design papers
-below. Read Thomson, Geweke, and Schreiber/Schmitz when implementing the
-spectral diagnostic; use Robinson/Veitch-Abry only when implementing a
-long-memory estimator. None of the classical spectral methods should delay
-the first predictive screen.
+Everything else in this memo is reference material. Chien et al. and
+Keshishian et al. are the first additions if we decide to implement
+activation relaxation immediately; Thomson, Geweke, and
+Schreiber/Schmitz become necessary only when implementing the spectral
+diagnostic.
 
 ## Questions for Surya, Francesco, Allan, and Matthieu
 
