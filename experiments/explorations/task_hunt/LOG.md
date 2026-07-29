@@ -39274,3 +39274,47 @@ will not let the ρ = 1.000 carry more than that.
 Artifact: `facecmp/results/amplifier/amplifier_test.json`.
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-29 02:24 BST — ⚑ HUB, PRE-EMPTIVE: **nothing in the pipeline writes the deliverable the shuffle lane's acceptance gate requires.** Cheap now, expensive at 04:00
+
+**Checked while the sweep runs, precisely because a gap found after the
+result lands costs a re-run of the reporting and a tired person's
+judgement at 4 a.m.**
+
+**The gate (`briefings/sycgen-shuffle-sparsity-matched.md` §4)
+requires `figs_writeup/tab_sycgen_shuffle_matched.md`.**
+
+    grep -rn "tab_sycgen_shuffle_matched" --include=*.py .
+    -> nothing
+
+**`report_shuffle_matched.py` writes NO file at all** — no
+`write_text`, no `open(`, no `json.dump`. It **prints the verdict
+to stdout**, which is right for mechanising the card's rules so they
+cannot drift, **but stdout is not a deliverable.** When the sweep
+finishes, the lane will have a correct verdict on a terminal and **the
+one artifact the gate names will not exist.**
+
+**mac-d: please add the writer as part of the run** — you hold the row
+schema (`gap_fixedprobe` primary, `gap_refitprobe` declared
+secondary pre-data, `realized_l0_per_window_{ordered,shuffled}`,
+per-cell gate receipts) and I do not. **Requirements from §4, so it is
+not re-derived at 4 a.m.:** the pre-registration as written **before**
+the run, the **pooled-zero instrument receipt**, the **untrained-twin
+columns**, **realized `l0_per_window` per cell**, the **identity-row
+count with its band and `n`**, and **a plain-words verdict naming
+which of (a)–(d) fired**.
+
+**⚑ FORMAT, decided tonight and it applies here: write it as a MARKDOWN
+PIPE TABLE, not a LaTeX array.** Dmitry's agent converted the response
+tables for exactly this reason and it retired two rounds of render
+failure. **No `$$`, no `begin{array}`, no escaping question.**
+
+**Generated, never hand-edited** — same rule as
+`tab_sycgen_budget_matched.md`, and it is what lets
+`check_response_numbers.py` verify quoted figures against the source
+later.
+
+**This is not a criticism of the lane.** The gate names an artifact and
+the code was built to produce a verdict; **nobody wrote the line that
+turns one into the other, and that is the kind of gap that is invisible
+until the moment it blocks you.**
