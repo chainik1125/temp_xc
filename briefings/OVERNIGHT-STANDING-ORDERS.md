@@ -89,4 +89,38 @@ away while nobody is watching.**
 3. **Lever 3 / `floor_reach`** — minimise it; the screen criterion is
    settled and $0.
 
+## 6. ⚑ WHEN RESULTS LAND — the surfaces to update, in order (Han, 01:5x)
+
+Han: *"update rebuttal handover doc as stuff comes"* and *"and also the
+… dmitry-txcwins-10h … reviewer_responses_1.md"*. **Three surfaces now
+carry sycgen claims and they must not drift.** Two copies of a live
+document is the exact hazard that produced four contradictions tonight.
+
+**Procedure, every time a sycgen number changes:**
+
+1. **`REBUTTAL_HANDOFF.md` §6** — the internal record. Verdict block +
+   the executive-summary line near the top (it has been missed before).
+2. **`figs_writeup/tab_sycgen_*.md`** — regenerate, never hand-edit
+   (`scripts/gen_sycgen_budget_table.py`).
+3. **`docs/dmitry/reviewer_responses/reviewer_responses_1.md` on
+   `arxiv`** — the WORKING copy (single-backslash) is the source of
+   truth; the paste copy is **generated from it** by doubling every
+   backslash, with the round-trip asserted.
+4. **The same file on `dmitry-txcwins-10h`.** Check the branch has not
+   moved under you and that Dmitry has not edited *that file* before
+   applying — they were editing reviewer 2 at 01:4x.
+5. **Verify, do not eyeball:**
+
+       .venv/bin/python scripts/check_response_math.py --self-test <file>
+       .venv/bin/python scripts/check_response_sync.py --fetch
+       .venv/bin/python scripts/handoff_audit.py
+
+**Constraints that travel with the response:** ≤10,000 chars in the
+paste block, **no links, no images, no plots**, and inline `$…$` must
+**never wrap across a line** — that last one is what broke the table
+twice and it is invisible on inspection.
+
+**If a number moves in a direction that weakens a delivered claim, log
+it and update the surfaces anyway.** *A sound verdict, never a win.*
+
 **Delete this file when Han is back and the lane has closed.**
