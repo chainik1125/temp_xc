@@ -13,6 +13,7 @@ def test_benchmark_plots_accept_complete_summary(tmp_path) -> None:
                 {
                     "task": task,
                     "model": model,
+                    "n": 3,
                     "mean": 0.1 * task_index + 0.01 * model_index,
                     "std": 0.01,
                     "delta_vs_txc_pre": 0.01 * model_index,

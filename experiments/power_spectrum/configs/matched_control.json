@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "run_name": "power-spectrum-matched-control-20260729",
+  "budget": {
+    "max_total_usd": 7.0,
+    "reserve_usd": 1.0,
+    "assumed_usd_per_gpu_hour": 4.0,
+    "cost_overhead_multiplier": 1.25,
+    "max_session_hours": 1.1
+  },
+  "planning": {
+    "estimated_steps_per_second": 120.0,
+    "estimated_eval_seconds_per_cell": 30.0,
+    "setup_seconds": 180.0
+  },
+  "training": {
+    "batch_tokens": 1024,
+    "buffer_tokens": 524288,
+    "refill_threshold": 0.5,
+    "learning_rate": 0.0003,
+    "warmup_steps": 1000,
+    "checkpoint_every_steps": 1000,
+    "budget_check_every_steps": 100
+  },
+  "fairness": {
+    "purpose": "Full-band global-top-k monolithic control for the multiband spectral models.",
+    "equivalence": "A full DCT basis spans every temporal kernel, so bands=full is an orthonormal reparameterization of a post-squash TXC with k_pos*T shared activations per window.",
+    "reporting": "Compare parameter count, realized l0_per_window, NMSE, and paired recovery to the main benchmark's TXC-pre and multiband spectral-v1 rows."
+  },
+  "models": [
+    {
+      "name": "txc_pre",
+      "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPre",
+      "implementation_version": "1.0.0",
+      "fairness_role": "reference_not_run",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "txc_post",
+      "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
+      "implementation_version": "1.0.0",
+      "fairness_role": "reference_not_run",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "v2_full_global",
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "implementation_version": "2.0.0-experimental",
+      "fairness_role": "matched_monolithic_window_support",
+      "hparams": {
+        "bands": "full",
+        "dc_mode": "keep",
+        "selection_mode": "global",
+        "auxk_alpha": 0.03125
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "name": "frequency",
+      "datasource": "toy_cyclic_circle_M101_d128",
+      "primary_metric": "velocity_recovery",
+      "T": 8,
+      "d_sae": 101,
+      "k_pos": 1,
+      "eval_window_L": 32,
+      "n_steps": 6000,
+      "max_cell_minutes": 20
+    },
+    {
+      "name": "multilane",
+      "datasource": "toy_multilane_circle_M101_d24",
+      "primary_metric": "multilane_recovery",
+      "T": 4,
+      "d_sae": 101,
+      "k_pos": 1,
+      "eval_window_L": 32,
+      "n_steps": 30000,
+      "max_cell_minutes": 30
+    },
+    {
+      "name": "phasepair",
+      "datasource": "toy_phasepair_M101_d24",
+      "primary_metric": "sign_recovery",
+      "T": 4,
+      "d_sae": 101,
+      "k_pos": 1,
+      "eval_window_L": 32,
+      "n_steps": 30000,
+      "max_cell_minutes": 30
+    },
+    {
+      "name": "permuted",
+      "datasource": "toy_permuted_circle_M101_d128",
+      "primary_metric": "schedule_recovery",
+      "T": 8,
+      "d_sae": 101,
+      "k_pos": 1,
+      "eval_window_L": 32,
+      "n_steps": 6000,
+      "max_cell_minutes": 20
+    },
+    {
+      "name": "colored",
+      "datasource": "toy_colored_sources_N32_D2_d32",
+      "primary_metric": "colored_rec_adj",
+      "T": 8,
+      "d_sae": 32,
+      "k_pos": 1,
+      "eval_window_L": 32,
+      "n_steps": 30000,
+      "max_cell_minutes": 30
+    }
+  ],
+  "phases": {
+    "smoke": {
+      "models": [
+        "v2_full_global"
+      ],
+      "tasks": [
+        "frequency"
+      ],
+      "seeds": [
+        0
+      ],
+      "n_steps": 2,
+      "max_cell_minutes": 5
+    },
+    "gate": {
+      "models": [
+        "v2_full_global"
+      ],
+      "tasks": "all",
+      "seeds": [
+        0
+      ],
+      "n_steps": 1200,
+      "max_cell_minutes": 10
+    },
+    "full": {
+      "models": [
+        "v2_full_global"
+      ],
+      "tasks": "all",
+      "seeds": [
+        1,
+        2,
+        42
+      ]
+    }
+  },
+  "gates": {
+    "required_models": [
+      "v2_full_global"
+    ],
+    "max_nmse": 100.0
+  }
+}

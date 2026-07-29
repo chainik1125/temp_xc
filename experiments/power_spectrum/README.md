@@ -28,8 +28,9 @@ results, figures, and conclusions for this run belong in this directory.
 - `tests/`: focused correctness tests.
 
 The original checkout is not modified by this experiment. Development occurs
-in the dedicated worktree `/private/tmp/temp_xc_spectral_screen` on branch
-`codex/spectral-screen-overnight-20260729`.
+on the isolated branch `codex/spectral-screen-overnight-20260729`; the
+checkout's host-side location is operational metadata rather than part of the
+experiment.
 
 ## Reading order
 
@@ -38,6 +39,8 @@ in the dedicated worktree `/private/tmp/temp_xc_spectral_screen` on branch
 - `analysis/task_screen_results.md`: three-seed synthetic screening results.
 - `code/spectral_txc_v2.py`: experiment-local spectral-crosscoder ablations.
 - `configs/overnight.json`: frozen matched benchmark and cost envelope.
+- `configs/matched_control.json`: bounded full-band, matched-window-support
+  control that separates the multiband prior from total support.
 
 ## Reproduction
 
@@ -46,14 +49,16 @@ Run the task screen, its plots, and the focused tests with:
 ```bash
 uv run python -m experiments.power_spectrum.code.run_task_screen
 uv run python -m experiments.power_spectrum.code.plot_task_screen
-uv run pytest experiments/power_spectrum/tests -q
-uv run ruff check experiments/power_spectrum
+uv run python -m pytest experiments/power_spectrum/tests -q
+uv run python -m ruff check experiments/power_spectrum
 ```
 
 Inspect the exact paid-compute plan without allocating a GPU:
 
 ```bash
 uv run modal run experiments/power_spectrum/code/modal_benchmark.py --stage plan
+uv run modal run experiments/power_spectrum/code/modal_matched_control.py \
+  --stage plan
 ```
 
 The frozen worst-case plan is 2,448,000 optimizer steps, 7.15 estimated A10G
@@ -69,4 +74,13 @@ uv run modal run experiments/power_spectrum/code/modal_benchmark.py \
   --stage smoke
 uv run modal run --detach \
   experiments/power_spectrum/code/modal_benchmark.py --stage overnight
+```
+
+After retrieving the completed JSONL, the canonical analyzer rejects missing
+or failed cells, verifies the exact training horizon and required metrics, and
+computes paired deltas versus both TXC baselines and spectral v1:
+
+```bash
+uv run python -m experiments.power_spectrum.code.analyze_benchmark
+uv run python -m experiments.power_spectrum.code.plot_benchmark
 ```

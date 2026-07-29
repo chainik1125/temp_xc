@@ -6,6 +6,7 @@ from experiments.power_spectrum.code import run_synthetic_benchmark as runner
 
 
 CONFIG = Path(__file__).resolve().parents[1] / "configs" / "overnight.json"
+CONTROL_CONFIG = Path(__file__).resolve().parents[1] / "configs" / "matched_control.json"
 
 
 def test_overnight_plan_is_below_time_and_cost_caps():
@@ -59,3 +60,20 @@ def test_new_budget_session_marks_stale_running_session_interrupted(tmp_path):
     assert resumed.ledger["sessions"][0]["status"] == "interrupted"
     assert resumed.ledger["sessions"][1]["status"] == "running"
     resumed.finish("complete")
+
+
+def test_full_band_control_is_bounded_and_uses_fresh_full_seeds():
+    cfg = runner.load_config(CONTROL_CONFIG)
+    plan = runner.build_plan(cfg)
+    assert plan["within_cost_plan"]
+    assert plan["within_time_plan"]
+    assert plan["estimated_cost_usd"] < 6
+    full = runner.enumerate_cells(cfg, "full")
+    assert len(full) == 15
+    assert {cell["model"] for cell in full} == {"v2_full_global"}
+    assert {cell["seed"] for cell in full} == {1, 2, 42}
+    assert all(cell["model_spec"]["hparams"]["bands"] == "full" for cell in full)
+    gate_training_ids = {
+        cell["training_id"] for cell in runner.enumerate_cells(cfg, "gate")
+    }
+    assert not gate_training_ids.intersection(cell["training_id"] for cell in full)

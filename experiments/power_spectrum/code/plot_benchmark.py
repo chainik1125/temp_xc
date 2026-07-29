@@ -13,7 +13,7 @@ import pandas as pd
 
 
 POWER_ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_INPUT = POWER_ROOT / "results" / "overnight_remote" / "summary.json"
+DEFAULT_INPUT = POWER_ROOT / "results" / "overnight_remote" / "benchmark_analysis.json"
 DEFAULT_FIGURES = POWER_ROOT / "figures"
 DEFAULT_RESULTS = POWER_ROOT / "results" / "overnight_remote"
 
@@ -139,12 +139,21 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     payload = json.loads(args.input.read_text())
+    integrity = payload.get("integrity")
+    if not integrity or not integrity.get("complete"):
+        raise RuntimeError("refusing to plot a benchmark without a complete integrity gate")
     frame = _ordered(pd.DataFrame(payload["aggregates"]))
     expected = {(task, model) for task in TASKS for model in MODELS}
     observed = {(str(row.task), str(row.model)) for row in frame.itertuples()}
     missing = sorted(expected - observed)
     if missing:
         raise RuntimeError(f"incomplete summary, missing {missing}")
+    wrong_n = frame[frame["n"] != 3][["task", "model", "n"]]
+    if not wrong_n.empty:
+        raise RuntimeError(
+            "expected three paired seeds per cell: "
+            f"{wrong_n.to_dict(orient='records')}"
+        )
     args.results_dir.mkdir(parents=True, exist_ok=True)
     frame.to_csv(args.results_dir / "benchmark_aggregate.csv", index=False)
     plot_primary(frame, args.figures_dir / "benchmark_primary_metrics.png")
