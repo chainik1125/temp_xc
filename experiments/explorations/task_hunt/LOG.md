@@ -39023,3 +39023,52 @@ one layer, **cheap to kill and it deserves the chance.**
 **Fleet guidance carried:** prefer A40s and measure first — the shuffle
 lane found **GPU idle 94% with RAM binding**, so generation and probing
 are plausibly CPU/RAM-bound too. **Say which resource bound.**
+
+## 2026-07-29 02:13 BST — HUB ratifies `dafd000ca`: the amplifier test, **and it is the first pre-registration tonight that names which way its author is motivated to be wrong**
+
+**Ratified. $0, 0 pods, caches on disk — and it runs BEFORE any corpus
+is generated, per §7.**
+
+**Design fixes the confound they raised against their own hint:** the
+three-corpus pattern spans **three different screen configurations**,
+so it is not evidence. This runs **six faces through ONE identical
+pipeline on ONE corpus.** They discarded their own supporting evidence
+for being incomparable — which is the harder half of building a test.
+
+**⚑ THE BIAS GUARD IS THE PART I HAVE NOT SEEN BEFORE TONIGHT:**
+
+> *"a face with weak tok and strong arm is exactly what the hunt is
+> looking for, so if one exists my framing dies and the program gets a
+> target. I am both author of the hypothesis and runner of its test, so
+> the bias runs toward confirming it; the preferred refutation is named
+> in advance."*
+
+**Every other pre-registration tonight stated a falsifier. This one
+states the DIRECTION OF ITS AUTHOR'S MOTIVATION and pre-commits to the
+outcome they would rather have.** Given the night's pattern — three
+flattering errors, arrived at honestly — naming the pull before the
+numbers exist is a better guard than any threshold.
+
+**A3 is asymmetric in the right direction:** *one* face with
+`tok ≤ 0.02` and `arm ≥ 0.05` **refutes** the hypothesis outright —
+**no pattern required.** A design where a single counterexample wins is
+a real test; one that accumulates support is not. **A2 refuses to set
+a threshold** and says so rather than inventing a cutoff after seeing
+the ratio. **A4 lists excluded faces rather than dropping them
+silently.** And there is a **falsifier against the test itself**: fewer
+than 4 usable faces ⇒ the Spearman is not reportable and they say so
+instead of quoting a correlation over 2–3 points.
+
+**⚑ ONE NOTE, and it is tonight's own rule pointed at A3: A3's power
+depends on the face set CONTAINING a near-silent face.** `retryesc`
+sat at `tok +0.047`, already above the 0.02 bar, so it is possible no
+face in this corpus can trip A3 at all. **If none does, "A3 did not
+fire" means UNTESTED, not SURVIVED** — an escaped control is not a
+passed control (mac-c's own formulation, `2785af115`). **Report the
+minimum `tok_excess` observed alongside the verdict**, so a reader can
+see whether A3 was ever in a position to fire. That costs one number
+and converts a silent pass into a stated limit.
+
+**Nothing else outstanding on this lane. The verdict, whichever way it
+lands, decides whether the hunt keeps its sourcing criterion or
+re-aims — and it costs nothing.**
