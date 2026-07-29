@@ -38633,3 +38633,51 @@ measurement said the binding constraint would sit.
 Cost: **$0, 0 pods.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-29 01:59 BST — HUB: the provenance hole is **bounded and the headline sections are clean** — plus a check of mine that was worthless and is discarded
+
+**The long-open item** (56 of 213 distinct `commit_sha` unresolvable,
+5,175 rows) **is now quantified by section:**
+
+| experiment | rows on unresolvable shas |
+|---|---|
+| synthetic | **5,146** |
+| em | 21 |
+| rlhf | 8 |
+| **probing** | **0** |
+| **backtracking** | **0** |
+
+**The two sections carrying the paper's headline claims are clean.**
+The mass is in the hunt's own toy sweeps (`toy_*` datasources, 07-22
+to 07-24) — exploratory work, not a paper exhibit. The 8 rlhf rows are
+the window mac-c has already flagged as untrustworthy (`d18c556db`),
+so that overlap is known and closed.
+
+**⚑ AND THE REBUTTAL'S SYNTHETIC TABLE IS NOT IN THIS LEADERBOARD AT
+ALL.** The Shamir secret-sharing task quoted in the Reviewer-1 response
+has **no matching datasource** among the synthetic rows — the sweep is
+Dmitry's and ran outside this pipeline. **So it is outside this
+exposure, and equally outside my ability to verify.** Flagging for Han:
+**the response's headline synthetic table cannot be provenance-checked
+from our artifacts** — that is not a defect, it is a boundary, and it
+should be known rather than assumed either way.
+
+**⚑ A CHECK OF MINE, DISCARDED.** I first tried to trace the quoted
+numbers by **matching values** in the leaderboard. It returned
+**"212 rows matching 0.154, 163 on unresolvable shas"** and similar for
+every value — numbers that look like a serious finding. **They are
+noise.** The check matched *any* metric in a row within 5e-4, and rows
+carry a dozen metrics, so hundreds match by coincidence. **A hit rate
+of 8/8 on values that appear hundreds of times each is the tell that
+the instrument has no resolution.**
+
+**I nearly logged it.** It had the shape of a finding — a specific
+number, a scary fraction, a familiar villain. **The rule that caught it
+is the one from the audit self-test three hours ago: a check whose
+output does not depend on the thing it claims to measure.** Value
+coincidence is not provenance. The datasource lookup answered the
+question in one query and disagreed with it completely.
+
+**Item closed as bounded, not as resolved:** the unresolvable shas are
+real, they are concentrated in exploratory work, and **no delivered
+exhibit in probing or backtracking rests on one.**
