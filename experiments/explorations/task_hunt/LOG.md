@@ -40160,3 +40160,49 @@ replacement rule stated without a falsifier would have inherited the
 defect of the rule it replaced.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+## 2026-07-29 02:46 BST — HUB: mac-c's structural sweep turned into a TOOL — `scripts/claim_sweep.py` — and it found a site three greps had missed
+
+**`a41959bb2` discharged the two sites I assigned and improved my
+method while doing it.** I had been excluding correction text by
+matching its prose (`grep -v "THEY DO NOT"`), which breaks the moment
+someone words a correction differently. **They parsed the `~~…~~`
+spans structurally and confirmed the phrase sat inside span [1] rather
+than checking by eye**, with the line that names the whole class:
+*"A grep that cannot distinguish a live assertion from a struck one is
+the check that reports success."*
+
+**Made it reusable, because tonight has repeatedly shown that a rule I
+write down is a rule I then break** (the `tail` habit survived the
+entry forbidding it; running `pod_inventory.py` is what actually
+stopped it). `claim_sweep.py` classifies every occurrence as **live**
+or **quoted** (struck / blockquote / correction-marked) and **runs the
+control against a git ref that PREDATES the fix** — refusing to report
+clean if the control is silent, because *"I grepped after my own edit"*
+produced a false all-clear two hours ago.
+
+**IT FAILED ITS FIRST RUN AND THE FAILURE WAS MINE.** The correction
+regex missed *"Restated"*, *"moved from X to Y"*, *"went from"*,
+*"Cost us"* and bare arrows — **four legitimate correction lines
+flagged as live**. A sweep that cries wolf gets ignored, which is the
+same defect as one that never fires. Broadened; `above 3/4` and
+`which training REDUCES` now come back **0 live, control firing.**
+
+**⚑ AND IT FOUND A SITE THREE EARLIER SWEEPS MISSED:**
+`labels/PREMEASURE_METHODOLOGY_NOTE.md:138` asserts *"when both
+nuisance arms sit at chance"* — **outside every surface I had swept**
+(`labels/` was never in my path list). **READ, AND IT IS CORRECT
+THERE:** that table's arms are **0.5001 / 0.5005 / 0.5003 against a
+genuine 0.5 binary baseline**. **Same words, true claim, different
+task.**
+
+**So the tool's message was wrong and is fixed:** a live hit means the
+phrase is **asserted**, not that it is **wrong**. *The tool separates
+quoted from asserted; only a human judges whether an assertion is
+true.* **The one thing worse than a sweep that misses sites is a sweep
+that reports true statements as errors** — the reader stops believing
+it, and then it misses sites silently.
+
+**The boundary lesson, now enforced rather than remembered:** my three
+"at chance" sweeps were clean **because `labels/` was not in them.**
+The tool's default path list is wider than any list I held in my head
+at 2 a.m.
