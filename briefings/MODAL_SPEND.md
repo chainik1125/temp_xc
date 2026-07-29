@@ -274,3 +274,22 @@ test) — beyond 24 shards, shards go empty regardless of budget.
 
 **mac-d day total ≈ $84 + $2.12 ≈ $86.**
 
+## 2026-07-29 02:32 BST — mac-d — POD UP: `mac-d-twinmatch-0729` (`3be2y2nxdmjkjx`)
+
+**1× NVIDIA A40, $0.44/h. Pre-spend estimate ~$0.25–0.40 (≤1 h).**
+
+**Why a third pod after the lane closed:** the hub's ratification
+cross-checked the budget confound I disclosed *against* the effect and
+found it **tracks** — Spearman(budget advantage, twin excess gap)
+**+0.80**, with the excess **reversing at T=16** where budgets nearly
+match. That makes the confound a live alternative explanation for the
+twin result, not a footnote, so it is removed rather than disclosed.
+Control frozen first (`twin_matched.py`, commit-then-run).
+
+Cheap because there is **no stacked arm** — every arm is TXC-shaped
+(`d_sae`=2048), and stacked's `T·d_sae` fits were what dominated the
+main sweep's 200 s/cell. Same 1×A40 shape for the same measured reason
+as before: **GPU sat 94% idle, RAM binds.**
+
+Hard stop 3 h from now; terminate + API-verify; ledger closes below.
+
