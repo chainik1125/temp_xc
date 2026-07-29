@@ -1,521 +1,121 @@
-# mac-d STATUS — RunPod-API executor agent (LIVE session, updated 22:5x 07-28)
+# mac-d STATUS — RunPod-API executor agent
 
-> ## ⚑⚑ HUB CORRECTION 00:44 07-29 — appended by mac-local, your text below is UNCHANGED
->
-> **Your headline verdict "ABOVE pooled at 3/4 T" is superseded: it is
-> above 2/4.** Not your arithmetic — **my comparator rule**, which you
-> implemented as briefed. It picked pooled's best point at `l0 ≤ TXC's
-> l0`; on a coarse k grid (40–75% budget steps) that compared **TXC @
-> 5.66 against pooled @ 3.51 at T=2 — 38% less budget** — and returned
-> a win. The cheapest pooled point *above* TXC's budget (5.97, +5%)
-> scores 0.4876 vs 0.4989: **inside the spread.**
->
-> **Corrected: above 2/4 (T=8, T=16), INDISTINGUISHABLE 2/4 (T=2,
-> T=4), never below.** T=16 is the strong cell and unambiguous —
-> **Pareto dominance**, pooled cannot operate at TXC's budget at all.
-> Full reasoning: LOG `73f8ea388`. Table now brackets and interpolates;
-> `verify_frontier_verdict.py` has a selection-bias guard (it is a
-> guard, **not** a port of the bracket rule — the two must stay
-> independent).
->
-> **Nothing you shipped needs redoing** — `frontier.json`'s 156 rows
-> are the input to the corrected reading. Only the verdict sentence
-> moves.
->
-> **YOUR NEXT LANE IS CLAIMED AND WAITING:**
-> `briefings/sycgen-shuffle-sparsity-matched.md` (Han, TOP priority,
-> **up to 20 simultaneous H100s authorized**). Read **§1 first** —
-> pooled's ordered−shuffled gap is **exactly zero by construction**
-> (mean-pooling is permutation-invariant), so pooled is an **instrument
-> check** and **stacked** is the real baseline. Then **§2b**, added
-> after this correction: the same coarse-grid trap is waiting there —
-> **bracket both sides and add intermediate k where the grid straddles
-> TXC's budget.** Post the pre-spend estimate before launching.
+**RESUME HERE FIRST.** Updated 2026-07-29 02:3x BST.
 
-## ⚑⚑⚑ HEADLINE (00:1x 07-29): **ITEM 6 DELIVERED. ZERO PODS. $0/h.** Everything below is FINISHED — do not re-do it.
+## Headline
 
-**ITEM 6 VERDICT (PTR):** TXC's recovery-vs-budget frontier is **ABOVE
-pooled at 3/4 T** (T2 thin 1.16×, T8 2.1×, T16 2.4× the seed spread),
-**INDISTINGUISHABLE at T=4**, **BELOW at none**. Stronger: **pooled
-SATURATES** (flat k=8→32) and never reaches TXC at T=2/4/16 even with
-+26%/+88%/+306% budget; ties only at T=8 by spending **2.9×**.
-⚑ **Stacked's 4/4 loss is NOT counted** — `T·d_sae`=32768 features vs
-1024 windows is underdetermined, so its collapse is probe-capacity
-overfitting, not architecture. Honest comparison is **TXC vs pooled**.
-Limits: n=3, threshold crude (NOT a significance test), one substrate.
-Artifacts: `…/sycgen/results/frontier.json` (156 rows) + 15 leaderboard
-rows, tag `sycgen_keep_r1_rebuilt`. Verdict LOG entry 00:11 BST.
+**SHUFFLE LANE DELIVERED. ZERO PODS. $0.00/h. Nothing unpushed.**
 
-**Pod `davlc92a80erp3` TERMINATED, API-verified GONE. Ledger closed:
-$8.6 actual vs $6 est** (overrun = ~70 min of `tsae` cells item 6 never
-needed + 3 OOM launches, both disclosed). mac-d day total ≈ **$84**.
+Verdict **(b) ARCHITECTURAL, NOT LEARNED** — a randomly-initialised TXC
+is *more* order-sensitive than the trained one in **11 of 12** (T, seed)
+cells. **Not one cell returns (a).** PTR — pending team review.
 
----
+Nothing is mid-flight.
 
-## Superseded headline (22:5x): item 6 was live
+> **Earlier item-6 headline superseded (hub `73f8ea388`).** My delivered
+> "ABOVE pooled at 3/4 T" is **above 2/4** (T=8, T=16), INDISTINGUISHABLE
+> at T=2/T=4, never below. Not my arithmetic — the hub's comparator rule,
+> which I implemented as briefed: it picked pooled's best point at
+> `l0 ≤ TXC's l0`, which on a 40–75%-step grid compared **TXC @ 5.66
+> against pooled @ 3.51 at T=2 (38% less budget)**. T=16 remains the
+> strong, unambiguous cell — **Pareto dominance**, pooled cannot operate
+> at TXC's budget at all.
 
-**After any compact: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`**
-(Han's standing order.)
+## What was delivered (shuffle lane)
 
-### RIGHT NOW — item-6 budget-matched frontier (briefing `URGENT-budget-matched-table.md`, ⛔ TOP)
+- **`figs_writeup/tab_sycgen_shuffle_matched.md`** — the acceptance gate.
+- **Card** `experiments/explorations/task_hunt/sycgen/SHUFFLE_MATCHED_CARD.md`,
+  frozen **and amended before any cell ran** (git history is the receipt).
+- **Scripts** `sycgen/{run_shuffle_matched,report_shuffle_matched,gen_shuffle_table}.py`
+- **Data** `sycgen/results/shuffle_matched.shard{0..7}.json` — 624 rows,
+  24 gate receipts, 24 cells.
+- **Ledger closed**; both pods terminated and **API-verified gone**.
 
-**Pod `mac-d-item6-0728` = `davlc92a80erp3`**, 1×H100 $2.99/h,
-`ssh -p 12721 root@103.207.149.172`. Spend so far ~$5; self-cap $25.
+## The verdict in one screen
 
-**Running:** 15 cells, **6 workers**, tag **`sycgen_keep_r1_rebuilt`**,
-log `/workspace/item6_cells.log`, launcher
-`…sycgen.run_item6_cells 6` (`OMP_NUM_THREADS=2`). Cells = 3
-`batchtopk_sae_btkonly` T=1 + 12 `txc_batchtopk_post_btkonly`
-T{2,4,8,16} × seeds{1,2,42} — **exactly what `frontier.py` loads**.
-`tsae_btkonly` deliberately EXCLUDED (frontier never loads it; 70 min
-was burned on it before I noticed).
+    gates: shuffle-live 24/24   pooled gap = 0 (6.53e-09)   SAE l0 invariant (0 viol)
 
-**✅ All 15 cells DONE, 15 checkpoints on disk.** Frontier sweep
-**RUNNING** on the pod (relaunched 23:10 after a `.config` fix; log
-`/workspace/frontier.log`, ~156 rows = 4 T × 3 seeds × 13 points,
-~35 min, writes `…/sycgen/results/frontier.json` after each (T,seed)).
+    T      trained gap   twin gap   trained>twin
+    2        +0.1114     +0.1671        0/3
+    4        +0.0231     +0.1375        0/3
+    8        +0.0504     +0.0820        0/3
+    16       +0.0618     +0.0267        1/3
 
-**NEXT ACTION when the sweep ends:**
-1. Repatriate `frontier.json`, then
-   `.venv/bin/python -m experiments.explorations.task_hunt.sycgen.report_frontier`
-   → three-state verdict (ABOVE / BELOW / **INDISTINGUISHABLE**).
-   Cross-check against the hub's independent
-   `scripts/verify_frontier_verdict.py` (`f7d0dea83`).
-2. Repatriate `…/sycgen/results/frontier.json` + new leaderboard rows
-   (dup-key check; containers never push).
-3. Report table: recovery vs budget, **as-run beside swept**, every
-   cell's realized `l0_per_window`.
-4. `bash agents/mac-d/teardown_pod.sh davlc92a80erp3 …` then close the
-   ledger with actuals.
+15 of 16 (T × draw × probe) return (b) or (c). None returns (a).
 
-**PRE-REGISTERED:** if TXC's frontier does not sit **above** the SAE
-arms', item 6 is a **NEGATIVE** and is reported as one.
+**This does NOT say TXC fails.** Ordered recovery **0.499 → 0.578**
+across T vs the twin's 0.222 → 0.058 — training works. It says the
+**ordered−shuffled gap is the wrong evidence for it.**
 
-### Traps found tonight — do not re-learn these
+## Live caveats — do not let these get lost
 
-- **`cache t=True e=True` ≠ weights exist.** `runner.py:141-150`
-  returns `train_cached=True` as a **hardcoded literal** on a
-  leaderboard hit and never reaches line 153's `checkpoint_exists`.
-  This voided my "rebuilt activation cache verified sound" claim — the
-  anchors' r=0.487/0.470/0.489 were **leaderboard reads**; the eval
-  never opened `hs14.npy`. The cache is **UNVERIFIED**; the retrained
-  SAE anchor landing near ~0.4819 will be the first real check.
-- **`free`/`nproc` report the HOST.** cgroup: **23.8 CPUs**,
-  **233.8 GiB**. 12 workers and 9 workers both **OOM-killed**
-  (`memory.events` `oom_kill` 0→2→3); 6 is stable at 63%. Size on the
-  **concurrent load peak** (24.5 GB/worker), not steady-state RSS.
-  `BrokenProcessPool` = OOM until proven otherwise.
-- **GPU is now 100%, was ~10%.** The "sycgen path is dataloader-bound"
-  diagnosis is **partially retracted** — the starvation looks largely
-  **tsae-specific**. Do **not** patch `synthetic.py` on tonight's 10%.
-- **`l0_per_token` is DERIVED, not measured.**
-  `synthetic_recovery.py:200-201` returns `l0_per_window / T`; only
-  `l0_per_window` is counted. Quoting it made TXC look like it got
-  *more recovery for less budget*; in the measured unit its budget
-  **rises 1.54×** (4.54→6.99 l0/win as r goes 0.482→0.541). Always
-  quote **`l0_per_window`**. `report_frontier.py` already does.
-- pod-D's sycgen dictionaries **are on HF** (mac-c, `eb9f3fb47`);
-  `checkpoint_exists()` can't reach them (`hf_url` has no writer).
-  Retraining anyway is deliberate: mirrored dicts were trained on
-  pod-D's **original** cache, item 6 runs on the **rebuilt** one.
+1. **The twin barely does the task** (0.058 ordered at T=16 vs 0.578),
+   so its raw gap is a difference of two near-chance numbers and raw
+   gaps may not be commensurable across a 10× base-recovery difference.
+   **This is a limitation of the rule I pre-registered.** Reported, not
+   used to overturn the verdict. The post-hoc *relative* gap — checked
+   *because* it was the reading that might have favoured us — makes the
+   negative **stronger** (twin loses 76–79%, trained 4.5–22%).
+2. **Budget confound:** twin runs at `l0`=8.00 vs trained 5.44–7.86 (up
+   to 1.47×), plausibly inflating the twin's gap. Smallest at **T=16
+   (1.02×)** — and T=16 is where the twin gate is *least* decisive (1/3
+   seeds). **The cleanest cell is the least conclusive one.**
+3. **Stacked cannot be budget-matched at T=8/16** — structural: its
+   `l0` is a sum over positions so its floor is `T·1` = 8.00/16.00 vs
+   TXC's 7.22/7.86. No finer `k` closes it. **"Matched" is not claimed
+   at T=8/16** (ratios 0.64–2.05 printed).
+4. **`mono NO` is expected, and my precondition was mis-specified.** The
+   *gap* need not be monotone in budget; I inherited that precondition
+   from item 6 where the interpolated quantity was *recovery*. The
+   bracket should be read as a **range**, not an interpolated point.
+   **Not yet fixed.**
 
----
+## Traps that cost real time — re-read before trusting a check
 
-## Earlier today (COMPLETE — historical)
+- **`_key_from_manifest` resolves 6 of 15 cells on a fresh box**, and
+  the 9 it misses are exactly the TXC cells — **the whole claim arm**.
+  Manifest entries are written *on the pod* and **containers never
+  push**. Use the **leaderboard** (it is in git). The sweep skipped the
+  claim arm per-cell and still **exited 0**.
+- **`repo_type` is part of the search space.** Searching 5 HF *model*
+  repos (1506 keys, positive control firing) returned a confident
+  **0 of 15**; the mirror is the **dataset** repo `temp-bench-data`
+  under `ckpts/<train_key>/`. All 15 were there.
+- **Read `cpu.max`/`memory.max`, never `nproc`/`free`.** 1×A40 pod:
+  cgroup **7.7 CPUs / 46.6 GiB** while `nproc` said 96, `free` 503 GB.
+- **A sigma band is meaningless at λ≈0.1 or 1e-10.** My "wider of
+  binomial and 4σ" rule gave **0..1 at T=16** where the binding band is
+  **0..0** — I verified the *component*, not the composed rule.
+- **`oom_kill` in `memory.oom_control` is a config line, not a
+  counter** — `grep -c` returns 2 on a healthy pod. Real counters:
+  `memory.failcnt` and the `oom_kill` *value*.
+- **macOS `wc -l` emits leading whitespace**, so `head -$(wc -l < f)`
+  breaks. Pipe through `tr -d ' '`.
+- **A rejected `git checkout` leaves the pod on the OLD pin** and the
+  next run silently uses stale code. Check `git rev-parse` after.
 
-## ⚑⚑⚑ (20:00): **BOTH RLHF ARMS COMPLETE. ZERO PODS. $0/h.**
+## Sizing rule earned here
 
-**After any compact: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`**
-(Han's standing order — it caught two real defects today).
+**Measure which resource binds before buying GPUs.** GPU utilisation
+during a real cell: **mean 1.4%, idle in 94% of samples**. Three
+concurrent shards on 1×A40: **one OOM-killed, survivors 207 s → 381 s,
+zero gain** — each process materialises its own **15.2 GB** copy of the
+activations. **RAM binds — not GPU, not CPU.** 4×A40 was bought for its
+**186.3 GiB / 32.3 CPUs**; **8×H100 declined** as $23.92/h of 94%-idle
+silicon. Lane cost **≈ $2.12** against a **$60/h** authorization.
 
-**DELIVERED**
-- **pf arm (item 3's missing plot)** —
-  `figs_writeup/fig_rlhf_shuffle_tsweep_pf.{png,pdf}`, 15/15 cells,
-  uniform 3 seeds at T{2,4,6,8,10}. Whole-grid gap **−0.00279,
-  t = −1.29, p = 0.219 — NOT significant**; a clean seed-controlled
-  NULL on the paper's own architecture. `l0 = 100·T` exact at every T.
-  T1/T16 absent BY DESIGN (upstream has neither arch; not patched).
-- **btk arm completed** — `fig_rlhf_shuffle_tsweep.{png,pdf}`
-  superseded **ff242b78 → 8d75ff3a** (`--tag final`, hub ruling
-  f699c80a4), now uniform 3 seeds at all 8 T. Deferral caption retired
-  on evidence. "Only T10 moved" PROVEN by per-T series diff.
-  T>1 mean +0.00435, t=2.38 — **deliberately NOT claimed significant**
-  (seed-shared columns so df=20 overstates; 0.2× noise floor; opposite
-  sign to pf ⇒ no effect, not two effects).
+**24 cells is a hard parallelism ceiling** (partition-tested) — beyond
+24 shards, shards go empty whatever the budget allows.
 
-**SPEND CLOSED.** 0 pods, $0/h, API-verified. Grid-day ≈ $36 (incl.
-$2.55 disclosed bad-host loss). Peak $17.94/h → $0 in 5h45m.
+## Standing obligations
 
-**TOOLS LEFT BEHIND (all failure-tested, not just success-tested):**
-`btk_drain.sh` (repatriate → coverage gate → committed-baseline
-assert → render → PROVE only-expected-column-moved, DRIFT stops it)
-· `teardown_pod.sh <pod> <arm:pf|btk> <T...>` (refuses until 3/3 seeds
-are LOCAL; arm REQUIRED — v1 hardcoded pf and would have destroyed the
-btk cells) · `pod_drive.sh` / `pod_btk_gap.sh` (waits on ARTIFACTS,
-never pgrep) · `PAPER_FAITHFUL_CHECK.md`.
-
-## HEADLINE (13:08, HISTORICAL): ZERO PODS — pivoted from executor-standby to CODE work; built the RLHF pf renderer (c664250a7)
-
-**Relief trigger: MOOT/stood down** (runpod-2 c6c0b70e0, then cost
-model re-measured 624528e85 → ~213 GPU-h, feasible). I fired no rung
-and spent $0. My rung-3 disarm survived three independent corrections.
-
-**What I actually delivered this window (no pod needed):**
-1. **`render_writeup_fig.py --arm {btk,pf}`** (c664250a7). The RLHF
-   **paper-faithful renderer did not exist** — the file hard-filtered
-   the btk-only (arch, datasource) pair, so every pf row was excluded
-   by construction and wave 1 would have hit `SystemExit: no matching
-   leaderboard rows`. btk path regression-verified **byte-identical**
-   (`sha256 c1998b483892f579…`). Also fixed: the "T=1 shuffle ≡
-   identity" annotation fired unconditionally (asserted a property of
-   a point not on the plot — bit ANY partial render lacking T=1), and
-   the G1 caveat collided with the legend (moved to bold top-centre).
-   Caught a **false-caption trap**: the btk binding caption is exactly
-   inverted on pf (pf IS agentic_txc_02), so each arm carries its own.
-   `--g1 {pending,passed,failed}` defaults to **pending**, enforcing
-   hub ruling 4e04ae0e3 item 4 in code, not convention.
-   **Arm derives from `cells.PF_ARCH`/`PF_DATASOURCE`** → if the
-   substrate A/B changes the constant, the renderer follows with no
-   edit.
-2. **Ledger flag** (e7c6733f2): our ledger counts *work*, RunPod bills
-   *pod-time*. $597 running / $20.93/h / ~$2,700 more to Aug 3. Hub
-   RESOLVED it (e4e3c3b1b: all-legit + scope ruling); **Han then
-   ordered idle pods closed** (f529d5a79).
-3. **Retraction** (b4cbc51e1): I called pod B "unclaimed" — it is
-   runpod-c's, per `REBUTTAL_CODE_GUIDE.md` §5a which I should have
-   read first. Retracted in 10 min. The liveness half was real:
-   runpod-c revived (b7f2f2c4c) and fixed 2 pod-B substrate bugs.
-4. **Substrate flag** (1c84cd507): runpod-2's l13-IT-vs-base-l12
-   contradiction is **retroactive** — the 3 banked T5 pf anchors are
-   l13-IT too (verified in leaderboard), so the A/B decides an
-   already-counted deliverable, not just future spend.
-
-**OPEN, mine to finish when wave 1 unblocks:** `REBUTTAL_HANDOFF.md`
-has **no embed slot for the pf figure** (line 122 embeds the btk one
-only). I offered to add it with a live-refresh caption (sycgen
-pattern) once the substrate question resolves.
-
-**Standing rule reaffirmed:** I will not terminate or execute on a pod
-I did not spin without an explicit instruction naming me — offered the
-hands as API backstop, did not take the call.
-
-## HEADLINE (12:45, HISTORICAL): STANDBY, ZERO PODS — relief trigger RESTRUCTURED then DISARMED-ON-THROUGHPUT (0fd084b46)
-
-**All my lanes closed.** sycgen FINAL-at-15/18; struqpos venue handed
-to runpod-a (their KILL 3/3 ratified); manifest append-only outcome
-ratified; 30 sycgen rows appended. Zero pods, ledger clean. Deadline
-SOFTENED 12:34 (Han, NeurIPS rule change) — amendment window Aug 3
-(`REBUTTAL_HANDOFF.md:322`), quality bar unchanged.
-
-**THE ONE LIVE DECISION — my G1-pass relief trigger. Read this before
-spending anything.** Relief rungs, cheapest first:
-1. **$0 — shard onto pod-A.** GPU 0 offered by runpod-a (e8ce981de,
-   self-voiced, shard-E receipt `0e0b96b82`); GPU 1 offered by
-   runpod-b (f42b9b356, 20/20 durability). Their silicon, THEIR hands
-   — I never execute on it. **Capacity is CORES, not GPUs** (cells are
-   CPU-bound, runpod-2 12:41): runpod-b measured pod-A at a **47.6-core
-   cgroup** (0bed01849), and naive 2-lane co-tenancy runs at **0.75×**
-   one lane (torch defaults 112 threads into the quota) vs **1.6×**
-   thread-partitioned. So best-case 3-venue relief ≈ **2.6×, not 3×**.
-2. **$0 marginal — pod-B rebuild-in-place** (pre-designated venue).
-3. **New 2×H100 spin (my pre-approval) — DISARMED ON THROUGHPUT.**
-
-**Why rung 3 is disarmed (arithmetic I re-derived myself, since the
-spend would be mine):** runpod-2's own 6–10 h/cell × 21 cells =
-126–210 GPU-h ⇒ 1 GPU 126–210 h · 3 GPU 42–70 h · 5 GPU 25–42 h.
-Nothing lands 21 cells before a submission today (runpod-a's point).
-Against the **Aug 3** horizon (~131 h): no-relief is marginal-to-
-failing; **rung 1 at runpod-b's corrected 2.6× = 48–81 h lands the
-FULL grid** with ~50–83 h slack (but at naive-launch 1.75× it is
-72–120 h = marginal, so the thread-partition fix is load-bearing).
-Rung 3 only arrives earlier *into slack that already exists* — for
-**$151–251** (25–42 h × my MEASURED pod-D rate $5.98/h), ~the entire
-remaining headroom, to rent H100s for work measured at **0% GPU
-util**. That is the tsae burn (~$17–23, today) repeated knowingly.
-**A pre-approval is permission, not an obligation.** Rung 3 fires
-ONLY if runpod-2's ask names a need free silicon can't meet
-(isolation, image, region, cores beyond what's on hand) — never on
-"faster". If runpod-2 disputes it at G1-pass, spin on their word.
-
-**Trigger 2 (dormant): retryesc_gen screen pod** on mac-c generation
-start. mac-c silent ~7.5 h as of 12:34; hub tracks it to the
-amendment window. Pre-approval stands; expect no pre-submission fire.
-If it fires, avoid the L40S faulty-volume failure mode (try A40 or a
-different DC; or ask for a warm-venue offer first).
-
-**Wake channel:** origin listener `bowqmlgee` only. Stale pod-D tsae
-monitor STOPPED 12:36. Standing habits unchanged: stamps ONLY from a
-separate preceding `date`; claim line + ledger BEFORE any spend; LOG
-conflicts resolve keep-BOTH (delete the 3 marker lines, upstream
-first) then re-check the blank line before my heading; pod clock UTC
-vs mac BST.
-
-## HEADLINE (03:44, HISTORICAL): PARTIAL EXHIBIT LIVE (fig-first re-sequence, Han order 03:25) — re-render loop until drain; both GPUs working
-**Shipped 03:40 (7af84fb80):** `figs_writeup/fig_sycgen_shuffle_tsweep.*`
-v1 (PARTIAL watermark; anchor band r≈0.482 + 18/18 untrained sweep)
-+ strict-JSON summary + 24 `sycgen_keep_r1` rows + HANDOFF item-6
-embed (live-refresh caption). Renderer is PARTIAL-TOLERANT (ordered
-layer from canonical rows; overlay optional→"PENDING"; ingests
-retrain_supp.json; cache-echo dedupe by (arch,T,seed,kind)).
-**Re-render + push at each landed trio — same paths supersede; run:**
-scp 3 result jsons from pod → `python -m …sycgen.render_tsweep` →
-commit fig+summary(+rows via repatriate.sh) → push.
-**Pod state:** GPU-0 = my supp pool (txc T{8,16}×3; T8 trio ROWED
-~03:38, T16 in flight; log retrain_supp.log, marker SUPP-DONE;
-launcher /workspace/run_supp.py — outside repo, pin-safe). GPU-1 =
-shard1 tsae trio CPU-grinding (NOT hung — CPU-time receipts in LOG
-03:31 ACK; **BOUND: no tsae completion by 04:05 → kill shard1**
-(bracketed lane-scoped pattern) **and relaunch remainder both-GPUs**
-— run_pool cache skips everything rowed). After tsae: shard1 trains
-T2,T4, burns doomed T6/T10 (§ 5 receipts), cache-skips T8/T16.
-**History:** § 5 amendment (48→36, T{6,10} eval-impossible) RATIFIED
-40013e558; my amended stall-response RATIFIED ae45c8fa6 (supersedes
-restart directive 486e14939). **Manifest merge DEFERRED: 336
-fleet-wide train_key conflicts pod↔local — owners' pass, not mine;
-sycgen ckpt manifest rides at HF-push step.** Pod clock = UTC (mac
-= BST) — never read pod mtimes as London. Est $15–21 ledgered.
-
-**POD-D: TERMINATED 07:01 07-28 (API-verified; order ae58a9336
-item 3; actuals ~$38 ledgered).** sycgen lane CLOSED my side:
-exhibit FINAL-at-15/18 (hub declaration; final render rides their
-morning pass — all inputs in-repo), 15/15 ckpts HF-durable (sha
-receipts below), all 10 result jsons committed, tsae trio
-abandoned-disclosed (killed 07:00; never completed a cell in 2
-attempts, 190+ min; twin receipts show its untrained T=1 ≡
-batchtopk's).
-
-**STRUQ L40S: TERMINATED 07:09 (API-verified).** Two identical
-bootstrap deaths (torch install "File exists" on clean venvs —
-pod/volume fault; same script worked on pod-D). Venue moved to
-**runpod-a's warm GPU-0 per their standing offer — THEIR pod,
-THEIR hands** (acceptance LOG 07:09); my executor role for the
-struqpos screen ENDED, repatriation standby only. $1.70
-zero-science disclosed. **mac-d pod count: ZERO.**
-
-**AT DRAIN (fig-first re-sequence, Han order 03:25 c53fc0311), in
-order:** (0) advance pod checkout to the AMENDMENT pin (`git fetch
-origin arxiv && git checkout --detach <rev-parse'd pin>` — overlay
-imports the amended `WINDOW_TS`; NEVER before ALL training procs
-exited — shard1 AND supp — workers re-import from disk); (1) on-pod
-`.venv/bin/python -m experiments.explorations.task_hunt.sycgen.shuffle_overlay`
-(reads shard jsons; supp cells re-echo in shard1 via cache at its
-T8/T16 arrival — if shard1 was killed at the tsae bound, overlay's
-by_cell must ALSO ingest retrain_supp.json + relaunch json — check
-before running); (2) scp overlay+result jsons →
-`…sycgen.render_tsweep` on the mac → **commit+push fig+summary
-IMMEDIATELY** (full-drain render supersedes the partials, same
-paths; drop the PARTIAL caption line in HANDOFF item 6); (3)
-`bash agents/mac-d/repatriate.sh 64.247.201.51 16977` (NOTE:
-manifest merge conflicts 336× fleet-wide — if still unresolved, run
-the two merge_rows calls manually: leaderboard WILL apply, manifest
-stays deferred) then push rows (pull-rebase; LOG keep-both); (4)
-on-pod ckpts → HF: `.venv/bin/python scripts/push_ckpts_hf.py
-<train_key>…` for the 18 TRAINED train_keys — extract from POD
-LEADERBOARD (`eval_cfg.retrain_tag == "sycgen_keep_r1"` &&
-`training_cfg.n_steps > 0`; shard-json rows carry NO train_key),
-ratified `ckpts/<train_key>/`, sha receipts HERE; (5) ledger
-ACTUALS (incl. supp-pool GPU-h); (6) ONE LOG bundle entry (PTR).
-THEN lane done → TERMINATE pod via
-`bash agents/mac-d/podctl.sh terminate jge1fuj9hqu8et` + ledger,
-UNLESS a retryesc_gen claim entry is in the LOG (claim-window
-cf59f25eb — hand over warm instead).
-
-**Session-local watchers armed pre-compact (they persist while the
-session lives; re-arm if genuinely fresh):** origin listener 150s
-(task_hunt/ + agents/mac-d/ + briefings/); retrain-shard monitor
-(ssh poll 240s, DONE+failure signatures); 08:55 London alarm →
-Mission-2 checkpoint (A5 relu-mix slip decision — likely moot,
-rmx_b is certificate-extension; check LOG first, coordinate with
-runpod-2 before ANY relief spin-up). Stamp discipline: stamps ONLY
-from a separate preceding `date` call (corrigenda 02:38, twice
-before). Screen results HF-durable
-(`hunt_corpora/sycgen_20260728/screen/`), corpus + gates likewise.
-
-## PREVIOUS HEADLINE: SYCGEN BUNDLE = KEEP 3/3 (02:28, first hunt KEEP)
-Screens I executed on MY pod (mac-c handoff 7cc702599 + GO
-dc3cb8fd9; freeze 782e9cad3): gpt2/gemma2/llama31 ALL KEEP, zero
-kill clauses (tok 0.50–0.53 ≈ chance; window 0.62–0.65 at
-T64/actxmean; wd passes; order-0). Results committed
-(sycgen/results/). Pod borrow REVERSED (ee16ea041) — 2×H100
-hunt-dedicated. **NOW BUILDING: retrain card (matrix standard 7-T
-{1,2,4,6,8,10,16} × seeds {42,1,2} × shuffle instrument, btk-only
-arm per 692cb mapping; substrate = sycgen v1; template = λ̂
-SHUFFLE_OVERLAY_CARD) + datasource plugin (single-file drop).
-Commit-then-run, then detached on pod-D, repatriate, HF ckpts
-(push_ckpts_hf.py, runpod-a's), ledger.** Screen actuals $2
-(−$5 corr). If resuming: read the 02:28 LOG entry first.
-
-## ⚑ WARM-HELD POD (0da616bca visibility rule — purpose stated here)
-**`mac-d-retrain-0728` = pod `jge1fuj9hqu8et`**, 2×H100 SXM secure,
-$5.98/h, RUNNING since 00:39 07-28 under Han's pre-provisioning
-order (per-agent $10/h WAIVED for hunt lanes; ceilings = $500
-aggregate + $300 generation). **Purpose: first hunt-KEEP matrix
-retrain starts the HOUR the verdict posts.** Terminate when the
-LANE is done, not between stages. Bring-up state: see Mission 1b.
-
-**You are `mac-d`** — a local mac agent whose job is DYNAMIC POD
-EXECUTION under Dmitry's RunPod API key. You spin up pods, run
-frozen cards on them as detached jobs, repatriate results, and
-TERMINATE. You are not a card owner — you execute other agents'
-frozen pins. Created 2026-07-27 ~23:40 London (LOG d8609e360 +
-mac-d addendum; stood up c50f7af3e; Mission 1 repointed 6452030b0).
-
-## Read order
-1. This file. 2. `briefings/actmix-shared.md` — especially the
-**RunPod API governance block (BINDING)** and house rules.
-3. LOG tail from d8609e360 forward.
-
-## Session state (first session, ~23:42→)
-- **Workspace VERIFIED**: venv py3.12.13 works, `run.py validate`
-  OK (37 archs / 39 datasources / 5 experiments) — completes
-  mac-local's provisioning receipt (c3996259b item 3).
-- **Key VERIFIED read-only**: keychain env-inject works; pod list
-  returns 132 pods, **zero `mac-d-*`** (historical `runpod-d`/
-  `runpod-e` EXITED pods are NOT mine — never touch). 2×H100 SXM
-  secure = $5.98/h < my $10/h cap. GPU type id
-  `NVIDIA H100 80GB HBM3`; image template (runpod-c's pod):
-  `runpod/pytorch:1.0.2-cu1281-torch280-ubuntu2404`.
-- **Tooling PRE-STAGED (this dir, committed):** `podctl.sh`
-  (create/mine/status/ssh/terminate; mac-d-* name guard both
-  directions; create --dry-run receipt clean; terminate verifies
-  by follow-up API query), `pod_remote_bootstrap.sh` (on-pod:
-  clone public repo, detach at PIN, canonical
-  `scripts/bootstrap_runpod.sh` non-interactive, AGENT_NAME=mac-d,
-  validate receipt), `repatriate.sh` + `merge_rows.py` (scp rows
-  home; append-only merge, dup-key eval_key/train_key,
-  same-key-different-content = CONFLICT hard-stop; self-merge
-  test 9843/9843 dup-identical 0 conflicts).
-- **Listener ARMED** (session-local Monitor, 150 s fetch-poll):
-  task_hunt/ + agents/mac-d/ + briefings/ against origin/arxiv.
-- **No pod this session — norm honored, then trigger died.**
-  mac-local's 23:39 norm (*pod goes up when a GPU stage exists*)
-  held me at $0 through the WAIT; reask_hr then KILLED 3/3, so
-  nothing was ever warmed and nothing billed. The old
-  "Meanwhile: SPIN UP `mac-d-rlhfgrid-0727`" bullet was the
-  pre-repoint mission's name+timing — superseded on the record
-  (my 23:53 LOG entry).
-
-## Mission 1a — RESOLVED BY STAND-DOWN (00:40): evalage generation = mac-c's
-Their RUNNING line (a266eeb76) landed during my smoke — my claim's
-pre-stated trigger fired, zero churn. My 2-doc smoke (~$0.02,
-ledgered, artifacts deleted) validated the same canonical backend
-they run. Residual: I support evalage premeasures/screen if asked, and my
-**corpus-card request stands with mac-c's arbitration** (sycgen_age
-or retryesc_gen — I drive generation from this mac the moment a
-card exists; 0da616bca repeats this assignment).
-
-## Mission 1b — WARM-HOLD COMPLETE (00:55): mac-d-retrain-0728 ready
-Bring-up receipts: ssh `root@64.247.201.51 -p 16977`; repo detached
-at pin f2c4f5898 (guard-verified); tokens gh+hf×2 seeded 0600 (NO
-Modal/Anthropic); on-pod `run.py validate` OK; both H100s visible;
-**runner smoke vs committed cell PASSED** (synthetic txc_base s0
---smoke, full metrics, AGENT_NAME=mac-d). Substrate: at-card-time
-by design — the KEEP corpus doesn't exist yet, so nothing
-corpus-specific exists to sync; committed cache builders take
-~5 min per pod-A receipts (disclosed trade). HOLDING WARM for the
-first KEEP's matrix retrain (starts within the hour of the
-verdict, pre-authorized f0ac106e4 item 3). Re-pin at card landing.
-
-## Mission 1c′ — disposition (c) EXECUTED (01:53, d897a00e4): geometry RESCUED within-domain
-Doc-mean 0.636–0.795 across all six domains (vs 0.858 confounded),
-position 0.608–0.731, pooled usable 511,907 ≥ 250k (2×), 158
-qualifying strata; trivia_qa thin (6/8, disclosed). (b) v2 looks
-UNNECESSARY. Instrument committed-then-run (numbers of record
-reproduced-identical at committed sha); artifact in-tree + HF
-(sha 9c9f9215…). **Awaiting design-owner/hub screen call** —
-per-token baseline FIRST on mac-c's pod, within-domain frame
-pre-registered. KEEP ⇒ warm-pod retrain within the hour.
-
-## Mission 1c — sycgen v1 LANDED + HALTED AT STOP (01:47, entry 9559f7102)
-400 convs / 986k tokens / 1,118 challenges @2.79/conv / 0 API
-failures / ~49 min / est-basis actuals $6–9. **Realised geometry
-ALL PASS** (position 0.808; doc-mean 0.858 — 0.007 from retryesc's
-fatal number, CI upper crosses the bar, disclosed; floors clean).
-**Vocab STOP FIRED** — mechanism isolated: schedule FLAT by domain
-(2.56–2.94), tokens/conv 12× by domain ⇒ length-normalization
-channel (retryesc family). **HALTED before screen per card §4;
-disposition = mac-c (design owner) + hub.** My weakly-held rec:
-screen-anyway first (unigram bar measures the leak, $2–3), v2
-length-controlled only if the face survives within-domain.
-**Durability receipts:** HF `temp-bench-data/hunt_corpora/
-sycgen_20260728/` — npz 2bdd9aca…, receipt 54181c6e…, gate
-2701e6d2…, sha manifest; same three committed in-tree (9559f7102).
-v2-if-chosen is UNBLOCKED: mac-c's elicit_lib checkpointing landed
-(279963722) with 3-line wiring instructions for run_sycgen —
-checkpoint clause binding on any relaunch.
-
-## Mission 1 (RE-ARMED by e585d665b FULL THROTTLE): harness-KEEP executor
-Original trigger died 23:55 07-27 (reask_hr KILL 3/3 4c231e149 +
-mac-c menu exhausted — resolved no-fire, $0, no pod ever created).
-mac-local's full-throttle ruling re-scopes me: **executor for
-harness-corpus screens/retrains as they land; Mission 1 =
-harness KEEPs exclusively.** Pipeline feeding me: mac-c generates
-corpora (their pod mac-c-hunt-0728, L40S) → runpod-a co-builds/
-owns the screen-side cards → revisit order (i) sycgen_age
-(passed geometry, nearest KEEP) (ii) Tier-C safety picks
-(iii) msdose_r2/sycpress_r2 regens. A screen or retrain card
-pointed at mac-d fires the runbook below (pod name per purpose:
-mac-d-huntscreen-/huntretrain-<mmdd>). The RLHF relu-mix grid is
-NOT mine — A5 (57eb9edd4) owns it; Mission 2 is the contingency.
-
-## Runbook on a card (execute in order)
-1. `bash agents/mac-d/podctl.sh create` (can start the moment the
-   card/directive is announced — bring-up overlaps the freeze;
-   rename via arg if purpose ≠ huntretrain). LEDGER line
-   in `briefings/MODAL_SPEND.md` § RUNPOD at spin-up (pod id,
-   2×H100 secure $5.98/h, purpose, est).
-2. Tokens (values never touch disk locally / git / logs):
-   `ssh -p <port> root@<ip> 'umask 077 && mkdir -p /workspace/.tokens'`
-   then pipe: `gh auth token | ssh … 'cat > /workspace/.tokens/gh_token'`;
-   `scp ~/.tokens/hf_token ~/.tokens/hf_token_datasets` → same dir.
-   NO Modal, NO Anthropic keys.
-3. `scp agents/mac-d/pod_remote_bootstrap.sh` up; run with the
-   CARD's pin; expect `BOOTSTRAP-DONE` + validate receipt.
-4. Substrate sync + lane launch VERBATIM from the frozen card
-   (committed cache builders; detached tmux, `TQDM_DISABLE=1`,
-   wall-log under /workspace/logs/). Containers never push.
-5. Monitor to completion; `bash agents/mac-d/repatriate.sh <ip>
-   <port>` (dry-run then apply; CONFLICT = stop, owner decides);
-   pull-rebase, push rows from the mac; ONE LOG results entry (PTR).
-6. `bash agents/mac-d/podctl.sh terminate <id>` (prefer terminate;
-   verify by API query — script does) → ledger ACTUALS.
-
-## Mission 2 (LIVE WATCH — the only armed mission):
-relu-mix RELIEF SHARD only if the A5 split is slipping past
-~09:00 London (check LOG + row landings: rmx_a = runpod-2
-T{1,2,4,6}×3, rmx_b = runpod-b T{8,10}×3; coordinate with
-runpod-2 BEFORE spinning up). Wake sources: origin listener
-(session Monitor) + 08:55 London alarm. Same lifecycle.
-
-## Rules you are bound by
-Pull-rebase before push; LOG conflicts keep BOTH + stray-marker
-grep; stamp from `date`; PTR everything; ledger both ends;
-$10/h/agent default (hub can authorize bursts within Han's $500
-aggregate); NEVER touch pods you did not spin up (incl. Han's 3
-hand-provisioned + anything mac-c creates + historical
-runpod-d/e); name every pod `mac-d-<purpose>-<mmdd>`; token
-VALUES never in git/logs/cards; tokens rotate post-weekend.
-Deadline context: NeurIPS rebuttal 13:00 BST 07-28, responses
-amendable to Aug 3.
-
-*Rewrite this file before any compact.*
-
-## CKPT SHA RECEIPTS — sycgen_keep_r1 (15/18 present cells, pushed 03:5x 07-28; tsae trio joins at drain)
-HF `han1823123123/temp-bench-data` `ckpts/<train_key>/model.safetensors`:
-```
-07bb350d5427283b  5996196530d8d6559927aa7e97696ff680aad9cf202b819b4e6c334dd29bdf24
-1241623533cd72b6  8dca43b35bcfda8ab3b2c4c3d47f9d11c9f3e1c20569c9aac587fb13e93366fc
-238516d8b6d22f50  68b0cd5e59e915bfcc6effd340b2e88f22824076effc17e4d199842f67f79965
-334fad65d3444d83  4f4d38b9e1b846237b8d237d7b2f6f868918d37fd11bc04d748b18f3fd00e785
-3bec3cd98ed73ce6  a92d98b93232f258392428a6b9b860fb41293103e9a95c65d067f01adf6d39b4
-44aac5ee33d48a63  2386eb978df4afbea2dc932a445f48ff58f73817c847f3eea233f768e70000b4
-45fd71606bcf65c7  dafdfdc739a2a9fe9b49eb630de4dd1347b2072ca12344ca68607ddbaea18aa5
-8d41e2c6aec38fd6  d40d8a94e5bfc8f02403dab0a90cb76ed4c351d1657c33bd54d00f1aea2e4ec3
-960d504f7261299e  f6d83d109bd94bf7f79b695fc2d6295eed96f6b100071392cfdf1784d22a2875
-9b4aae2910c4d2b1  730c5f6d414c863233be944f843d93fa11be4daac6ba66601c440c0397f1c166
-a5077a9360ffab8b  2b3fffb921688363ea5a44fb41e9c33f13d151695934a16a3595410658526c9e
-acfe74e73e9335e1  8c6ced9df310bd0244ff0c7a6659c3de17b826515984269a2b712161643be4bc
-cd45bbd78f71e951  06780fc711fd4b284baf06bbdfab56041957c58333837e3b84dbd616eb95ef6a
-d337d72ce4cff4a5  dcdc6e651ae671e740241faecf2967dddb4d34d26bcb270791396b5851c4d21e
-da59eec992c78905  13f7bd845516540adcdb02395d3194c0408cc8036b6055c2a8ce3332aa43704d
-```
+- **Post-compact: run `agents/mac-d/PAPER_FAITHFUL_CHECK.md`** — Han's
+  standing instruction, every compact, no exceptions.
+- Pods: `mac-d-<purpose>-<mmdd>`; ledger at spin-up **and** teardown;
+  terminate > stop; verify by API query. **Never touch a pod I did not
+  spin up** (4 unattributed at $9.41/h — untouched all night).
+- Secrets: RunPod + Claude keys env-injected from keychain only, never
+  echoed / written to a file / passed as argv, and **never seeded to
+  pods**. Pods get gh + hf×2 only — no Modal, no Anthropic. `chmod` is
+  a **silent no-op** on the `/workspace` MooseFS FUSE volume.
+- Stamps only from a separate preceding `date` call.

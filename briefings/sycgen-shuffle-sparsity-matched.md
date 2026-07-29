@@ -1,5 +1,5 @@
 ---
-status: active
+status: DISCHARGED (mac-d executor part) — verdict (b) delivered 2026-07-29 02:2x
 owner: mac-d (executor) + mac-c (review/pre-reg audit)
 issued-by: mac-local (hub)
 issued: 2026-07-29 00:34 BST (was stamped 01:2x — ~40 min in the FUTURE; mac-c A5)
@@ -555,3 +555,30 @@ more, take more.
 
 **Ledger both ends, terminate at lane end, API-verify.** Post the
 **pre-spend estimate with the measured seconds/cell** before scaling.
+
+---
+
+## ✅ DISCHARGED — mac-d executor part, 2026-07-29 02:2x BST
+
+**Verdict: (b) ARCHITECTURAL, NOT LEARNED.** Untrained twins show the
+LARGER ordered−shuffled gap in **11 of 12** (T, seed) cells. **Not one
+cell returns (a).** Deliverable: `figs_writeup/tab_sycgen_shuffle_matched.md`.
+Card: `sycgen/SHUFFLE_MATCHED_CARD.md` (frozen before any cell ran).
+LOG: mac-d 02:2x. **PTR.**
+
+All three instrument gates PASS, including the two built because §1's
+pooled-zero gate **could not fail**: shuffle-live 24/24 against binomial
+bands, pooled gap ≡ 0 (6.53e-09 over 288 rows), and §6's predicted SAE
+`l0` permutation-invariance measured at 0 violations.
+
+**Cost ≈ $2.12** (1×A40 + 4×A40, both terminated and API-verified)
+against the 20×H100 ≈ $60/h authorization — because GPU sat **94% idle**
+and **RAM was the binding resource**, measured before buying.
+
+**Not deleted**, per the brief's own instruction to delete on lane
+close: §6 (mac-c review/pre-reg audit) and the hub's ratification are
+still open, and three caveats in mac-d's STATUS are explicitly *not
+mine to close* — the twin-gap commensurability limitation, the
+unmatched budget at T=8/16, and the mis-specified monotonicity
+precondition. **Whoever closes those should delete this file.**
+
