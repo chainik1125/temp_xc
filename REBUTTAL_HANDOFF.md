@@ -465,9 +465,14 @@ panel — directly comparable to the btk figs above):**
 > ~4.5"*) landing on the headline instead of in a footnote.
 >
 > **Status: the claim as written in this section is NOT supported
-> against the right null.** Quote item 6 only as *"a per-token-silent
+> against the right null.** ~~Quote item 6 only as *"a per-token-silent
 > safety task on which windowed probes read state that per-token probes
-> cannot"* — never as TXC beating an SAE. **Resolution:** budget-matched
+> cannot"*~~ — **⚑ that quote-form is ALSO withdrawn (02:1x 07-29): per-token
+> probes reach 0.50–0.53 against a ~0.33 null, so they read the state
+> partially and "cannot" is false.** Quote it as *"a task where a
+> windowed probe reads the state substantially better than the best
+> per-token probe at matched sparsity"* — never as TXC beating an SAE,
+> and never as per-token blindness. **Resolution:** budget-matched
 > head-to-head, T{2,4,8,16} × 3 seeds, TXC vs pooled vs stacked at
 > **matched `l0_per_window`**. Pre-registered: **if TXC still loses at
 > matched budget, item 6 is a negative and we report it as one.**
@@ -560,10 +565,23 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
   the last challenge happened** — the "age" of the pushback. The
   point: this is a **per-token-silent state**. The feared lexical
   tell (a "capitulation register" — apology/agreement vocabulary)
-  measurably did NOT materialize: per-token probes sit at chance
-  (0.50–0.53) on all three models, while **windowed** probes read
-  the state at 0.62–0.65 — a signal that exists only as pooled
-  window-state, which is precisely the regime the TXC claims to own.
+  measurably did NOT materialize.
+
+  > **⚑ CORRECTED 02:1x 07-29 — this block said per-token probes "sit
+  > at chance (0.50–0.53)". THEY DO NOT. The task is 3-class and the
+  > measured null is `null_win` = 0.3368 / 0.3437 / 0.3324, so
+  > 0.50–0.53 is roughly +0.17 ABOVE chance.** Someone read 0.50 as
+  > chance, which is only true of a binary task. **A single token's
+  > activation carries much of the state** — the residual stream there
+  > has attended over the prefix (independently measured by mac-c's
+  > upper edge: a single token carries age past 1024 tokens).
+  > **The claim item 6 supports is the GAIN, not per-token blindness.**
+
+  **Per-token probes reach 0.50–0.53 against a ~0.33 null** — well
+  above chance — **while windowed probes read the state at 0.62–0.65**,
+  a gain of **+0.11 to +0.12** over the best per-token arm on all three
+  models. **The window adds; it is not reading something the token
+  cannot see at all.**
   Safety relevance: detecting "this model was recently challenged
   (and may be in a capitulation regime)" from internals when no
   token says so — internal-state sycophancy monitoring that cannot

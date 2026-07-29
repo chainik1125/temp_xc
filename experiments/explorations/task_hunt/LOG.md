@@ -39072,3 +39072,53 @@ and converts a silent pass into a stated limit.
 **Nothing else outstanding on this lane. The verdict, whichever way it
 lands, decides whether the hunt keeps its sourcing criterion or
 re-aims — and it costs nothing.**
+
+## 2026-07-29 02:15 BST — ⚑⚑ HUB: **"per-token probes sit at chance" was FALSE and it is the root of tonight's rebuttal overclaim.** 0.50 was read as chance on a 3-CLASS task
+
+**Found by chasing the response correction back into the handover,
+which is the propagation step I have failed twice tonight.** The
+handoff said:
+
+> *"per-token probes sit at chance (0.50–0.53) on all three models"*
+
+**The measured null is `null_win` = 0.3368 / 0.3437 / 0.3324.** The
+task is **3-class**. So **0.50–0.53 is roughly +0.17 ABOVE chance**, not
+at it. **Someone read 0.50 as "chance" — which is true of a binary task
+and this is not one.** A number that looks like a coin flip was taken
+for one.
+
+**This single misreading is the origin of the whole chain:** it made
+sycgen "per-token-silent", which became the handoff's binding
+quote-form (*"windowed probes read state that per-token probes
+cannot"*), which became the rebuttal's *"not visible in any single
+token"* — **a claim that shipped to both branches and that our own
+verdict file contradicts.** Corrected at all three sites tonight;
+**this entry records the source so it is not re-derived from the same
+misreading later.**
+
+**What item 6 actually supports, stated once:** per-token probes reach
+**0.50–0.53 against a ~0.33 null** — they read the state **partially
+and well above chance** — while windowed probes reach **0.62–0.65**, a
+gain of **+0.11 to +0.12** on all three models. **The claim is the
+GAIN, at matched sparsity, against baselines that see the same
+activations.** It is not per-token blindness and never was.
+
+**⚑ AND THE CORRECTION MAKES TWO OTHER FINDINGS COHERENT RATHER THAN
+WEAKENING THEM:**
+
+- mac-c's upper edge — **a single token carries age past 1024 tokens**
+  — is no longer in tension with item 6. It predicts exactly this.
+- mac-c's amplifier hypothesis — **the window amplifies an existing
+  per-token signal rather than generating one** — now has our KEEP as
+  its **strongest supporting case** rather than an awkward exception:
+  sycgen has the **highest** tok of the three candidates *and* the
+  highest arm.
+
+**Three independent routes arrived at the same fact tonight** (the
+upper-edge probe, the arm-instrument diagnosis, and this handoff
+misreading) **and only the third was load-bearing on a delivered
+claim.** The other two are why it was caught.
+
+**Standing check earned: when a metric is quoted as "chance", quote the
+MEASURED null beside it.** `null_win` was in the verdict file the
+whole time, one field away from `tok_best`.
