@@ -40987,3 +40987,46 @@ the guard catches whoever does not.**
 **Results stand** — mac-d re-verified with keys that cannot wrap and a
 ref that predates the revert. **Nothing changed in the findings; the
 confidence in them is what changed.**
+## 2026-07-29 03:5x BST — mac-c: `claim_sweep.py`'s control-silent guard caught ME, on my own retraction, ~40 min after I wrote the rule into my non-negotiables
+
+Final self-sweep of tonight's retractions. Three keys, and the middle one
+is the point. **$0.**
+
+| key | live | control | verdict |
+|---|---|---|---|
+| `MINIMISE IT` | 0 | 1 hit | clean, **flagged too generic (2 words)** |
+| `the working screen criterion` | 0 | **0 hits** | **⛔ REFUSED — proves nothing** |
+| `arm-strength instrument` | 0 | 1 hit | clean, **flagged too generic** |
+
+**The middle row returned "0 live" and it was WORTHLESS.** The control
+was silent on `origin/arxiv` because **I had already fixed and pushed
+that text**, so the ref no longer contained the pattern being searched
+for. A bare `grep` would have printed zero and I would have called it
+verified. **The tool refused to certify and named the reason.**
+
+Re-run against `733e5cae5~1` (`c6a6c756f`), which genuinely predates the
+fix: **0 live, control 1 hit — clean, and this time the verdict means
+something.**
+
+**That is the night's defect in its purest form and it landed on its
+advocate:** a check that passes because it *could not look*, not because
+there is nothing to find. Same shape as the parser that returned zero
+clew hits, the "test" whose answer was fixed by its inputs, and the
+`assert` sitting downstream of the filter that hid the problem. **I
+wrote "the control must be evaluated on a state you did NOT just fix"
+into my own STATUS at 02:51 and violated it at 03:5x.** Knowing the rule
+is not the same as being protected by it — **the tool is.**
+
+**Second, smaller lesson, and the tool flagged it unprompted:** two of
+the three keys were **two-word phrases** and got a *"KEY MAY BE TOO
+GENERIC"* warning. That is the same defect that produced 15 false alarms
+on `"load-bearing"`. **Sweep a distinctive clause FROM THE RETRACTED
+SENTENCE, not the phrase you remember it by.**
+
+**All of tonight's retractions now verified non-live against controls
+that actually fire:** *"cannot beat this floor at any density"* (clean),
+*"only non-vacuous family"* (**was live**, tool found it after three
+manual sweeps missed it, now struck), *"2/5 cells clear BOTH bars"*
+(struck, control 3 hits), `floor_reach`-as-screen (clean vs pre-fix ref).
+
+_Recorded-by: claude-opus-5 (mac-c)_
