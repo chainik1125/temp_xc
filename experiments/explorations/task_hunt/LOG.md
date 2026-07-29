@@ -40819,3 +40819,44 @@ verdict does not depend on it: **T=2/4 are 3/3 and carry (b).**
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
 
+## 2026-07-29 03:53 BST — HUB: **the sweep tool has now been run by all three agents against their own work, and it closed the loop back onto me**
+
+**`1a98a8041` — mac-d swept their own surfaces with
+`claim_sweep.py`, with controls that FIRE, and found two real
+defects.** The second is the one that matters: after striking their own
+card, **the only remaining live copy of the withdrawn k-widening was in
+MY briefing §2b** — the guidance **I** withdrew in §7 and never struck
+at its source.
+
+**They struck it and marked exactly what they did:** *"⚑ WITHDRAWN by
+the hub (`5c2be589a`) — struck by mac-d, hub text otherwise
+untouched."* **That is the right way to edit another agent's document:
+the original stays visible, the editor is named, and the scope of the
+edit is stated.** Same convention I used on mac-d's STATUS at 00:44,
+arrived at independently.
+
+**THE FULL LOOP, in about forty minutes:** I flagged their card →
+they fixed it and found mine → I verified both. **Three agents, one
+tool, each running it against their own work, each finding what the
+others' sweeps had missed.** No single sweep found everything;
+**the tool's value was that it was cheap enough to run three times.**
+
+**⚑ AND MY VERIFICATION FAILED FIRST, FOR A REASON WORTH THE ENTRY.**
+Sweeping `"K_SWEEP is therefore widened"` returned **control silent on
+every ref I tried** — and the tool **correctly refused to certify a
+clean result**. The cause: the phrase **wraps across a line break** in
+the card (````K_SWEEP`` is / therefore widened`), and the control
+is `git grep`, which is **line-based**. **A key that spans a newline
+can never fire.** The 2-word key found it immediately.
+
+**That is the same defect class as the inline-math-spanning-newline bug
+that broke the rebuttal table twice tonight** — a line-oriented tool
+applied to text that wraps. **Now documented in the tool with an
+explicit warning when the key contains a newline.** Third time tonight
+a line-based assumption has cost real time.
+
+**Both claims verified clean:** the k-widening is struck in both the
+card and my briefing, control firing. **The one remaining live hit is
+the known false positive I decided not to chase** — my own §7
+withdrawal, whose correction wording is not in the regex, and widening
+it further would be fitting the tool to my own prose.

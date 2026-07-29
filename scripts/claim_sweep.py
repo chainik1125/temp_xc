@@ -111,6 +111,15 @@ def main(argv: list[str]) -> int:
         total_live += len(live)
         total_quoted += len(quoted)
 
+    # ⚑ The control is line-based (`git grep`), so a key that spans a LINE
+    # BREAK in the source can never fire and the tool will refuse to certify
+    # a genuinely clean sweep. Found 03:3x: "`K_SWEEP` is / therefore widened"
+    # wraps, so the 4-word key was silent on every ref while the 2-word key
+    # found it. Same class as the inline-math-spanning-newline bug that broke
+    # the rebuttal table twice. **Pick a key that sits on ONE line.**
+    if "\n" in phrase:
+        print("** KEY SPANS A NEWLINE — the control is line-based and cannot "
+              "fire. Choose a key contained on a single line.")
     # --- the control: the phrase must be findable on a ref that predates the fix
     ctrl = subprocess.run(["git", "grep", "-c", "-i", phrase, ref],
                           cwd=ROOT, capture_output=True, text=True)
