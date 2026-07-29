@@ -41,6 +41,7 @@ import argparse
 import json
 import math
 import sys
+import time
 from pathlib import Path
 
 import numpy as np
@@ -81,6 +82,10 @@ SHUF_EVAL_SEED = 0            # inherited from shuffle_overlay.py verbatim
 K_SWEEP = (1, 2, 4, 8, 16, 32)
 
 DRAWS = ("plain", "redraw")
+
+
+def _now() -> float:
+    return time.monotonic()
 
 
 # ── shuffle draws ──────────────────────────────────────────────────────
@@ -295,7 +300,21 @@ def main() -> int:
     ap.add_argument("--smoke", action="store_true",
                     help="random activations + random arms; validates the "
                          "path at $0 and produces NO scientific rows")
+    # HAN DIRECTIVE (brief §8): parallelize cells across GPUs, max
+    # throughput. Adding GPUs to an unsharded script buys EXACTLY ZERO —
+    # this was single-process/single-device with a serial `for T`, so a
+    # 16-GPU pod would have run 15 idle GPUs. The unit is (T, seed, draw)
+    # = 24 independent cells; assignment is `sorted(cells)[i::n]`, so it
+    # is deterministic and needs no coordination between shards.
+    ap.add_argument("--shard", default="0/1", metavar="i/n",
+                    help="run cell subset i of n (deterministic stride)")
+    ap.add_argument("--max-cells", type=int, default=0,
+                    help="stop after N cells — for the seconds/cell "
+                         "measurement the fleet size must be derived from")
     args = ap.parse_args()
+
+    shard_i, shard_n = (int(v) for v in args.shard.split("/"))
+    assert 0 <= shard_i < shard_n, f"bad --shard {args.shard}"
 
     from temp_bench.evals.synthetic_recovery import _sample_windows
 
@@ -320,12 +339,22 @@ def main() -> int:
         x, lam = data.x, lam.float()
         ts, seeds, ks = TS, SEEDS, K_SWEEP
 
-    print(f"[shuffle] device={device} x={tuple(x.shape)} "
-          f"smoke={args.smoke}", flush=True)
+    cells = sorted((T, seed, draw)
+                   for T in ts for seed in seeds for draw in DRAWS)
+    mine = cells[shard_i::shard_n]
+    if args.max_cells:
+        mine = mine[:args.max_cells]
+    out = (OUT if shard_n == 1
+           else OUT.with_suffix(f".shard{shard_i}.json"))
 
-    rows, gates = [], []
-    for T in ts:
-        for seed in seeds:
+    print(f"[shuffle] device={device} x={tuple(x.shape)} "
+          f"smoke={args.smoke} shard={shard_i}/{shard_n} "
+          f"cells={len(mine)}/{len(cells)} -> {out.name}", flush=True)
+
+    rows, gates, timings = [], [], []
+    t_wall0 = _now()
+    for T, seed, draw in mine:
+            t_cell0 = _now()
             lam3 = lam.reshape(lam.shape[0], lam.shape[1], 1)
             n = x.shape[0]; split = n // 2
             wx_tr, _ = _sample_windows(x[:split], L=EVAL_L,
@@ -341,78 +370,83 @@ def main() -> int:
 
             fin_tr = np.isfinite(t_tr); fin_ev = np.isfinite(t_ev)
 
-            for draw in DRAWS:
-                tiles_sh = _shuffle(tiles_ev, T, SHUF_EVAL_SEED, draw)
-                sh_tr = _shuffle(tiles_tr, T, SHUF_EVAL_SEED, draw)
-                # GATE FIRST — before any arm runs, so no arm's algebra
-                # can launder a dead shuffle into a pass.
-                g_ev = _gate_shuffle_live(tiles_ev, tiles_sh, T, draw)
-                g_ev.update({"T": T, "seed": seed, "draw": draw})
-                gates.append(g_ev)
-                print(f"  GATE T{T} s{seed} {draw:7s} identity_rows="
-                      f"{g_ev['identity_rows']}/{g_ev['n_rows']} "
-                      f"(exp {g_ev['identity_expected']:.3g}, band "
-                      f"{g_ev['band'][0]}..{g_ev['band'][1]})"
-                      f"{'  [by construction]' if g_ev['by_construction'] else ''}",
-                      flush=True)
+            tiles_sh = _shuffle(tiles_ev, T, SHUF_EVAL_SEED, draw)
+            sh_tr = _shuffle(tiles_tr, T, SHUF_EVAL_SEED, draw)
+            # GATE FIRST — before any arm runs, so no arm's algebra
+            # can launder a dead shuffle into a pass.
+            g_ev = _gate_shuffle_live(tiles_ev, tiles_sh, T, draw)
+            g_ev.update({"T": T, "seed": seed, "draw": draw})
+            gates.append(g_ev)
+            print(f"  GATE T{T} s{seed} {draw:7s} identity_rows="
+                  f"{g_ev['identity_rows']}/{g_ev['n_rows']} "
+                  f"(exp {g_ev['identity_expected']:.3g}, band "
+                  f"{g_ev['band'][0]}..{g_ev['band'][1]})"
+                  f"{'  [by construction]' if g_ev['by_construction'] else ''}",
+                  flush=True)
 
-                for trained in (True, False):
-                    tag = "trained" if trained else "untrained"
-                    # --- TXC ---
-                    try:
-                        if args.smoke:
-                            raw, tk = _mk_smoke_txc(T, seed, trained), None
-                        else:
-                            raw, tk = _build("txc_batchtopk_post_btkonly",
-                                             T, seed, ds_spec, trained=trained)
-                        raw = raw.to(device)
-                        m = _score(lambda: MeasuredArm(raw),
-                                   tiles_tr, t_tr, tiles_ev, t_ev,
-                                   tiles_sh, sh_tr, fin_tr, fin_ev)
-                        rows.append({"arm": "txc", "weights": tag, "draw": draw,
-                                     "T": T, "seed": seed, "k_tok": None,
-                                     "train_key": tk,
-                                     "l0_unit": "nonzeros_in_tile_code", **m})
-                        print(f"    txc      {tag:9s} {draw:7s} T{T} s{seed} "
-                              f"gap={m['gap_fixedprobe']:+.4f} "
-                              f"l0={m['realized_l0_per_window_ordered']:.2f}",
-                              flush=True)
-                    except Exception as e:
-                        print(f"    txc      {tag:9s} {draw:7s} T{T} s{seed} "
-                              f"SKIP {type(e).__name__}: {str(e)[:80]}", flush=True)
+            for trained in (True, False):
+                tag = "trained" if trained else "untrained"
+                # --- TXC ---
+                try:
+                    if args.smoke:
+                        raw, tk = _mk_smoke_txc(T, seed, trained), None
+                    else:
+                        raw, tk = _build("txc_batchtopk_post_btkonly",
+                                         T, seed, ds_spec, trained=trained)
+                    raw = raw.to(device)
+                    m = _score(lambda: MeasuredArm(raw),
+                               tiles_tr, t_tr, tiles_ev, t_ev,
+                               tiles_sh, sh_tr, fin_tr, fin_ev)
+                    rows.append({"arm": "txc", "weights": tag, "draw": draw,
+                                 "T": T, "seed": seed, "k_tok": None,
+                                 "train_key": tk,
+                                 "l0_unit": "nonzeros_in_tile_code", **m})
+                    print(f"    txc      {tag:9s} {draw:7s} T{T} s{seed} "
+                          f"gap={m['gap_fixedprobe']:+.4f} "
+                          f"l0={m['realized_l0_per_window_ordered']:.2f}",
+                          flush=True)
+                except Exception as e:
+                    print(f"    txc      {tag:9s} {draw:7s} T{T} s{seed} "
+                          f"SKIP {type(e).__name__}: {str(e)[:80]}", flush=True)
 
-                    # --- pooled / stacked over the SAE ---
-                    try:
-                        if args.smoke:
-                            sae, sae_tk = _mk_smoke_sae(trained), None
-                        else:
-                            sae, sae_tk = _build("batchtopk_sae_btkonly", 1,
-                                                 seed, ds_spec, trained=trained)
-                        sae = sae.to(device)
-                    except Exception as e:
-                        print(f"    sae      {tag:9s} LOAD FAIL "
-                              f"{type(e).__name__}: {str(e)[:70]}", flush=True)
-                        continue
-                    for mode in ("pooled", "stacked"):
-                        for k in ks:
-                            m = _score(
-                                lambda: WindowWrapper(sae, T, mode, k),
-                                tiles_tr, t_tr, tiles_ev, t_ev, tiles_sh,
-                                sh_tr, fin_tr, fin_ev)
-                            rows.append({
-                                "arm": mode, "weights": tag, "draw": draw,
-                                "T": T, "seed": seed, "k_tok": k,
-                                "sae_train_key": sae_tk,
-                                "l0_unit": ("union_over_positions"
-                                            if mode == "pooled"
-                                            else "sum_over_positions"), **m})
-                        print(f"    {mode:8s} {tag:9s} {draw:7s} T{T} s{seed} "
-                              f"k-sweep done ({len(ks)} pts)", flush=True)
+                # --- pooled / stacked over the SAE ---
+                try:
+                    if args.smoke:
+                        sae, sae_tk = _mk_smoke_sae(trained), None
+                    else:
+                        sae, sae_tk = _build("batchtopk_sae_btkonly", 1,
+                                             seed, ds_spec, trained=trained)
+                    sae = sae.to(device)
+                except Exception as e:
+                    print(f"    sae      {tag:9s} LOAD FAIL "
+                          f"{type(e).__name__}: {str(e)[:70]}", flush=True)
+                    continue
+                for mode in ("pooled", "stacked"):
+                    for k in ks:
+                        m = _score(
+                            lambda: WindowWrapper(sae, T, mode, k),
+                            tiles_tr, t_tr, tiles_ev, t_ev, tiles_sh,
+                            sh_tr, fin_tr, fin_ev)
+                        rows.append({
+                            "arm": mode, "weights": tag, "draw": draw,
+                            "T": T, "seed": seed, "k_tok": k,
+                            "sae_train_key": sae_tk,
+                            "l0_unit": ("union_over_positions"
+                                        if mode == "pooled"
+                                        else "sum_over_positions"), **m})
+                    print(f"    {mode:8s} {tag:9s} {draw:7s} T{T} s{seed} "
+                          f"k-sweep done ({len(ks)} pts)", flush=True)
 
             OUT.parent.mkdir(parents=True, exist_ok=True)
-            OUT.write_text(json.dumps({"rows": rows, "gates": gates,
+            timings.append({"T": T, "seed": seed, "draw": draw,
+                            "seconds": _now() - t_cell0})
+            out.write_text(json.dumps({"rows": rows, "gates": gates,
+                                       "timings": timings,
+                                       "shard": [shard_i, shard_n],
                                        "smoke": bool(args.smoke)}, indent=1))
-
+            print(f"  [cell] T{T} s{seed} {draw} done in "
+                  f"{timings[-1]['seconds']:.1f}s "
+                  f"({len(timings)}/{len(mine)})", flush=True)
     print(f"[shuffle] {len(rows)} rows, {len(gates)} gate receipts -> {OUT}")
     if args.smoke:
         _smoke_selfcheck(rows, gates)
