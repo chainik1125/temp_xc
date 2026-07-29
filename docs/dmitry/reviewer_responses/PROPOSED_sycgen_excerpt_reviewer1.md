@@ -25,10 +25,31 @@ limit, so there is room.
 "four" and add:**
 
 ```
-d. We add a real-world task whose label no single token reveals, and show
-that the TXC beats both SAE baselines at matched sparsity and loses accuracy
-when the token order inside its window is destroyed.
+d. We add a real-world task on model activations, where the TXC matches or
+beats both SAE baselines at matched sparsity -- clearly so at the larger
+window sizes -- and loses accuracy when the token order inside its window is
+destroyed.
 ```
+
+> **⚑ SUMMARY LINE CORRECTED (mac-d, 12:3x) — two overclaims, both
+> contradicted by our own ratified verdicts.**
+>
+> 1. *"the TXC **beats** both SAE baselines"* — **not true of pooled at
+>    T=2/4.** `tab_sycgen_budget_matched.md` returns **INDISTINGUISHABLE**
+>    there and **TXC above** only at T=8/16. That table's headline was itself
+>    corrected from "above 3/4" to **"above 2/4"** when the comparator rule
+>    was found biased; restating "beats" in the summary would reintroduce
+>    exactly the claim that correction removed. Changed to **"matches or
+>    beats … clearly so at the larger window sizes"**, which is what the
+>    numbers in the body actually show.
+> 2. *"whose label **no single token reveals**"* — this is the overclaim
+>    already fixed twice on this response (`7bebeccbe`, `0a1e48cfd`:
+>    *"not visible in any single token" is false by our own screen*). The
+>    body of the excerpt is careful and says so explicitly — *"a probe on one
+>    token's activation still recovers part of it … the baselines are not
+>    blind"* — so the summary contradicted its own section. Dropped.
+>
+> A reviewer reading the body table would have caught both.
 
 **Then add this section after "1c. Stacked SAE baseline":**
 
@@ -88,7 +109,7 @@ Scope: one task, one model, one layer, three seeds.
 **We also ran an untrained control, and it qualifies the claim
 substantially.** A randomly-initialised TXC also loses accuracy under
 shuffling — and its gap is **LARGER than the trained model's at 3 of the 4
-window sizes** (T=2 0.167 vs 0.111; T=4 0.138 vs 0.023; T=8 0.082 vs 0.050;
+window sizes** (and in **11 of 12** individual (T, seed) cells) (T=2 0.167 vs 0.111; T=4 0.138 vs 0.023; T=8 0.082 vs 0.050;
 only T=16 is smaller, 0.027 vs 0.062). **This still holds when the twin is
 re-run at the trained model's exact sparsity**, so it is not a budget
 artifact — we tested that and it was refuted.
@@ -99,9 +120,21 @@ temporal structure. Note the twin is off the figure's axis for a **scale**
 reason (0.058 vs 0.578 ordered recovery), **not** because its gap is small —
 it is not.
 
-**What training adds is the accuracy itself**: ordered recovery goes from
-**0.22 (untrained) to 0.58 (trained)** at T=16, while the untrained model
-sits near chance.
+**What training adds is the accuracy itself**: at T=16, ordered recovery goes
+from **0.058 (untrained) to 0.578 (trained)** — the untrained model is near
+chance.
+
+> **⚑ NUMBER CORRECTED (mac-d, 12:3x, before this was pasted anywhere).** This
+> read *"from 0.22 (untrained) to 0.58 (trained) at T=16"*. **0.22 is the T=2
+> untrained value; at T=16 it is 0.058** — the sentence paired T=2's untrained
+> figure with T=16's trained one. Untrained ordered recovery by T is
+> **0.222 / 0.179 / 0.103 / 0.058** (T=2/4/8/16); trained is
+> **0.499 / 0.523 / 0.536 / 0.578**. The error **understated our own result**
+> (the real lift at T=16 is ~10x, not ~2.6x) but would not have survived a
+> reviewer checking it. *"By a comparable amount"* also softened: the twin's
+> gap is **larger** in 11/12 cells and **6x larger at T=4**, so "comparable"
+> understated it in the direction that flatters us. Shuffle table above
+> re-verified against the 8 source shards: **16/16 values exact.**
 
 **Two ways to handle it, your call:**
 
@@ -116,7 +149,7 @@ sits near chance.
 A randomly-initialised TXC also loses accuracy under shuffling, by a similar or
 larger amount, so this order-sensitivity is a property of the architecture
 rather than something training creates. What training adds is the accuracy
-itself: ordered recovery rises from 0.22 to 0.58 at T=16.
+itself: at T=16, ordered recovery rises from 0.058 to 0.578.
 ```
 
 **Our recommendation is (2).** It costs one sentence, it is the kind of

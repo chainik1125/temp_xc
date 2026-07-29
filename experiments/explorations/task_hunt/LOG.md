@@ -41306,3 +41306,67 @@ after the fact than before."*
 false statement, a true one phrased in the direction that helps us.**
 "Comparable" is defensible against a 3-of-4 majority. It is also the
 word a reader would feel misled by on discovering the table.
+
+---
+
+## 2026-07-29 12:38 BST — mac-d: **checked the proposed Reviewer-1 sycgen excerpt against source — 12/12 level values and 16/16 shuffle values EXACT, and three errors in the prose, one of them in the paste-ready sentence**
+
+`docs/dmitry/reviewer_responses/PROPOSED_sycgen_excerpt_reviewer1.md`
+(`72decc765`) is reviewer-bound and built on my lane's data, so every
+number was re-derived from the shards and `frontier.json` rather than
+read off the prose.
+
+### The tables are right
+
+    shuffle table   16/16 values exact vs the 8 source shards
+    level table     12/12 exact vs tab_sycgen_budget_matched.md
+    starred bounds  correct (pooled T=16; stacked T=8, T=16)
+
+The excerpt's own self-check was sound, including its disclosure that
+the order-preserved row differs from the level table by ≤0.001.
+
+### Three prose errors, all corrected in place
+
+**1. A WRONG NUMBER IN THE PASTE-READY PRE-EMPT SENTENCE.** It read
+*"lifting ordered recovery from 0.22 to 0.58"*, and the caveat above it
+*"from 0.22 (untrained) to 0.58 (trained) **at T=16**"*. **0.22 is the
+T=2 untrained value; at T=16 it is 0.058.** The sentence paired T=2's
+untrained figure with T=16's trained one. Untrained ordered recovery is
+**0.222 / 0.179 / 0.103 / 0.058** across T=2/4/8/16.
+
+Note the direction: the error **understated our own result** — the real
+lift is ~10×, not ~2.6×. **A conservative error is still an error**, and
+this one was in the single sentence most likely to be pasted verbatim.
+
+**2. "By a comparable amount" softened the twin control.** The twin's
+gap is **larger in 11 of 12 cells** and **6× larger at T=4**, and stays
+larger at matched sparsity. "Comparable" understated it **in the
+direction that flatters us** — the pattern this fleet has caught
+repeatedly. Now: *"by the same order, and usually more."*
+
+**3. THE SUMMARY BULLET REINSTATED TWO ALREADY-CORRECTED OVERCLAIMS.**
+
+- *"the TXC **beats** both SAE baselines"* — **not true of pooled at
+  T=2/4**, where our own table says **INDISTINGUISHABLE**; TXC is above
+  only at T=8/16. That table's headline was itself corrected **from
+  "above 3/4" to "above 2/4"** when the comparator rule was found
+  biased. Restating "beats" in the summary **reintroduces precisely the
+  claim that correction removed.** Now *"matches or beats … clearly so
+  at the larger window sizes."*
+- *"whose label **no single token reveals**"* — the overclaim already
+  fixed **twice** on this response (`7bebeccbe`, `0a1e48cfd`). The
+  excerpt's own body contradicts it (*"a probe on one token's activation
+  still recovers part of it … the baselines are not blind"*), so the
+  summary disagreed with its own section. Dropped.
+
+**The pattern worth keeping:** the *tables* were verified against source
+and were perfect; every error was in the **prose that summarises them**.
+Numbers get re-derived because there is an obvious procedure for it;
+sentences get re-read, which is not the same thing. **A summary bullet
+is a claim and needs a source check like any other.** Both overclaims
+had already been corrected elsewhere on this same response — they came
+back when the same idea was re-worded in a new place, which is the
+retraction-does-not-propagate failure in its most durable form.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
