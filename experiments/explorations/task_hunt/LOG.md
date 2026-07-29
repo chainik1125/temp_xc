@@ -37632,3 +37632,54 @@ reruns it.
 still carry an event that old. **The band's upper edge remains
 unmeasured and needs real activations.** So the screen can rule
 candidates OUT cheaply; it cannot rule them IN.
+
+## 2026-07-29 01:16 BST — HUB: sharding delivered — **and my §8 cell count was 12× too high. The parallelism ceiling is 24, not 288.**
+
+**`0b58144c9` ratified.** mac-d implemented Han's directive and
+**corrected the sizing inside it.**
+
+**MY ERROR:** §8 said *"≈288 cells, all independent"*, taken as
+`T{4} × seeds{3} × arms{3} × {ord,shuf} × {plain,redraw} ×
+{trained,untrained}`. **That is the cross-product of the REPORTING
+GRID, not the set of independently runnable units.** The arms,
+both order conditions, both draws and both twins **share the loaded
+activations and the same tiles**, so splitting them would duplicate the
+expensive part rather than parallelise it. The real unit is
+**`(T, seed, draw)` = 24 cells.** I counted **measurements** and
+called them **work.**
+
+**⇒ 24 IS A HARD PARALLELISM CEILING. More than 24 GPUs is strictly
+wasted on this grid, whatever the authorization allows.** Han's
+directive was *max throughput*; the honest answer is that throughput
+saturates at 24-way and the $60/h authorization cannot be spent
+usefully beyond it. **A ceiling found before the pod is a saving; found
+after, it is a bill.**
+
+**AND THEY VERIFIED THE PARTITION RATHER THAN ASSUMING IT** — the point
+that makes the ceiling trustworthy. *"Silent cell loss is the exact
+failure mode of a stride-shard, and a sweep that drops cells still
+prints 'done'."* For n in {1,2,3,4,6,8,12,24,32}: **coverage 24/24,
+overlap 0, sizes even.** The ceiling surfaced *because* n=32 leaves 8
+shards empty — **the discovery came out of the verification, not out of
+reasoning about it.** Fifth instance tonight of a check whose failure
+would have looked like success, and the first found by someone testing
+their own partition arithmetic before it ran.
+
+**`--max-cells` and per-cell wall-clock added, timings persisted into
+the JSON** so seconds/cell is *a recorded number, not reconstructed
+from logs* — §8 step 3 binds and they bound themselves to it.
+
+**`d74bc2874` also ratified, and the principle generalises past this
+lane:** `--smoke` was writing into `results/shuffle_matched.json`,
+the tracked path a reader goes to for real rows. It carried
+`"smoke": true` inside — **but a key inside a file does not undo a
+file sitting where real results belong.** Now
+`shuffle_matched.SMOKE.json`. **Provenance that requires opening the
+file is not provenance; the path is the first claim a file makes.**
+
+**FLEET SIZING HELD until seconds/cell lands** — I told mac-d to size
+from a measurement and I am not going to pre-empt it with a guess an
+hour after withdrawing exactly that kind of guess on the k-grid. With
+24 cells the plausible shapes are one 8-GPU pod (3 cells each) or one
+12-GPU pod (2 each); **the measurement decides, and phase 1's shared
+cache still argues for a single multi-GPU pod over many pods.**
