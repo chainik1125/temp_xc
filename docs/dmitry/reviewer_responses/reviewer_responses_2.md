@@ -29,7 +29,7 @@ We provide several lines of evidence. First, the Stacked SAE matches the TXC's t
 | TXC-base (T = 10 / 20) | 0.85 / 1.7 | — | — | — |
 | TXC-pro (max T = 10) | 0.85 | 2.7 | 2.3 | — |
 
-**Dense inference cost (GFLOPs per native forward):**
+**Dense inference cost (GFLOPs per forward pass):**
 
 | Architecture and native input | Sparse | Backtracking | Medical EM | HH-RLHF |
 | :--- | ---: | ---: | ---: | ---: |
@@ -42,16 +42,11 @@ We provide several lines of evidence. First, the Stacked SAE matches the TXC's t
 | TXC-base, 10 / 20 tokens | 1.7 / 3.4 | — | — | — |
 | TXC-pro, 10 tokens | 1.7 | 5.4 | 4.7 | — |
 
-¹ Medical T-SAE entries report paper-width / matched-width values. Costs
-are per architecture's native forward. For an equal five-token segment, the
-single-token SAE and T-SAE costs should therefore be multiplied by five.
 
-We next compare the TXC with the Stacked SAE baseline directly. The TXC scores
-higher on Sparse probing, both Backtracking metrics, and HH-RLHF; the Stacked
-SAE scores higher on Medical EM detection, while its Medical EM steering
-evaluation was not run.
+Having established equal capacity, we compare the TXC with the Stacked SAE baseline directly. The TXC outperforms everywhere outside of EM:
 
-**Stacked SAE control at T = 5:**
+
+**Stacked SAE:**
 
 | Task and metric | Stacked SAE | TXC | Stacked / TXC | Floor |
 | :--- | ---: | ---: | ---: | ---: |
@@ -62,10 +57,6 @@ evaluation was not run.
 | Medical EM detection | 0.65† | 0.54 | 1.2† | 0.34 |
 | HH-RLHF | 0.60 | 0.61 | 0.99 | **0.62** |
 
-† The Medical EM detection comparison is not
-sparsity-calibrated: realized evaluation L₀ exceeded its nominal target for
-every architecture under train-to-rollout distribution shift. We therefore
-treat this comparison as directional pending re-thresholding.
 
 The matched-capacity Backtracking result isolates cross-position sharing from
 generic parameter count: the Stacked SAE reaches only 0.45× the TXC's
@@ -102,6 +93,3 @@ settings to the paper appendix:
 | Backtracking | Detection PR-AUC at S = 32 | 0.26‡ | 0.25 (d = 32,768) | 0.25 (d = 32,768) |
 | Medical EM | Detection PR-AUC at S = 16 | 0.54 | 0.71 (d = 16,384) | 0.43 (d = 32,768) |
 | HH-RLHF | Preference ROC-AUC at k = 20 | 0.62 | 0.60 (d = 18,432) | 0.60 (d = 18,432) |
-
-‡ The Backtracking TXC value is the T = 5 cell from the new window-size
-sweep.

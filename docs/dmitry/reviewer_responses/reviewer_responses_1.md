@@ -6,7 +6,7 @@ tags:
   - results
 ---
 
-## 🟩 Reviewer 1 response
+## Reviewer 1 response
 
 <!-- TODO:  Extend a little bit to highlight the strengths of the paper -->
 
@@ -165,7 +165,7 @@ generations; scope was held to the trained seed-42 cells).
 
 <!-- Callout box here -->
 
-🟩 "The checklist says the experiments use 2 seeds, but the appendix says the main backtracking results use only seed 42. Which is correct? Are the reported improvements larger than the variation across different seeds?"
+"The checklist says the experiments use 2 seeds, but the appendix says the main backtracking results use only seed 42. Which is correct? Are the reported improvements larger than the variation across different seeds?"
 
 We provide TXC-base results for random initialization seeds 1, 2, and 42 in
 the table below. Outstanding evaluations are marked as pending.
@@ -185,7 +185,7 @@ pending.
 
     - a. Abstract wording:
 
-🟩 "Is there one model setting where both the 40% better detection and the 15% better inducement are achieved? If not, please make this clear in the abstract."
+"Is there one model setting where both the 40% better detection and the 15% better inducement are achieved? If not, please make this clear in the abstract."
 
 Detection (Fig 4b) and inducement (Fig 4a) refer to the excess performance of the base TXC over the TopK SAE: a 40% higher AUC for detection and a 15% higher average rate of genuine backtracking events induced, respectively. We have clarified the abstract to reflect this:
 
@@ -196,7 +196,7 @@ Detection (Fig 4b) and inducement (Fig 4a) refer to the excess performance of th
 
     - b. Is the T-SAE underpowered?
 
-    🟩 "Why does T-SAE use a smaller dictionary if the paper claims all methods use the same dictionary size? Please also report the parameter count and inference cost for each model."
+    "Why does T-SAE use a smaller dictionary if the paper claims all methods use the same dictionary size? Please also report the parameter count and inference cost for each model."
 
 We agree that our description of dictionary sizes was ambiguous. For each
 task, we ran the T-SAE at the width used for the paper result and, where
@@ -227,19 +227,31 @@ We thank the reviewer for recognizing the novelty of our proposal and for noting
 
    **a.** First, we introduce an additional task in the synthetic setting that is provably impossible without temporal feature sharing. The TXC architecture strongly outperforms all other architectures on this task.
 
-   **b.** Second, we provide window size sweeps for all tasks (in response to 🟦 Reviewer 4z15).
+   **b.** Second, we provide window size sweeps for all tasks (in response to Reviewer 4z15).
 
-   **c.** Third we provide the Stacked-SAE baseline explicitly (in response to 🟦 Reviewer 4z15).
+   **c.** Third we provide the Stacked-SAE baseline explicitly (in response to Reviewer 4z15).
 
-2. We address the reviewer's concerns about seed variance by providing explicit thee seed results. We confirm that the relative rankings do not change.
+2. We address the reviewer's concerns about seed variance by providing
+explicit three-seed results. We confirm that the relative rankings do not
+change.
 
-3. We provide specific responses to the other points raised, including the abstract wording, T-SAE dictionary size, parameter count, and inference cost.
+3. We respond to the remaining points below, including the abstract wording,
+T-SAE dictionary size, parameter count, and inference cost.
 
 ### Synthetic setting
 
-In the synthetic setting. We introduce a task with an analytic ceiling on recoverability from single-token information. The task uses a Hidden Markov Model (HMM) based on Shamir secret sharing. This HMM encodes a temporal ``secret'', whose recovery can be no better than random guessing below a threshold number of temporal steps, $h$. For a fair comparison, when probing single-token architectures, we stack the activations over a window of the same size.
+To prove that the TXC uses temporal information, we introduce a synthetic task
+with an analytic ceiling on recoverability from single-token information. The
+task uses a Hidden Markov Model (HMM) based on Shamir secret sharing. This HMM
+encodes a temporal “secret” whose recovery can be no better than random
+guessing below a threshold number of temporal steps, h. For a fair comparison,
+when probing single-token architectures, we stack the activations over a
+window of the same size.
 
-For $h=2$, recovery below three steps is bounded at the chance accuracy of $1/11\\approx0.09$. All methods satisfy this ceiling. Beyond the threshold, TXC accuracy improves from $0.15$ at $W=3$ to near-perfect recovery, $0.96$, at $W=10$.
+For h = 2, recovery below three steps is bounded at the chance accuracy of
+1/11 ≈ 0.09. All methods satisfy this ceiling. Beyond the threshold, TXC
+accuracy improves from 0.15 at W = 3 to near-perfect recovery, 0.96, at
+W = 10.
 
 **Secret-recovery accuracy** (parentheses give the selected k):
 
@@ -262,7 +274,7 @@ each window size. We sweep k over {1, 2, 5, 10, 20} and choose the best k.
 
 The reviewer asks:
 
-> 🟩 The checklist says the experiments use 2 seeds, but the appendix says the main backtracking results use only seed 42. Which is correct? Are the reported improvements larger than the variation across different seeds?
+> The checklist says the experiments use 2 seeds, but the appendix says the main backtracking results use only seed 42. Which is correct? Are the reported improvements larger than the variation across different seeds?
 
 In the main text, we reported one training seed, consistent with landmark SAE-architecture papers introducing TopK (Gao et al., 2025, ICLR), Gated and JumpReLU (Rajamanoharan et al., 2024a,b), and BatchTopK (Bussmann et al., 2024). The appendix provided an additional seed; we have now updated it to include three-seed results, reproduced here:
 
@@ -277,13 +289,16 @@ In the main text, we reported one training seed, consistent with landmark SAE-ar
 
 **a. Abstract wording**
 
-> 🟩 Is there one model setting where both the 40% better detection and the 15% better inducement are achieved? If not, please make this clear in the abstract.
+> Is there one model setting where both the 40% better detection and the 15% better inducement are achieved? If not, please make this clear in the abstract.
 
-Detection (Fig. 4b) and inducement (Fig. 4a) refer to the excess performance of the base TXC over the TopK SAE: a 40% higher detection AUC and a 15% higher average rate of backtracking induced, respectively. We have clarified the abstract to reflect this.
+Detection (Fig. 4b) and inducement (Fig. 4a) refer to the excess performance
+of the base TXC over the TopK SAE: a 40% higher detection AUC and a 15% higher
+average rate of backtracking induced, respectively. We have clarified the
+abstract to reflect this.
 
 **b. Is the T-SAE underpowered?**
 
-> 🟩 Why does T-SAE use a smaller dictionary if the paper claims all methods use the same dictionary size? Please also report the parameter count and inference cost for each model.
+> Why does T-SAE use a smaller dictionary if the paper claims all methods use the same dictionary size? Please also report the parameter count and inference cost for each model.
 
 Our description of dictionary sizes was ambiguous. For each task, we ran the
 T-SAE at the width used for the paper result and, where different, at the width
@@ -303,4 +318,4 @@ sweep.
 
 **c**. Parameter count and inference cost
 
-See response to 🟦 Reviewer 4z15.
+See response to Reviewer 4z15.
