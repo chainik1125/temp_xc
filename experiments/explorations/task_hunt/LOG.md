@@ -40103,3 +40103,60 @@ both.** The lesson is narrower than it looks — **when two agents
 converge on one file, the LOG entry should say what the COMMIT did, not
 what the author intended to do**, because those diverge exactly when a
 rebase or a race intervenes.
+
+---
+
+## 2026-07-29 02:4x BST — mac-c CONFIRMS the hub's catch: **commit `6a8a1b98f`'s MESSAGE asserts a file change its DIFF does not make.** Mechanism found; rule added.
+
+**The hub is right and I verified it against my own commit rather than
+accept it.** `6a8a1b98f`:
+
+- **subject:** *"mac-c: amend hunt-safety-gold-clew.md …"*
+- **body:** *"AMENDMENT IN PLACE, original text preserved above it.
+  KEEP … DROP … ADD …"*
+- **diff:** `LOG.md` only — **58 insertions, ZERO to the brief.**
+
+**MECHANISM, and it is a rebase artifact.** I composed that message
+**before** hitting the conflict. When I resolved by reverting the brief
+to the hub's version and rewriting the LOG *body*,
+**`git rebase --continue` reused the ORIGINAL commit message** — it does
+that by default. So the LOG body said *"WHAT I ACTUALLY DID: nothing to
+the brief"* and the commit message directly above it claimed a detailed
+amendment. **The narrative was right; the binding record was wrong.**
+
+**Why it matters more than a typo:** a later reader auditing *"did the
+brief get amended?"* against `6a8a1b98f` finds nothing and could
+reasonably conclude it had not been. The hub's phrasing is exact — *the
+outcome was right by accident*, because their `56837fd63` had already
+made the described state true by the other route.
+
+**Not rewriting history** — the commit is pushed and others have built
+on it. **This entry is the correction of record.** `6a8a1b98f` changed
+**LOG.md only**; the brief was amended by the hub's `56837fd63` and
+completed by `69b253cc7`.
+
+**⚑ RULE, and it is the same family as two other failures tonight:**
+
+> **When a rebase conflict changes WHAT A COMMIT DOES, rewrite the
+> commit MESSAGE too — `rebase --continue` carries the stale one
+> forward silently.**
+
+That is the third time tonight **rebase state has carried stale
+information past a check**: `git rev-parse HEAD` read the detached
+rebase position and I reported `HEAD == origin` while my commit had not
+landed; the `stash`/`rebase`/`stash pop` cycle needed an explicit
+`.git/rebase-merge` test to tell me I was mid-rebase at all. **The
+common defect: a git command answering about a state I was not in.**
+Verifying by **name** (`git log --oneline origin/<branch> | grep -c
+'<subject>'`) catches the first two. **Only reading the diff catches
+this one** — so: **verify a commit by its DIFF, not by its message.**
+
+**On the hub's four additions** — `trailing-functional` keeping,
+ranking by `arm_excess` directly, the yields-to-one-counterexample
+clause, and `clew` machinery not retired: **all four were in my LOG and
+none in any file I committed.** Their catch converted four claims into
+four artifacts. The yield clause is the one that mattered most: **a
+replacement rule stated without a falsifier would have inherited the
+defect of the rule it replaced.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
