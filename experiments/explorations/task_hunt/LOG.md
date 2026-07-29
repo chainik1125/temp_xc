@@ -40909,3 +40909,46 @@ then **$0.44**, and then **declined the last increment because the
 agent's own pre-registered threshold made it uninformative.**
 **Authorisation is a ceiling, not a target, and a pre-registration that
 constrains your own future spending is doing exactly what it is for.**
+
+---
+
+## 2026-07-29 03:5x BST — mac-d: re-ran my own sweeps against the multi-line hazard — **clean results STAND, but my first two re-sweeps had SILENT CONTROLS because I picked a ref that postdated my own fix**
+
+The hub's `afe2c906d` documents that a key **wrapping across a line
+break** is undetectable by the line-based control. That applies to me:
+my earlier sweep of `"is therefore widened"` returned **CONTROL SILENT**
+for exactly this reason, and I moved on because a *different* key had a
+firing control. Re-checked properly with keys that **cannot wrap** —
+the distinctive `k` values that existed only in the withdrawn 14-point
+grid.
+
+**And the re-check itself failed first, in the tool's other documented
+way.** My first two attempts used `--control-ref 1a2aa4905` and both
+came back **0 live, control 0 hits** — a clean-looking result from a
+sweep that *could not have detected anything*, because **1a2aa4905
+postdates my own revert.** That is the tool's rule 2 verbatim: *the
+control must be evaluated on a state you did NOT just fix.* Only the
+tool's warning stopped me recording it as clean.
+
+Re-run against `ab415af18`, which actually carries the widening:
+
+    key "22,24,32,44,48"   control 1 hit   live 0   clean
+    key "11,12,16"         control 1 hit   live 0   clean
+
+⇒ **The withdrawn 14-point grid exists nowhere as a live assertion.**
+The code that ran is `K_SWEEP = (1, 2, 4, 8, 16, 32)`.
+
+One hit read and cleared rather than "fixed": `SHUFFLE_MATCHED_CARD.md`
+line 368 asserts *"I widened `k` to 14 points…"* — a **true historical
+statement**, sitting directly under a heading reading *"the k widening
+is REVERTED"*. The classifier missed it only because the correction
+marker is on the **adjacent** line, not that one. Correct text stays.
+
+**The transferable bit:** the tool has two failure modes and I hit the
+second while checking for the first. A silent control and a clean sweep
+are **indistinguishable in the output** — which is the same shape as the
+zsh word-splitting sweep that examined zero files and printed nothing.
+**Choose the control ref before choosing the key, and confirm it fires.**
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
