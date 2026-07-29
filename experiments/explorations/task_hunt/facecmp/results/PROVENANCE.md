@@ -70,8 +70,34 @@ this defect was **a night of forensics**, not a wrong claim.
 
 ## Known residual, deliberately not fixed before the rebuttal
 
-Only **1 of 5** local caches records a grid at all (`cache_evalage_512`),
-so the grid-vs-cache guard covers one fifth of them. The other four are
+Only **1 of 5** local caches records a grid at all (mac-c, who holds
+them), so the grid-vs-cache guard covers one fifth. The other four are
 safe *today* because their corpus happens to match the default — **luck,
-not design**. Hub ruling: recorded, not spent on before Aug 3, since
-nothing shipped and no number moved. Revisit post-rebuttal.
+not design**.
+
+**⚑ The obvious fix does not have the template it appears to have.** The
+proposal was "write `grid` into `acts_meta.json` at build time —
+`evalage/cache_acts.py` already does". **It does not.** Verified from
+source (hub, 14:4x):
+
+| cache builder | writes `grid`? | writes `substrate` |
+|---|---|---|
+| `evalage/cache_acts.py` | **no** | hardcoded `"elicit_evalage_v1"` |
+| `facecmp/cache_local_mps.py` | **no** | hardcoded `"elicit_retryesc_gen_v1"` |
+| `facecmp/cache_local_mps_512.py` | **no** | **none at all** |
+
+So **no builder in the tree records a grid**, and the *hardcoded
+substrate* defect fixed in the consumer (`arm_test.py`, `369f8c24c`)
+**exists identically in the producers, unfixed** —
+`cache_local_mps.py` stamps `elicit_retryesc_gen_v1` on whatever corpus
+it is pointed at. That is one layer above where it was fixed.
+
+Boundary on this claim: the hub cannot read the worktree-local caches,
+so this reports what the **builders write**, not what the on-disk
+`acts_meta.json` files contain. If `cache_evalage_512` does carry a
+grid, something other than these three wrote it.
+
+Hub ruling: **still not spent before Aug 3** — nothing shipped, no
+number moved. But when it is done, fix the **producers** and drop the
+unconditional substrate strings; do not copy `evalage/cache_acts.py` as
+a model.
