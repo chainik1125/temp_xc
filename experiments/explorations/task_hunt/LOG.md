@@ -42886,3 +42886,66 @@ response contradicts itself.** Section stays frozen. No agent is to
 edit the EM figures without Han's word.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-29 15:2x BST — hub: **CORRECTING MY OWN FLAG (`535181453`) — two claims in it were wrong, and the insinuation it carried is uninformative. The question survives; the suspicion does not.**
+
+I pushed a flag implying a submitted number might be unbacked. That is
+a serious thing to imply about a collaborator's work, so I kept
+checking. **Two of my claims do not hold.**
+
+### ✗ WRONG: *"the steering triple is not reproducible from this repo at all"*
+
+It is in our own history, with **more precision than the response
+quotes** — `d46f0b990^:reviewer_responses_1.md:285`:
+
+    16.72 \,/\, \mathrm{pending} \,/\, 22.88
+
+So `17` and `23` are **our own rounded 16.72 and 22.88**. I searched the
+leaderboard and the results tree and concluded "nothing on disk", never
+checking **the document's own git history** — the fifth costume again,
+in my third instance tonight: *my check measured the results tree; the
+claim was about the number existing anywhere.*
+
+### ✗ WRONG BY IMPLICATION: *"`Pending` in our copy vs `20` in the submitted"*
+
+I framed our copy as the trustworthy one diverging from the submitted.
+**Backwards.** `pending` was in the draft **before** I touched it —
+introduced by Dmitry's own lineage, not by my pipe-table conversion
+(`d46f0b990`), which carried it faithfully. Our arxiv copy is simply
+**older**, and `origin/dmitry-txcwins-10h:187,404` has had
+`17 / 20 / 23` since `e7c43737f` (chainik1125, Jul 28 21:33).
+
+### ⚑ WITHDRAWN: the midpoint observation, as uninformative
+
+I noted `20` is exactly the midpoint of `17` and `23` — true, and
+**worthless as evidence**, which I should have seen before writing it:
+
+- midpoint of the **rounded** values (17, 23) = **20**
+- midpoint of the **precise** values (16.72, 22.88) = 19.8 → **20**
+- a **genuine** seed-2 result anywhere in 19.5–20.4 → **20**
+
+All three roads lead to 20 because Dmitry rounds every seed to an
+integer in that table. The observation **cannot discriminate** between a
+real run and an interpolation, so offering it as a reason for suspicion
+was wrong. **Withdrawn.**
+
+### What actually survives — a stale-copy question, not an integrity one
+
+**Our arxiv copy is stale at two lines** (`:187`, `:398`) and Dmitry's
+branch is current. The remaining question is ordinary and low-drama:
+**did the seed-2 EM steering run complete after the `pending` draft, and
+if so what is its precise value** (the other two are 16.72 / 22.88, so
+seed 2 should have a decimal too).
+
+Almost certainly yes: `stacked-em-steer` terminated at 02:52, and 21:33
+on the 28th is when Dmitry updated the drafts. **Nothing here suggests a
+fabricated number**, and my earlier entry should not be read as
+suggesting one.
+
+**Unchanged:** section stays frozen, no agent edits the EM figures, our
+copy is not synced without Han's word — syncing it is a one-line fix
+once the value is confirmed.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
