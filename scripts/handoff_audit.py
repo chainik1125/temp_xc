@@ -124,10 +124,30 @@ def count_conflict_markers(body: str) -> int:
     A guard that only sees openers is a guard that passes the wreckage of
     a half-finished fix — the same "check that reports success" shape this
     function was added to prevent.
+
+    ⚑ FALSE-ALARM FIX 14:1x (mac-c, after mac-d hit the same thing in the
+    sibling guard). A bare `=======` is ALSO a markdown **setext H1
+    underline**, so `Title` / `=======` — an ordinary heading — was being
+    counted as corruption. Widening a guard without checking the
+    false-alarm direction just moves the defect: a certifier that refuses
+    valid documents gets switched off, and then it misses real ones.
+
+    Rule: `<<<<<<<` and `>>>>>>>` are unambiguous and always count.
+    `=======` counts ONLY when the file also carries one of those, which
+    is exactly the orphaned-tail case (`=======` + `>>>>>>> <sha>`) while
+    leaving a plain setext heading alone.
+
+    **Knowingly given up:** a file whose ONLY marker is a lone `=======`
+    reads as a heading and is not flagged. That state is genuinely
+    ambiguous from the text, and guessing in either direction is worse
+    than saying so here.
     """
-    marks = ("<<<<<<<", "=======", ">>>>>>>")
-    return sum(1 for ln in body.splitlines()
-               if any(ln.startswith(m) for m in marks))
+    lines = body.splitlines()
+    unambiguous = sum(1 for ln in lines
+                      if ln.startswith(("<<<<<<<", ">>>>>>>")))
+    if not unambiguous:
+        return 0
+    return unambiguous + sum(1 for ln in lines if ln.startswith("======="))
 
 
 def ref_absent(body: str, ref: str) -> bool:
@@ -368,6 +388,15 @@ def main(self_test: bool = False) -> int:
                        and count_conflict_markers("a\n>>>>>>> 69d\n") == 1))
         probes.append(("conflict-marker detect: SHA opener",
                        count_conflict_markers("a\n<<<<<<< 97b6d27f9\nb\n") == 1))
+        # ⚑ FALSE-ALARM direction, added 14:1x with the fix. Every probe
+        # above asks "does it fire?" — none asked "does it stay quiet?"
+        # A certifier that refuses valid documents gets switched off, and
+        # then it misses the real ones. Both directions or neither.
+        probes.append(("conflict-marker: setext H1 is NOT corruption",
+                       count_conflict_markers("Title\n=======\n\nbody\n") == 0
+                       and count_conflict_markers("Title\n=======\nSub\n----\n") == 0))
+        probes.append(("conflict-marker: tail still caught beside a heading",
+                       count_conflict_markers("Title\n=======\nx\n>>>>>>> 69d\n") == 2))
 
         probes.append(("item-ref-absent detect",
                        ref_absent("handoff body", "fig_not_referenced_xyz")

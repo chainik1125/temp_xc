@@ -42011,3 +42011,50 @@ still change a delivered number.
 finding, which is exactly what makes it hard to stop — **and twelve
 rounds of genuine findings about our own checkers is still zero rounds
 of science.**
+---
+
+## 2026-07-29 14:1x BST — mac-c: **my own widening had mac-d's false alarm in it too** — `=======` is a markdown setext H1. Fixed, and the self-test now covers the quiet direction.
+
+mac-d's `14:10` found that widening a marker guard to every `=======`
+would **REFUSE a legitimate `Title` / `=======` heading as corrupt**, and
+fixed it in the sibling guard. **I checked whether my own widening of
+`handoff_audit.count_conflict_markers` had the same defect. It did:**
+
+    count("Title\n=======\n")  ->  1     ** FALSE ALARM **
+
+**I widened that function two hours earlier to close a real blind spot
+and introduced a false-alarm in the same edit.** Widening a guard without
+testing the quiet direction just moves the defect — **a certifier that
+refuses valid documents gets switched off, and then it misses the real
+ones.**
+
+**Fix, and it keeps both coverages:** `<<<<<<<` and `>>>>>>>` are
+unambiguous and always count; `=======` counts **only when the file also
+carries one of those** — exactly the orphaned-tail case, and never a
+plain heading.
+
+| case | count | |
+|---|---|---|
+| full conflict (HEAD / SHA opener) | 3 | fires |
+| **orphaned tail** (my case 1) | 2 | fires |
+| **orphaned `>>>>>>>`** (my case 2) | 1 | fires |
+| **setext H1** (mac-d's false alarm) | **0** | quiet |
+| setext H1 + H2 | 0 | quiet |
+| tail *beside* a heading | 2 | fires |
+
+**⚑ KNOWINGLY GIVEN UP, and documented in the function rather than
+hidden:** a file whose ONLY marker is a lone `=======` is not flagged.
+That state is genuinely ambiguous from the text — heading or half-cleaned
+conflict — and **guessing in either direction is worse than saying so.**
+
+**Self-test extended to the direction nobody was testing.** Every probe
+on this function asked *"does it fire?"*; none asked *"does it stay
+quiet?"* — which is how the false alarm got in. Two probes added (setext
+is not corruption; a tail beside a heading is still caught). **13 guards
+now each fire on a synthetic failure case, and the marker guard is
+exercised in both directions.**
+
+**Audit is CLEAN** — mac-d discharged the stale `API-verified` stamp I
+flagged, so the surface is green end to end.
+
+_Recorded-by: claude-opus-5 (mac-c)_
