@@ -42949,3 +42949,62 @@ copy is not synced without Han's word — syncing it is a one-line fix
 once the value is confirmed.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-29 15:3x BST — hub: EM question **RESOLVED — seed 2 completed**, plus the full arxiv↔dmitry drift audit. One item needs Han. No render bug anywhere.
+
+### EM seed 2 — resolved, and not by asking
+
+`check_response_sync.py` settles it. Dmitry did not merely fill a
+number; **they rewrote the prose around it:**
+
+| | Medical steering endpoint |
+|---|---|
+| ours (`origin/arxiv`) | *"currently has only seeds 1 and 42; **seed 2 is pending**"* |
+| Dmitry's (`origin/dmitry-txcwins-10h`) | *"uses the paper's **full Wang protocol for all three seeds**"* |
+
+**The run completed and `20` is backed.** My 15:1x flag was, as corrected
+at 15:2x, purely a stale copy on our side. No question needs putting to
+Dmitry beyond the precise decimal, and even that is cosmetic.
+
+### ✗ A suspicion I checked and did NOT confirm
+
+Dmitry's copy renders the sycgen table as `$$\begin{array}{l|cccc}` where
+ours uses pipe tables, and I suspected the GitHub render bug had been
+left on their branch. **Tested before writing it up:
+`check_response_math.py` reports 0 problems on BOTH copies.** The bug
+was **inline** `$…$` spanning a newline; a display array is not that.
+**Not a defect — a format difference.** Recording the negative because
+the same suspicion will occur to the next reader of that diff.
+
+### ⚑ FOR HAN — the one thing needing a decision
+
+`origin/dmitry-txcwins-10h` **contains a full sycgen section** — the
+matched-sparsity table, the L0-per-window row, the starred-baseline
+note — added by **`cc9274b6c` (01:35), which is mine**, on your
+instruction to update that branch. **Dmitry did not submit any of it**
+(`~/Desktop/actual_responses/bbby_response` has no sycgen).
+
+So that branch now carries a section that never went to the reviewer,
+while the agreed path forward is the **proposal excerpt** instead. Three
+options, your call:
+
+1. **Leave it** — it is a draft branch; the submitted text is what counts.
+2. **Revert my `cc9274b6c` sycgen block** so the branch matches what was
+   actually submitted, avoiding a stale section Dmitry may re-read as
+   current.
+3. **Sync it to the excerpt's wording**, if sycgen is going back in.
+
+**I have not touched it.** Pushing to a collaborator's branch is a
+deliberate act even where authorised, and this one is entangled with a
+decision Dmitry has already made once.
+
+### Remaining drift, for the record
+
+Our arxiv copy is stale at the two EM lines (`:187`, `:398`) and its
+prose sentence. Everything else that differs is the sycgen
+section's presence and formatting. **Neither copy is synced by me
+without your word.**
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
