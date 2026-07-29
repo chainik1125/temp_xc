@@ -42831,3 +42831,58 @@ the six instances are recorded. Item 1 and everything downstream of it
 are closed.
 
 _Recorded-by: claude-opus-5 (mac-local, hub)_
+
+---
+
+## 2026-07-29 15:1x BST — hub: ⚑ **FOR HAN AND DMITRY — the SUBMITTED Reviewer-1 response quotes an EM steering seed our own copy marks `Pending`, and I can find nothing on disk backing it.** Flagged, not actioned. Section stays frozen.
+
+Item 1 closed, so I went to the open item that touches a **shipped**
+surface: the `stacked-em-steer` reconciliation I flagged at 02:52.
+Read-only. **Verifying is not unfreezing** — I have changed nothing.
+
+### The discrepancy
+
+| surface | Medical EM, Δalignment at coherence ≥ 70 (seeds 1/2/42) |
+|---|---|
+| `docs/dmitry/reviewer_responses/reviewer_responses_1.md:187, :398` (ours) | **17 / `Pending` / 23** |
+| `~/Desktop/actual_responses/bbby_response:48` (**SUBMITTED**) | **17 / 20 / 23** |
+
+The middle seed is **`Pending` in our copy and `20` in the response that
+went to the reviewer.**
+
+### What I could and could not verify
+
+- **Zero** leaderboard rows with a **TXC arch at seed 2** for `em`. The
+  only seed-2 `em` rows are `batchtopk_sae` — the baseline, carrying
+  *detection* metrics (`n_sent`, `positive_rate`, `n_folds`, …).
+- **The steering triple is not reproducible from this repo at all** —
+  not just the 20. Nothing on disk carries Δalignment-at-coherence-70;
+  the only mention of the metric is a docstring in
+  `render_paper_figures.py:185`. So I cannot verify 17 or 23 either.
+- **⚑ Therefore the leaderboard's silence is weak evidence.** EM
+  steering does not appear to be a leaderboard-backed pipeline, so
+  "absent from the leaderboard" does **not** establish "never ran". This
+  is the night's own rule applied to myself: *my check measures the
+  leaderboard; the claim is about a number's existence.* Those are not
+  the same state.
+
+### The question to put to Dmitry — a question, not a finding
+
+**20 is exactly the midpoint of 17 and 23.** That is what an
+interpolation produces, and it is also an entirely ordinary thing for a
+real third seed to be. **I am not asserting it was estimated** — I have
+no evidence either way, and the run is Dmitry's, on their machine.
+
+The ask is one sentence: **"is the EM seed-2 steering value a completed
+run, and where is it?"** If it is, our branch copy is stale at two lines
+and should be filled in. If it is not, it is a fabricated seed in a
+submitted response, and responses are amendable to **Aug 3**.
+
+### Why I am not touching it
+
+Unchanged from 01:5x: it is Dmitry's run and their number, and **two
+people editing one rebuttal section from different data is how a
+response contradicts itself.** Section stays frozen. No agent is to
+edit the EM figures without Han's word.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
