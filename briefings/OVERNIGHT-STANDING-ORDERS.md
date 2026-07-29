@@ -132,12 +132,19 @@ document is the exact hazard that produced four contradictions tonight.
 2. **`figs_writeup/tab_sycgen_*.md`** — regenerate, never hand-edit
    (`scripts/gen_sycgen_budget_table.py`).
 3. **`docs/dmitry/reviewer_responses/reviewer_responses_1.md` on
-   `arxiv`** — the WORKING copy (single-backslash) is the source of
-   truth; the paste copy is **generated from it** by doubling every
-   backslash, with the round-trip asserted.
-4. **The same file on `dmitry-txcwins-10h`.** Check the branch has not
-   moved under you and that Dmitry has not edited *that file* before
-   applying — they were editing reviewer 2 at 01:4x.
+   `arxiv`.** **⚑ FORMAT CHANGED 02:2x — the backslash-doubling rule
+   below is RETIRED for tables.** Dmitry's agent converted the tables
+   to **markdown pipe tables**, which render everywhere; the sycgen
+   table now matches. **Write new tables as pipe tables** — no `$$`,
+   no arrays, no escaping question. Both copies of the sycgen block are
+   now byte-identical, so there is nothing to regenerate. Remaining
+   inline math still must not wrap across a line.
+4. **The same file on `dmitry-txcwins-10h` — and it is ACTIVELY EDITED
+   by Dmitry's agent.** It moved twice in twenty minutes on 07-29.
+   **Never copy your working file over theirs.** Take **their current
+   tip** as the base, graft only your own block onto it, and diff to
+   confirm nothing else moved. Their tip removed the `(k)` annotations
+   between two of my reads; a stale base would have reverted it.
 5. **Verify, do not eyeball:**
 
        .venv/bin/python scripts/check_response_numbers.py

@@ -13,6 +13,14 @@ LOG, ledger oversight, and the handover surfaces
 
 ## ⚑⚑ OVERNIGHT MODE (Han asleep from ~01:5x 07-29) — read this first
 
+**⚑ FORMAT + CO-EDITING CHANGE (02:23):** the reviewer-response
+tables are now **markdown pipe tables** (Dmitry's agent converted them;
+it retires the LaTeX/backslash-escaping problem entirely). **And
+`dmitry-txcwins-10h` is ACTIVELY EDITED** — it moved twice in twenty
+minutes. **Never copy your file over theirs: rebase onto their current
+tip and graft only your block.** Both copies are byte-identical now
+(434 lines, 0 drift).
+
 **Han: *"i'm going to head to sleep, continue orchestration of agentic
 work"*, plus two standing instructions: keep `REBUTTAL_HANDOFF.md`
 updated as results land, and keep
