@@ -39902,3 +39902,61 @@ measured result** on a different benchmark, not a screening criterion.
 **Precision about where a correction does NOT apply is part of the
 correction** — the same call as leaving `tab_dq_tsweep.md`
 un-annotated for A4.
+---
+
+## 2026-07-29 02:4x BST — mac-c: went to amend `hunt-safety-gold-clew.md` and found the HUB GOT THERE FIRST (`7d8a8a18d`, 02:39). **I dropped my duplicate rather than stack a second near-identical block.**
+
+**⚑ WHAT I ACTUALLY DID: nothing to the brief.** I wrote a full
+amendment, hit a rebase conflict, and found the hub had withdrawn the
+criterion two minutes earlier with the same evidence. **Two overlapping
+amendment blocks in one section is the "history trains its reader to
+ignore it" failure the hub named tonight**, so I reverted the file to
+their version and kept none of mine. The brief is correct as it stands.
+
+**Their version is also better than mine in one respect I had missed** —
+it draws a boundary I did not: *"This governs THE HUNT'S SCREEN. It is
+NOT a test of the paper's ambience claim — flagged for Han, not
+concluded."* My amplifier result is about **which candidates to screen
+for**, and it would have been easy to read it as undermining the paper's
+central claim. It does not, and that distinction should travel with the
+finding. **Adopting their scope note as the canonical one.**
+
+
+**Closing the loop on the brief that generated tonight's hunt work.** It
+is `status: active`, `owner: mac-c`, and its §1 instructs the reader to
+screen for **per-token silence** and to *"not spend generation money"* on
+a candidate lacking it. **Two corpora now say that criterion selects
+against the arm.** Leaving it unamended would have sent the next agent —
+or a post-compact me — to generate a corpus under a refuted rule, which
+is the most expensive mistake on the board.
+
+**The amendment (in place, original text preserved above it):**
+
+- **KEEP** *safety-meaningful* and *trailing functional of sparse
+  events*. Both stand.
+- **DROP** per-token silence as a **positive** criterion. It aims at the
+  **gain** bar while the **floor** is what kills (the floor reads no
+  tokens), and it predicts a **weak arm**, not a wide gap.
+- **ADD** ranking by **arm-excess** and by the **amplification factor**
+  (`arm_excess / tok_excess`), a corpus property varying **~2×** —
+  on the gain side, where the constraint actually binds.
+- **`floor_reach` = KILL FILTER ONLY.** It ranked our one KEEP behind a
+  WEAK.
+
+**The sharpest line, and it is measured rather than argued: our one KEEP
+fails this brief's own criterion.** `sycgen` has the **strongest** tok of
+the three candidates (+0.196 vs +0.127 vs +0.047) — **it is not
+per-token-silent.** The criterion we screen by and the exhibit we ship
+were in tension, and it took a rebuttal overclaim and an ICC measurement,
+arriving independently within an hour, to make it visible.
+
+**Limits carried into the amendment, not left in the LOG:** one model,
+one layer, faces within a corpus are readouts of one event stream, and
+**absence of a weak-tok/strong-arm face over 12 faces is
+absence-evidence, not proof**. The amendment explicitly yields if someone
+finds one — that face would be the target.
+
+**Not retired.** The brief's clew-sourcing machinery is still good and
+the registry answered well; only the screening rule was wrong. `$0`.
+
+_Recorded-by: claude-opus-5 (mac-c)_
