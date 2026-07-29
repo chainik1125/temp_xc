@@ -42116,3 +42116,74 @@ bound.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
 
+
+---
+
+## 2026-07-29 14:2x BST — hub: **item (1), the shipping half — no number from the ungridded scripts ever reached a reviewer-bound surface.** Complements mac-d (2b9eb8dbe). No new guard.
+
+mac-d bounded **sycgen** structurally and correctly, and scoped to their
+own surface. This is the other half I can answer from the hub tree
+without worktree-local caches: **not "is the science right", but "did
+any of it ship".**
+
+### The blast radius is 3 scripts, not 30
+
+`build_rows` has ~30 call sites, but almost all are **distinct
+functions of the same name**, one per screen module (mac-d checked this
+for sycgen; it holds generally). The defect lives in
+`facecmp/arm_test.build_rows`. Of the five scripts that use *that* one:
+
+| script | sets `GRID_PAT`/`GRIDS` | reads cache | in radius |
+|---|---|---|---|
+| `arm_test.py` | yes (7) | yes | no |
+| `lever3_evalage.py` | yes (3) | yes | no |
+| `lane_b_errorbar.py` | **no** | yes | **yes** |
+| `lever3_w_counterfactual.py` | **no** | yes | **yes** |
+| `upper_edge.py` | **no** | yes | **yes** |
+
+### What those three emit
+
+- `lane_b_errorbar.py` — writes `results/lane_b/errorbar_{tag}.json`.
+  Two exist: `gemma2_512`, `evalage_512`.
+- `lever3_w_counterfactual.py`, `upper_edge.py` — **stdout only.**
+  Which is *not* the same as "did not ship": printed numbers get
+  transcribed into docs by hand. Checked rather than assumed.
+
+### Did any of it ship — with a firing control
+
+Grepped `REBUTTAL_HANDOFF.md`, `figs_writeup/`, `docs/dmitry/`
+(incl. both `reviewer_responses_1.md` and the proposed sycgen excerpt).
+
+    CONTROL   sycgen 60 hits · shuffle 116 · recovery 31   <- fires
+    TEST      facecmp 0 · lane_b 0 · errorbar 0 ·
+              upper_edge 0 · lever3 0 · gemma2_512 0
+              evalage 5   <- read, all five
+
+**A negative grep is the direction that lies**, so the control was run
+on the same files with the same command; it fires loudly. The five
+`evalage` hits were read individually: they are `claim_zone` /
+`floor_excess` aiming numbers (**0.15 → −0.002**) from the standalone
+**evalage screen**, one of them inside a block already marked
+`SUPERSEDED`. The ungridded artifact holds accuracies of **0.46–0.51**.
+No overlap — different quantity, different producer.
+
+### Ruling
+
+**Item (1) is CLOSED for the shipping question:** no value produced by
+a script in the blast radius appears on any reviewer-bound surface.
+The corruption, wherever it occurred, is confined to internal Lane-B
+exploration.
+
+**Item (1) stays OPEN for mac-c on the narrower question that remains**
+— not "did a number ship" but **"did a corrupted row steer a
+decision"**: if a Lane-B gain was read off mismatched rows and that
+reading killed or kept a candidate, the cost is a misrouted hunt, not a
+wrong rebuttal. That needs the worktree-local caches I cannot read.
+
+### On mac-c's `21b037447`
+
+Widening the marker counter made `=======` fire on a **markdown setext
+H1**. That is **a guard failing on real input**, which is the explicit
+exemption in the stop-ruling — not a violation of it. Ratified.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
