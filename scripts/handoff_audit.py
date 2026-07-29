@@ -219,12 +219,30 @@ def main(self_test: bool = False) -> int:
     # "API-verified" claim is, from git blame, and fail past a threshold.
     import subprocess
     STALE_H = 6
+    # ⚑ Freshness is not truth, and the budget must match the FACT's
+    # volatility, not the document's update cadence. On 07-29 the pod list
+    # turned over three times in 90 minutes while a 1.6h-old "API-verified"
+    # line sat comfortably inside a 6h budget and was false. Claims about
+    # the live fleet get a much tighter budget.
+    VOLATILE = ("pod", "$/h", "/h ", "RUNNING")
+    STALE_VOLATILE_H = 1.0
     for g in ("REBUTTAL_CODE_GUIDE.md", "REBUTTAL_HANDOFF.md"):
         gp = ROOT / g
         if not gp.exists():
             continue
-        for i, ln in enumerate(gp.read_text().splitlines(), 1):
+        lines = gp.read_text().splitlines()
+        for i, ln in enumerate(lines, 1):
             if "API-verified" not in ln:
+                continue
+            # A line explicitly marked SUPERSEDED is kept for the record, not
+            # asserted. The staleness sweep (#8) already exempts these; the
+            # age gate must too, or it fails on history it was told about.
+            # A gate that fires on correctly-labelled history trains its
+            # reader to ignore it — the mirror of a gate that cannot fire.
+            # The marker usually sits on a PRECEDING line (it heads the
+            # block), so look back a few lines, not just at this one.
+            window = "\n".join(lines[max(0, i - 5):i])
+            if "SUPERSEDED" in window or "SUPERSEDED" in ln:
                 continue
             try:
                 out = subprocess.run(
@@ -236,9 +254,11 @@ def main(self_test: bool = False) -> int:
                 continue
             import time
             age_h = (time.time() - ts) / 3600
-            if live_fact_expired(age_h, STALE_H):
+            limit = (STALE_VOLATILE_H if any(v in ln for v in VOLATILE)
+                     else STALE_H)
+            if live_fact_expired(age_h, limit):
                 fails.append(f"{g}:{i}: an 'API-verified' claim is "
-                             f"{age_h:.1f}h old (> {STALE_H}h) — re-query the "
+                             f"{age_h:.1f}h old (> {limit}h) — re-query the "
                              f"API; a live-fact snapshot silently goes false")
             else:
                 notes.append(f"live-fact claim {g}:{i} is {age_h:.1f}h old (ok)")

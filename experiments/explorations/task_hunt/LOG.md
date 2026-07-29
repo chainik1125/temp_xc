@@ -38805,3 +38805,42 @@ argv). **Never `tail` a list whose length you do not control.**
 H100s) was from an untruncated query and stands. **The pods remain
 untouched** — house rule holds regardless of what they cost. **Han's
 decision is now about $298/day.**
+
+## 2026-07-29 02:06 BST — HUB: my live-fact age gate **passed a false claim**, because I calibrated it to the document's cadence, not the fact's volatility
+
+**Chasing the pod correction into the handover surfaces found the
+guide asserting two things that were true when written and false now:**
+*"All agent pods are terminated and API-verified gone"* (mac-d has two
+up) and *"the other three are non-convention names totalling
+$3.87/h"* (five, $12.40/h).
+
+**The age gate did not fire on either, and it was working correctly.**
+Both lines are **1.6 h old** against a **6 h** budget. **I set 6 h
+because that was roughly how often the handover got re-stamped — the
+DOCUMENT's cadence.** The fleet turns over in **minutes**: three
+compositions in ninety of them. **A freshness budget must be set by how
+fast the FACT moves, not by how often the file is touched**, and mine
+measured the wrong clock. **Freshness is not truth: a claim can be
+1.6 h old and false, and the gate said "ok" in exactly that case.**
+
+**FIX — volatile claims get a 1 h budget**: any `API-verified` line
+mentioning pods, `$/h`, or `RUNNING`. Everything else keeps 6 h.
+
+**⚑ AND THE TIGHTENED GATE IMMEDIATELY FIRED ON A LINE I HAD JUST
+LABELLED `SUPERSEDED`** — history kept deliberately, with the
+correction directly above it. **A gate that fires on correctly-labelled
+history trains its reader to ignore it, which is the mirror of a gate
+that cannot fire** — the same pair mac-c and I have now hit three times
+tonight (A1 and its fix; the σ-bands; this). The staleness sweep
+already exempted `SUPERSEDED`; the age gate did not, so I made them
+consistent — **and had to look BACK five lines, because the marker
+heads the block rather than sitting on the claim.** My first attempt
+checked only the claim line and still failed.
+
+**Guide corrected**: fleet list re-stamped with all seven pods, ours
+vs unattributed split out, the two stale assertions superseded in place
+with the originals kept, and a pointer to `scripts/pod_inventory.py`
+with the `tail` failure named. Audit clean, self-test 9/9.
+
+**The reusable line: a "live fact" needs an expiry set by the fact, and
+a gate needs to know the difference between stale and retired.**

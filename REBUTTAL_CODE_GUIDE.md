@@ -251,15 +251,26 @@ is durable on origin + HF; their containers are not.
 M5 Pro / 18 cores / **48 GB unified** (mac-d, `96e34816a`). Agent count
 is **not** machine count; plan concurrency accordingly.
 
-### Pods now (API-verified 01:0x 07-29 — **the set turns over fast; re-query, do not trust this list**)
+### Pods now (API-verified 02:05 07-29 — **the set turns over in MINUTES; re-query with `scripts/pod_inventory.py`, do not trust this list**)
 
-**5 RUNNING, $12.40/h — and NOT ONE is an agent lane. Agent spend is $0/h.**
+**7 RUNNING, $14.60/h — ours $2.20/h, unattributed $12.40/h (≈$298/day).**
 
+    mac-d-sycshuffle-0729          $0.44/h  OURS (shuffle lane)
+    mac-d-sycshuffle8-0729         $1.76/h  OURS (4xA40, bought for RAM)
     mats-lenctl-h100               $2.99/h  ⚑ not an agent lane
     stacked-em-steer               $2.99/h  ⚑ not an agent lane
     reviewer-btk-tsae-300k         $2.99/h  ⚑ not an agent lane
     reviewer-headline-multiseed    $2.99/h  ⚑ not an agent lane
     tsae-paper-widthmatch-probing  $0.44/h  ⚑ not an agent lane
+
+**⚑ Read this list with `scripts/pod_inventory.py`, never through
+`tail`.** At 01:47 a truncated read dropped a row and reported a running
+pod as gone (LOG 02:0x). **A printed total that disagrees with the rows
+above it is a truncated list.**
+
+**⚑ SUPERSEDED 02:05 07-29 — mac-d has TWO pods up for the shuffle lane
+(see the list above). The statement below was true at 01:0x and is not
+now; a "live fact" written 90 minutes ago is not a live fact.**
 
 **All agent pods are terminated and API-verified gone** (mac-d's
 `mac-d-item6-0728` closed with the item-6 ledger; actuals $8.6 vs $6
@@ -277,6 +288,9 @@ EXITED at 18:0x and is RUNNING again** — so these are being
 hand-provisioned by a human, not leaked by an agent. Per Han's scope
 ruling, hand-provisioned pods bill **outside** the agent $500 cap. They
 are **untouched** either way (never modify a pod you did not spin up).
+
+**⚑ FIGURE SUPERSEDED: the unattributed set is now FIVE pods at
+$12.40/h (≈$298/day), not three at $3.87/h.** Original text kept:
 
 **Only one pod belongs to a live agent lane.** The other three are
 non-convention names totalling **$3.87/h**, attributable to no agent
