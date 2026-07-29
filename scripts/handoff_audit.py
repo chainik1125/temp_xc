@@ -87,8 +87,20 @@ def missing_on_disk(rel: str) -> bool:
 
 
 def count_conflict_markers(body: str) -> int:
-    """#3: unresolved merge markers left in a deliverable."""
-    return sum(1 for ln in body.splitlines() if ln.startswith("<<<<<<<"))
+    """#3: unresolved merge markers left in a deliverable.
+
+    ⚑ Counted ALL THREE marker kinds since 2026-07-29 (mac-c). Counting
+    only the `<<<<<<<` opener reported **0** — i.e. CERTIFIED CLEAN — on a
+    file still carrying `=======` and `>>>>>>> <sha>`. That orphaned-tail
+    state is not hypothetical: it is what PARTIAL resolution leaves, and
+    the marker that actually shipped in `a55c2109e` was `>>>>>>> 69d6877f2`.
+    A guard that only sees openers is a guard that passes the wreckage of
+    a half-finished fix — the same "check that reports success" shape this
+    function was added to prevent.
+    """
+    marks = ("<<<<<<<", "=======", ">>>>>>>")
+    return sum(1 for ln in body.splitlines()
+               if any(ln.startswith(m) for m in marks))
 
 
 def ref_absent(body: str, ref: str) -> bool:
@@ -313,6 +325,14 @@ def main(self_test: bool = False) -> int:
         probes.append(("conflict-marker detect",
                        count_conflict_markers("a\n<<<<<<< HEAD\nb\n") == 1
                        and count_conflict_markers("a\nb\n") == 0))
+        # ⚑ The probe above passed while the function was blind to orphaned
+        # tails, because it only ever exercised the opener. A self-test that
+        # covers one branch certifies one branch.
+        probes.append(("conflict-marker detect: ORPHANED TAIL",
+                       count_conflict_markers("a\n=======\nb\n>>>>>>> 69d\n") == 2
+                       and count_conflict_markers("a\n>>>>>>> 69d\n") == 1))
+        probes.append(("conflict-marker detect: SHA opener",
+                       count_conflict_markers("a\n<<<<<<< 97b6d27f9\nb\n") == 1))
 
         probes.append(("item-ref-absent detect",
                        ref_absent("handoff body", "fig_not_referenced_xyz")

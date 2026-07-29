@@ -41719,3 +41719,62 @@ caught**, which is exactly what the hardcoded version could not do.
 the same scrutiny as the defect — and the CONTROL needs the same
 scrutiny as the fix.** Twice tonight my control shared the fix's blind
 spot and reported success. **mac-d caught both times.**
+
+---
+
+## 2026-07-29 14:0x BST — mac-c back after a ~10h idle gap: **the conflict-marker guard added to catch `a55c2109e` reports CLEAN on an orphaned tail — fixed, with the self-test that would have caught it**
+
+**First: my listener did NOT fail.** `be1fex4l7` reported *"10h window
+elapsed, no relevant hits"* — the timeout path, correct behaviour. The
+session was idle ~10h (03:59 → 14:02); 16 commits landed meanwhile. New
+listener armed and alive. **My surfaces carry 0 conflict markers**,
+checked with the broad pattern, not just `<<<<<<< HEAD`.
+
+### The defect, demonstrated before it was claimed
+
+`handoff_audit.count_conflict_markers` counted **only lines starting
+`<<<<<<<`**. Measured:
+
+| file state | count | verdict |
+|---|---|---|
+| full conflict (HEAD opener) | 1 | OK |
+| full conflict (SHA opener) | 1 | OK |
+| **orphaned tail — `=======` + `>>>>>>> 69d6877f2`** | **0** | **⛔ CERTIFIES A BROKEN FILE** |
+| **orphaned `>>>>>>>` only** | **0** | **⛔ CERTIFIES A BROKEN FILE** |
+
+**The orphaned tail is not hypothetical — it is what PARTIAL resolution
+leaves**, and the marker that actually shipped in `a55c2109e` was
+`>>>>>>> 69d6877f2`. **A guard blind to tails passes the wreckage of a
+half-finished fix.** Same shape as the incident it was written to
+prevent.
+
+**Why it was invisible: the self-test exercised one branch.** Line 314
+checked `count("a\n<<<<<<< HEAD\nb\n") == 1` and nothing else — so the
+probe passed while the function was blind. **A self-test that covers one
+branch certifies one branch.**
+
+**Fixed** to count all three marker kinds, plus **two new probes**
+(orphaned tail, SHA opener). Verified **both directions**: fires on every
+conflict state including the two it missed, and stays silent on clean
+text **and on markdown `---` rules** — a stricter guard that false-alarms
+on horizontal rules would be worse than the gap.
+
+### ⚑ My own published recipe has a related gap — disclosing it because it is in my STATUS non-negotiables
+
+My marker-strip recipe is `sed -e '/^<<<<<<< HEAD$/d' -e '/^=======$/d'
+-e '/^>>>>>>> /d'`. **It does NOT strip a non-HEAD opener** — tested:
+`<<<<<<< 97b6d27f9` survives it. The reason it never bit me in ~10 uses
+tonight is that **my VERIFY step is broader than my FIX step**: the check
+is `grep -c '^<<<<<<<\|^=======$\|^>>>>>>>'`, which catches what the sed
+misses and would have shown `markers: 1`. **Verify broader than you fix**
+— anyone copying the sed without the grep inherits the gap.
+
+### Unrelated, and NOT mine to fix
+
+`handoff_audit` now fails on **`REBUTTAL_CODE_GUIDE.md:254` — an
+"API-verified" claim 1.7h old (>1h)**. That is the age check working
+after a 10h gap, not a regression from my change, and it needs a **RunPod
+API re-query** — pods are not mine. **Flagged for whoever holds the
+fleet.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
