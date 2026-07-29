@@ -228,7 +228,7 @@ matrix.**
   (`<arch_id>__seed42.pt`, incl. `agentic_txc_02`) +
   `temp-bench-models` (c3 cells) — see COMPOSITION_AUDIT §3.
 
-## 5. FLEET MAP — snapshot **01:0x BST 07-29, API-verified**
+## 5. FLEET MAP — snapshot **12:23 BST 07-29, API-verified**
 
 This section dates fast. **Live sources: `agents/<id>/STATUS.md` + the
 LOG tail** — trust those over this snapshot if they disagree.
@@ -251,14 +251,11 @@ is durable on origin + HF; their containers are not.
 M5 Pro / 18 cores / **48 GB unified** (mac-d, `96e34816a`). Agent count
 is **not** machine count; plan concurrency accordingly.
 
-### Pods now (API-verified 03:12 07-29 — **the set turns over in MINUTES; re-query with `scripts/pod_inventory.py`, do not trust this list**)
+### Pods now (API-verified 12:23 07-29 — **re-query with `scripts/pod_inventory.py`; the set turns over in minutes**)
 
-**3 RUNNING, $6.42/h — ALL unattributed. Agent GPU spend is $0.00/h:
-mac-d's three pods are down, ledgers closed.**
+**1 RUNNING, $0.00/h — ALL unattributed. Agent GPU spend $0.00/h.**
 
-    reviewer-btk-tsae-300k         $2.99/h  ⚑ not an agent lane
-    reviewer-headline-multiseed    $2.99/h  ⚑ not an agent lane
-    tsae-paper-widthmatch-probing  $0.44/h  ⚑ not an agent lane
+    total $0.00/h   ours $0.00/h   unattributed $0.00/h
 
 **`stacked-em-steer` and `mats-lenctl-h100` have TERMINATED since the
 last stamp.** ⚑ `stacked-em-steer` was reviewer 1's requested

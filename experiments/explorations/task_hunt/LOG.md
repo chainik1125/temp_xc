@@ -41077,3 +41077,51 @@ night they were written.**
 
 **Nothing outstanding. Agent spend $0.00/h. All lanes closed, all
 retractions swept, all surfaces verified.**
+
+## 2026-07-29 12:24 BST — ⚑ HAN: the rebuttal figure did not exist — **trained-ordered vs trained-shuffled, and nothing else on the axis**
+
+**Han: *"for the rebuttal we care only about the gap between the trained
+TXC on order preserved vs the trained TXC on shuffled; untrained twins
+are NOT of the same level. Where is the single shuffle ablation /
+T-sweep plot?"***
+
+**He is right and the gap was real: it did not exist.** The only sycgen
+shuffle figure on disk was `fig_sycgen_shuffle_tsweep.png` from
+**28 Jul — the UNMATCHED-sparsity run.** The matched run shipped a
+**table only**, because **the acceptance gate I wrote named a table and
+never asked for a plot.** I flagged the missing table-writer
+pre-emptively at 02:2x and did not notice I had under-specified the
+gate itself.
+
+**And the twin point is not cosmetic.** The twin reaches **0.058**
+ordered at T=16 against the trained model's **0.578** — its gap is a
+difference between two near-chance numbers. **mac-d raised exactly this
+as their own qualifier and I carried it as a caveat; Han's framing is
+to act on it and take the twin off the axis entirely.**
+
+**BUILT: `sycgen/render_shuffle_matched.py` →
+`figs_writeup/fig_sycgen_shuffle_matched.{png,pdf}`**, embedded in
+§6. Trained TXC only, ordered vs shuffled, 3 seeds, matched sparsity.
+
+    T=2   0.4991 -> 0.3877   gap +0.111 ± 0.023
+    T=4   0.5225 -> 0.4994   gap +0.023 ± 0.007
+    T=8   0.5363 -> 0.4859   gap +0.050 ± 0.044
+    T=16  0.5776 -> 0.5158   gap +0.062 ± 0.030
+
+**⚑ AND MY FIRST RENDER HAD THE ERROR BARS WRONG.** I propagated the
+gap's s.d. as `sqrt(sd_o² + sd_s²)`, **treating ordered and shuffled
+as independent when they are PAIRED** — same seed, same model, so the
+seed-to-seed swing in *level* is common to both arms and cancels in the
+difference. **Measured overstatement: 6.7× at T=4**, which is the
+difference between an error bar that **crosses zero** and one that
+**clearly does not.** Corrected to the s.d. of the per-seed gaps.
+**A figure that overstates its own uncertainty is not the safe
+direction to err — it hides a real effect and invites the reader to
+dismiss it.**
+
+**Caveat carried onto the figure: the gap is NOT monotone in T**
+(0.111 → 0.023 → 0.050 → 0.062). **Do not quote a T-trend.**
+
+**Fleet: 0 RUNNING, $0.00/h — the unattributed pods have also come
+down since 03:57.** Both stale `API-verified` stamps in the code guide
+refreshed; audit clean, 10 figures embedded, all present.

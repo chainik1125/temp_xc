@@ -497,6 +497,32 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
 
 ![sycgen T-sweep (partial renders refresh in place)](figs_writeup/fig_sycgen_shuffle_tsweep.png)
 
+  ![sycgen shuffle, matched sparsity — trained TXC only](figs_writeup/fig_sycgen_shuffle_matched.png)
+
+  **⚑ THE REBUTTAL FIGURE (12:23 07-29, Han's framing): trained TXC
+  ordered vs trained TXC shuffled, at matched sparsity, and NOTHING
+  ELSE ON THE AXIS.** Untrained twins are deliberately absent — they
+  reach **0.058** ordered at T=16 against the trained model's
+  **0.578**, so their gap is a difference between two near-chance
+  numbers and is **not commensurable**. Render with
+  `sycgen/render_shuffle_matched.py`.
+
+  | T | ordered | shuffled | gap (paired s.d.) |
+  |---|---|---|---|
+  | 2 | 0.4991 | 0.3877 | **+0.111 ± 0.023** |
+  | 4 | 0.5225 | 0.4994 | **+0.023 ± 0.007** |
+  | 8 | 0.5363 | 0.4859 | **+0.050 ± 0.044** |
+  | 16 | 0.5776 | 0.5158 | **+0.062 ± 0.030** |
+
+  **All four gaps are positive.** ⚑ **The s.d. is PAIRED** (s.d. of the
+  per-seed gaps) — ordered and shuffled share a seed and a model, so
+  the level swing cancels. Propagating as `sqrt(sd_o²+sd_s²)` treats
+  them as independent and **overstates T=4 by 6.7×**, which is the
+  difference between "crosses zero" and "clearly positive".
+  **⚑ The gap is NOT monotone in T** (0.111 → 0.023 → 0.050 → 0.062) —
+  **do not quote a T-trend.** `redraw` draw, since this is a cross-T
+  reading and `plain` leaves 1/T! of rows unshuffled (50% at T=2).
+
   > ## ✅ SPARSITY-MATCHED SHUFFLE ABLATION — DELIVERED 02:30 07-29, and it is a NEGATIVE we pre-committed to publishing
   >
   > **`figs_writeup/tab_sycgen_shuffle_matched.md`.** 624 rows, 24
