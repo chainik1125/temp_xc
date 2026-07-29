@@ -38924,3 +38924,48 @@ and the "amplifier" framing goes with it.
 Cost: **$0, 0 pods.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-29 02:10 BST — ⚑ HUB: **"not visible in any single token" was an OVERCLAIM in the rebuttal, and mac-c's arm work is what exposed it**
+
+**Corrected on both branches.** The response said the task's state is
+*"not visible in any single token."* **Our own screen says otherwise:**
+
+    sycgen tok_best   0.5012 / 0.5291 / 0.5298   (gpt2 / gemma2 / llama)
+    null_win          0.3368 / 0.3437 / 0.3324
+
+**A probe on a SINGLE token's activation scores ~0.53 against a ~0.34
+null.** The label is substantially recoverable from one position —
+because the residual stream at that position has already attended over
+the prefix. **This is the same fact mac-c measured on the upper edge**
+(a single token carries age past 1024) **arriving in a delivered
+claim.**
+
+**The distinction the wording collapsed, and it is a real one:**
+
+- **The TEXT shows nothing at one token** — true by construction, and
+  it is what "per-token silent" was ever meant to mean.
+- **The ACTIVATION at one token carries plenty** — measured, and the
+  opposite of what the sentence said.
+
+**Rewritten to say exactly that, and the honest version is the stronger
+one for this reviewer:** *"A probe on one token's activation still
+recovers part of it, as the residual stream has attended over the
+prefix, so the baselines here are not blind: they read the same
+activations, and the question is whether the window adds anything at
+matched sparsity."* **Claiming the baselines are blind invites the
+reply that they are not; claiming we beat them while they see
+everything we see is both true and harder to attack.**
+
+**⚑ THIS ALSO PUTS A CRACK IN THE HUNT'S SOURCING CRITERION**, which
+mac-c reached independently from the other side (`7df9f25d8`):
+`hunt-safety-gold-clew.md` demands **per-token-SILENT** tasks — and
+**our only KEEP has the STRONGEST tok signal of the three candidates**
+(+0.196 over chance vs evalage +0.127, retryesc +0.047). **sycgen is
+not per-token-silent by measurement.** The criterion we screen by and
+the exhibit we ship are in tension, and it took a rebuttal sentence to
+make it visible.
+
+**Files re-verified after the fix:** response math **0 problems**,
+quoted numbers **0 mismatches** against `frontier.json`,
+`tab_sycgen_budget_matched.md` **regenerates byte-identical** (already
+current, verdict unchanged: above 2/4, indistinguishable 2/4).
