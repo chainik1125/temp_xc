@@ -37574,3 +37574,61 @@ transcribed** — a table in this document rendered a 1.27× ratio as
 
 **NOT CITED: the shuffle-matched run, which is still in flight.** The
 response uses only what is on disk, per Han.
+
+## 2026-07-29 01:14 BST — HUB: **my "sort by beyond-T mass" screen is FALSIFIED — mac-c built it with the falsifier first and it fired**
+
+**Ratified. `f023f0cf3` kills my proposal from `41281e0eb` and
+replaces it with a working one.** `beyond_T = P(age>T)` is
+**1.0000 for BOTH evalage and retryesc_gen at T=4, 8, 16** — events are
+far sparser than the window, so "mass beyond T" is everything for
+everyone — and **at T=16 it orders the corpora backwards.** No
+discriminating power **exactly where the hunt operates.**
+
+**MY ERROR, precisely:** I read `sage_floor` at source, confirmed it
+censors at T+1, and generalised from it **as though it were the
+floor**. The floor is **two** features and the discriminating one is
+the other: `dose_window_count(event_MASK, T)`, over masked **turn**
+tokens of width `w`. **The floor's power comes from MASK WIDTH — which
+is exactly why `w` is lever 3.** I quoted both features in my own
+entry and then reasoned from only the one I had opened. **Verifying one
+component and generalising to the system is the same defect mac-d named
+two hours ago** — *"verifying a component is not verifying the rule
+built from it"* — and I committed it while ratifying their statement of
+it.
+
+**THE WORKING QUANTITY IS mac-c's CORRECTED FLOOR LAW**
+(`floor_reach = P(any masked token in the trailing T window)`,
+`d2320d274`), and it is **validated, not asserted**: tracks the two
+corpora's **observed** `floor_excess` within **0.82–1.13×** (evalage
+T4 0.0035 vs 0.0031, T64 0.0541 vs 0.0572; retryesc T4 0.0184 vs
+0.0225, T64 0.2431 vs 0.2748) and **separates the corpora ~5.3× at
+every T across 3 legs each, consistent to ±8%** — where mine was flat
+at 1.0000.
+
+**SCREEN RULE ADOPTED: MINIMISE `floor_reach`** — the fraction of
+positions whose label the floor can already resolve. **The 5.3× is what
+lever 3 (w 25→13) buys**, and it is the ordering the observed floors
+and the KEEP-shaped cells actually showed.
+
+**⚑ NOTE WHAT THIS VINDICATES.** `floor_reach` is the corrected form
+of the quantity I propagated in a **refuted** version earlier tonight
+(the `floor_excess ≡ f` / 2e-6 identity, which survived on
+`REBUTTAL_HANDOFF.md` as a "reusable result" until the retraction
+sweep caught it). **The refutation was right and the corrected law is
+now the hunt's screen criterion** — the same quantity, correctly
+stated, doing real work. **A retracted claim is not a worthless one;
+it is an unfinished one, and finishing it was worth more than either
+the original assertion or the retraction.**
+
+**METHOD POINT WORTH KEEPING:** mac-c **did not delete the falsified
+criterion** — both live in `beyond_t_mass.py`, *"its saturation is
+why the corrected one is credible rather than fitted after the fact."*
+**A negative result kept next to its replacement is what distinguishes
+a correction from a post-hoc fit**, and it is checkable by anyone who
+reruns it.
+
+**HONEST LIMIT, stated by them and not by me:** `floor_reach` is a
+**lower edge only** — it says nothing about whether the activations
+still carry an event that old. **The band's upper edge remains
+unmeasured and needs real activations.** So the screen can rule
+candidates OUT cheaply; it cannot rule them IN.
