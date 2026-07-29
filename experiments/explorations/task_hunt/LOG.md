@@ -41125,3 +41125,72 @@ dismiss it.**
 **Fleet: 0 RUNNING, $0.00/h — the unattributed pods have also come
 down since 03:57.** Both stale `API-verified` stamps in the code guide
 refreshed; audit clean, 10 figures embedded, all present.
+
+---
+
+## 2026-07-29 04:0x BST — mac-d: **the new rebuttal figure ships the exact framing my lane refuted**, and `REBUTTAL_HANDOFF.md` still carried the REFUTED budget-artifact reading as live guidance — **`claim_sweep.py` called it CLEAN**
+
+The hub built `fig_sycgen_shuffle_matched` (`1e9266d8c`) — trained TXC
+ordered vs shuffled, **twins deliberately off the axis**, justified with
+**my own commensurability caveat**. The figure is fine; the framing
+around it was not, on a **shipping** surface. Four corrections, all in
+place, nothing rewritten.
+
+### 1. ⚑ The sweep said CLEAN and the content was live — blockquote-as-callout defeats the classifier
+
+`claim_sweep.py` classifies an occurrence inside `> ` as **quoted, not
+asserted**. That is right when a blockquote quotes a claim in order to
+refute it. **`REBUTTAL_HANDOFF.md` uses blockquotes as CALLOUT BOXES**,
+so its most emphatic, most load-bearing guidance is *entirely* inside
+`>` — and the tool reported **`live 0 … clean`** on refuted text that a
+reader would follow.
+
+**This is the unsafe direction:** the tool's other two failure modes
+(wrapped key, control-ref postdating the fix) produce a *silent*
+control, which it warns about. **This one produces a confident
+`clean`.** Recommend the classifier treat `>` as quoted only when the
+block also carries a correction marker — a callout box is prose, not a
+quotation. Flagging rather than patching someone else's tool mid-lane.
+
+I only caught it because the tool's own instruction says *only you can
+judge* and I read the lines anyway.
+
+### 2. What was stale (all my lane's content, so mine to fix)
+
+- **"WHAT WE CANNOT SAY: that training *reduces* order-sensitivity;
+  the comparison that would show it is the one the budget confounds."**
+  **Refuted** — the confound was *removed*, not disclosed
+  (`twin_matched.py`), and the twin excess **survives matching** at
+  T=2 (+0.0365) and T=4 (+0.1249), 3/3 seeds each. Hub ratified at
+  `8b8806e40`. Now sayable **at T=2/4 only**; T=8/16 indeterminate.
+- **"Next $0 step: re-run the twin at the trained model's realized
+  `l0` … the only way T=16 resolves."** **Already done** — and T=16
+  did **not** resolve.
+- **"The sparsity-matched shuffle ablation … is a separate run in
+  flight."** **It landed 02:30.** Replaced with the measured reason
+  the exhibits still do not cross: **stacked cannot be budget-matched
+  at T=8/16 at all** (`l0` is a sum over positions ⇒ floor `T·1` =
+  8.00/16.00 vs TXC 7.22/7.86).
+- **"The live hypothesis is that the gap is architectural."** Not a
+  hypothesis any more — **confirmed**.
+
+### 3. The figure needs its verdict attached, not just nearby
+
+The figure shows the trained gap **and nothing else** — *precisely* the
+framing this lane found is **not evidence of learned temporal
+structure**. The verdict block sits below it in the handoff, but **a
+caption lifted into the rebuttal travels alone.** Added, at the figure:
+the twin is off the axis for a **scale** reason (0.058 vs 0.578
+ordered), **not because its gap is small — it is LARGER, and still
+larger at matched budget.**
+
+Same defect the paper-faithful check caught on the pf figure: a caption
+that omits what qualifies it.
+
+**Credit where due:** the hub's own correction in that commit — paired
+vs independent error bars, overstated 6.7× at T=4 — is the right catch
+and the figure's numbers are sound. **The gaps are real; what they are
+evidence *of* is the part that had to travel with them.**
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+

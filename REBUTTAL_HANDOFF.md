@@ -514,6 +514,17 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
   | 8 | 0.5363 | 0.4859 | **+0.050 ± 0.044** |
   | 16 | 0.5776 | 0.5158 | **+0.062 ± 0.030** |
 
+  **⚑ THIS FIGURE MUST NOT TRAVEL WITHOUT ITS VERDICT.** It shows the
+  trained model's ordered−shuffled gap and nothing else — which is
+  *precisely* the framing the sparsity-matched ablation below found is
+  **NOT evidence of learned temporal structure**: an untrained twin
+  shows a gap of the same order or **larger**, and it still does at
+  **matched budget** (T=2 +0.0365, T=4 +0.1249, both 3/3 seeds). The
+  twin is off the axis for a **scale** reason (0.058 vs 0.578 ordered),
+  **not** because its gap is small. **Any caption lifted into the
+  rebuttal must carry that**, or a reader takes the positive gaps below
+  as evidence of learning — the exact reading this lane refuted.
+
   **All four gaps are positive.** ⚑ **The s.d. is PAIRED** (s.d. of the
   per-seed gaps) — ordered and shuffled share a seed and a model, so
   the level swing cancels. Propagating as `sqrt(sd_o²+sd_s²)` treats
@@ -548,27 +559,61 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
   > arithmetically and returns PASS on a dead shuffle); the input-side
   > identity-row count is what certifies the instrument.
   >
-  > **⚑ BUDGET CONFOUND — carry it at equal prominence.** The twin runs
-  > at `l0` = 8.00 against the trained model's 5.44–7.86, **up to
-  > 1.47×**. Hub cross-check: the twin's excess gap **tracks its budget
-  > advantage** (Spearman +0.80, n=4) and **reverses at T=16**, where
-  > the budgets nearly match (1.02×) — which is the signature a budget
-  > artifact leaves. **(b) is carried by T=2/4/8; at the one T with a
-  > near-matched comparison the direction flips toward (a) and fails its
-  > own 3/3 sign test.**
+  > **⚑ BUDGET CONFOUND — RAISED, THEN REMOVED. IT IS NOT THE
+  > MECHANISM.** The twin runs at `l0` = 8.00 against the trained
+  > model's 5.44–7.86, up to 1.47×, and the hub's cross-check found the
+  > twin's excess **tracked** that advantage (Spearman +0.80, n=4,
+  > reversing at T=16) — the signature of a budget artifact. **So the
+  > confound was removed rather than disclosed:** the twin was re-run
+  > with `k_pos` swept to bracket each trained cell's measured `l0`
+  > (`sycgen/twin_matched.py`, 168 rows, frozen before running).
+  >
+  > **The twin excess SURVIVES budget matching** (hub ratified,
+  > `8b8806e40`):
+  >
+  > | T | twin excess @ matched budget | twin > trained |
+  > |---|---|---|
+  > | 2 | +0.0365 | **3/3** |
+  > | 4 | +0.1249 | **3/3** |
+  > | 8 | +0.0372 | 2/3 |
+  > | 16 | −0.0340 | 2/3 |
+  >
+  > The twin's gap is large at **every** `k_pos` swept, including
+  > settings **below** the trained budget (T=2 s2: twin +0.1318 at
+  > `l0`=3.00 vs trained +0.0550 at `l0`=5.89). **A budget artifact
+  > cannot look like that.** T=8/16 stay **INDETERMINATE** — 2/3 fails
+  > the pre-registered 3/3 sign test, and at T=16 the bracket ends
+  > disagree by more than the excess itself.
   >
   > **WHAT WE CAN SAY:** *the ordered−shuffled gap is not evidence of
-  > learned temporal structure* — which is what the binding quote-form
-  > has said since 04:16 07-28. **WHAT WE CANNOT SAY:** that training
-  > *reduces* order-sensitivity; the comparison that would show it is
-  > the one the budget confounds. **This does NOT say the TXC fails** —
-  > ordered recovery still rises 0.499 → 0.578 across T against the
-  > twin's 0.222 → 0.058. It says the **shuffle gap is the wrong
-  > evidence** for it.
+  > learned temporal structure* — the binding quote-form since 04:16
+  > 07-28, and now **stronger**: a random model at the *same measured
+  > budget* shows a gap of the same order or larger, established by
+  > T=2/4 at 3/3 each. **WHAT WE CAN NOW ALSO SAY, AT T=2 AND T=4
+  > ONLY:** that training *reduces* the raw gap — ~~the comparison that
+  > would show it is the one the budget confounds~~ **(superseded: the
+  > confound was removed; that comparison now exists).** **NOT
+  > generalised across T** — T=8/16 are indeterminate.
   >
-  > **Next $0 step:** re-run the twin at the trained model's realized
+  > **What budget matching does NOT fix:** the twin still barely does
+  > the task (0.058 ordered at T=16 vs 0.578), so raw gaps remain hard
+  > to compare across a 10× base-recovery difference. **Matching fixes
+  > the budget, not the scale.** The post-hoc *relative* gap — checked
+  > because it was the reading that might have flattered us — makes the
+  > negative **stronger** (twin loses 76–79% of recovery, trained
+  > 4.5–22%).
+  >
+  > **This does NOT say the TXC fails** — ordered recovery still rises
+  > 0.499 → 0.578 across T against the twin's 0.222 → 0.058. It says
+  > the **shuffle gap is the wrong evidence** for it.
+  >
+  > ~~**Next $0 step:** re-run the twin at the trained model's realized
   > `l0` instead of `k_pos`-full. That removes the confound and is the
-  > only way T=16 resolves.
+  > only way T=16 resolves.~~ **DONE 02:5x 07-29** — see the table
+  > above. T=16 did **not** resolve; it is indeterminate at n=3. The
+  > remaining follow-up is a **5-seed run** to size outcome (d), which
+  > mac-d declined to fund unasked because the card's own 5/5 sign rule
+  > pre-commits it to be inconclusive (LOG 03:51). Hub's call.
 
   **Table:** `figs_writeup/tab_sycgen_shuffle_tsweep.md` —
   generated from the overlay/twin/summary jsons (ordered/shuffled
@@ -582,8 +627,18 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
   > stacked at **matched budget with no shuffle dimension at all**
   > (`frontier.json` carries no shuffle key — verified). Neither
   > supports a "TXC beats a windowed SAE on order-sensitivity" claim.
-  > The sparsity-matched shuffle ablation that *would* is a separate
-  > run in flight (`briefings/sycgen-shuffle-sparsity-matched.md`).
+  > ~~The sparsity-matched shuffle ablation that *would* is a separate
+  > run in flight (`briefings/sycgen-shuffle-sparsity-matched.md`).~~
+  > **⇒ IT LANDED 02:30 07-29 and it does NOT support that claim
+  > either.** Verdict **(b) architectural, not learned**
+  > (`figs_writeup/tab_sycgen_shuffle_matched.md`, 624 rows, hub
+  > ratified). **The exhibits still do not cross into a "TXC beats a
+  > windowed SAE on order-sensitivity" claim** — and now for a measured
+  > reason rather than a missing run: **stacked cannot be
+  > budget-matched at T=8/16 at all** (its `l0` is a sum over
+  > positions, so its floor is `T·1` = 8.00/16.00 against TXC's
+  > 7.22/7.86), and where they *can* be compared TXC's gap is larger at
+  > T=2 but **smaller** at T=8/16.
   >
   > **⚑ And when it lands, do not compare a shuffle gap to pooled's:
   > pooled's ordered−shuffled gap is EXACTLY ZERO by construction.**
@@ -596,13 +651,16 @@ say *"status, not yet exhibits"*; that is no longer true of item 6.
   > supplies order free from the architecture with no temporal
   > learning.
   >
-  > **The live hypothesis is that the gap is architectural, not
-  > learned** — sycgen's shuffle claim already dissolved once under
-  > exactly this pressure: **untrained twins show LARGER gaps than
-  > trained models at every T** (see the twin column above). The
-  > binding quote-form already says the claim is the LEVEL story, not
-  > the order story. Keep it that way until the matched run says
-  > otherwise.
+  > ~~**The live hypothesis is that the gap is architectural, not
+  > learned**~~ — **NO LONGER A HYPOTHESIS: the matched run landed and
+  > CONFIRMED it (verdict (b), 02:30 07-29).** sycgen's shuffle claim
+  > had already dissolved once under exactly this pressure, and it did
+  > so again under a sparsity-matched comparator: **untrained twins
+  > show LARGER gaps in 11 of 12 (T, seed) cells**, and the excess
+  > **survives budget matching** at T=2/4. The binding quote-form says
+  > the claim is the LEVEL story, not the order story — ~~keep it that
+  > way until the matched run says otherwise~~ **and the matched run
+  > has now said so explicitly; keep it that way.**
   >
   > **⚑ AND NEVER QUOTE THE T-SWEEP AS A TREND (added 00:5x 07-29).**
   > The shuffle draws an independent `randperm(T)` per row, which is
