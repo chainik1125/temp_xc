@@ -11,6 +11,31 @@ LOG, ledger oversight, and the handover surfaces
 
 # RESUME HERE
 
+## ⚑⚑ OVERNIGHT MODE (Han asleep from ~01:5x 07-29) — read this first
+
+**Han: *"i'm going to head to sleep, continue orchestration of agentic
+work"*, plus two standing instructions: keep `REBUTTAL_HANDOFF.md`
+updated as results land, and keep
+`docs/dmitry/reviewer_responses/reviewer_responses_1.md` updated **on
+both `arxiv` and `dmitry-txcwins-10h`**.
+
+**`briefings/OVERNIGHT-STANDING-ORDERS.md` is the operative document**
+— pre-authorised spend defaults, hard stops, what needs Han and must
+WAIT, and §6's results-landing procedure across all three surfaces.
+
+**Hub beat while he sleeps:** pull → ratify worker pushes in the LOG →
+if a sycgen number moved, run §6 → `handoff_audit.py`,
+`check_response_math.py`, `check_response_sync.py` → push. Fleet is
+mac-d's single A40 at $0.44/h; **hard stop 3h after pod-up.**
+
+**Do NOT wake him for:** anything covered by the standing orders.
+**Do leave for him:** token rotation, the 4 unattributed pods
+($9.41/h ≈ $226/day), and coordination with Dmitry — `stacked-em-steer`
+is recomputing the Stacked-SAE-on-EM number the Reviewer-1 response
+quotes, so **that section is frozen overnight.**
+
+
+
 ## The one paragraph
 
 **ITEM 6 CLOSED — challenge answered, claim RESTORED but NARROWED.**
