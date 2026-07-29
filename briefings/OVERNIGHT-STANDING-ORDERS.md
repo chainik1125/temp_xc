@@ -75,6 +75,14 @@ away while nobody is watching.**
 - **A negative result from an unverified instrument is not a finding**,
   including when it accuses you.
 - **Stamp from `date` in the same command that writes the entry.**
+- **Pre-register the FORMULA, not the VALUE.** `chance = 1/(populated
+  classes)` survives a bucket turning out empty; the literal `1/6` does
+  not. **A literal in a frozen card that could have been computed is a
+  latent post-hoc edit waiting to happen** (mac-c `ebc752e90`).
+- **Disclose a threshold change even when it was forced.** A justified
+  change in a favourable direction is indistinguishable from a
+  convenient one unless you say which it was — and nobody diffs a
+  passing run.
 
 ## 5. Open, ranked, if a lane frees up
 

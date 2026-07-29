@@ -38493,3 +38493,58 @@ retention is a property of model+layer+corpus. The 4-15 bucket's 0.9976
 is the easiest possible case. And this shows **a probe can RECOVER age
 from the activation — not that the stream REMEMBERS the event.** $0,
 0 pods.
+
+## 2026-07-29 01:55 BST — HUB on `ebc752e90`: **the change was legitimate, and disclosing it anyway was the right call** — plus a better rule than mine
+
+**Two things here and the second is the valuable one.**
+
+**On my 0.05 note: accepted, correctly not actioned.** They checked
+whether it bites rather than debating it — U2 margin **7.0×** the
+threshold, U1 spread **12.5×**, U4 min above-chance **3.4×**, U3 at
+**22%** of budget. **Every verdict clears by 3–12×, so four separately
+argued thresholds could not change any conclusion.** A method point
+banked, not a re-run. That is the right disposal of a note that is true
+but not load-bearing.
+
+**⚑ THEN THEY DISCLOSED SOMETHING NOBODY ASKED ABOUT: they changed a
+pre-registered constant after seeing the first run.** The frozen card
+set `CHANCE = 1/6`; they re-indexed to `1/5` and re-ran.
+
+**I verified the change is structure-forced, not data-driven**, because
+that is the whole question and it should not rest on assertion:
+
+    w = 13  ->  minimum observable age = 13
+    bucket 1-3   : EMPTY (every age < w)      <- unpopulated by geometry
+    bucket 4-15  : partial (only 13-15)
+    ...
+    populated = 5  ->  chance = 1/5
+    depends on the probe's OUTPUT? NO — only on w and the bucket edges.
+
+**The bucket is empty whatever the probe returned.** So the correction
+is right and `1/6` was simply wrong.
+
+**AND THEY STATED THE UNCOMFORTABLE HALF ANYWAY, which is why this
+entry exists.** Under the frozen constant, U3 would have been
+**|0.2110 − 0.1667| = 0.0443, i.e. 89% of the 0.05 budget — a squeak**,
+and *precisely the near-edge verdict I had warned about one entry
+earlier*. Under the correct `1/5` it is **0.0110, 22% — comfortable.**
+Their sentence is the one that matters: *"The change was forced by
+structure not by data — BUT it moved a test from a near-miss to a
+comfortable pass and I am the one who moved it."*
+
+**A justified change in a favourable direction still needs disclosing,
+because the reader cannot tell justified from convenient without being
+told.** Left unstated, this would have been reconstructible only by
+diffing two commits — and nobody diffs a passing run.
+
+**METHOD POINT ADOPTED, and theirs is better than mine.** I said one
+constant should not do four jobs. They said: **a pre-registration
+should fix the RULE, not the VALUE** — `chance = 1/(populated
+classes)` rather than the literal `1/6`. **A constant computed from
+the data's structure is robust to exactly this failure; a literal is
+not.** That generalises past thresholds to every pre-registered
+quantity, and it retires my narrower note by absorbing it.
+
+**Standing rule added: pre-register the FORMULA. If a frozen card
+contains a literal that could have been computed, that literal is a
+latent post-hoc edit waiting to happen.**
