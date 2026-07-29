@@ -39796,3 +39796,73 @@ readouts of one signal rather than independent tasks. **The tension with
 screening FOR per-token silence selects against the arm, not for it.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-29 02:38 BST — ⚑⚑ HUB ratifies the AMPLIFIER TEST: **the hunt's sourcing criterion is now MEASURED as counterproductive on two corpora**
+
+**Ratified. 12/12 faces built and passed the A4 validity gate, none
+excluded, $0, 0 pods** — six faces × two corpora through **one
+identical pipeline**, which is the confound mac-c discarded their own
+supporting evidence to remove.
+
+**A1 HOLDS OUT-OF-SAMPLE:** Spearman(tok_excess, arm_excess) =
+**+1.000 (evalage)** and **+0.943 (retryesc)**, **reported per corpus
+and never pooled.** Two instruments died tonight by being read
+in-sample; **this is the first that survived the test it was built to
+face.**
+
+**A2 IS DEAD, killed by their own frozen rule.** Ratio ranges
+**[1.29, 1.73]** and **[1.98, 3.24]** do not overlap, so the
+constant-multiplier reading fails *"even if both correlations are +1"* —
+the clause they wrote **before** seeing retryesc. **A pre-registration
+that kills a claim its author would have liked is the only kind worth
+writing.**
+
+**⚑ AND THE DEAD CLAUSE IS THE RESULT.** The amplification factor is
+**not a constant but a CORPUS PROPERTY**, varying ~2× (evalage ~1.5,
+retryesc ~2.7). **That is a new screening axis on the GAIN side —
+exactly where the upper-edge measurement said the binding constraint
+sits.** And they immediately checked whether it rescues a weak corpus,
+and it does not:
+
+    evalage   tok +0.1265 x 1.56  ->  arm +0.1975
+    retryesc  tok +0.0485 x 3.24  ->  arm +0.1573
+
+**retryesc amplifies ~2× harder and still loses, because it multiplies
+a signal ~2.6× smaller. Ratio does not compensate for absent signal.**
+
+**⇒ THE SCREEN THIS IMPLIES, and it is concrete: rank candidates by
+tok_excess × amplification, and require BOTH.** Neither term alone
+orders the outcomes.
+
+**⚑ MY A3 CONCERN IS ANSWERED BY THEIR DATA, AND IN THE DIRECTION THAT
+STRENGTHENS THEM.** I warned that "A3 did not fire" would mean
+**untested** unless the face set contained a near-silent face — an
+escaped control is not a passed control. **It did contain one:**
+retryesc `gap_last` at **tok −0.0018** — per-token silent to within
+noise — **with an arm of only +0.0125, far under the +0.05 bar.**
+**A3 was in a position to fire and did not.** They also report the
+covered range (**tok_excess −0.0018 to +0.1736**), which is the receipt
+I asked for. **They call it absence-evidence, not proof, which is the
+correct weight.**
+
+## ⇒ HUB RULING: `hunt-safety-gold-clew.md`'s per-token-silence criterion is WITHDRAWN
+
+**The tension is no longer an inference from three mismatched screens —
+it is measured on two corpora through one pipeline:** *"screening FOR
+per-token silence selects against the arm, not for it."* Combined with
+tonight's other two findings — the floor is handed the **censored age**,
+and `tok` **recovers age past 1024 tokens** — **the hunt has been
+selecting for the property that suppresses the signal it needs.**
+
+**Effective immediately:** per-token silence is **not** a positive
+criterion. **Rank by `tok_excess × amplification`; keep
+`floor_reach` as a kill filter only.** Both of the hunt's previous
+aiming rules are now retired by measurement rather than by argument.
+
+**⚑ FLAG FOR HAN, NOT A CONCLUSION:** the paper's framing is that TXCs
+win on **per-token-silent** latents. **This measurement is about the
+HUNT's screen** — one model, one layer, age-family faces, two corpora —
+**and it does not directly test the paper's claim.** But it points the
+other way, and **item 6's own numbers agree** (our one KEEP has the
+strongest `tok` of the three candidates). **Worth a deliberate look
+before the ambience framing is leaned on again.**
