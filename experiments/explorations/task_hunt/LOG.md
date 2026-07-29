@@ -41486,3 +41486,63 @@ actually live here.
 scrutiny as the defect.** The `tail` fix, the sweep-tool regex, and
 this one each shipped with an error that its own control caught within
 a minute.
+
+---
+
+## 2026-07-29 12:4x BST — mac-d: ⚑ **LIVE CONFLICT MARKERS WERE COMMITTED INSIDE THE PASTE-READY BLOCK** of the reviewer proposal — and the commit's own programmatic verification reported it CLEAN
+
+`aea7924fd` (Han's directive to drop the untrained control) landed as an
+**unresolved merge** against my `755a22b42`. The shipping file carried
+`<<<<<<< HEAD` / `=======` / `>>>>>>>` **at lines 23–32, inside the
+fenced block a human is meant to paste into the reviewer response**, and
+again at 112–174.
+
+**The commit message reports "verified programmatically" and "all six
+data rows re-verified: 0 mismatches."** Both checks ran **on a
+conflicted file** and passed: they looked for untrained-mentions and for
+data-row values, and **neither could express "this file is in a merge
+conflict."** A check that cannot see the defect in front of it is the
+failure mode this fleet has now catalogued a dozen times — here it
+certified a document that would have pasted `>>>>>>> 69d6877f2` into a
+reviewer response.
+
+**Add to the standing checks: before certifying any shipping surface,
+grep it for conflict markers.** It is one line, it is unconditional, and
+no content check implies it.
+
+### The merge also silently reverted three corrections
+
+Because the conflict was left unresolved, **both variants survived side
+by side**, and the incoming side restored what I had fixed an hour
+earlier:
+
+- *"whose label **no single token reveals**"* — the overclaim already
+  corrected **twice** on this response (`7bebeccbe`, `0a1e48cfd`).
+- *"The TXC **beats** the per-token, pooled and stacked SAE baselines"*
+  — **INDISTINGUISHABLE vs pooled at T=2/4** by our own ratified table.
+- *"ordered recovery 0.22 → 0.58 at T=16"* — **third appearance** of
+  this error. **0.22 is the T=2 untrained value; at T=16 it is 0.058.**
+
+**Three corrections, three reversions, one merge.** The lesson is not
+about care: it is that **a correction living only in prose has no
+mechanism to survive a merge**, while a number in a generated table
+does. That is why the tables have been right all night and the
+sentences have not.
+
+### Resolved, satisfying Han's directive AND the numbers
+
+- Paste-ready block: **zero** untrained/random-init mentions
+  (programmatically checked **on an unconflicted file**).
+- Summary bullet: *"matches or beats … clearly so at the larger window
+  sizes"* — no bare "beats", no "no single token reveals".
+- Random-init pointer kept **outside** the excerpt exactly as Han
+  structured it, with the corrected figure: **0.058 → 0.578**, plus the
+  strength the earlier wording lost (twin gap larger at **3 of 4** T and
+  **11 of 12** cells, and still larger at matched sparsity).
+
+**Every number re-derived from the 8 shards after resolving:** T=16
+untrained ordered **0.0575**, trained **0.5776**; twin larger in
+**11/12** cells. 6/6 checks pass.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
