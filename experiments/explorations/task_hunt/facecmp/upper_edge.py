@@ -133,10 +133,29 @@ def build_bucket_rows(key: str, grids: Path, pat: str, cache_root: Path):
         bins[sel] = b
     elig = elig & (bins >= 0)
 
-    out, stats = {}, {"buckets": LABELS, "edges": [float(e) for e in EDGES],
-                      "n_elig": int(elig.sum()),
-                      "bin_counts": {LABELS[b]: int((bins == b).sum())
-                                     for b in range(K)}}
+    # ⚑ EMPTY BY CONSTRUCTION, found on the first run and disclosed rather
+    # than papered over: eligibility requires `mask == 0`, and the event
+    # MASK spans the whole event turn (w = 13 on evalage). Every position
+    # whose age is below w therefore sits INSIDE the masked turn and is
+    # ineligible. The youngest ages are unobservable on this corpus by
+    # design, not by accident — so the "1-3" bucket has zero rows and the
+    # "4-15" bucket is populated only by its 13-15 tail.
+    # Drop empty buckets and re-index, so `chance` is 1/(populated) and
+    # not a number that flatters the probe.
+    present = [b for b in range(K) if (bins == b).any()]
+    labels = [LABELS[b] for b in present]
+    remap = {b: i for i, b in enumerate(present)}
+    bins = np.where(bins >= 0, np.vectorize(lambda v: remap.get(v, -1))(bins),
+                    -1) if len(present) < K else bins
+    elig = elig & (bins >= 0)
+
+    nk = len(labels)
+    out, stats = {}, {"buckets": labels, "edges": [float(e) for e in EDGES],
+                      "n_elig": int(elig.sum()), "n_classes": nk,
+                      "dropped_empty_buckets": [LABELS[b] for b in range(K)
+                                                if b not in present],
+                      "bin_counts": {labels[b]: int((bins == b).sum())
+                                     for b in range(nk)}}
     for split_name, flag in (("train", 0), ("test", 1)):
         m = elig & (doc_split[doc_of] == flag)
         pool = np.flatnonzero(m)
@@ -145,7 +164,7 @@ def build_bucket_rows(key: str, grids: Path, pat: str, cache_root: Path):
         md, mp, mc = stratified_balanced_manifest(
             bins[pool], strata, doc_of[pool], pos_of[pool],
             cap=CAP[split_name], seed=seed)
-        per = {LABELS[int(cl)]: int((mc == cl).sum()) for cl in range(K)
+        per = {labels[int(cl)]: int((mc == cl).sum()) for cl in range(nk)
                if (mc == cl).any()}
         stats[split_name] = {"rows_per_bucket": per,
                              "ok": bool(per and min(per.values()) >= MIN_ROWS)}
@@ -153,7 +172,7 @@ def build_bucket_rows(key: str, grids: Path, pat: str, cache_root: Path):
         keep = rows_all >= 0
         r = np.stack([rows_all[keep], cpos_all[keep], mp[keep]], 1)
         out[split_name] = (r, mc[keep].astype(np.int64))
-    return out, stats
+    return out, stats, labels
 
 
 def main() -> None:
@@ -163,7 +182,14 @@ def main() -> None:
     grids = here.parent / "evalage" / "grids"
     pat = "elicit_evalage_screen_{tag}.npz"
 
-    man, stats = build_bucket_rows(key, grids, pat, root)
+    man, stats, labels = build_bucket_rows(key, grids, pat, root)
+    nk = len(labels)
+    chance = 1.0 / nk
+    if stats["dropped_empty_buckets"]:
+        print(f"⚑ EMPTY BY CONSTRUCTION, dropped: "
+              f"{stats['dropped_empty_buckets']} — positions younger than the "
+              f"masked turn width (w=13) sit INSIDE the masked event turn and "
+              f"are ineligible. chance is therefore 1/{nk}, not 1/{K}.")
     print("rows per bucket:", json.dumps(stats["train"]["rows_per_bucket"]))
     print("            test:", json.dumps(stats["test"]["rows_per_bucket"]))
     if not (stats["train"]["ok"] and stats["test"]["ok"]):
@@ -177,47 +203,52 @@ def main() -> None:
     ytr_t, yte_t = torch.from_numpy(ytr), torch.from_numpy(yte)
 
     Xtr, Xte = gather_tok(acts, rtr), gather_tok(acts, rte)
-    act = fit_probe(Xtr, ytr_t, Xte, yte_t, K, hidden=512)
-    pos = fit_probe(_pos_feats(rtr), ytr_t, _pos_feats(rte), yte_t, K)
+    act = fit_probe(Xtr, ytr_t, Xte, yte_t, nk, hidden=512)
+    pos = fit_probe(_pos_feats(rtr), ytr_t, _pos_feats(rte), yte_t, nk)
     rng = np.random.default_rng(NULL_SEED)
     ynull = torch.from_numpy(rng.permutation(ytr.copy()))
-    null = fit_probe(Xtr, ynull, Xte, yte_t, K, hidden=512)
+    null = fit_probe(Xtr, ynull, Xte, yte_t, nk, hidden=512)
 
-    print(f"\nchance = 1/{K} = {CHANCE:.4f}")
+    print(f"\nchance = 1/{nk} = {chance:.4f}")
     print(f"  activation probe (tok) : {act['acc_test']:.4f}")
     print(f"  position control       : {pos['acc_test']:.4f}   [U2]")
     print(f"  label_null             : {null['acc_test']:.4f}   [U3]")
 
-    per = act.get("per_class") or {}
-    pper = pos.get("per_class") or {}
+    def _pc(d):
+        v = d.get("per_class")
+        if isinstance(v, dict):
+            return [float(v.get(str(i), v.get(i, float("nan"))))
+                    for i in range(nk)]
+        return [float(x) for x in (v or [])]
+    per, pper = _pc(act), _pc(pos)
     print(f"\n{'bucket (age tok)':<18}{'act recall':>12}{'pos recall':>12}"
           f"{'act - chance':>14}")
     print("-" * 56)
     rec = {}
-    for b, lab in enumerate(LABELS):
-        a = float(per.get(str(b), per.get(b, float("nan"))))
-        p = float(pper.get(str(b), pper.get(b, float("nan"))))
+    for b, lab in enumerate(labels):
+        a = per[b] if b < len(per) else float("nan")
+        p = pper[b] if b < len(pper) else float("nan")
         rec[lab] = a
-        print(f"{lab:<18}{a:>12.4f}{p:>12.4f}{a - CHANCE:>+14.4f}")
+        print(f"{lab:<18}{a:>12.4f}{p:>12.4f}{a - chance:>+14.4f}")
 
     # --- pre-registered verdicts -------------------------------------
     print("\n--- PRE-REGISTERED VERDICTS ---")
     u2 = pos["acc_test"] < act["acc_test"] - 0.05
-    u3 = abs(null["acc_test"] - CHANCE) < 0.05
+    u3 = abs(null["acc_test"] - chance) < 0.05
     print(f"U2 position control well below activation probe : "
           f"{'HELD' if u2 else '** VIOLATED -> RUN IS VOID **'}")
     print(f"U3 label_null within 0.05 of chance             : "
           f"{'HELD' if u3 else '** VIOLATED -> RUN IS VOID **'}")
-    vals = [rec[l] for l in LABELS if np.isfinite(rec[l])]
+    vals = [rec[l] for l in labels if np.isfinite(rec[l])]
     if len(vals) >= 2:
         spread = max(vals) - min(vals)
         u1 = spread > 0.05 and vals[0] > vals[-1]
         print(f"U1 accuracy declines with age (spread {spread:.4f})   : "
               f"{'HELD' if u1 else '** FLAT/NON-MONOTONE — see U1 falsifier **'}")
-        above = [l for l in LABELS
-                 if np.isfinite(rec[l]) and rec[l] - CHANCE > 0.05]
+        above = [l for l in labels
+                 if np.isfinite(rec[l]) and rec[l] - chance > 0.05]
         print(f"U4 buckets clearly above chance                 : {above}")
-        if above and above[-1] == LABELS[-1]:
+        if above and above[-1] == labels[-1]:
             print("   => HORIZON EXCEEDS THE MEASURABLE RANGE on this corpus. "
                   "Reported as such, NOT as a number.")
         elif above:
@@ -227,7 +258,8 @@ def main() -> None:
     outp = here / "results" / "upper_edge"
     outp.mkdir(parents=True, exist_ok=True)
     (outp / f"upper_edge_{key}.json").write_text(json.dumps({
-        "key": key, "buckets": LABELS, "chance": CHANCE, "stats": stats,
+        "key": key, "buckets": labels, "chance": chance,
+        "per_class_act": per, "per_class_pos": pper, "stats": stats,
         "act": act, "pos_control": pos, "label_null": null,
         "note": "Upper edge of the aiming band. Instrument property of the "
                 "model, not a candidate verdict. Pre-registered U1-U4.",

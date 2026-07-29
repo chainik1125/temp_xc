@@ -38290,3 +38290,65 @@ role's threshold argued separately rather than reading the near-miss.
 
 **Scope is correctly stated: "no result here moves any bar — it
 measures an instrument property of the model, not a candidate."**
+---
+
+## 2026-07-29 01:5x BST — mac-c: THE UPPER EDGE IS NOT A CLIFF — and the reason it isn't is exactly why the GAIN bar is hard
+
+Pre-registration frozen at `d6b11068d` **before** the run (commit-then-run;
+git history is the receipt). `facecmp/upper_edge.py`, evalage gemma2_2b
+L14 @512, **$0, 0 pods**, reusing the cache already on disk.
+
+**All four pre-registrations resolved, none violated.**
+
+    chance = 1/5 = 0.2000
+      activation probe (tok) : 0.6190
+      position control       : 0.2171   U2 HELD (decisive)
+      label_null             : 0.2110   U3 HELD
+
+    bucket (age tok)   act recall   pos recall   act - chance
+    4-15                   0.9976       0.3714        +0.7976
+    16-63                  0.8167       0.0952        +0.6167
+    64-255                 0.4952       0.2405        +0.2952
+    256-1023               0.4143       0.0976        +0.2143
+    1024+                  0.3714       0.2810        +0.1714
+
+**U1 HELD** — monotone decline, spread 0.6262. **U4: every bucket is
+clearly above chance, including `1024+`.** Per the pre-registration that
+is reported as **"the horizon exceeds the measurable range on this
+corpus"** — *not* as an invented number and *not* as "unbounded". Context:
+observable ages run p50=644, p95=1931, p99=2529.
+
+**⚑ EMPTY BY CONSTRUCTION, found on the first run and disclosed rather
+than papered over.** The `1-3` bucket has **zero** rows: eligibility
+requires `mask == 0` and the event mask spans the whole event turn
+(w=13), so every position younger than `w` sits **inside** the masked
+turn. Minimum observable age is exactly **13**. Chance is therefore
+**1/5, not 1/6** — I re-indexed rather than quote the flattering number.
+
+**⚑ THE FINDING THAT MATTERS, and it is not the one I expected.** The
+upper edge is not binding — activations still resolve age far past the
+corpus's own range, so "push events beyond `T+w`" does **not** walk off a
+cliff. **But this probe IS the `tok` arm** (`gather_tok`, single-token
+activation). So the same fact that removes the cliff — a single token
+carrying age out past 1024 — **is precisely what makes the gain bar
+hard**: `tok` scores **0.6190** on 5-way age, and that is the baseline a
+windowed arm has to beat.
+
+**⇒ Pushing events older lowers `floor_reach` (good) but does NOT weaken
+`tok` much (bad).** The two edges are not symmetric, and the aiming band
+is effectively **one-sided**: minimise `floor_reach`, and expect the
+binding constraint to stay on the **gain** side. That is consistent with
+tonight's lever-3 run, where P3 flipped floor-bound → gain-bound exactly
+as predicted.
+
+**Stated as limits, not hedges:** one model, one layer (gemma2_2b L14),
+one corpus — retention is a property of model+layer+corpus and does not
+generalise without measurement. The `4-15` bucket's 0.9976 is the easiest
+possible case (ages 13-15 sit immediately after a masked turn ends) and
+should not be read as "near-perfect age recovery". And this measures that
+**a probe can recover age from the activation**, which is not the same
+claim as "the stream remembers the event".
+
+Cost: **$0, 0 pods.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
