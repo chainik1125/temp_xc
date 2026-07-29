@@ -111,9 +111,18 @@ document is the exact hazard that produced four contradictions tonight.
    applying — they were editing reviewer 2 at 01:4x.
 5. **Verify, do not eyeball:**
 
+       .venv/bin/python scripts/check_response_numbers.py
        .venv/bin/python scripts/check_response_math.py --self-test <file>
        .venv/bin/python scripts/check_response_sync.py --fetch
        .venv/bin/python scripts/handoff_audit.py
+
+   **`check_response_numbers.py` is the one that matters most** — it
+   re-derives the quoted table from `frontier.json`. It caught a wrong
+   figure (T=8 TXC quoted 0.537, true 0.536) that had survived two
+   rendering checks and a prose rewrite on both branches. **Rendering
+   and prose checks do not look at whether the numbers are true.**
+   **Quote from the source, never from a printout of the source** — a
+   4 dp display rounded again to 3 dp is how 0.536463 became 0.537.
 
 **Constraints that travel with the response:** ≤10,000 chars in the
 paste block, **no links, no images, no plots**, and inline `$…$` must

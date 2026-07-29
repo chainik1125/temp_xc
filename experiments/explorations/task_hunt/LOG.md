@@ -38117,3 +38117,44 @@ the next such flag.
 Cost: **$0, 0 pods.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+## 2026-07-29 01:44 BST — HUB: **a wrong number was in the rebuttal on both branches — DOUBLE ROUNDING.** Caught by a checker written ten minutes earlier
+
+Han's standing instruction (*"update the handover doc as stuff comes"*)
+implies a failure mode worth naming: **the source is regenerated, the
+prose is not, and a stale figure sits in a document nobody re-reads
+because it was right when written.** So I wrote
+`scripts/check_response_numbers.py` to re-derive the quoted table from
+`frontier.json` rather than trust it. **It failed on its first run.**
+
+    T=8  TXC   quoted 0.537   source 0.536   MISMATCH
+
+**The exact mean is 0.536463384188777, which rounds to 0.536.** I
+quoted **0.537**. Cause: my extraction printed the value at **4 dp** as
+`0.5365`, and I rounded *that* to 3 dp when building the table.
+**0.536463 → 0.5365 → 0.537. I rounded a rounded number**, and the
+second rounding crossed a boundary the first had already moved it to.
+No other cell was affected — T=8 was the only one whose 4 dp form sat
+exactly on a `.xxx5` edge.
+
+**This is exactly the class the rebuttal cannot afford**, and it was in
+**both branches**, inside the table that answers the reviewer's main
+objection, in a document I had already validated twice for rendering
+and once for prose. **Rendering checks and prose checks do not look at
+whether the numbers are true.** Every earlier check on this file passed
+while a wrong figure sat in the middle of it.
+
+**Fixed in both copies and both branches; `check_response_numbers.py`
+now reports 0 mismatches.** The checker compares at **the precision
+actually printed** — comparing at full precision would either always
+fail or require a tolerance nobody could justify.
+
+**GENERALISATION: quote from the source, never from a printout of the
+source.** Every intermediate display is a lossy transform, and the loss
+is invisible because the printout looks like the number. Earlier tonight
+I insisted the table's numbers be *"generated programmatically, not
+transcribed"* — and then transcribed them from my own terminal output.
+**The rule was right; I applied it to the file and not to myself.**
+
+**Added to the standing orders' results-landing procedure**, so it runs
+when the shuffle numbers land rather than after someone notices.

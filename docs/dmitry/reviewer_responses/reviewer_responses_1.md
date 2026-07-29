@@ -378,7 +378,7 @@ $$
 \text{Pooled SAE} & 0.485 & 0.488 & 0.467 & 0.486^{*} \\
 \text{Stacked SAE} & 0.468 & 0.412 & 0.149^{*} & 0.314^{*} \\
 \hline
-\text{TXC} & \mathbf{0.499} & \mathbf{0.523} & \mathbf{0.537} & \mathbf{0.577} \\
+\text{TXC} & \mathbf{0.499} & \mathbf{0.523} & \mathbf{0.536} & \mathbf{0.577} \\
 \hline
 \text{TXC } L_0/\text{window} & 5.66 & 6.35 & 6.94 & 7.82 \\
 \hline
@@ -479,7 +479,7 @@ $$
 \\text{Pooled SAE} & 0.485 & 0.488 & 0.467 & 0.486^{*} \\\\
 \\text{Stacked SAE} & 0.468 & 0.412 & 0.149^{*} & 0.314^{*} \\\\
 \\hline
-\\text{TXC} & \\mathbf{0.499} & \\mathbf{0.523} & \\mathbf{0.537} & \\mathbf{0.577} \\\\
+\\text{TXC} & \\mathbf{0.499} & \\mathbf{0.523} & \\mathbf{0.536} & \\mathbf{0.577} \\\\
 \\hline
 \\text{TXC } L_0/\\text{window} & 5.66 & 6.35 & 6.94 & 7.82 \\\\
 \\hline
