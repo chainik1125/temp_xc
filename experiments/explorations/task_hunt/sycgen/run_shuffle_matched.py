@@ -339,6 +339,59 @@ def _corr(pred: np.ndarray, tgt: np.ndarray) -> float:
     return float(np.corrcoef(pred, tgt)[0, 1])
 
 
+def _provenance(ds_spec, smoke: bool) -> dict:
+    """What produced these rows. Recorded, so nobody has to do forensics.
+
+    ⚑ mac-c's blast-radius finding (`369f8c24c`): the Lane B corruption
+    scare turned out to corrupt **0 results** — the real defect was
+    **PROVENANCE**. A results file that does not say which corpus, cache
+    and code produced it has to be identified by matching its numbers
+    against candidate corpora, which is exactly the forensics that made
+    that file ambiguous for 11 hours.
+
+    My own shipped shards recorded **none** of it: no datasource, no
+    cache identity, no code version. That matters more here than
+    usually, because the sycgen activation cache is a deliberate
+    **REBUILD** and not pod-D's original — a distinction the card
+    discloses in §7 and the data file could not have told you.
+    """
+    import subprocess
+    prov = {"smoke": bool(smoke)}
+    try:
+        prov["datasource"] = getattr(ds_spec, "name", None)
+    except Exception:
+        prov["datasource"] = None
+    try:
+        from experiments.explorations.task_hunt.sycgen.run_shuffle_matched import RETRAIN_TAG
+        prov["retrain_tag"] = RETRAIN_TAG
+    except Exception:
+        pass
+    # The activation cache, identified by SIZE + mtime rather than a name:
+    # a name is what the Lane B file had, and it was not enough.
+    try:
+        from explorations.task_hunt.real_sycgen import CACHE_ROOT
+        acts = CACHE_ROOT / "llama31_8b" / "hs14.npy"
+        if acts.exists():
+            st = acts.stat()
+            prov["acts_cache"] = {"path": str(acts), "bytes": st.st_size,
+                                  "mtime": int(st.st_mtime)}
+            meta = acts.parent / "acts_meta.json"
+            if meta.exists():
+                prov["acts_meta"] = json.loads(meta.read_text())
+    except Exception as e:
+        prov["acts_cache_error"] = f"{type(e).__name__}: {e}"
+    try:
+        prov["commit"] = subprocess.run(
+            ["git", "rev-parse", "HEAD"], cwd=str(HERE), capture_output=True,
+            text=True).stdout.strip() or None
+        prov["dirty"] = bool(subprocess.run(
+            ["git", "status", "--porcelain"], cwd=str(HERE),
+            capture_output=True, text=True).stdout.strip())
+    except Exception:
+        pass
+    return prov
+
+
 def _tiles(win_x, win_l, T, device):
     W, L_, d_in = win_x.shape
     n_tiles = L_ // T
@@ -407,6 +460,10 @@ def main() -> int:
           f"smoke={args.smoke} shard={shard_i}/{shard_n} "
           f"cells={len(mine)}/{len(cells)} -> {out.name}", flush=True)
 
+    prov = _provenance(ds_spec, args.smoke)
+    print(f"[shuffle] provenance: ds={prov.get('datasource')} "
+          f"cache={(prov.get('acts_cache') or {}).get('bytes')}B "
+          f"commit={(prov.get('commit') or '')[:9]}", flush=True)
     rows, gates, timings = [], [], []
     t_wall0 = _now()
     for T, seed, draw in mine:
@@ -496,7 +553,8 @@ def main() -> int:
             OUT.parent.mkdir(parents=True, exist_ok=True)
             timings.append({"T": T, "seed": seed, "draw": draw,
                             "seconds": _now() - t_cell0})
-            out.write_text(json.dumps({"rows": rows, "gates": gates,
+            out.write_text(json.dumps({"provenance": prov,
+                                       "rows": rows, "gates": gates,
                                        "timings": timings,
                                        "shard": [shard_i, shard_n],
                                        "smoke": bool(args.smoke)}, indent=1))

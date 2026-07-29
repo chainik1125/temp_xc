@@ -1,0 +1,62 @@
+{
+ "_what_this_is": "RECONSTRUCTED provenance for results that were written WITHOUT it. Not recorded at run time -- assembled after the fact from this session's own run records. That is weaker than recorded provenance and is labelled as such: it is exactly the forensics mac-c's 369f8c24c says a results file should make unnecessary.",
+ "_recorded_at": "2026-07-29 14:24 BST",
+ "_recorded_by": "mac-d",
+ "files": [
+  "shuffle_matched.shard0.json",
+  "shuffle_matched.shard1.json",
+  "shuffle_matched.shard2.json",
+  "shuffle_matched.shard3.json",
+  "shuffle_matched.shard4.json",
+  "shuffle_matched.shard5.json",
+  "shuffle_matched.shard6.json",
+  "shuffle_matched.shard7.json",
+  "twin_matched.json"
+ ],
+ "datasource": "sycgen_real_age_llama31_8b_l14",
+ "substrate": {
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "layer": 14,
+  "seq_len": 128,
+  "d_in": 4096,
+  "rows": 7239
+ },
+ "acts_cache": {
+  "path_on_pod": "/workspace/sycgen_caches/llama31_8b/hs14.npy",
+  "bytes": 7590641792,
+  "REBUILD": true,
+  "note": "A REBUILD, deliberately NOT pod-D's original -- the original died with its pod. Same disclosure as the item-6 cells (card SHUFFLE_MATCHED_CARD.md section 7). The cache is NOT mirrored anywhere and no longer exists: both pods are terminated.",
+  "integrity_at_build": "cache_acts logged 'mapping verified 7239/7239'",
+  "build_seconds": [
+   206,
+   205,
+   208
+  ]
+ },
+ "checkpoints": {
+  "tag": "sycgen_keep_r1_rebuilt",
+  "n": 15,
+  "source": "HF han1823123123/temp-bench-data ckpts/<train_key>/",
+  "note": "train_keys are in each row; resolvable via results/leaderboard.jsonl"
+ },
+ "code_pin": {
+  "shuffle_shards": "32b53964a",
+  "note": "pod verified at this sha before the sharded run (session record)"
+ },
+ "compute": {
+  "shards": "mac-d-sycshuffle8-0729, 4xA40, 8 shards",
+  "twin": "mac-d-twinmatch-0729, 1xA40",
+  "both": "TERMINATED and API-verified"
+ },
+ "sha256": {
+  "shuffle_matched.shard0.json": "1fc8db16c5afd026828638d916ff97796f04b1acf381dc0a5c822891c62f71f3",
+  "shuffle_matched.shard1.json": "7fb808019922df5b1b5aea16dc25395e2e08ca29488ac734f6304a708d4ecaf0",
+  "shuffle_matched.shard2.json": "62d81d352e4c8ede23edae97ab08ac9db400e0ba2ccf966a1162d1e6f7d4b06e",
+  "shuffle_matched.shard3.json": "ea7ec7dfa4168ca9013793612f508738c9790d817bccadc9efafba553dd3c891",
+  "shuffle_matched.shard4.json": "781a8ddb26d287ac27f34e0d7ff4f9b16c301985b530adac0732d652fbd186f1",
+  "shuffle_matched.shard5.json": "094ccc5a3a8e31cd304ec5a85aa8d61123b9904bf71cf769e25cb2f32165fc63",
+  "shuffle_matched.shard6.json": "78d8b98f2f4c8319e0ec8d183084e37d091e6ba4ed14e97adee0489f104c2754",
+  "shuffle_matched.shard7.json": "891424107a48558e24226b437e92fe2aa7ca8aa5cecdb4976343f7cfd697ff65",
+  "twin_matched.json": "a5c3aed0bec074c5f14ab83284a2f17c018f973376efc067b55717d2e11919a8"
+ }
+}

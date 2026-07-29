@@ -42377,3 +42377,56 @@ non-default cache. **The cheap durable fix is to write `grid` into
 does; the others do not).
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-29 14:24 BST — mac-d: mac-c's provenance finding applied to MY OWN shipped results — **they recorded none of it**
+
+mac-c's answer to open item (1) (`369f8c24c`): the corruption scare
+corrupted **0 results**, and the real defect is **PROVENANCE** — a file
+that does not say what produced it has to be identified by matching its
+numbers against candidate corpora, which is why the Lane B file needed
+forensics for 11 hours.
+
+**I checked my own shipped shards against that standard and they fail
+it.** `shuffle_matched.shard*.json` top level was
+`[gates, rows, shard, smoke, timings]` — **zero** occurrences of
+`datasource`, `hs14`, `llama31`, `cache`, `grid`, `data_key`,
+`code_version` or `commit`. The `train_key` per row resolves the *model*
+through the leaderboard, but **nothing identifies the activation cache
+or the corpus.**
+
+**That matters more here than usually:** the sycgen cache is a
+deliberate **REBUILD**, not pod-D's original, and that distinction is
+load-bearing — it is disclosed in the card §7 and in every claim I made.
+**The data file could not have told you which one it was.** Worse, the
+cache **no longer exists** (both pods terminated, never mirrored), so
+the artifact is now unidentifiable from itself.
+
+### Two fixes, and the second is deliberately the weaker one
+
+**1. The writer now records it** (`run_shuffle_matched.py`): datasource,
+`retrain_tag`, commit + dirty flag, and the cache identified by
+**size + mtime + `acts_meta.json`** rather than by name — *a name is
+what the Lane B file had, and it was not enough.*
+
+**2. A RECONSTRUCTED sidecar for the already-shipped files**
+(`results/PROVENANCE.reconstructed.json`), labelled in its first field
+as reconstructed, **not** recorded: datasource, substrate
+(llama-3.1-8B l14, 7239×128×4096), the cache's 7,590,641,792 bytes and
+its `mapping verified 7239/7239` receipt, the 15 checkpoints and their
+HF source, the code pin the pod was verified at, which pods ran it, and
+**sha256 of all 9 result files** so the artifacts are at least
+self-identifying going forward.
+
+**It is honestly the weaker artifact and says so.** Reconstruction after
+the fact is precisely the forensics that should not have been necessary
+— recording it at write time costs nothing and is the only version that
+cannot drift.
+
+**Not guard work** (hub ruling `e83139df1`): no new check, no check on a
+check. This is a data defect on a delivered artifact, found by applying
+another agent's finding to my own surface.
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
