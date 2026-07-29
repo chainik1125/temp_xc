@@ -1,0 +1,90 @@
+{
+  "aggregates": [
+    {
+      "delta_vs_txc_post": null,
+      "delta_vs_txc_pre": null,
+      "mean": 0.928385478898288,
+      "mean_l0_per_window": 7.697021484375,
+      "mean_nmse": 0.5554790524992472,
+      "metric": "velocity_recovery",
+      "model": "v2_full_global",
+      "n": 3,
+      "parameter_count": 207973,
+      "std": 0.009080034865365292,
+      "task": "frequency"
+    },
+    {
+      "delta_vs_txc_post": null,
+      "delta_vs_txc_pre": null,
+      "mean": 0.3936749669312832,
+      "mean_l0_per_window": 4.013509114583333,
+      "mean_nmse": 0.39991646933807523,
+      "metric": "multilane_recovery",
+      "model": "v2_full_global",
+      "n": 3,
+      "parameter_count": 19589,
+      "std": 0.0027785542176038845,
+      "task": "multilane"
+    },
+    {
+      "delta_vs_txc_post": null,
+      "delta_vs_txc_pre": null,
+      "mean": 0.9987958645342893,
+      "mean_l0_per_window": 3.93798828125,
+      "mean_nmse": 0.17690973783342887,
+      "metric": "sign_recovery",
+      "model": "v2_full_global",
+      "n": 3,
+      "parameter_count": 19589,
+      "std": 0.000523253031317383,
+      "task": "phasepair"
+    },
+    {
+      "delta_vs_txc_post": null,
+      "delta_vs_txc_pre": null,
+      "mean": 0.13564258604283463,
+      "mean_l0_per_window": 7.88427734375,
+      "mean_nmse": 0.5940173847891383,
+      "metric": "schedule_recovery",
+      "model": "v2_full_global",
+      "n": 3,
+      "parameter_count": 207973,
+      "std": 0.003853463507385928,
+      "task": "permuted"
+    },
+    {
+      "delta_vs_txc_post": null,
+      "delta_vs_txc_pre": null,
+      "mean": -0.06663610094837591,
+      "mean_l0_per_window": 8.011311848958334,
+      "mean_nmse": 0.7900810805097317,
+      "metric": "colored_rec_adj",
+      "model": "v2_full_global",
+      "n": 3,
+      "parameter_count": 16672,
+      "std": 0.025771535591128405,
+      "task": "colored"
+    }
+  ],
+  "fairness": {
+    "equivalence": "A full DCT basis spans every temporal kernel, so bands=full is an orthonormal reparameterization of a post-squash TXC with k_pos*T shared activations per window.",
+    "purpose": "Full-band global-top-k monolithic control for the multiband spectral models.",
+    "reporting": "Compare parameter count, realized l0_per_window, NMSE, and paired recovery to the main benchmark's TXC-pre and multiband spectral-v1 rows."
+  },
+  "gate_report": {
+    "abort": false,
+    "models": {
+      "v2_full_global": {
+        "failures": [],
+        "passed": true
+      }
+    },
+    "promoted_models": [
+      "v2_full_global"
+    ]
+  },
+  "generated_at": "2026-07-29T19:43:13Z",
+  "n_full_rows": 15,
+  "run_name": "power-spectrum-matched-control-20260729",
+  "schema_version": 1
+}

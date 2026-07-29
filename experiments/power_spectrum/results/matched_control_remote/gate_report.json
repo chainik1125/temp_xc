@@ -1,0 +1,12 @@
+{
+  "abort": false,
+  "models": {
+    "v2_full_global": {
+      "failures": [],
+      "passed": true
+    }
+  },
+  "promoted_models": [
+    "v2_full_global"
+  ]
+}
