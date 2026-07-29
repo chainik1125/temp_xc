@@ -35,6 +35,16 @@ SURFACES = [
     "REBUTTAL_CODE_GUIDE.md",
     "REBUTTAL_CELL_CENSUS.md",
     "experiments/explorations/task_hunt/LOG.md",
+    # ⚑ Added 2026-07-29 after the hub pushed conflict markers into the
+    # reviewer-response docs. The marker check only ever looked at the four
+    # files above, so a corrupt REVIEWER-BOUND file reached origin/arxiv and
+    # the audit still said CLEAN. Anything a reviewer or a co-author reads
+    # belongs here.
+    # Only what actually lives on `arxiv`: reviewer_responses_2/_3 exist on
+    # `dmitry-txcwins-10h` and listing them here made the audit fail on a file
+    # that was never supposed to be in this tree.
+    "docs/dmitry/reviewer_responses/reviewer_responses_1.md",
+    "docs/dmitry/reviewer_responses/PROPOSED_sycgen_excerpt_reviewer1.md",
 ]
 
 # item -> (plot substring, table substring). Both must appear in the

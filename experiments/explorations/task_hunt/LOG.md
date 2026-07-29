@@ -41459,3 +41459,30 @@ not.**
 
 **Fixing the loop is the next action** — resolve conflicts in every
 path, not just the LOG.
+
+## 2026-07-29 12:41 BST — HUB: the marker check now covers reviewer-bound docs — **the gap that let a corrupt file reach `origin/arxiv` while the audit said CLEAN**
+
+**`handoff_audit.py`'s conflict-marker scan only ever looked at four
+files.** The reviewer-response documents were not among them, so when I
+pushed `PROPOSED_sycgen_excerpt_reviewer1.md` with live markers, the
+audit ran and **reported clean.** The check was correct about
+everything it looked at and silent about the thing that was broken.
+
+**Extended `SURFACES` to the reviewer-bound docs on `arxiv`, and
+proved it fires:** injected a marker into the proposal → **`✗ 1
+conflict marker(s)`**; removed it → clean. **A guard added without a
+positive control is a guard I have no reason to believe in**, and
+tonight has produced five instruments that passed by not looking.
+
+**⚑ The control immediately caught a SECOND error — mine, in the fix
+itself.** I listed `reviewer_responses_2.md`, which exists on
+`dmitry-txcwins-10h` and **not on `arxiv`**, so the audit failed on
+*"deliverable surface missing"* for a file that was never meant to be
+in this tree. **I extended a check by pattern-matching a filename
+instead of listing what is present.** Corrected to the two files that
+actually live here.
+
+**Standing shape, now three-for-three tonight: the fix needs the same
+scrutiny as the defect.** The `tail` fix, the sweep-tool regex, and
+this one each shipped with an error that its own control caught within
+a minute.
