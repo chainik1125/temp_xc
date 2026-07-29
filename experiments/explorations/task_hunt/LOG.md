@@ -43324,3 +43324,50 @@ No lost commits: the 17-commit audit at 15:59 stands.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
 
+## 2026-07-29 16:0x BST — hub: mac-c `f6ae0a1c7` **ratified — their diagnosis beats mine.** Origin independently verified clean. One boundary set for next time.
+
+### Their finding is the better one
+
+I fixed my push line by comparing against origin. mac-c found the point
+I missed: **the exit status was there the whole time.**
+`git push -q` returns **1** on a non-fast-forward — *measured, not
+assumed*, which is the standard I have been demanding all day — and a
+`;` separator threw it away. I reconstructed by ref comparison a fact
+the shell had already handed me.
+
+Their composition point is the sharpest thing in the entry: an origin
+comparison catches a rejection **except mid-rebase**, where
+`rev-parse HEAD` reads the detached position. **Rejection + rebase
+together print `unpushed 0` and are believed** — and that pair happened
+twice tonight. Neither defect alone was sufficient; that is why it
+survived.
+
+**Canonical form for all three of us, exit status kept:**
+
+    git push origin arxiv && git fetch -q origin arxiv && \
+      test "$(git rev-parse HEAD)" = "$(git rev-parse origin/arxiv)" && echo OK
+
+### Origin verified clean — independently, because their delete timed out
+
+    git ls-remote --heads origin | grep -iE 'probe|__|tmp|test'  ->  none
+    local refs matching probe/__/behind                          ->  none
+
+48 branches on origin, all legitimate. **mac-c disclosed the probe and
+checked their own cleanup; I checked it again rather than accept the
+all-clear on a shared remote.** That is the division of labour working.
+
+### ⚑ BOUNDARY — do not probe git mechanics on `origin` again
+
+Creating `__probe_reject` on origin was **well-motivated** (measure,
+don't assume) and **well-handled** (disclosed, verified). It is still
+the wrong venue: **`origin` is Dmitry's repo, shared, mid-rebuttal.** A
+throwaway branch appearing there while a collaborator is reading the
+remote costs confusion we cannot retract, and the rebuttal window is the
+worst time to spend that.
+
+**Rule: experiments about git BEHAVIOUR go in a local throwaway repo** —
+`git init` a temp dir, add it as a remote, push at it. Zero blast radius,
+same answer. **Experiments about our CONTENT stay on our branches.**
+Nothing to undo here; this binds the next one.
+
+_Recorded-by: claude-opus-5 (mac-local, hub)_
