@@ -238,9 +238,14 @@ def aggregate(
                 "mean_l0_per_window": _mean(
                     [float(row["metrics"]["l0_per_window"]) for row in selected]
                 ),
-                "mean_nmse": _mean(
-                    [float(row["metrics"]["nmse"]) for row in selected]
+                "std_l0_per_window": _std(
+                    [float(row["metrics"]["l0_per_window"]) for row in selected]
                 ),
+                "mean_l0_per_token": _mean(
+                    [float(row["metrics"]["l0_per_token"]) for row in selected]
+                ),
+                "mean_nmse": _mean([float(row["metrics"]["nmse"]) for row in selected]),
+                "std_nmse": _std([float(row["metrics"]["nmse"]) for row in selected]),
                 "parameter_count": int(selected[0]["training"]["parameter_count"]),
                 "fairness_role": selected[0].get("fairness_role"),
             }

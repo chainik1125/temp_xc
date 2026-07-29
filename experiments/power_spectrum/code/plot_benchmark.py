@@ -50,6 +50,17 @@ MODEL_COLORS = {
     "v2_global": "#CC79A7",
     "v2_full_global": "#000000",
 }
+MODEL_MARKERS = {
+    "txc_pre": "o",
+    "txc_post": "s",
+    "spectral_v1": "^",
+    "v2_remove_dc": "v",
+    "v2_dominance": "P",
+    "v2_freq_matryoshka": "X",
+    "v2_combined": "<",
+    "v2_global": ">",
+    "v2_full_global": "D",
+}
 TASKS = ("frequency", "multilane", "phasepair", "permuted", "colored")
 TASK_LABELS = {
     "frequency": "Periodic velocity",
@@ -131,6 +142,48 @@ def plot_deltas(frame: pd.DataFrame, output: Path) -> None:
     plt.close(fig)
 
 
+def plot_recovery_nmse(frame: pd.DataFrame, output: Path) -> None:
+    """Facet the task-specific recovery/reconstruction tradeoff."""
+    fig, axes = plt.subplots(1, len(TASKS), figsize=(15, 4.1))
+    for axis, task in zip(axes, TASKS, strict=True):
+        part = frame[frame["task"] == task].set_index("model").reindex(MODELS)
+        for model in MODELS:
+            row = part.loc[model]
+            axis.errorbar(
+                float(row["mean_nmse"]),
+                float(row["mean"]),
+                xerr=float(row["std_nmse"]),
+                yerr=float(row["std"]),
+                marker=MODEL_MARKERS[model],
+                markersize=5.5,
+                color=MODEL_COLORS[model],
+                markeredgecolor="white",
+                markeredgewidth=0.4,
+                linewidth=0.8,
+                capsize=2,
+                linestyle="none",
+                label=MODEL_LABELS[model],
+            )
+        axis.set_title(TASK_LABELS[task])
+        axis.set_xlabel("NMSE (lower is better)")
+        axis.grid(alpha=0.2)
+    axes[0].set_ylabel("Primary recovery (higher is better)")
+    handles, labels = axes[0].get_legend_handles_labels()
+    fig.legend(
+        handles,
+        labels,
+        loc="lower center",
+        ncol=5,
+        frameon=False,
+        bbox_to_anchor=(0.5, -0.02),
+    )
+    fig.suptitle("Recovery–reconstruction frontier", y=0.995)
+    fig.tight_layout(rect=(0, 0.12, 1, 0.94))
+    output.parent.mkdir(parents=True, exist_ok=True)
+    fig.savefig(output, dpi=180, bbox_inches="tight")
+    plt.close(fig)
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument("--input", type=Path, default=DEFAULT_INPUT)
@@ -161,6 +214,7 @@ def main() -> None:
     frame.to_csv(args.results_dir / "benchmark_aggregate.csv", index=False)
     plot_primary(frame, args.figures_dir / "benchmark_primary_metrics.png")
     plot_deltas(frame, args.figures_dir / "benchmark_delta_vs_txc_pre.png")
+    plot_recovery_nmse(frame, args.figures_dir / "benchmark_recovery_nmse.png")
     print(
         frame.pivot(index="model", columns="task", values="mean")
         .reindex(index=MODELS, columns=TASKS)
