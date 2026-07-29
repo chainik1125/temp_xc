@@ -40658,3 +40658,52 @@ the work is behaving; a gate you keep loosening is not.**
 
 **Agent GPU spend is $0.00/h. Everything in flight tonight has
 landed.**
+---
+
+## 2026-07-29 02:5x BST — mac-c: Lane B's missing half run on `evalage` — **the T64 rescue SURVIVES its own uncertainty; T32 DOES NOT, and my single-seed run had reported it clearing**
+
+`hunt-rescue-retrain-mac-c.md` Lane B asks to re-score **both** corpora.
+Only `retryesc_gen` had ever been scored (`errorbar_gemma2_512.json`,
+identified by tok 0.3774 / n_test 4494). **evalage now scored**, 5 seeds
++ paired bootstrap, `GRIDS` and `CACHE_ROOT` set together. **$0.**
+Replication guard passed first: `fit_probe 0.459862 == mine 0.459862`.
+
+| cell | gain | SE_boot | 95% CI | SD_seed(gain) | ρ | **P(gain<0.05)** |
+|---|---|---|---|---|---|---|
+| T16 | +0.0425 | 0.0058 | [+0.0308, +0.0539] | 0.0058 | 0.628 | 0.904 |
+| T32 | +0.0445 | 0.0056 | [+0.0336, +0.0553] | **0.0205** | 0.596 | 0.840 |
+| T64 | **+0.0705** | 0.0063 | **[+0.0587, +0.0828]** | 0.0101 | 0.555 | **0.001** |
+
+**⚑ T64 SURVIVES.** Its 95% CI lies **entirely above** the +0.05 bar and
+`P(gain<0.05) = 0.001`. Tonight's single-seed lever-3 reported +0.0709;
+the 5-seed mean is **+0.0705**. **The rescue's headline cell is real
+under its own uncertainty** — which is what it did not have this
+morning, and what proviso 2 said it needed.
+
+**⛔ T32 DOES NOT, AND I REPORTED IT AS CLEARING.** My lever-3 run put
+T32's gain at **+0.0554** (above the bar, min-both +0.0054). The 5-seed
+mean is **+0.0445 — BELOW the bar**, with `P(gain<0.05) = 0.840`.
+**So "2/5 cells clear BOTH bars" should read "1/5".** My proviso 1 said
+*"T32 is not credibly anything — margin +0.0054, inside the sampling SE
+alone"*; that was right, and it is now measured rather than argued.
+**The corrected rescue is ONE cell, T64.**
+
+**Why T32 specifically:** its `SD_seed(gain)` is **0.0205**, roughly
+**4× its own SE_boot (0.0056)** and 3–4× the other cells' seed SD.
+**Training variance DOMINATES sampling variance in that cell** — exactly
+Lane B's founding premise, that a closed-form σ on `n_test` understates
+the real uncertainty. A single seed landed T32 on the lucky side of a
+noisy cell.
+
+**ρ = 0.628 / 0.596 / 0.555** — moderate, matching what I measured on
+`retryesc_gen` (0.518/0.534/0.383) and confirming the hub's illustrative
+ρ=0.5 was well calibrated. **My original objection to it remains
+withdrawn on both corpora now, not one.**
+
+**The +0.05 bar is NOT changed here.** T32 fell below a threshold that
+was fixed before the data; that is the threshold working.
+
+**Lane B is now fully discharged** — both corpora scored, per-example
+predictions saved, verdicts re-reported against their own uncertainty.
+
+_Recorded-by: claude-opus-5 (mac-c)_
