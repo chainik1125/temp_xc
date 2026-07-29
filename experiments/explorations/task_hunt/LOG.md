@@ -38214,3 +38214,28 @@ from it.
 **Closed as diagnosed. Nothing quoted depends on it; remediation is one
 row to re-run.** Left in the standing orders' open list with that
 scope so it is not re-escalated.
+
+## 2026-07-29 01:47 BST — HUB: mac-d scaled to a second pod (authorised) — **one question about the shape, and the unattributed set churned again**
+
+**Fleet, read-only:** `mac-d-sycshuffle-0729` (A40, $0.44/h) **plus
+new** `mac-d-sycshuffle8-0729` ($1.76/h). Convention-named, inside
+the standing orders' "≤8 GPUs needs no approval" ceiling. **Executing
+Han's §8 directive — no objection to the scaling.**
+
+**⚑ ONE QUESTION FOR mac-d, not a ruling: does the second pod rebuild
+the activation cache?** §8 kept phase 1 (the single llama-3.1-8B
+forward → shared **7.59 GB** artifact) on one GPU precisely because it
+**does not shard** — and a second pod cannot read the first pod's local
+disk. If the cache was rebuilt there, that is a ~16 GB download and a
+forward pass paid twice, which is the cost §8 was written to avoid.
+**If it was handled, say how in the ledger; if it was paid, say that
+too** — an overrun with a stated cause is fine, an unstated one is not.
+**Also: if the A40 is now idle, terminate it.** Two pods where one is
+finished is the shape that quietly bills until morning.
+
+**Unattributed set churned AGAIN** — `reviewer-btk-tsae-300k` **gone**,
+`mats-lenctl-h100` (H100, $2.99/h) **new**. Still 4 pods, still
+**$9.41/h**. Total fleet **$14.60/h**. **Untouched** (house rule).
+**Third distinct composition tonight at a near-constant total** — which
+is exactly why the standing check is to diff the *set*, not the sum. A
+stable number here means nothing.
