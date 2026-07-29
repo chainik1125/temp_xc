@@ -81,6 +81,33 @@ def resolve(ref: str) -> Path | None:
 # CLEAN" was partly an unfalsifiable claim — the exact defect the fleet
 # spent tonight finding in gates elsewhere. See LOG `33a5c72d8`.)
 
+FLEET_CLAIM = re.compile(r"\*\*(\d+)\s+RUNNING,\s*\$([\d.]+)/h", re.I)
+
+
+def fleet_incoherent(body: str):
+    """A live-fact block that contradicts ITSELF.
+
+    ⚑ 2026-07-29 (mac-d `edc6bc421`): the guide carried "**1 RUNNING,
+    $0.00/h**" — written by a re-stamp script whose row-counter matched the
+    summary line — and no check saw it. The age gate reads the CLOCK, not
+    whether the block agrees with itself. One running pod cannot cost $0.00/h,
+    and zero running pods cannot cost more than nothing.
+
+    Freshness and coherence are different properties; a stamp can be seconds
+    old and self-contradictory.
+    """
+    out = []
+    for m in FLEET_CLAIM.finditer(body):
+        n, cost = int(m.group(1)), float(m.group(2))
+        if n > 0 and cost == 0.0:
+            out.append(f"claims {n} RUNNING at $0.00/h — a running pod costs "
+                       f"something")
+        elif n == 0 and cost > 0.0:
+            out.append(f"claims 0 RUNNING at ${cost:.2f}/h — nothing running "
+                       f"cannot cost money")
+    return out
+
+
 def missing_on_disk(rel: str) -> bool:
     """#1/#7: a cited path that is not on disk."""
     return not (ROOT / rel).exists()
@@ -285,6 +312,14 @@ def main(self_test: bool = False) -> int:
             else:
                 notes.append(f"live-fact claim {g}:{i} is {age_h:.1f}h old (ok)")
 
+    # 9b. live-fact blocks must agree with themselves, not just be fresh
+    for g in ("REBUTTAL_CODE_GUIDE.md", "REBUTTAL_HANDOFF.md"):
+        gp = ROOT / g
+        if gp.exists():
+            for msg in fleet_incoherent(gp.read_text()):
+                fails.append(f"{g}: {msg}")
+    notes.append("live-fact blocks checked for internal coherence")
+
     # 5. census freshness
     census, lb = ROOT / "REBUTTAL_CELL_CENSUS.md", ROOT / "results/leaderboard.jsonl"
     if (census.exists() and lb.exists()
@@ -350,6 +385,12 @@ def main(self_test: bool = False) -> int:
         # pass/fail path to probe — but its REGEX can silently stop
         # matching, which would look exactly like clean prose. Probe the
         # pattern, and state plainly that this is not a gate.
+        probes.append(("fleet-incoherence detect",
+                       bool(fleet_incoherent("**1 RUNNING, $0.00/h**"))
+                       and bool(fleet_incoherent("**0 RUNNING, $6.42/h**"))
+                       and not fleet_incoherent("**3 RUNNING, $6.42/h**")
+                       and not fleet_incoherent("**0 RUNNING, $0.00/h**")))
+
         probes.append(("staleness-regex alive (report-only check)",
                        bool(stale_pat.search("figure lands ~14:00 BST today"))
                        and not stale_pat.search("a plain sentence")))
