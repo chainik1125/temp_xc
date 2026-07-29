@@ -91,7 +91,22 @@ away while nobody is watching.**
    to be distrusted. Nothing quoted depends on it — **do not
    re-escalate this.**
 3. **Lever 3 / `floor_reach`** — minimise it; the screen criterion is
-   settled and $0.
+   settled and $0. **⚑ But see 4: lever 3 now looks weaker than it
+   did.**
+4. **⚑ NEW, and it may outrank everything above: WHY DID SYCGEN
+   SURVIVE?** Tonight's three findings compose into one claim —
+   the floor is handed the **censored age** (`sage_floor`), `tok`
+   **recovers age past 1024 tokens at 0.619**, so **age-based labels
+   are squeezed from both sides** and density moves only one of them.
+   **The hunt has been generating age labels**, which explains the kill
+   record better than any individual candidate's flaws.
+   **But sycgen's label IS an age and it cleared floor AND gain on
+   three models.** Either it sits in a corner of the geometry the
+   others missed (model, layer, corpus, or beyond-T mass) **or one of
+   the three findings does not generalise as stated.** $0 to ask,
+   answerable from artifacts already on disk, and it should be asked
+   **before another corpus is generated**. **A theory that explains
+   every failure and cannot explain the one success is not finished.**
 
 ## 6. ⚑ WHEN RESULTS LAND — the surfaces to update, in order (Han, 01:5x)
 
