@@ -1,12 +1,12 @@
-# Reviewer responses
+## Reviewer responses
 
 
 ## Meta:
 
-The paper proposes to extend the crosscoder from cross-layer to cross-position temporally, it is acknowledged that this is a novel extension. However, the reviewers all would like to see more evidence/comparisons that clearly approves the usefulness of temporal aggregation. Reviewer EAxU also provided some suggestions for further improving the presentation.
+The paper proposes to extend the crosscoder from cross-layer to cross-position temporally, it is acknowledged that this is a novel extension. However, the reviewers all would like to see more evidence/comparisons that clearly approves the usefulness of temporal aggregation. 🟧 Reviewer EAxU also provided some suggestions for further improving the presentation.
 
 
-## Reviewer 1
+## 🟩 Reviewer 1
 Summary:
 The paper introduces temporal crosscoders, which extend the crosscoder idea from the layer axis to the sequence axis: a window of token activations is compressed into one shared sparse latent space and then decoded back per position, so a feature can capture multi-token patterns. To evaluate this, the authors build TempBench, pairing two synthetic benchmarks with four real-model tasks. The main finding is that temporal aggregation helps when the signal is spread over nearby tokens but hurts on per-token or length-correlated tasks.
 
@@ -39,7 +39,7 @@ Confidence: 2: You are willing to defend your assessment, but it is quite likely
 
 
 
-## Reviewer 2
+## 🟦 Reviewer 2
 
 Summary:
 This paper proposes a novel method towards the disentanglement of features across sequence positions. It expands the application of crosscoders to crosscodes temporally, where each crosscoder encoder-decoder pair concerns about one position's activation. It also introduces TempBench, a matched-condition comparison of temporal dictionary architectures across two synthetic benches. It also compares the crosscoder-based methods with previous temporal methods including T-SAE and TopK SAEs, etc in real world scenario including sparse coding, backtracking and emergent misalignment.
@@ -66,7 +66,7 @@ Rating: 5: Accept: Technically solid paper, with high potential value on at leas
 Confidence: 2: You are willing to defend your assessment, but it is quite likely that you did not understand the central parts of the submission or that you are unfamiliar with some pieces of related work. Math/other details were not carefully checked.
 
 
-## Reviewer 3
+## 🟧 Reviewer 3
 Summary:
 The paper presents a new method, Temporal Crosscoders, an adaptation of the crosscoder architecture proposed for temporal feature discovery in LLMs, and introduces TempBench, which includes both synthetic and real-world tasks for evaluating temporal structures. The paper's main claims:
 

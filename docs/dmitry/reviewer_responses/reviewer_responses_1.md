@@ -3,7 +3,7 @@
 
 
 
-## Reviewer 1 response
+## 🟩 Reviewer 1 response
 
 <!-- TODO:  Extend a little bit to highlight the strengths of the paper -->
 
@@ -247,7 +247,7 @@ generations; scope was held to the trained seed-42 cells).
 
 <!-- Callout box here -->
 
-"The checklist says the experiments use 2 seeds, but the appendix says the main backtracking results use only seed 42. Which is correct? Are the reported improvements larger than the variation across different seeds?"
+🟩 "The checklist says the experiments use 2 seeds, but the appendix says the main backtracking results use only seed 42. Which is correct? Are the reported improvements larger than the variation across different seeds?"
 
 We provide TXC-base results for random initialization seeds 1, 2, and 42 in
 the table below. Outstanding evaluations are marked as pending.
@@ -291,7 +291,7 @@ pending.
 
     - a. Abstract wording:
 
-"Is there one model setting where both the 40% better detection and the 15% better inducement are achieved? If not, please make this clear in the abstract."
+🟩 "Is there one model setting where both the 40% better detection and the 15% better inducement are achieved? If not, please make this clear in the abstract."
 
 Detection (Fig 4b) and inducement (Fig 4a) refer to the excess performance of the base TXC over the TopK SAE: a 40% higher AUC for detection and a 15% higher average rate of genuine backtracking events induced, respectively. We have clarified the abstract to reflect this:
 
@@ -302,7 +302,7 @@ Detection (Fig 4b) and inducement (Fig 4a) refer to the excess performance of th
 
     - b. Is the T-SAE underpowered?
 
-    "Why does T-SAE use a smaller dictionary if the paper claims all methods use the same dictionary size? Please also report the parameter count and inference cost for each model."
+    🟩 "Why does T-SAE use a smaller dictionary if the paper claims all methods use the same dictionary size? Please also report the parameter count and inference cost for each model."
 
 We agree that our description of dictionary sizes was ambiguous. We ran widths matched both the other architectures and width matched to the original paper $(d_{\mathrm{SAE}}=16{,}384)$. Where they disagreed, we chose the best performing variant in order to have the strongest baseline.  We have now added results for both explicitly to the paper appendix. We reproduce the summary data here:
 
@@ -349,9 +349,9 @@ We thank the reviewer for recognizing the novelty of our proposal and for noting
 
    **a.** First, we introduce an additional task in the synthetic setting that is provably impossible without temporal feature sharing. The TXC architecture strongly outperforms all other architectures on this task.
 
-   **b.** Second, we provide window size sweeps for all tasks (in response to Reviewer 4z15).
+   **b.** Second, we provide window size sweeps for all tasks (in response to 🟦 Reviewer 4z15).
 
-   **c.** Third we provide the Stacked-SAE baseline explicitly (in response to Reviewer 4z15).
+   **c.** Third we provide the Stacked-SAE baseline explicitly (in response to 🟦 Reviewer 4z15).
 
 2. We address the reviewer's concerns about seed variance by providing explicit thee seed results. We confirm that the relative rankings do not change.
 
@@ -386,7 +386,7 @@ For every non-TXC baseline, subscripts give the selected k independently at each
 
 The reviewer asks:
 
-> The checklist says the experiments use 2 seeds, but the appendix says the main backtracking results use only seed 42. Which is correct? Are the reported improvements larger than the variation across different seeds?
+> 🟩 The checklist says the experiments use 2 seeds, but the appendix says the main backtracking results use only seed 42. Which is correct? Are the reported improvements larger than the variation across different seeds?
 
 In the main text, we reported one training seed, consistent with landmark SAE-architecture papers introducing TopK (Gao et al., 2025, ICLR), Gated and JumpReLU (Rajamanoharan et al., 2024a,b), and BatchTopK (Bussmann et al., 2024). The appendix provided an additional seed; we have now updated it to include three-seed results, reproduced here:
 
@@ -404,13 +404,13 @@ $$
 
 **a. Abstract wording**
 
-> Is there one model setting where both the 40% better detection and the 15% better inducement are achieved? If not, please make this clear in the abstract.
+> 🟩 Is there one model setting where both the 40% better detection and the 15% better inducement are achieved? If not, please make this clear in the abstract.
 
 Detection (Fig. 4b) and inducement (Fig. 4a) refer to the excess performance of the base TXC over the TopK SAE: a 40% higher detection AUC and a 15% higher average rate of backtracking induced, respectively. We have clarified the abstract to reflect this.
 
 **b. Is the T-SAE underpowered?**
 
-> Why does T-SAE use a smaller dictionary if the paper claims all methods use the same dictionary size? Please also report the parameter count and inference cost for each model.
+> 🟩 Why does T-SAE use a smaller dictionary if the paper claims all methods use the same dictionary size? Please also report the parameter count and inference cost for each model.
 
 Our description of dictionary sizes was ambiguous. We ran both matched widths, and widths matched to the original paper ($d_{\\mathrm{SAE}}=16{,}384$). Where they disagreed, we chose the best-performing variant for a strong comparison. We have clarified this and added results for both explicitly to the paper appendix. We reproduce the summary data here:
 
@@ -425,4 +425,4 @@ $$
 
 **c**. Parameter count and inference cost
 
-See response to Reviewer 4z15.
+See response to 🟦 Reviewer 4z15.

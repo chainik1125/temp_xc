@@ -8,15 +8,15 @@ tags:
 
 <!-- Thank the reviewer for appreciating the benchmarking. -->
 
-## Reviewer 2 response
+## 🟦 Reviewer 2 response
 
 ## OpenReview copy-and-paste version
 
 We thank the reviewer for recognizing the novelty of applying crosscoders along the sequence axis and the value of the synthetic and real-world benchmarks. We provide responses to the specific question about temporal vs. generic capacity below.
 
-> Since the non-temporal MLC ties TXC on probing, can you isolate the temporal contribution from generic crosscoder capacity?
+> 🟦 Since the non-temporal MLC ties TXC on probing, can you isolate the temporal contribution from generic crosscoder capacity?
 
-We provide a number of lines of evidence. First, we provide the explicit parameter counts for all architectures, since this was explicitly asked for by Reviewer bbby.
+We provide a number of lines of evidence. First, we provide the explicit parameter counts for all architectures, since this was explicitly asked for by 🟩 Reviewer bbby.
 
 
 **Trainable parameters (billions):**

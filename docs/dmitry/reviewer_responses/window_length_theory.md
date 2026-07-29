@@ -189,7 +189,7 @@ per-frequency failure region sitting left of $1/W$ in every panel.
   cross-position weight sharing. It is the middle row above — well above chance
   but far below the TXC — which isolates cross-position weight sharing (not mere
   aggregation) as the operative ingredient. This is precisely the decomposition
-  Reviewer 1 asked for, on a task where the theory says the crosscoder must win.
+  🟩 Reviewer 1 asked for, on a task where the theory says the crosscoder must win.
 
 ### Testable predictions (what each task should show if the frame is right)
 
