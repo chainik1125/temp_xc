@@ -17,7 +17,7 @@ We first provide a high level summary of our responses.
 
 ### Summary of response
 <!-- TODO: maybe quote the reviewer -->
-1. The reviewer points out the the importance of establishing that the temporal features allowed by the temporal crosscoder are responsible for the performance improvements shown. We provide four additional lines of evidence to show this.
+1. The reviewer points out the the importance of establishing that the temporal features allowed by the temporal crosscoder are responsible for the performance improvements shown. We provide five additional lines of evidence to show this.
 
 <!-- TODO: this should be less what you did and more what the result is -->
 <!-- TODO: maybe you can just  -->
@@ -31,6 +31,16 @@ We first provide a high level summary of our responses.
     - c. Third, we provide the data for the scaling of TXC performance with window size for all real world tasks considered in the paper.
 
     - d. Fourth, we provide Stacked SAE results for all real world tasks. Stacked SAEs underperform TXCs for all tasks considered except Emergent Misalignment steering.
+
+<!-- ============================================================
+     ADDED ON THE `arxiv` BRANCH (mac-local, 2026-07-29): sycgen.
+     Source branch `dmitry-txcwins-10h` is NOT modified.
+     ============================================================ -->
+    - e. Fifth, we add a real world task whose label no single token of text
+      displays, and compare against pooled and stacked SAEs at matched
+      sparsity over three seeds. The TXC improves with window size and is
+      above both baselines at every window size.
+<!-- ===================== END ADDED (sycgen) ===================== -->
 
 <!-- Summary par -->
 
@@ -217,6 +227,54 @@ sweep.
 
 
 
+<!-- ============================================================
+     ADDED ON THE `arxiv` BRANCH (mac-local, 2026-07-29): sycgen.
+     Source branch `dmitry-txcwins-10h` is NOT modified.
+
+     THIS is the readable copy: SINGLE-backslash LaTeX, matching the
+     other working-section tables, which render correctly. The
+     copy-and-paste section below carries the same table in that
+     section's DOUBLE-backslash convention, for pasting only.
+     ============================================================ -->
+
+## A new real world task: how long since the user last challenged the model
+
+We add a real world task whose label no single token of text displays. The data
+is multi-turn dialogue where the user repeatedly questions the model's answers,
+and the label at each position is the number of tokens since the user last
+challenged it. A probe on one token's activation still recovers part of it, as
+the residual stream has attended over the prefix, so the baselines here are not
+blind: they read the same activations, and the question is whether the window
+adds anything at matched sparsity. We compare the TXC against a pooled
+SAE (the mean of the per-token codes across the window) and a stacked SAE (the
+same codes concatenated), matched on sparsity: we sweep $k$ for both baselines
+and read each one off at the sparsity the TXC actually uses. Three seeds;
+Llama-3.1-8B, layer 14, $d_{\text{SAE}}=2048$. A per-token SAE reaches $0.482$.
+
+$$
+\begin{array}{l|cccc}
+\hline
+\text{Architecture} & T{=}2 & T{=}4 & T{=}8 & T{=}16 \\
+\hline
+\text{Pooled SAE} & 0.485 & 0.488 & 0.467 & 0.486^{*} \\
+\text{Stacked SAE} & 0.468 & 0.412 & 0.149^{*} & 0.314^{*} \\
+\hline
+\text{TXC} & \mathbf{0.499} & \mathbf{0.523} & \mathbf{0.536} & \mathbf{0.577} \\
+\hline
+\text{TXC } L_0/\text{window} & 5.66 & 6.35 & 6.94 & 7.82 \\
+\hline
+\end{array}
+$$
+
+The TXC improves with window size, from $0.499$ at $T{=}2$ to $0.577$ at
+$T{=}16$, and is above both baselines at every window size; at $T{=}2$ and
+$T{=}4$ the margin over the pooled SAE is smaller than the variation across
+seeds. Starred entries are baselines that cannot run as sparsely as the TXC,
+so they are read off at a higher sparsity and the comparison favours them. The
+stacked SAE's drop at $T\ge8$ comes from its input growing to $T\cdot d_\text{SAE}$, not from the architecture.
+
+<!-- ===================== END ADDED (sycgen) ===================== -->
+
 ## OpenReview copy-and-paste version
 
 We thank the reviewer for recognizing the novelty of our proposal and for noting the synthetic benchmarking procedure we introduce.
@@ -230,6 +288,14 @@ We thank the reviewer for recognizing the novelty of our proposal and for noting
    **b.** Second, we provide window size sweeps for all tasks (in response to Reviewer 4z15).
 
    **c.** Third we provide the Stacked-SAE baseline explicitly (in response to Reviewer 4z15).
+
+<!-- ============================================================
+     ADDED ON THE `arxiv` BRANCH (mac-local, 2026-07-29): sycgen.
+     Source branch `dmitry-txcwins-10h` is NOT modified.
+     Everything between these markers is new.
+     ============================================================ -->
+   **d.** Fourth, we add a real world task whose label no single token of text displays, and compare against pooled and stacked SAEs at matched sparsity. The TXC improves with window size and is above both baselines.
+<!-- ===================== END ADDED (sycgen) ===================== -->
 
 2. We address the reviewer's concerns about seed variance by providing
 explicit three-seed results. We confirm that the relative rankings do not
@@ -269,6 +335,59 @@ W = 10.
 For every non-TXC baseline, parentheses give the selected k independently at
 each window size. We sweep k over {1, 2, 5, 10, 20} and choose the best k.
 
+
+<!-- ============================================================
+     ADDED ON THE `arxiv` BRANCH (mac-local, 2026-07-29): sycgen.
+     Source branch `dmitry-txcwins-10h` is NOT modified.
+     Everything between these markers is new.
+
+     LaTeX CONVENTION IN THIS SECTION: every backslash is DOUBLED --
+     \\begin{array}, \\mathrm{...}, and rows end in \\\\ . The markdown
+     renderer consumes one backslash before the math engine sees it, so a
+     single \begin{array}{lcccc} loses its command and leaves stray braces,
+     which reports as "Extra close brace or missing open brace" and the
+     table does not render. Match the neighbouring tables, not raw LaTeX.
+     Verified by rendering all 32 math blocks of this section with KaTeX
+     after applying the markdown unescape: 0 failures.
+     ============================================================ -->
+
+### A new real world task: how long since the user last challenged the model
+
+We add a real world task whose label no single token of text displays. The data
+is multi-turn dialogue where the user repeatedly questions the model's answers,
+and the label at each position is the number of tokens since the user last
+challenged it. A probe on one token's activation still recovers part of it, as
+the residual stream has attended over the prefix, so the baselines here are not
+blind: they read the same activations, and the question is whether the window
+adds anything at matched sparsity. We compare the TXC against a pooled
+SAE (the mean of the per-token codes across the window) and a stacked SAE (the
+same codes concatenated), matched on sparsity: we sweep $k$ for both baselines
+and read each one off at the sparsity the TXC actually uses. Three seeds;
+Llama-3.1-8B, layer 14, $d_{\\text{SAE}}=2048$. A per-token SAE reaches $0.482$.
+
+$$
+\\begin{array}{l|cccc}
+\\hline
+\\text{Architecture} & T{=}2 & T{=}4 & T{=}8 & T{=}16 \\\\
+\\hline
+\\text{Pooled SAE} & 0.485 & 0.488 & 0.467 & 0.486^{*} \\\\
+\\text{Stacked SAE} & 0.468 & 0.412 & 0.149^{*} & 0.314^{*} \\\\
+\\hline
+\\text{TXC} & \\mathbf{0.499} & \\mathbf{0.523} & \\mathbf{0.536} & \\mathbf{0.577} \\\\
+\\hline
+\\text{TXC } L_0/\\text{window} & 5.66 & 6.35 & 6.94 & 7.82 \\\\
+\\hline
+\\end{array}
+$$
+
+The TXC improves with window size, from $0.499$ at $T{=}2$ to $0.577$ at
+$T{=}16$, and is above both baselines at every window size; at $T{=}2$ and
+$T{=}4$ the margin over the pooled SAE is smaller than the variation across
+seeds. Starred entries are baselines that cannot run as sparsely as the TXC,
+so they are read off at a higher sparsity and the comparison favours them. The
+stacked SAE's drop at $T\\ge8$ comes from its input growing to $T\\cdot d_\\text{SAE}$, not from the architecture.
+
+<!-- ===================== END ADDED (sycgen) ===================== -->
 
 ### Seed dependence
 
