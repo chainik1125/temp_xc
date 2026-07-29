@@ -40425,3 +40425,75 @@ corrections in arbitrary wording will always leak. **That is precisely
 why its output says READ each one.** A filter that must be perfect to
 be useful is not a filter; **one false positive per sweep is a cheap
 price for finding the card.**
+
+---
+
+## 2026-07-29 02:5x BST — mac-d: **TWIN-AT-MATCHED-BUDGET CONTROL — the hub's artifact hypothesis is REFUTED at T=2/4, indeterminate at T=8/16.** I pre-registered the opposite expectation and it was wrong. Pod terminated, $0/h
+
+The hub ratified verdict (b) and then cross-checked the budget confound
+I disclosed *against* the effect: **Spearman(budget advantage, twin
+excess) = +0.80**, with the excess **reversing at T=16** where budgets
+nearly match. Their ruling: *"the gap is not evidence of LEARNED
+temporal structure"* is defensible; *"training REDUCES
+order-sensitivity"* is **not yet**; next step, re-run the twin at the
+trained model's realized `l0`.
+
+Done. Control frozen first (`twin_matched.py`, commit-then-run,
+`1a2aa4905`), and I wrote in it that **I expected outcome (ii) — that
+the excess would vanish.**
+
+### The result at matched budget (interpolated to ratio 1.000, redraw)
+
+    T=2    twin excess  +0.0365   twin>trained  3/3 seeds
+    T=4    twin excess  +0.1249   twin>trained  3/3 seeds
+    T=8    twin excess  +0.0372   twin>trained  2/3 seeds
+    T=16   twin excess  -0.0340   twin>trained  2/3 seeds  (mean flips on one seed at -0.1127)
+
+**Outcome (i), not (ii).** The twin excess **SURVIVES** budget matching
+at T=2 and T=4 with 3/3 sign agreement. The twin's gap is large at
+*every* `k_pos` in the sweep, including settings **below** the trained
+model's budget — e.g. T=2 s2, twin at `l0`=3.00 gives +0.1318 against
+the trained model's +0.0550 at `l0`=5.89. **A budget artifact cannot
+look like that.**
+
+**I was wrong in my own pre-registration, and the hub's +0.80 did not
+survive removal of the confound.** Recording that plainly: the
+correlation was real in the unmatched data and is not the mechanism.
+
+### Where it does NOT hold, by my own frozen rules
+
+**T=8 and T=16 are INDETERMINATE, not supporting.** Only 2/3 seeds, so
+the pre-registered 3/3 sign test fails. And at T=16 the **bracket ends
+disagree by 0.069–0.086, which is LARGER than the excess itself
+(+0.008, −0.113, +0.003)** — card §2b says when the ends disagree that
+IS the finding, so T=16 is not determinable from this control at n=3.
+
+The twin's gap across `k_pos` at T=16 bounces between **−0.056 and
++0.094** with no trend: it is noise around zero, which is what a model
+with **0.058 ordered recovery** should produce.
+
+### What each claim is now worth
+
+- **(b) — the gap is not evidence of LEARNED temporal structure:
+  STANDS, and is now stronger.** A random model at the *same measured
+  budget* shows a gap of the same order or larger. Unaffected by T=8/16
+  being indeterminate, since T=2/4 alone establish it.
+- **"Training REDUCES order-sensitivity": defensible AT T=2 AND T=4
+  ONLY.** Supported 3/3 at those T, indeterminate at T=8/16. I am not
+  generalising it across T, and the hub's caution was right to that
+  extent.
+- **The commensurability caveat does NOT go away with budget
+  matching.** The twin still barely does the task (ordered recovery
+  0.058 at T=16 vs 0.578), so its gap remains a difference between two
+  near-chance numbers. Budget matching fixes the *budget*, not the
+  *scale*.
+
+### Cost
+
+1×A40, 02:32→02:57, **≈$0.19**. Cheap because the control has **no
+stacked arm** — every arm is TXC-shaped (`d_sae`=2048), and stacked's
+`T·d_sae` fits were what dominated the main sweep. 168 rows.
+**Pod terminated and API-verified; mac-d burn $0.00/h.**
+
+_Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
+
