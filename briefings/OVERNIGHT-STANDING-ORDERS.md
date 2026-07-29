@@ -81,11 +81,15 @@ away while nobody is watching.**
 1. **n=3 → n=5 on item 6's own cells** — outcome (d) has been unsized
    since the pre-registration and is the binding limitation on every
    sycgen claim. The marginal GPU-minute goes here, not to more k.
-2. **The RLHF metric collision** (`4e0c8e1a`-adjacent, LOG 01:5x):
-   `batchtopk_sae_btkonly` and `tsae_btkonly` share
-   `preference_auc_k20` to 16 digits with different train/eval keys.
-   Not urgent — no quoted number depends on it — but it should not
-   still be open when RLHF baselines are leaned on.
+2. ~~The RLHF metric collision~~ **CLOSED by mac-c (`d18c556db`),
+   hub-ratified.** One real anomaly, not eight: 9 of 10 all-metric
+   pairs are the same model under the `_btkonly` rename (discriminator:
+   same base arch **and** matching `batch_size` ⇒ benign). The survivor
+   is `tsae_btkonly` bs=32 identical to `batchtopk_sae_btkonly`
+   bs=1024. **Remediation is ONE row to re-run**, and both rows from
+   that 90-second window (`0.6588`, and a `0.5000000000` exactly) are
+   to be distrusted. Nothing quoted depends on it — **do not
+   re-escalate this.**
 3. **Lever 3 / `floor_reach`** — minimise it; the screen criterion is
    settled and $0.
 
