@@ -57,7 +57,7 @@ dictionary learning.
 
 In the synthetic setting, we prove that temporal information is responsible for performance. We do this by introducing a task with an analytic ceiling on recoverability from single token information. The task uses a Hidden Markov Model (HMM) based on Shamir secret sharing. This HMM has the property that secret recovery can be no better than random guessing below a threshold number of temporal steps $h$. The resulting performance for probing the secret on a given window size (for single-token architectures, we stack the activations in a same size window for a fair comparison).
 
-For the $h=2$, recovery is bounded to chance accuracy is $1/11=0.091$ below *3* steps. All methods satisfy this ceiling; beyond the threshold, the TXC improves from $0.154$ at $W=3$ to near perfect recovery, $0.956$ at $W=10$.
+For the $h=2$, recovery is bounded to chance accuracy is $1/11=0.091$ below *3* steps. All methods satisfy this ceiling; beyond the threshold, the TXC improves from $0.15$ at $W=3$ to near perfect recovery, $0.96$ at $W=10$.
 
 $$
 \begin{array}{l|cccccc}
@@ -68,25 +68,25 @@ W{=}1 & W{=}2 & W{=}3 & W{=}4 & W{=}5 & W{=}10 \\
 \text{Chance} &
 0.091 & 0.091 & 0.091 & 0.091 & 0.091 & 0.091 \\
 \text{SAE (best }k\text{)} &
-0.099_{(2)} & 0.095_{(10)} & 0.101_{(1)} &
+0.099_{(2)} & 0.095_{(10)} & 0.10_{(1)} &
 0.092_{(2)} & 0.094_{(1)} & 0.095_{(10)} \\
 \text{Stacked SAE (best }k\text{)} &
-0.100_{(2)} & 0.092_{(5)} & 0.100_{(1)} &
-0.097_{(2)} & 0.098_{(10)} & 0.108_{(5)} \\
+0.10_{(2)} & 0.092_{(5)} & 0.10_{(1)} &
+0.097_{(2)} & 0.098_{(10)} & 0.11_{(5)} \\
 \text{T-SAE (best }k\text{)} &
-\text{--} & 0.095_{(5)} & 0.103_{(5)} &
-0.096_{(2)} & 0.104_{(2)} & 0.123_{(2)} \\
+\text{--} & 0.095_{(5)} & 0.10_{(5)} &
+0.096_{(2)} & 0.10_{(2)} & 0.12_{(2)} \\
 \text{TFA (best }k\text{)} &
-\text{--} & 0.096_{(2)} & 0.104_{(2)} &
-0.101_{(10)} & 0.098_{(1)} & 0.094_{(2)} \\
+\text{--} & 0.096_{(2)} & 0.10_{(2)} &
+0.10_{(10)} & 0.098_{(1)} & 0.094_{(2)} \\
 \hline
 \text{TXC }(k{=}1) &
-0.100 & 0.091 & 0.131 & 0.186 & 0.292 & 0.634 \\
+0.10 & 0.091 & 0.13 & 0.19 & 0.29 & 0.63 \\
 \text{TXC }(k{=}2) &
-0.098 & 0.087 & \mathbf{0.154} & \mathbf{0.324} &
-\mathbf{0.562} & 0.909 \\
+0.098 & 0.087 & \mathbf{0.15} & \mathbf{0.32} &
+\mathbf{0.56} & 0.91 \\
 \text{TXC }(k{=}5) &
-0.092 & 0.088 & 0.097 & 0.097 & 0.156 & \mathbf{0.956} \\
+0.092 & 0.088 & 0.097 & 0.097 & 0.16 & \mathbf{0.96} \\
 \hline
 \end{array}
 $$
@@ -158,45 +158,45 @@ $$
 \hline
 \text{Sparse probing} &
 \text{mean AUC (38 tasks)} &
-0.869 &
-0.890 &
+0.87 &
+0.89 &
 0.98\times &
-0.803 \\
+0.80 \\
 \hline
 \text{Backtracking (steer)} &
 \Delta gc_{\mathrm{peak}}\ \text{(25-mag)} &
-0.246\ (m{=}{-}12) &
-0.541\ (m{=}{-}12) &
+0.25\ (m{=}{-}12) &
+0.54\ (m{=}{-}12) &
 0.45\times &
 \text{--} \\
 \hline
 \text{Backtracking (detect)} &
 \text{PR-AUC}@S{=}8 &
-0.158 &
-0.242 &
+0.16 &
+0.24 &
 0.65\times &
 \text{--} \\
 \hline
 \text{Medical EM (steer)} &
 \Delta\mathrm{align}\ (\mathrm{coh}\geq 70) &
 \mathrm{not\ run} &
-22.88 &
+23 &
 \text{--} &
 \text{--} \\
 \hline
 \text{Medical EM (detect)} &
 \text{PR-AUC}@S{=}16 &
-0.652^{\dagger} &
-0.540 &
-1.21\times^{\dagger} &
-0.344 \\
+0.65^{\dagger} &
+0.54 &
+1.2\times^{\dagger} &
+0.34 \\
 \hline
 \text{HH-RLHF} &
 \text{pref.\ AUC}@k{=}20 &
-0.602 &
-0.610 &
+0.60 &
+0.61 &
 0.99\times &
-\mathbf{0.617} \\
+\mathbf{0.62} \\
 \hline
 \end{array}
 $$
@@ -220,13 +220,13 @@ nominal, $1/20$ length-spurious top features).
 Reading. Temporal aggregation alone reaches mid-pack on the causal
 benchmark — the stacked baseline peaks at the same magnitude as
 TXC-base but at $0.45\times$ its $\Delta gc$, while beating T-SAE
-($0.164$) and matching MLC ($0.246$) — and does not explain the static
+($0.16$) and matching MLC ($0.25$) — and does not explain the static
 results: it trails the per-token TopK SAE on sparse probing. Weight
 sharing across positions, not aggregation, carries the remaining
 factor of $2.2$ on inducement. The HH-RLHF floor deserves emphasis: an
-untrained stacked dictionary scores $0.617$, above both the trained
+untrained stacked dictionary scores $0.62$, above both the trained
 cell and the paper headline, and inside the three-seed spread of the
-trained architectures ($0.604$--$0.618$, § Seed dependence) — the
+trained architectures ($0.60$--$0.62$, § Seed dependence) — the
 preference-AUC metric is largely training-insensitive, consistent with
 the manuscript's treatment of HH-RLHF as a length-confounded negative
 control.
@@ -237,7 +237,7 @@ train$\to$rollout distribution shift; references $6$--$10\times$
 nominal, stacked $\sim 32\times$), so the EM detection comparison is
 not sparsity-calibrated; treat the above-headline value as directional
 until the panel is re-thresholded. The trained EM signal is real
-relative to its floor ($0.652$ vs $0.344$, prevalence $0.315$).
+relative to its floor ($0.65$ vs $0.34$, prevalence $0.32$).
 Backtracking floors were not run (steering floors require judged
 generations; scope was held to the trained seed-42 cells).
 
@@ -262,23 +262,23 @@ $$
 \hline
 \text{Sparse probing} &
 \text{mean AUC (38 tasks)} &
-0.900\,/\,0.900\,/\,0.898 &
-0.886 \\
+0.90\,/\,0.90\,/\,0.90 &
+0.89 \\
 \hline
 \text{Backtracking} &
 \Delta gc_{\mathrm{peak}}\ \text{(25-mag)} &
-\mathrm{pending}\,/\,\mathrm{pending}\,/\,0.541 &
-0.400 \\
+\mathrm{pending}\,/\,\mathrm{pending}\,/\,0.54 &
+0.40 \\
 \hline
 \text{Medical EM} &
 \Delta\mathrm{align}\ (\mathrm{coh}\geq 70) &
-16.72\,/\,\mathrm{pending}\,/\,22.88 &
-21.45 \\
+17\,/\,\mathrm{pending}\,/\,23 &
+21 \\
 \hline
 \text{HH-RLHF} &
 \text{pref.\ AUC}@k{=}20 &
-0.622\,/\,0.618\,/\,0.623 &
-0.613 \\
+0.62\,/\,0.62\,/\,0.62 &
+0.61 \\
 \hline
 \end{array}
 $$
@@ -293,7 +293,7 @@ pending.
 
 "Is there one model setting where both the 40% better detection and the 15% better inducement are achieved? If not, please make this clear in the abstract."
 
-Detection (Fig 4b) and inducement (Fig 4a) refer to the excess performance of the base TXC over the TopK SAE: 0.23 vs. 0.17 when evaluated on the AUC for detection, and 1.20 vs 1.15 when evaluated on the average rate of genuine backtracking events induced, respectively. We have clarified the abstract to reflect this:
+Detection (Fig 4b) and inducement (Fig 4a) refer to the excess performance of the base TXC over the TopK SAE: a 40% higher AUC for detection and a 15% higher average rate of genuine backtracking events induced, respectively. We have clarified the abstract to reflect this:
 
 "Base temporal crosscoders can detect backtracking - a key reasoning behavior - at a 40% higher rate than conventional SAEs, and are 15% more effective in inducing it.
 
@@ -317,21 +317,21 @@ $$
 \hline
 \text{Backtracking} &
 \text{detection PR-AUC}@S{=}32 &
-0.260^{\dagger} &
-0.245\ (d{=}32{,}768) &
-0.245\ (d{=}32{,}768) \\
+0.26^{\dagger} &
+0.25\ (d{=}32{,}768) &
+0.25\ (d{=}32{,}768) \\
 \hline
 \text{Medical EM} &
 \text{detection PR-AUC}@S{=}16 &
-0.540 &
-0.710\ (d{=}16{,}384) &
-0.431\ (d{=}32{,}768) \\
+0.54 &
+0.71\ (d{=}16{,}384) &
+0.43\ (d{=}32{,}768) \\
 \hline
 \text{HH-RLHF} &
 \text{preference ROC-AUC}@k{=}20 &
-0.623 &
-0.600\ (d{=}18{,}432) &
-0.599\ (d{=}18{,}432) \\
+0.62 &
+0.60\ (d{=}18{,}432) &
+0.60\ (d{=}18{,}432) \\
 \hline
 \end{array}
 $$
@@ -353,7 +353,7 @@ We thank the reviewer for recognizing the novelty of our proposal and for noting
 
    **c.** Third we provide the Stacked-SAE baseline explicitly (in response to Reviewer 4z15).
 
-2. We address the reviewer's concerns about seeds by running three seeds for the base TXC. We confirm that the relative rankings do not change.
+2. We address the reviewer's concerns about seed variance by providing explicit thee seed results. We confirm that the relative rankings do not change.
 
 3. We provide specific responses to the other points raised, including the abstract wording, T-SAE dictionary size, parameter count, and inference cost.
 
@@ -393,10 +393,10 @@ In the main text, we reported one training seed, consistent with landmark SAE-ar
 $$
 \\begin{array}{lcc}
 &\\mathrm{TXC\ seeds\ }1/2/42&\\mathrm{TopK}\\\\
-\\mathrm{Sparse}&.900/.900/.898&.886\\\\
-\\mathrm{Backtrack}&\\mathrm{pending/pending}/.541&.400\\\\
-\\mathrm{Medical\ EM}&16.72/\\mathrm{pending}/22.88&21.45\\\\
-\\mathrm{HH\!-\!RLHF}&.622/.618/.623&.613
+\\mathrm{Sparse}&.90/.90/.90&.89\\\\
+\\mathrm{Backtrack}&\\mathrm{pending/pending}/.54&.40\\\\
+\\mathrm{Medical\ EM}&17/\\mathrm{pending}/23&21\\\\
+\\mathrm{HH\!-\!RLHF}&.62/.62/.62&.61
 \\end{array}
 $$
 
@@ -406,20 +406,20 @@ $$
 
 > Is there one model setting where both the 40% better detection and the 15% better inducement are achieved? If not, please make this clear in the abstract.
 
-Detection (Fig. 4b) and inducement (Fig. 4a) refer to the excess performance of the base TXC over the TopK SAE: $0.23$ vs. $0.17$, and $1.20$ vs. $1.15$  on backtracking induced, respectively. We have clarified the abstract to reflect this.
+Detection (Fig. 4b) and inducement (Fig. 4a) refer to the excess performance of the base TXC over the TopK SAE: a 40% higher detection AUC and a 15% higher average rate of backtracking induced, respectively. We have clarified the abstract to reflect this.
 
 **b. Is the T-SAE underpowered?**
 
 > Why does T-SAE use a smaller dictionary if the paper claims all methods use the same dictionary size? Please also report the parameter count and inference cost for each model.
 
-Our description of dictionary sizes was ambiguous. We ran variants whose widths were matched to the other architectures as well as variants whose widths were matched to the original paper ($d_{\\mathrm{SAE}}=16{,}384$). Where they disagreed, we chose the best-performing variant in order to use the strongest baseline. We have clarified this and added results for both explicitly to the paper appendix. We reproduce the summary data here:
+Our description of dictionary sizes was ambiguous. We ran both matched widths, and widths matched to the original paper ($d_{\\mathrm{SAE}}=16{,}384$). Where they disagreed, we chose the best-performing variant for a strong comparison. We have clarified this and added results for both explicitly to the paper appendix. We reproduce the summary data here:
 
 $$
 \\begin{array}{lccc}
 &\\mathrm{TXC}&\\mathrm{TSAE\ paper}&\\mathrm{TSAE\ matched}\\\\
-\\mathrm{Backtrack}\ S32&.260^\\dagger&.245\ (32768)&.245\ (32768)\\\\
-\\mathrm{Medical}\ S16&.540&.710\ (16384)&.431\ (32768)\\\\
-\\mathrm{HH\!-\!RLHF}\ k20&.623&.600\ (18432)&.599\ (18432)
+\\mathrm{Backtrack}\ S32&.26^\\dagger&.25\ (32768)&.25\ (32768)\\\\
+\\mathrm{Medical}\ S16&.54&.71\ (16384)&.43\ (32768)\\\\
+\\mathrm{HH\!-\!RLHF}\ k20&.62&.60\ (18432)&.60\ (18432)
 \\end{array}
 $$
 

@@ -39,12 +39,12 @@ As an additional comparison, we provide explicitly the stacked SAE baseline, whi
 $$
 \\begin{array}{lrrrr}
 &\\mathrm{Stacked}&\\mathrm{TXC}&\\mathrm{Ratio}&\\mathrm{Floor}\\\\
-\\mathrm{Sparse}&.869&.890&.98&.803\\\\
-\\mathrm{BT\ steer}&.246&.541&.45&-\\\\
-\\mathrm{BT\ detect}&.158&.242&.65&-\\\\
-\\mathrm{Medical\ steer}&\\mathrm{not\ run}&22.88&-&-\\\\
-\\mathrm{Medical\ detect}&.652^\\dagger&.540&1.21^\\dagger&.344\\\\
-\\mathrm{HH\!-\!RLHF}&.602&.610&.99&\\mathbf{.617}
+\\mathrm{Sparse}&.87&.89&.98&.80\\\\
+\\mathrm{BT\ steer}&.25&.54&.45&-\\\\
+\\mathrm{BT\ detect}&.16&.24&.65&-\\\\
+\\mathrm{Medical\ steer}&\\mathrm{not\ run}&23&-&-\\\\
+\\mathrm{Medical\ detect}&.65^\\dagger&.54&1.2^\\dagger&.34\\\\
+\\mathrm{HH\!-\!RLHF}&.60&.61&.99&\\mathbf{.62}
 \\end{array}
 $$
 
@@ -64,21 +64,21 @@ $$
 \\hline
 \\text{Backtracking} &
 \\text{detection PR-AUC}@S{=}32 &
-0.260^{\\dagger} &
-0.245\\ (d{=}32{,}768) &
-0.245\\ (d{=}32{,}768) \\\\
+0.26^{\\dagger} &
+0.25\\ (d{=}32{,}768) &
+0.25\\ (d{=}32{,}768) \\\\
 \\hline
 \\text{Medical EM} &
 \\text{detection PR-AUC}@S{=}16 &
-0.540 &
-0.710\\ (d{=}16{,}384) &
-0.431\\ (d{=}32{,}768) \\\\
+0.54 &
+0.71\\ (d{=}16{,}384) &
+0.43\\ (d{=}32{,}768) \\\\
 \\hline
 \\text{HH-RLHF} &
 \\text{preference ROC-AUC}@k{=}20 &
-0.623 &
-0.600\\ (d{=}18{,}432) &
-0.599\\ (d{=}18{,}432) \\\\
+0.62 &
+0.60\\ (d{=}18{,}432) &
+0.60\\ (d{=}18{,}432) \\\\
 \\hline
 \\end{array}
 $$
@@ -86,13 +86,13 @@ $$
 ### Parameter count and inference cost
 
 We also report the capacity and dense inference cost of every architecture in
-the headline configurations. Parameter counts are in millions. Inference cost
+the headline configurations. Parameter counts are in billions. Inference cost
 is in GFLOPs per architecture's native forward: one token for TopK SAE and
 T-SAE, five positions for TFA, Stacked SAE, and TXC-base, five layers for MLC,
 and ten positions for TXC-pro. We count one multiply-add as two FLOPs and
 exclude selection, bias additions, nonlinearities, and training-only losses.
 
-**Trainable parameters (millions):**
+**Trainable parameters (billions):**
 
 $$
 \\begin{array}{l|rrrr}
@@ -104,21 +104,21 @@ $$
 \\text{HH-RLHF} \\\\
 \\hline
 \\text{TopK SAE / SAE-Arditi} &
-84.96 & 268.47 & 234.92 & 84.96 \\\\
+0.085 & 0.27 & 0.23 & 0.085 \\\\
 \\text{T-SAE} &
-75.52 & 268.47 & 117.46/234.92^{*} & 84.96 \\\\
+0.076 & 0.27 & 0.12/0.23^{*} & 0.085 \\\\
 \\text{TFA }(T{=}5) &
-732.60 & 2315.33 & 2298.55 & \\text{--} \\\\
+0.73 & 2.3 & 2.3 & \\text{--} \\\\
 \\text{MLC }(L{=}5) &
-424.70 & 1342.23 & \\text{--} & \\text{--} \\\\
+0.42 & 1.3 & \\text{--} & \\text{--} \\\\
 \\text{Stacked SAE }(T{=}5) &
-424.78 & 1342.36 & 1174.59 & 424.78 \\\\
+0.42 & 1.3 & 1.2 & 0.42 \\\\
 \\text{TXC-base }(T{=}5) &
-424.70 & 1342.23 & 1174.46 & 424.70 \\\\
+0.42 & 1.3 & 1.2 & 0.42 \\\\
 \\text{TXC-base }(T{=}10/20) &
-849.39/1698.76 & \\text{--} & \\text{--} & \\text{--} \\\\
+0.85/1.7 & \\text{--} & \\text{--} & \\text{--} \\\\
 \\text{TXC-pro }(T_{\\max}{=}10) &
-849.39 & 2684.43 & 2348.88 & \\text{--} \\\\
+0.85 & 2.7 & 2.3 & \\text{--} \\\\
 \\hline
 \\end{array}
 $$
@@ -135,21 +135,21 @@ $$
 \\text{HH-RLHF} \\\\
 \\hline
 \\text{TopK SAE / SAE-Arditi, 1 token} &
-0.170 & 0.537 & 0.470 & 0.170 \\\\
+0.17 & 0.54 & 0.47 & 0.17 \\\\
 \\text{T-SAE, 1 token} &
-0.151 & 0.537 & 0.235/0.470^{*} & 0.170 \\\\
+0.15 & 0.54 & 0.24/0.47^{*} & 0.17 \\\\
 \\text{TFA, 5 tokens} &
-8.601 & 27.181 & 26.510 & \\text{--} \\\\
+8.6 & 27 & 27 & \\text{--} \\\\
 \\text{MLC, 5 layers} &
-0.849 & 2.684 & \\text{--} & \\text{--} \\\\
+0.85 & 2.7 & \\text{--} & \\text{--} \\\\
 \\text{Stacked SAE, 5 tokens} &
-0.849 & 2.684 & 2.349 & 0.849 \\\\
+0.85 & 2.7 & 2.3 & 0.85 \\\\
 \\text{TXC-base, 5 tokens} &
-0.849 & 2.684 & 2.349 & 0.849 \\\\
+0.85 & 2.7 & 2.3 & 0.85 \\\\
 \\text{TXC-base, 10/20 tokens} &
-1.699/3.397 & \\text{--} & \\text{--} & \\text{--} \\\\
+1.7/3.4 & \\text{--} & \\text{--} & \\text{--} \\\\
 \\text{TXC-pro, 10 tokens} &
-1.699 & 5.369 & 4.698 & \\text{--} \\\\
+1.7 & 5.4 & 4.7 & \\text{--} \\\\
 \\hline
 \\end{array}
 $$
@@ -163,8 +163,8 @@ because its encoder and decoder weights are position-specific. Sliding-window
 evaluation adds one native forward per window.
 
 This also sharpens the Stacked SAE control: Stacked SAE and $T=5$ TXC are
-effectively capacity- and inference-matched (1,342.36M vs. 1,342.23M
-parameters and 2.684 GFLOPs each on Backtracking), but Stacked SAE reaches only
+effectively capacity- and inference-matched (1.3B parameters and 2.7 GFLOPs
+each on Backtracking), but Stacked SAE reaches only
 $0.45\\times$ TXC's causal steering effect. The Backtracking gain therefore
 cannot be explained by generic parameter count or dense inference compute
 alone.
