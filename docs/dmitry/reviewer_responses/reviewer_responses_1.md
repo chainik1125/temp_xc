@@ -30,8 +30,8 @@ We first provide a high level summary of our responses.
     - d. Fourth, we provide Stacked SAE results for all real world tasks. Stacked SAEs underperform TXCs for all tasks considered except Emergent Misalignment steering.
 
 <!-- ============================================================
-     ADDED by mac-local, 2026-07-29. Present on both this branch and
-     `arxiv`; keep the two copies in step if either is edited.
+     ADDED ON THE `arxiv` BRANCH (mac-local, 2026-07-29): sycgen.
+     Source branch `dmitry-txcwins-10h` is NOT modified.
      ============================================================ -->
     - e. Fifth, we add a real world task whose state is not visible in any
       single token, and compare against pooled and stacked SAEs at matched
@@ -350,8 +350,8 @@ $$
 
 
 <!-- ============================================================
-     ADDED by mac-local, 2026-07-29. Present on both this branch and
-     `arxiv`; keep the two copies in step if either is edited.
+     ADDED ON THE `arxiv` BRANCH (mac-local, 2026-07-29): sycgen.
+     Source branch `dmitry-txcwins-10h` is NOT modified.
 
      THIS is the readable copy: SINGLE-backslash LaTeX, matching the
      other working-section tables, which render correctly. The
@@ -378,7 +378,7 @@ $$
 \text{Pooled SAE} & 0.485 & 0.488 & 0.467 & 0.486^{*} \\
 \text{Stacked SAE} & 0.468 & 0.412 & 0.149^{*} & 0.314^{*} \\
 \hline
-\text{TXC} & \mathbf{0.499} & \mathbf{0.523} & \mathbf{0.537} & \mathbf{0.577} \\
+\text{TXC} & \mathbf{0.499} & \mathbf{0.523} & \mathbf{0.536} & \mathbf{0.577} \\
 \hline
 \text{TXC } L_0/\text{window} & 5.66 & 6.35 & 6.94 & 7.82 \\
 \hline
@@ -409,8 +409,8 @@ We thank the reviewer for recognizing the novelty of our proposal and for noting
    **c.** Third we provide the Stacked-SAE baseline explicitly (in response to Reviewer 4z15).
 
 <!-- ============================================================
-     ADDED by mac-local, 2026-07-29. Present on both this branch and
-     `arxiv`; keep the two copies in step if either is edited.
+     ADDED ON THE `arxiv` BRANCH (mac-local, 2026-07-29): sycgen.
+     Source branch `dmitry-txcwins-10h` is NOT modified.
      Everything between these markers is new.
      ============================================================ -->
    **d.** Fourth, we add a real world task whose state is not visible in any single token, and compare against pooled and stacked SAEs at matched sparsity. The TXC improves with window size and is above both baselines.
@@ -446,8 +446,8 @@ For every non-TXC baseline, subscripts give the selected k independently at each
 
 
 <!-- ============================================================
-     ADDED by mac-local, 2026-07-29. Present on both this branch and
-     `arxiv`; keep the two copies in step if either is edited.
+     ADDED ON THE `arxiv` BRANCH (mac-local, 2026-07-29): sycgen.
+     Source branch `dmitry-txcwins-10h` is NOT modified.
      Everything between these markers is new.
 
      LaTeX CONVENTION IN THIS SECTION: every backslash is DOUBLED --
@@ -479,7 +479,7 @@ $$
 \\text{Pooled SAE} & 0.485 & 0.488 & 0.467 & 0.486^{*} \\\\
 \\text{Stacked SAE} & 0.468 & 0.412 & 0.149^{*} & 0.314^{*} \\\\
 \\hline
-\\text{TXC} & \\mathbf{0.499} & \\mathbf{0.523} & \\mathbf{0.537} & \\mathbf{0.577} \\\\
+\\text{TXC} & \\mathbf{0.499} & \\mathbf{0.523} & \\mathbf{0.536} & \\mathbf{0.577} \\\\
 \\hline
 \\text{TXC } L_0/\\text{window} & 5.66 & 6.35 & 6.94 & 7.82 \\\\
 \\hline
