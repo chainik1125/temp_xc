@@ -242,10 +242,18 @@ def summarize_spectrum(x: Array, *, low_cutoff: float = 0.125) -> SpectralSummar
     )
 
 
-def _pca_projection(x: Array, n_components: int) -> tuple[Array, Array]:
+def _pca_projection(
+    x: Array,
+    n_components: int,
+    *,
+    fit_x: Array | None = None,
+) -> tuple[Array, Array]:
     x = _as_3d(x)
-    mean = x.mean(axis=(0, 1), keepdims=True)
-    flat = (x - mean).reshape(-1, x.shape[-1])
+    fit = x if fit_x is None else _as_3d(fit_x)
+    if fit.shape[-1] != x.shape[-1]:
+        raise ValueError(f"fit channels {fit.shape[-1]} != input channels {x.shape[-1]}")
+    mean = fit.mean(axis=(0, 1), keepdims=True)
+    flat = (fit - mean).reshape(-1, fit.shape[-1])
     cov = flat.T @ flat / max(flat.shape[0], 1)
     eigval, eigvec = np.linalg.eigh(cov)
     rank = min(int(n_components), x.shape[-1])
@@ -260,6 +268,7 @@ def spectral_features(
     n_components: int = 8,
     remove_dc: bool = True,
     window: WindowMode = "hann",
+    fit_x: Array | None = None,
 ) -> Array:
     """Per-window power or cross-spectral features for a lightweight probe.
 
@@ -268,7 +277,7 @@ def spectral_features(
     channel cross-spectra; the imaginary terms distinguish quadrature and
     time-reversal signals with identical power.
     """
-    projected, _ = _pca_projection(x, n_components)
+    projected, _ = _pca_projection(x, n_components, fit_x=fit_x)
     _, T, rank = projected.shape
     if remove_dc:
         projected = projected - projected.mean(axis=1, keepdims=True)
@@ -295,7 +304,12 @@ def spectral_features(
     )
 
 
-def dc_features(x: Array, *, n_components: int = 8) -> Array:
+def dc_features(
+    x: Array,
+    *,
+    n_components: int = 8,
+    fit_x: Array | None = None,
+) -> Array:
     """Signed sequence-mean coefficients for the explicit DC branch.
 
     A power spectrum squares Fourier coefficients and therefore discards the
@@ -303,7 +317,7 @@ def dc_features(x: Array, *, n_components: int = 8) -> Array:
     retains the coefficient vector itself, so a task screen must test that
     vector separately before deciding that DC can be removed.
     """
-    projected, _ = _pca_projection(x, n_components)
+    projected, _ = _pca_projection(x, n_components, fit_x=fit_x)
     return projected.mean(axis=1)
 
 

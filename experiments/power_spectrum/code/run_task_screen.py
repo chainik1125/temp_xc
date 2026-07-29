@@ -127,6 +127,7 @@ def _leading_tiles(
 
 def _run_probe(
     x: np.ndarray,
+    calibration_x: np.ndarray,
     labels: np.ndarray,
     spec: TargetSpec,
     *,
@@ -143,14 +144,18 @@ def _run_probe(
     ):
         kind = "power" if feature_kind.startswith("power") else "cross"
         features = spectral_features(
-            x, kind=kind, n_components=n_components, remove_dc=remove_dc
+            x,
+            kind=kind,
+            n_components=n_components,
+            remove_dc=remove_dc,
+            fit_x=calibration_x,
         )
         if spec.kind == "classification":
             score = classification_probe(features, labels, n_splits=n_splits, seed=seed)
         else:
             score = regression_probe(features, labels, n_splits=n_splits, seed=seed)
         out[feature_kind] = score.to_dict()
-    dc = dc_features(x, n_components=n_components)
+    dc = dc_features(x, n_components=n_components, fit_x=calibration_x)
     if spec.kind == "classification":
         dc_score = classification_probe(dc, labels, n_splits=n_splits, seed=seed)
     else:
@@ -172,10 +177,12 @@ def run(config: dict, *, smoke: bool = False) -> dict:
     seeds = [int(v) for v in config["seeds"]]
     tile_sizes = [int(v) for v in config["tile_sizes"]]
     n_sequences = int(config["n_sequences"])
+    n_calibration = int(config.get("n_calibration_sequences", 128))
     if smoke:
         seeds = seeds[:1]
         tile_sizes = [tile_sizes[0], tile_sizes[-1]]
         n_sequences = min(n_sequences, 96)
+        n_calibration = min(n_calibration, 32)
 
     result = {
         "config": {
@@ -183,6 +190,7 @@ def run(config: dict, *, smoke: bool = False) -> dict:
             "seeds": seeds,
             "tile_sizes": tile_sizes,
             "n_sequences": n_sequences,
+            "n_calibration_sequences": n_calibration,
             "smoke": smoke,
         },
         "summaries": [],
@@ -193,15 +201,20 @@ def run(config: dict, *, smoke: bool = False) -> dict:
     def data_for(datasource: str, seed: int):
         key = (datasource, seed)
         if key not in cache:
-            print(f"[data] {datasource} seed={seed} n={n_sequences}", flush=True)
-            cache[key] = _generate(datasource, n_sequences=n_sequences, seed=seed)
+            total = n_calibration + n_sequences
+            print(
+                f"[data] {datasource} seed={seed} "
+                f"n_probe={n_sequences} n_cal={n_calibration}",
+                flush=True,
+            )
+            cache[key] = _generate(datasource, n_sequences=total, seed=seed)
         return cache[key]
 
     for seed in seeds:
         for datasource in config["summary_datasources"]:
             data = data_for(datasource, seed)
             summary = summarize_spectrum(
-                data.x.detach().cpu().numpy(),
+                data.x.detach().cpu().numpy()[n_calibration:],
                 low_cutoff=float(config["low_cutoff"]),
             )
             result["summaries"].append({
@@ -219,15 +232,19 @@ def run(config: dict, *, smoke: bool = False) -> dict:
         for target_name in config["targets"]:
             spec = TARGETS[target_name]
             data = data_for(spec.datasource, seed)
-            x = data.x.detach().cpu().numpy()
-            labels = _labels(data, spec)
+            all_x = data.x.detach().cpu().numpy()
+            x = all_x[n_calibration:]
+            calibration_x = all_x[:n_calibration]
+            labels = _labels(data, spec)[n_calibration:]
             for tile_size in tile_sizes:
                 tiles, target = _leading_tiles(x, labels, spec, tile_size)
+                calibration_tiles = calibration_x[:, :tile_size, :]
                 valid = np.isfinite(target)
                 if spec.negative_is_invalid:
                     valid &= target >= 0
                 probe = _run_probe(
                     tiles[valid],
+                    calibration_tiles,
                     target[valid],
                     spec,
                     n_components=int(config["n_components"]),

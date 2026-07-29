@@ -59,3 +59,18 @@ def test_dc_vector_retains_signed_stable_state() -> None:
     x = labels[:, None, None] + 0.1 * rng.normal(size=(256, 16, 3))
     score = classification_probe(dc_features(x, n_components=3), labels, seed=5)
     assert score.score_mean > 0.99
+
+
+def test_spectral_projection_accepts_disjoint_calibration_data() -> None:
+    rng = np.random.default_rng(6)
+    calibration = rng.normal(size=(32, 8, 5))
+    probe = rng.normal(size=(48, 8, 5))
+    power = spectral_features(
+        probe,
+        kind="power",
+        n_components=3,
+        fit_x=calibration,
+    )
+    dc = dc_features(probe, n_components=3, fit_x=calibration)
+    assert power.shape[0] == probe.shape[0]
+    assert dc.shape == (probe.shape[0], 3)

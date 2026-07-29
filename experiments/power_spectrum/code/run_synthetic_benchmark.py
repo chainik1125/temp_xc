@@ -350,6 +350,9 @@ class BudgetGuard:
         self.usable_budget = float(self.cfg["max_total_usd"]) - float(self.cfg["reserve_usd"])
         self.max_session_seconds = float(self.cfg["max_session_hours"]) * 3600
         self.ledger = self._load()
+        for session in self.ledger["sessions"]:
+            if session.get("status") == "running":
+                session["status"] = "interrupted"
         prior = sum(float(s.get("estimated_cost_usd", 0)) for s in self.ledger["sessions"])
         if prior >= self.usable_budget:
             raise StopRequested(

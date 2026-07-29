@@ -156,6 +156,21 @@ def main(stage: str = "plan", out: str = ""):
         return
     if stage not in {"smoke", "gate", "overnight"}:
         raise SystemExit("stage must be one of: plan, smoke, gate, overnight")
+    if stage == "overnight":
+        call = run_remote.spawn(stage)
+        text = json.dumps(
+            {
+                "mode": stage,
+                "function_call_id": call.object_id,
+                "status": "spawned",
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        print(text)
+        if out:
+            Path(out).write_text(text + "\n")
+        return
     result = run_remote.remote(stage)
     text = json.dumps(result, indent=2, sort_keys=True)
     print(text)

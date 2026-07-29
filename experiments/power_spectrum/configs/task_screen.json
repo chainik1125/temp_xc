@@ -1,6 +1,7 @@
 {
   "seeds": [1, 2, 42],
   "n_sequences": 512,
+  "n_calibration_sequences": 128,
   "tile_sizes": [4, 8, 16, 32],
   "n_components": 8,
   "n_splits": 5,

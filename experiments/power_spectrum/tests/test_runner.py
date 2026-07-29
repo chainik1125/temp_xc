@@ -50,3 +50,12 @@ def test_every_cell_normalizes_batch_tokens():
     for cell in runner.enumerate_cells(cfg, "full"):
         batch_size = target // cell["T"]
         assert batch_size * cell["T"] == target
+
+
+def test_new_budget_session_marks_stale_running_session_interrupted(tmp_path):
+    cfg = runner.load_config(CONFIG)
+    runner.BudgetGuard(cfg, tmp_path, "test-hash")
+    resumed = runner.BudgetGuard(cfg, tmp_path, "test-hash")
+    assert resumed.ledger["sessions"][0]["status"] == "interrupted"
+    assert resumed.ledger["sessions"][1]["status"] == "running"
+    resumed.finish("complete")
