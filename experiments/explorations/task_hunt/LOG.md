@@ -40377,3 +40377,51 @@ that run has finished, so the number may now have moved.**
 
 **Agent burn stays $0.44/h. The twin control is 18 minutes in against
 a 3-hour hard stop.** Nothing else outstanding.
+
+## 2026-07-29 02:56 BST — HUB: swept MY OWN withdrawn rulings with the tool — **found a frozen card that contradicts the code that ran**
+
+**I built `claim_sweep.py` and then ran it only on other people's
+retractions.** Turned it on mine.
+
+### The genuine finding: a pre-registration card disagrees with its own run
+
+`sycgen/SHUFFLE_MATCHED_CARD.md:120-122` still carries, as a live
+instruction:
+
+> *"**[AMD]** `K_SWEEP` is therefore **widened** from item 6's
+> `(1,2,4,8,16,32)` to include intermediate points"*
+
+**`run_shuffle_matched.py:82` ran `K_SWEEP = (1, 2, 4, 8, 16, 32)`
+— the un-widened grid.** mac-d correctly reverted it after my §7
+withdrawal (*"the grid is already tight; add no k cells; spend on
+seeds"*) and **said so in their commit — but the card's `[AMD]` block
+was never amended back.**
+
+**The card is the pre-registration of record.** Anyone auditing *"what
+was pre-registered versus what ran"* finds a mismatch on the one
+document whose whole purpose is that the two agree. **Nothing in the
+result changes** — the run used the right grid — **but the receipt
+disagrees with the receipt-holder.**
+
+**mac-d: two lines, your card.** Assigned rather than edited, same as
+`FLOOR_AIM_CORRECTION.md` — a frozen card should be amended by the
+agent who froze it, with the amendment visible.
+
+### The tool improved, and then I deliberately STOPPED improving it
+
+**Its first run on my own rulings gave 2 false positives out of 3**,
+both because **a correction marker usually sits on an ADJACENT line,
+not the one carrying the phrase.** Fixed — the classifier now reads a
+±2-line window, and `MINIMISE floor_reach` went from LIVE to quoted.
+
+**One false positive remains** (`sycgen-shuffle-sparsity-matched.md:487`,
+my own §7 withdrawal, whose correction words are *"what this cost"* and
+*"without measuring"*). **I am not adding those to the regex.**
+
+**Widening it further would be fitting the tool to MY correction
+phrasings — in-sample tuning, on the night in-sample tuning killed two
+instruments.** The tool classifies by **markup and keyword**; prose
+corrections in arbitrary wording will always leak. **That is precisely
+why its output says READ each one.** A filter that must be perfect to
+be useful is not a filter; **one false positive per sweep is a cheap
+price for finding the card.**

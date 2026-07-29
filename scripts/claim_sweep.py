@@ -65,7 +65,13 @@ def classify(text: str, phrase: str) -> tuple[list, list]:
         line = text.splitlines()[ln - 1] if ln <= len(text.splitlines()) else ""
         in_struck = any(a <= i < b for a, b in struck_spans)
         in_quote = line.lstrip().startswith(">")
-        near_corr = bool(CORRECTION.search(line))
+        # A correction marker usually sits on an ADJACENT line, not the one
+        # carrying the phrase — the correction reads "X" / was wrong because…
+        # Checking only the phrase's own line produced 2 false positives out
+        # of 3 on its first run against the hub's own withdrawn rulings.
+        lines_all = text.splitlines()
+        window = "\n".join(lines_all[max(0, ln - 3): ln + 2])
+        near_corr = bool(CORRECTION.search(window))
         (quoted if (in_struck or in_quote or near_corr) else live).append(ln)
     return live, quoted
 
