@@ -8,7 +8,10 @@ tags:
 
 ## Reviewer 3 response
 
-*Placeholder draft.*
+We thank the reviewer for taking the time to review our manuscript (MS) and for appreciating the motivation behind our proposal. We appreciate the constructive suggestions on formatting, readability and proper citation.
+
+### Performance improvements
+
 
 > Experiments show a marginal improvement over existing works, such as T-SAE
 > and MLC. This leaves the proposed TXC and TXC-pro primarily motivated by the
@@ -16,12 +19,9 @@ tags:
 
 We emphasize three points.
 
-### 1. Ground-truth temporal recovery
+#### 1. TXCs are the only architecture which reliably recovers ground truth temporal features
 
-TXC is the only tested temporal architecture that recovers the ground-truth
-temporal feature. Prior work has emphasized that feature recovery cannot be
-established without ground truth (Venhoff et al., 2024; Makelov et al., 2024).
-We provide that ground truth and find:
+Prior work has emphasized that feature recovery cannot be established without ground truth (Venhoff et al., 2024; Makelov et al., 2024). In section 4, we find that the TXC is the only temporal architecture we tested that recovers ground-truth temporal features. In our response to Reviewer bbby we make this even more explicitly through a task with a formal no-go theorem. We summarize the ground truth recovery results in secton 4 below.
 
 | Task and metric | SAE | T-SAE | TFA | TXC |
 | :--- | ---: | ---: | ---: | ---: |
@@ -29,11 +29,8 @@ We provide that ground truth and find:
 | Coupling, peak gAUC | 0.884 | 0.941 | 0.663 | **0.990** |
 | Secret recovery, \(W=10\) | 0.10 | 0.12 | 0.09 | **0.96** |
 
-The final task has a formal single-token ceiling, presented in our response to
-Reviewer bbby. TXC is the only architecture that moves substantially above
-chance.
-
-### 2. Scale of improvement
+<!--  -->
+#### 2. Scale of improvement
 
 The appropriate scale is performance relative to the regular SAE:
 
@@ -51,7 +48,7 @@ on backtracking. TXC also outperforms TFA on four of the five non-HH-RLHF
 headline comparisons. These architectures therefore have comparable breadth
 but different capability profiles.
 
-### 3. Matched benchmarking
+#### 3. Matched benchmarking
 
 The matched comparison is itself part of the contribution. Previous temporal
 architectures were introduced and evaluated separately. To our knowledge, this

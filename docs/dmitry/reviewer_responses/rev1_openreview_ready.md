@@ -20,7 +20,7 @@ We thank the reviewer for recognizing the novelty of our proposal and for noting
 
 **2. Seed variance.** We provide explicit three-seed results and confirm that the relative rankings do not change.
 
-**3. Remaining points.** We respond below to the abstract wording, T-SAE dictionary size, parameter count, and inference cost.
+**3. Remaining points.** We respond below to the abstract wording, T-SAE dictionary size, and provide parameter counts in response to Reviewer 4z15.
 
 ### Synthetic setting
 
@@ -30,16 +30,16 @@ For h = 2, recovery below three steps is bounded at the chance accuracy of 1/11 
 
 **Secret-recovery accuracy:**
 
-| Architecture | W = 1 | W = 2 | W = 3 | W = 4 | W = 5 | W = 10 |
-| :--- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Chance | 0.09 | 0.09 | 0.09 | 0.09 | 0.09 | 0.09 |
-| SAE | 0.10 | 0.10 | 0.10 | 0.09 | 0.09 | 0.10 |
-| Stacked SAE | 0.10 | 0.09 | 0.10 | 0.10 | 0.10 | 0.11 |
-| T-SAE | — | 0.10 | 0.10 | 0.10 | 0.10 | 0.12 |
-| TFA | — | 0.10 | 0.10 | 0.10 | 0.10 | 0.09 |
-| TXC, k = 1 | 0.10 | 0.09 | 0.13 | 0.19 | 0.29 | 0.63 |
-| TXC, k = 2 | 0.10 | 0.09 | **0.15** | **0.32** | **0.56** | 0.91 |
-| TXC, k = 5 | 0.09 | 0.09 | 0.10 | 0.10 | 0.16 | **0.96** |
+|Architecture|W=1|W=2|W=3|W=4|W=5|W=10|
+|:---|---:|---:|---:|---:|---:|---:|
+|Chance|0.09|0.09|0.09|0.09|0.09|0.09|
+|SAE|0.10|0.10|0.10|0.09|0.09|0.10|
+|Stacked SAE|0.10|0.09|0.10|0.10|0.10|0.11|
+|T-SAE|—|0.10|0.10|0.10|0.10|0.12|
+|TFA|—|0.10|0.10|0.10|0.10|0.09|
+|TXC, k=1|0.10|0.09|0.13|0.19|0.29|0.63|
+|TXC, k=2|0.10|0.09|**0.15**|**0.32**|**0.56**|0.91|
+|TXC, k=5|0.09|0.09|0.10|0.10|0.16|**0.96**|
 
 For every non-TXC baseline, we sweep k over {1, 2, 5, 10, 20} and report the best accuracy independently at each window size.
 
@@ -51,12 +51,12 @@ The reviewer asks:
 
 In the main text, we reported one training seed, consistent with landmark SAE-architecture papers introducing TopK (Gao et al., 2025, ICLR), Gated and JumpReLU (Rajamanoharan et al., 2024a,b), and BatchTopK (Bussmann et al., 2024). The appendix provided an additional seed; we have now updated it to include three-seed results:
 
-| Task | TXC-base, seeds 1 / 2 / 42 | TopK SAE |
-| :--- | ---: | ---: |
-| Sparse probing | 0.90 / 0.90 / 0.90 | 0.89 |
-| Backtracking | Pending / Pending / 0.54 | 0.40 |
-| Medical EM | 17 / Pending / 23 | 21 |
-| HH-RLHF | 0.62 / 0.62 / 0.62 | 0.61 |
+|Task|TXC-base, seeds 1/2/42|TopK SAE|
+|:---|---:|---:|
+|Sparse probing|0.90/0.90/0.90|0.89|
+|Backtracking|Pending/Pending/0.54|0.40|
+|Medical EM|17/20/23|21|
+|HH-RLHF|0.62/0.62/0.62|0.61|
 
 ### Other points
 
@@ -72,11 +72,11 @@ Detection (Fig. 4b) and inducement (Fig. 4a) refer to the excess performance of 
 
 Our description of dictionary sizes was ambiguous. For each task, we ran the T-SAE at the width used for the paper result and, where different, at the width matched to the other architectures. Where these disagreed, we selected the better-performing variant to ensure that we compared against the strongest baseline. We have clarified this and added both settings to the paper appendix:
 
-| Task and metric | TXC | T-SAE, paper width | T-SAE, matched width |
-| :--- | ---: | ---: | ---: |
-| Backtracking, PR-AUC at S = 32 | 0.26‡ | 0.25 (d = 32,768) | 0.25 (d = 32,768) |
-| Medical EM, PR-AUC at S = 16 | 0.54 | 0.71 (d = 16,384) | 0.43 (d = 32,768) |
-| HH-RLHF, ROC-AUC at k = 20 | 0.62 | 0.60 (d = 18,432) | 0.60 (d = 18,432) |
+|Task and metric|TXC|T-SAE, paper width|T-SAE, matched width|
+|:---|---:|---:|---:|
+|Backtracking, PR-AUC at S=32|0.26‡|0.25 (d=32,768)|0.25 (d=32,768)|
+|Medical EM, PR-AUC at S=16|0.54|0.71 (d=16,384)|0.43 (d=32,768)|
+|HH-RLHF, ROC-AUC at k=20|0.62|0.60 (d=18,432)|0.60 (d=18,432)|
 
 ‡ The Backtracking TXC value is the T = 5 cell from the new window-size sweep.
 

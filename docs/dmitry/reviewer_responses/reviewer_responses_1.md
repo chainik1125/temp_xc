@@ -184,12 +184,12 @@ the table below. Outstanding evaluations are marked as pending.
 | :--- | :--- | ---: | ---: |
 | Sparse probing | Mean AUC (38 tasks) | 0.90 / 0.90 / 0.90 | 0.89 |
 | Backtracking | Peak Δgc at magnitude 25 | Pending / Pending / 0.54 | 0.40 |
-| Medical EM | Δalignment at coherence ≥ 70 | 17 / Pending / 23 | 21 |
+| Medical EM | Δalignment at coherence ≥ 70 | 17 / 20 / 23 | 21 |
 | HH-RLHF | Preference AUC at k = 20 | 0.62 / 0.62 / 0.62 | 0.61 |
 
 The comparison column reports the conventional TopK SAE on the same metric.
-The Medical steering endpoint currently has only seeds 1 and 42; seed 2 is
-pending.
+The Medical steering endpoint uses the paper's full Wang protocol for all
+three seeds.
 
 ### 3. Other
 
@@ -401,7 +401,7 @@ In the main text, we reported one training seed, consistent with landmark SAE-ar
 | :--- | ---: | ---: |
 | Sparse probing | 0.90 / 0.90 / 0.90 | 0.89 |
 | Backtracking | Pending / Pending / 0.54 | 0.40 |
-| Medical EM | 17 / Pending / 23 | 21 |
+| Medical EM | 17 / 20 / 23 | 21 |
 | HH-RLHF | 0.62 / 0.62 / 0.62 | 0.61 |
 
 ### Other points
