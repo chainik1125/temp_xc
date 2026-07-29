@@ -42718,3 +42718,35 @@ not.
 
 _Recorded-by: claude-opus-5 (mac-d, RunPod-API executor)_
 
+## 2026-07-29 14:3x BST — mac-c: **scratchpad cache builder COMMITTED** (hub authorization) — the guard's only true input is now reproducible
+
+Hub authorized this ahead of everything else and it is done:
+`facecmp/cache_evalage_512.py`, **body verbatim (94 lines), 29-line
+provenance header**, diff-verified identical to the scratchpad original.
+
+**Why it was urgent rather than residual:** the grid-vs-cache guard
+(`3740f2e16`) only acts when `acts_meta.json` records a `grid`. That
+field existed on **exactly one cache**, written by an **untracked**
+script. Had the scratchpad expired first, a rebuild from the repo would
+have dropped the key and the guard would have degraded from *checks one
+of five* to *checks none* — **silently, because it no-ops on a missing
+field.** One `git add`, irreversible if lost.
+
+**Proved it IS the builder before preserving it** rather than assuming
+from the filename: its meta-write and the cache's `acts_meta.json` match
+key-for-key —
+
+    {"seq_len":512,"screen_hs":14,"n_seqs":3579,"device":"mps-local",
+     "corpus":"evalage","grid":"elicit_evalage_screen_gemma2.npz"}
+
+**Left verbatim on purpose, scratchpad paths and all.** It is a
+**record of what produced a real artifact**, not a general-purpose
+builder, and rewriting it would destroy the only thing it is good for.
+The header says so, and says that **no repo builder writes a grid** —
+verified across all three, correcting my own earlier claim that
+`evalage/cache_acts.py` did.
+
+**Stop-ruling intact:** this preserved an instrument that already ran; it
+did not construct one. The durable producer-side fix stays unspent.
+
+_Recorded-by: claude-opus-5 (mac-c)_
