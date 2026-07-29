@@ -253,7 +253,17 @@ def screen(key: str):
     bank = _FloorBank(**fl)
     done = (json.loads(out_path.read_text()) if out_path.exists()
             else {"meta": {}, "cells": {}})
-    done["meta"] = {"substrate": "elicit_retryesc_gen_v1 (BORROWED corpus)",
+    # ⚑ substrate was HARDCODED to retryesc until 2026-07-29 14:2x (mac-c).
+    # `GRID_PAT` became overridable earlier tonight and the meta did not
+    # follow, so EVERY result run on another corpus was stamped
+    # "elicit_retryesc_gen_v1" — e.g. `results/lever3/arm_test_gemma2_2b.json`
+    # records n_docs=400 (the evalage grid) under a retryesc label. That is
+    # why identifying `errorbar_gemma2_512.json`'s corpus needed a tok/n_test
+    # fingerprint instead of just reading its provenance. Derive it, and
+    # record cache + grid so a mismatch is legible after the fact rather
+    # than reconstructable only by forensics.
+    done["meta"] = {"substrate": GRID_PAT.format(tag=TOK_TAG[key]),
+                    "grid_dir": str(GRIDS), "cache_root": str(CACHE_ROOT),
                     "model": key, "screen_hs": hs, "face": FACE, "H": H,
                     "status": "FEASIBILITY PROBE, not a hunt4 verdict",
                     "ax_ts": AX_TS, "rows": mstats}
