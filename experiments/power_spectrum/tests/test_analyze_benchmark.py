@@ -105,3 +105,46 @@ def test_analysis_rejects_incomplete_panel(tmp_path: Path) -> None:
 
     with pytest.raises(RuntimeError, match="incomplete"):
         analyze_benchmark.run_analysis(config_path, results_path, tmp_path / "out")
+
+
+def test_analysis_merges_matched_control_and_pairs_against_main(tmp_path: Path) -> None:
+    config_path = tmp_path / "config.json"
+    results_path = tmp_path / "results.jsonl"
+    control_config_path = tmp_path / "control-config.json"
+    control_results_path = tmp_path / "control-results.jsonl"
+    config_path.write_text(json.dumps(_config()))
+    results_path.write_text("\n".join(json.dumps(row) for row in _complete_rows()) + "\n")
+    control_config = {
+        **_config(),
+        "run_name": "control",
+        "models": [
+            {
+                "name": "full_control",
+                "fairness_role": "matched_monolithic_window_support",
+            }
+        ],
+        "phases": {"full": {"models": ["full_control"], "seeds": [1, 2]}},
+    }
+    control_config_path.write_text(json.dumps(control_config))
+    control_rows = [
+        {**_row("full_control", seed, value), "fairness_role": "matched_monolithic_window_support"}
+        for seed, value in ((1, 0.7), (2, 0.8))
+    ]
+    control_results_path.write_text(
+        "\n".join(json.dumps(row) for row in control_rows) + "\n"
+    )
+
+    payload = analyze_benchmark.run_analysis(
+        config_path,
+        results_path,
+        tmp_path / "out",
+        control_config_path=control_config_path,
+        control_results_path=control_results_path,
+    )
+
+    assert payload["integrity"]["complete"]
+    control = next(
+        row for row in payload["aggregates"] if row["model"] == "full_control"
+    )
+    assert control["delta_vs_txc_pre"] == pytest.approx(0.5)
+    assert control["delta_vs_spectral_v1"] == pytest.approx(0.1)

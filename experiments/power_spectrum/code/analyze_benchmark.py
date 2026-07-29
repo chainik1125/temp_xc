@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 import json
 import math
@@ -272,8 +273,10 @@ def l0_match_report(
             continue
         baseline_l0 = float(baseline["mean_l0_per_window"])
         for model_spec in config["models"]:
-            if not str(model_spec.get("fairness_role", "")).startswith(
-                "equal_window_support"
+            role = str(model_spec.get("fairness_role", ""))
+            if not (
+                role.startswith("equal_window_support")
+                or role == "matched_monolithic_window_support"
             ):
                 continue
             model = str(model_spec["name"])
@@ -344,21 +347,59 @@ def run_analysis(
     output_dir: Path,
     *,
     require_complete: bool = True,
+    control_config_path: Path | None = None,
+    control_results_path: Path | None = None,
 ) -> dict[str, Any]:
     config = json.loads(config_path.read_text())
     raw_rows = read_jsonl(results_path)
-    integrity = validate_panel(raw_rows, config)
-    if require_complete and not integrity["complete"]:
+    main_integrity = validate_panel(raw_rows, config)
+    if require_complete and not main_integrity["complete"]:
         raise RuntimeError(
             "benchmark panel is incomplete or invalid: "
-            f"missing={len(integrity['missing'])}, failed={len(integrity['failed'])}, "
-            f"fairness_errors={len(integrity['fairness_errors'])}"
+            f"missing={len(main_integrity['missing'])}, "
+            f"failed={len(main_integrity['failed'])}, "
+            f"fairness_errors={len(main_integrity['fairness_errors'])}"
         )
-    aggregates = aggregate(raw_rows, config)
-    seeds = seed_rows(raw_rows)
-    l0_matches = l0_match_report(aggregates, config)
+    if (control_config_path is None) != (control_results_path is None):
+        raise ValueError("control config and results must be supplied together")
+
+    combined_config = copy.deepcopy(config)
+    combined_rows = list(raw_rows)
+    control_integrity: dict[str, Any] | None = None
+    if control_config_path is not None and control_results_path is not None:
+        control_config = json.loads(control_config_path.read_text())
+        control_rows = read_jsonl(control_results_path)
+        control_integrity = validate_panel(control_rows, control_config)
+        if require_complete and not control_integrity["complete"]:
+            raise RuntimeError(
+                "matched-control panel is incomplete or invalid: "
+                f"missing={len(control_integrity['missing'])}, "
+                f"failed={len(control_integrity['failed'])}, "
+                f"fairness_errors={len(control_integrity['fairness_errors'])}"
+            )
+        selected = control_config["phases"]["full"].get("models", "all")
+        if selected == "all":
+            selected_control_models = {
+                str(model["name"]) for model in control_config["models"]
+            }
+        else:
+            selected_control_models = {str(model) for model in selected}
+        known_models = {
+            str(model["name"]) for model in combined_config["models"]
+        }
+        combined_config["models"].extend(
+            copy.deepcopy(model)
+            for model in control_config["models"]
+            if str(model["name"]) in selected_control_models
+            and str(model["name"]) not in known_models
+        )
+        combined_rows.extend(control_rows)
+
+    aggregates = aggregate(combined_rows, combined_config)
+    seeds = seed_rows(combined_rows)
+    l0_matches = l0_match_report(aggregates, combined_config)
     task_winners = {}
-    for task in (str(task["name"]) for task in config["tasks"]):
+    for task in (str(task["name"]) for task in combined_config["tasks"]):
         candidates = [row for row in aggregates if row["task"] == task]
         if candidates:
             best = max(candidates, key=lambda row: float(row["mean"]))
@@ -367,6 +408,18 @@ def run_analysis(
                 "mean": best["mean"],
                 "metric": best["metric"],
             }
+    all_complete = main_integrity["complete"] and (
+        control_integrity is None or control_integrity["complete"]
+    )
+    integrity: dict[str, Any]
+    if control_integrity is None:
+        integrity = main_integrity
+    else:
+        integrity = {
+            "complete": all_complete,
+            "main": main_integrity,
+            "matched_control": control_integrity,
+        }
     payload = {
         "schema_version": 1,
         "run_name": config["run_name"],
@@ -395,6 +448,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS / "results.jsonl")
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_RESULTS)
+    parser.add_argument("--control-config", type=Path)
+    parser.add_argument("--control-results", type=Path)
     parser.add_argument("--allow-incomplete", action="store_true")
     return parser.parse_args()
 
@@ -406,6 +461,8 @@ def main() -> None:
         args.results,
         args.output_dir,
         require_complete=not args.allow_incomplete,
+        control_config_path=args.control_config,
+        control_results_path=args.control_results,
     )
     print(json.dumps(payload["integrity"], indent=2, sort_keys=True))
     for task, winner in payload["task_winners"].items():

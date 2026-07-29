@@ -26,6 +26,7 @@ MODELS = (
     "v2_freq_matryoshka",
     "v2_combined",
     "v2_global",
+    "v2_full_global",
 )
 MODEL_LABELS = {
     "txc_pre": "TXC-pre",
@@ -36,6 +37,7 @@ MODEL_LABELS = {
     "v2_freq_matryoshka": "Freq-Mat.",
     "v2_combined": "Combined",
     "v2_global": "Global top-k",
+    "v2_full_global": "Full-band control",
 }
 MODEL_COLORS = {
     "txc_pre": "#777777",
@@ -46,6 +48,7 @@ MODEL_COLORS = {
     "v2_freq_matryoshka": "#E69F00",
     "v2_combined": "#D55E00",
     "v2_global": "#CC79A7",
+    "v2_full_global": "#000000",
 }
 TASKS = ("frequency", "multilane", "phasepair", "permuted", "colored")
 TASK_LABELS = {
