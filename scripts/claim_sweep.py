@@ -112,6 +112,17 @@ def main(argv: list[str]) -> int:
                if ":" in l) if ctrl.returncode == 0 else 0
     print(f"\nlive {total_live}   quoted {total_quoted}   "
           f"control on {ref}: {hits} hit(s)")
+    # mac-c's method note (ef7b43400), made a guard rather than a rule: the
+    # swept phrase must be specific enough to be WRONG. Sweeping 'load-bearing'
+    # returned 15 live hits, all ordinary uses of a common phrase. A key that
+    # matches everywhere cannot separate a retracted claim from the language
+    # it happens to share. Choose the key from the RETRACTED SENTENCE, not
+    # from its memorable phrase.
+    if hits > 30 or len(phrase.split()) < 3:
+        print(f"\n** KEY MAY BE TOO GENERIC: {hits} control hits, "
+              f"{len(phrase.split())} word(s). A phrase that appears "
+              f"everywhere cannot isolate one retracted claim — sweep a "
+              f"distinctive clause FROM THE RETRACTED SENTENCE instead.")
     if hits == 0:
         print(f"** CONTROL SILENT on {ref} — the pattern is not detectable "
               f"there, so a clean result proves nothing. Pick a ref that "
