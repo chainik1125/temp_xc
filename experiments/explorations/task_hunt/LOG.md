@@ -40007,3 +40007,58 @@ defensible; the unlabelled state is not.
 the outcome matrix at §116-121 correctly breaks out both draws and both
 probes, and the cross-T restriction is stated. **The gap is one missing
 column header on the one table people will quote.**
+
+---
+
+## 2026-07-29 02:4x BST — mac-c: discharged the hub's two assigned sites in `FLOOR_AIM_CORRECTION.md` — my own line was HALF right, and the correction makes it STRONGER, not softer
+
+Hub `56837fd63` propagated the withdrawn criterion and **assigned me two
+sites rather than editing them** — `FLOOR_AIM_CORRECTION.md:42` and
+`:212`, on the grounds that it is *"their document, their analysis, and
+they are awake and hold the context."* Correct call: the nuance is mine
+to write. **Both amended in place, original text struck rather than
+deleted. $0.**
+
+**What my line got right:** *"hunting for per-token-silent tasks selects
+for the gain bar"* — true, and it is the instrument fact that still
+stands (the floor reads no tokens).
+
+**What it missed, and it is not a softening:** it says nothing about
+**which way** silence pushes once it gets to the gain bar. The amplifier
+test answers that — **it pushes the WRONG way.** `arm_excess` tracks
+`tok_excess` at Spearman **+1.000** / **+0.943**, so suppressing the
+per-token signal suppresses the windowed arm with it; the one genuinely
+silent face (`gap_last`, `tok_excess` −0.0018) returned `arm_excess`
+**+0.0125** against a +0.05 bar.
+
+**So the corrected statement is stronger than the original:** the search
+key is not merely *mis-aimed at a non-binding bar* — it **selects
+against the very thing the hunt is trying to find.** A correction that
+strengthens a claim still has to be written down; "half right" is not a
+reason to leave it.
+
+**Adopting the hub's scope boundary into both amendments, because I had
+not drawn it:** this governs **the hunt's screening rule**, and is
+**NOT** a test of the paper's ambience claim — one model, one layer,
+age-family faces, two corpora. **Flagged for Han, not concluded.** My
+result was easy to over-read as undermining the paper's central claim;
+it does not, and that limit now travels attached to the finding rather
+than living in a LOG entry.
+
+**Swept with a POSITIVE CONTROL, not a bare grep.** The control fires on
+the pre-fix `origin/arxiv` state (1 hit), proving the pattern would have
+been detected. Live remaining hits: **2, both legitimate** — the hub's
+LOG entry *quoting* my line inside their assignment, and my own text
+*inside* the strikethrough. Verified structurally rather than by eye:
+parsed all `~~…~~` spans and confirmed the retracted phrase sits inside
+span [1] (span [0] is §3's earlier retraction). **A grep that cannot
+distinguish a live assertion from a struck one is the check that reports
+success.**
+
+**`synthetic/STATUS.md:540` left alone, and I agree with the hub's
+reasoning** — *"frequency per-token-silent/TXC-pre-flat confirmed"* is a
+**description of a measured result on a different benchmark**, not a
+screening criterion. **Precision about where a correction does NOT apply
+is part of the correction.**
+
+_Recorded-by: claude-opus-5 (mac-c)_

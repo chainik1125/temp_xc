@@ -45,6 +45,32 @@ But `hunt-safety-gold-clew.md` § 2 states the situation plainly:
 Two of its three criteria (silence, trailing-functional-of-events) aim
 at gain. The floor is untouched by both, and the floor is what kills.
 
+> ### ⚑ AMENDED 02:4x — half-superseded BY MY OWN LATER MEASUREMENT
+>
+> The sentence above is **right that silence aims at the gain bar** and
+> **incomplete about what it does when it gets there.** The amplifier
+> test (`21217087e`, 12 faces × 2 corpora, one identical pipeline) adds
+> the direction:
+>
+> **Silence does not widen the gain — it aims at the gain bar and pushes
+> the WRONG WAY.** `arm_excess` tracks `tok_excess` at Spearman
+> **+1.000** (evalage) and **+0.943** (retryesc_gen), so suppressing the
+> per-token signal suppresses the windowed arm with it. The one face
+> that was genuinely per-token silent — `gap_last`, `tok_excess`
+> **−0.0018** — returned `arm_excess` **+0.0125**, a fifth of the bar.
+> **A per-token-silent face produced a silent window.**
+>
+> So the correct reading of § 2 is stronger than what I wrote: the
+> criterion is not merely *aimed at a non-binding bar*, it is
+> **actively counterproductive on the bar it aims at**. Our one KEEP
+> has the **strongest** `tok` of the three candidates and fails the
+> criterion outright.
+>
+> **Scope, adopting the hub's boundary (`7d8a8a18d`) because I had not
+> drawn it:** this governs **the hunt's screening rule**. It is **not**
+> a test of the paper's ambience claim — one model, one layer,
+> age-family faces, two corpora. Flagged for Han, not concluded.
+
 ## 3. The three failures have ONE mechanism, not three diagnoses
 
 `evalage`'s face is a balanced 3-class binning of **the age of the last
@@ -208,9 +234,20 @@ measured, and no verdict is claimed. **It is not a reasoned negative on
 the registry** — the registry answered well; § 6 is sourced from it.
 
 It is a **correction to the aiming criterion**, and it is worth posting
-before more sourcing because it invalidates the search key: hunting for
+before more sourcing because it invalidates the search key: ~~hunting for
 per-token-silent tasks selects for the gain bar, and the gain bar has not
-been the binding constraint since `retryesc_gen`.
+been the binding constraint since `retryesc_gen`.~~
+
+> **⚑ AMENDED 02:4x — superseded by my own later measurement, and the
+> replacement is a stronger statement, not a softer one.** Hunting for
+> per-token-silent tasks does aim at the gain bar — **and it pushes the
+> wrong way when it gets there.** `arm_excess` tracks `tok_excess`
+> (Spearman **+1.000** / **+0.943**, 12 faces × 2 corpora), so silence
+> suppresses the windowed arm along with the per-token probe; the one
+> genuinely silent face returned `arm_excess` **+0.0125** against a
+> +0.05 bar. **The search key is not merely mis-aimed — it selects
+> against the thing the hunt is trying to find.** See § 3's amendment.
+> Scope: the hunt's screening rule, **not** the paper's ambience claim.
 
 ## 9. ⚑⚑ CORRECTION TO § 8, 20 MINUTES LATER — the test I proposed is ARITHMETIC, and the "advantage" it would have shown is a TAUTOLOGY
 
