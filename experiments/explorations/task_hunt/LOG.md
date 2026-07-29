@@ -37451,3 +37451,69 @@ alive.**
 Cost: **$0, 0 pods.**
 
 _Recorded-by: claude-opus-5 (mac-c)_
+
+---
+
+## 2026-07-29 01:1x BST — mac-c: the hub's "sort by beyond-T mass" screen is FALSIFIED as stated (it saturates) — and the corrected quantity works, separates 5×, and is my own floor law
+
+Hub `41281e0eb` ratified my retraction and issued the constructive half:
+*"Sort candidates by beyond-T mass before generating anything… it is not
+tautological — it can come out either way."* **I built it, ran it with the
+falsifier stated first, and the falsifier fired.** $0, no model, no pods —
+`experiments/explorations/task_hunt/beyond_t_mass.py`, existing grids only.
+
+**`beyond_T = P(age > T)` HELD AT ONLY 2/5 T VALUES:**
+
+    T        4        8       16       32       64
+    evalage   1.0000  1.0000  0.9971  0.9821  0.9530
+    retryesc  1.0000  1.0000  1.0000  0.9515  0.7951
+
+**At T=4, 8, 16 it is 1.0000 for BOTH corpora** — events are far sparser
+than the window, so "mass beyond T" is everything, for everyone. **The
+criterion has no discriminating power exactly where the hunt operates**,
+and at T=16 it orders the two corpora *backwards*.
+
+**Diagnosis — I scored the wrong array, and the fix is in my own prior
+result.** `beyond_T` reads `event_first`, but the floor's *discriminating*
+feature is `dose_window_count(event_MASK, T)` — masked **turn** tokens of
+width `w`. The floor's power comes from **mask width**, which is exactly
+why `w` is lever 3.
+
+**The working quantity: `floor_reach = P(any masked token in the trailing
+T window)`** — which is precisely my corrected floor law from
+`d2320d274`. Validated against the two corpora's **observed**
+`floor_excess`:
+
+    corpus         T   floor_reach   observed floor_excess   ratio
+    evalage        4        0.0035                  0.0031    1.13
+    evalage       64        0.0541                  0.0572    0.95
+    retryesc_gen   4        0.0184                  0.0225    0.82
+    retryesc_gen  64        0.2431                  0.2748    0.88
+
+**Tracks the real floor within 0.82–1.13× and separates the corpora
+~5.3× at every T** (3 legs each, consistent to ±8%), where `beyond_T` was
+flat at 1.0000:
+
+    T          4       8      16      32      64
+    evalage   0.0034  0.0069  0.0138  0.0275  0.0532
+    retryesc  0.0183  0.0366  0.0732  0.1424  0.2409
+    ratio     5.31x   5.31x   5.31x   5.17x   4.53x
+
+**SCREEN RULE: MINIMISE `floor_reach`** — the fraction of positions whose
+label the floor can already resolve. That 5.3× is what lever 3 (w 25→13)
+buys, and it is the ordering the observed floors and the KEEP-shaped cells
+actually showed.
+
+**Both criteria are kept in the file.** The falsified one is not deleted —
+it is the record, and its saturation is the reason the corrected one is
+credible rather than fitted after the fact.
+
+**Still LOWER EDGE ONLY, and I will not overstate it:** `floor_reach`
+scores what the floor *can* resolve. It says nothing about whether
+activations still carry an event that old. **The band's upper edge remains
+unmeasured** and needs activations — that is the next $0 run on the cached
+`evalage` acts I already hold.
+
+Cost: **$0, 0 pods.**
+
+_Recorded-by: claude-opus-5 (mac-c)_
