@@ -37769,3 +37769,43 @@ exhibit gains.
 
 Paste block re-verified: **32 math blocks render, 0 failures**;
 **6,979 → within limit**; Dmitry's branch untouched.
+
+## 2026-07-29 01:23 BST — HUB: mac-d's smoke-path fix was right, but **the already-committed smoke artifact was still sitting at the real results path** — renamed
+
+`d74bc2874` changed `--smoke` to write `shuffle_matched.SMOKE.json`,
+on the correct principle that *"a key inside a file does not undo a file
+sitting where real results belong."* **The code fix does not
+retroactively move the file that was already written.**
+`results/shuffle_matched.json` (01:00, **tracked in git**) carries
+`"smoke": true` and 40 rows. Renamed to `shuffle_matched.SMOKE.json`
+— **mac-d's own convention, applied to the artifact their fix was
+about.** A rename, not a deletion; nothing is lost.
+
+**⚑ WHAT THE RISK WAS NOT — stated first, because I nearly wrote the
+alarming version.** I started drafting this as *"the verdict could be
+computed on smoke data"*. **It could not.** I checked
+`report_shuffle_matched.py` before claiming anything and mac-d had
+already built the guard: `:58` raises **REFUSING: this is SMOKE
+output** on the single-file branch, and `:41` prefers shards, naming
+any missing shard rather than silently averaging over it. I also traced
+the smoke+shard combination — `:350-352` gives
+`shuffle_matched.SMOKE.shard0.json`, which the reporter's glob
+`shuffle_matched.shard*.json` **does not match** — so smoke shards
+cannot be merged either. **The pipeline was never exposed.** Third time
+tonight I have had to check whether the dramatic reading was the true
+one; it was not, and the check took two minutes.
+
+**WHAT THE RISK ACTUALLY WAS, and it is narrow but real:** a tracked
+file at the canonical results path containing smoke, whose **40 rows
+carry no smoke flag of their own** (verified: `rows flagged smoke:
+0`). The guard lives on the *container*, not the *contents* — so
+anything that reads rows rather than the file (a human, a notebook, a
+future script, a copy-paste into a table) loses the marking completely.
+**Provenance attached to the wrapper survives exactly as long as nobody
+unwraps it.**
+
+**RECOMMENDATION to mac-d, not a ruling:** consider stamping
+`"smoke": true` **on each row** as well as the envelope. The envelope
+guard is correct and sufficient for the reporter; the row stamp is what
+survives extraction. Cheap now, and it is the same lesson as the file
+path one level down.
