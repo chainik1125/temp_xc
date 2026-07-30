@@ -1,0 +1,335 @@
+{
+  "aggregates": [
+    {
+      "family": "factorial_hmm",
+      "max": 0.811851630546981,
+      "mean": 0.811851630546981,
+      "mean_l0_per_window": 7.7060546875,
+      "mean_nmse": 0.48736074566841125,
+      "metric": "direct_latent_r2",
+      "min": 0.811851630546981,
+      "model": "txc",
+      "n": 1,
+      "seed_values": {
+        "2": 0.811851630546981
+      },
+      "std": 0.0,
+      "task": "hmm_slow_t8_routed_screen"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.7998964237719977,
+      "mean": 0.7998964237719977,
+      "mean_l0_per_window": 7.7392578125,
+      "mean_nmse": 0.45442020893096924,
+      "metric": "direct_latent_r2",
+      "min": 0.7998964237719977,
+      "model": "spectral_fourier_global",
+      "n": 1,
+      "seed_values": {
+        "2": 0.7998964237719977
+      },
+      "std": 0.0,
+      "task": "hmm_slow_t8_routed_screen"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.7997649767755244,
+      "mean": 0.7997649767755244,
+      "mean_l0_per_window": 7.7294921875,
+      "mean_nmse": 0.45467403531074524,
+      "metric": "direct_latent_r2",
+      "min": 0.7997649767755244,
+      "model": "spectral_fourier_adaptive",
+      "n": 1,
+      "seed_values": {
+        "2": 0.7997649767755244
+      },
+      "std": 0.0,
+      "task": "hmm_slow_t8_routed_screen"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.7999459346219914,
+      "mean": 0.7999459346219914,
+      "mean_l0_per_window": 7.7109375,
+      "mean_nmse": 0.45516473054885864,
+      "metric": "direct_latent_r2",
+      "min": 0.7999459346219914,
+      "model": "spectral_fourier_routed",
+      "n": 1,
+      "seed_values": {
+        "2": 0.7999459346219914
+      },
+      "std": 0.0,
+      "task": "hmm_slow_t8_routed_screen"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.8106687837288832,
+      "mean": 0.8106687837288832,
+      "mean_l0_per_window": 7.6494140625,
+      "mean_nmse": 0.48100346326828003,
+      "metric": "direct_latent_r2",
+      "min": 0.8106687837288832,
+      "model": "txc",
+      "n": 1,
+      "seed_values": {
+        "2": 0.8106687837288832
+      },
+      "std": 0.0,
+      "task": "hmm_alternating_t8_routed_screen"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.761148640505041,
+      "mean": 0.761148640505041,
+      "mean_l0_per_window": 7.87109375,
+      "mean_nmse": 0.4655230939388275,
+      "metric": "direct_latent_r2",
+      "min": 0.761148640505041,
+      "model": "spectral_fourier_global",
+      "n": 1,
+      "seed_values": {
+        "2": 0.761148640505041
+      },
+      "std": 0.0,
+      "task": "hmm_alternating_t8_routed_screen"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.7615587921838735,
+      "mean": 0.7615587921838735,
+      "mean_l0_per_window": 7.8642578125,
+      "mean_nmse": 0.4654841125011444,
+      "metric": "direct_latent_r2",
+      "min": 0.7615587921838735,
+      "model": "spectral_fourier_adaptive",
+      "n": 1,
+      "seed_values": {
+        "2": 0.7615587921838735
+      },
+      "std": 0.0,
+      "task": "hmm_alternating_t8_routed_screen"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.7610607944108898,
+      "mean": 0.7610607944108898,
+      "mean_l0_per_window": 7.8369140625,
+      "mean_nmse": 0.46639013290405273,
+      "metric": "direct_latent_r2",
+      "min": 0.7610607944108898,
+      "model": "spectral_fourier_routed",
+      "n": 1,
+      "seed_values": {
+        "2": 0.7610607944108898
+      },
+      "std": 0.0,
+      "task": "hmm_alternating_t8_routed_screen"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.7721449389470821,
+      "mean": 0.7721449389470821,
+      "mean_l0_per_window": 8.0859375,
+      "mean_nmse": 0.5116447806358337,
+      "metric": "direct_latent_r2",
+      "min": 0.7721449389470821,
+      "model": "txc",
+      "n": 1,
+      "seed_values": {
+        "2": 0.7721449389470821
+      },
+      "std": 0.0,
+      "task": "narrowband_sparse_balanced_t8"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.8340783533277474,
+      "mean": 0.8340783533277474,
+      "mean_l0_per_window": 8.115234375,
+      "mean_nmse": 0.4840489327907562,
+      "metric": "direct_latent_r2",
+      "min": 0.8340783533277474,
+      "model": "spectral_dct_global",
+      "n": 1,
+      "seed_values": {
+        "2": 0.8340783533277474
+      },
+      "std": 0.0,
+      "task": "narrowband_sparse_balanced_t8"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.9625303428845089,
+      "mean": 0.9625303428845089,
+      "mean_l0_per_window": 7.892578125,
+      "mean_nmse": 0.40959781408309937,
+      "metric": "direct_latent_r2",
+      "min": 0.9625303428845089,
+      "model": "spectral_fourier_global",
+      "n": 1,
+      "seed_values": {
+        "2": 0.9625303428845089
+      },
+      "std": 0.0,
+      "task": "narrowband_sparse_balanced_t8"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.9623247470539065,
+      "mean": 0.9623247470539065,
+      "mean_l0_per_window": 7.9052734375,
+      "mean_nmse": 0.41002777218818665,
+      "metric": "direct_latent_r2",
+      "min": 0.9623247470539065,
+      "model": "spectral_fourier_adaptive",
+      "n": 1,
+      "seed_values": {
+        "2": 0.9623247470539065
+      },
+      "std": 0.0,
+      "task": "narrowband_sparse_balanced_t8"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.962281148437086,
+      "mean": 0.962281148437086,
+      "mean_l0_per_window": 7.896484375,
+      "mean_nmse": 0.4101203978061676,
+      "metric": "direct_latent_r2",
+      "min": 0.962281148437086,
+      "model": "spectral_fourier_routed",
+      "n": 1,
+      "seed_values": {
+        "2": 0.962281148437086
+      },
+      "std": 0.0,
+      "task": "narrowband_sparse_balanced_t8"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.7595722943983864,
+      "mean": 0.7595722943983864,
+      "mean_l0_per_window": 8.16796875,
+      "mean_nmse": 0.5183407664299011,
+      "metric": "direct_latent_r2",
+      "min": 0.7595722943983864,
+      "model": "txc",
+      "n": 1,
+      "seed_values": {
+        "2": 0.7595722943983864
+      },
+      "std": 0.0,
+      "task": "narrowband_sparse_high_crowded_t8"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.8399863337567061,
+      "mean": 0.8399863337567061,
+      "mean_l0_per_window": 7.9375,
+      "mean_nmse": 0.481609582901001,
+      "metric": "direct_latent_r2",
+      "min": 0.8399863337567061,
+      "model": "spectral_dct_global",
+      "n": 1,
+      "seed_values": {
+        "2": 0.8399863337567061
+      },
+      "std": 0.0,
+      "task": "narrowband_sparse_high_crowded_t8"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.95374018625449,
+      "mean": 0.95374018625449,
+      "mean_l0_per_window": 7.7861328125,
+      "mean_nmse": 0.419016033411026,
+      "metric": "direct_latent_r2",
+      "min": 0.95374018625449,
+      "model": "spectral_fourier_global",
+      "n": 1,
+      "seed_values": {
+        "2": 0.95374018625449
+      },
+      "std": 0.0,
+      "task": "narrowband_sparse_high_crowded_t8"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.9526737048552798,
+      "mean": 0.9526737048552798,
+      "mean_l0_per_window": 7.8232421875,
+      "mean_nmse": 0.41891852021217346,
+      "metric": "direct_latent_r2",
+      "min": 0.9526737048552798,
+      "model": "spectral_fourier_adaptive",
+      "n": 1,
+      "seed_values": {
+        "2": 0.9526737048552798
+      },
+      "std": 0.0,
+      "task": "narrowband_sparse_high_crowded_t8"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.9544173201049851,
+      "mean": 0.9544173201049851,
+      "mean_l0_per_window": 7.7333984375,
+      "mean_nmse": 0.41851797699928284,
+      "metric": "direct_latent_r2",
+      "min": 0.9544173201049851,
+      "model": "spectral_fourier_routed",
+      "n": 1,
+      "seed_values": {
+        "2": 0.9544173201049851
+      },
+      "std": 0.0,
+      "task": "narrowband_sparse_high_crowded_t8"
+    }
+  ],
+  "complete": true,
+  "expected_cells": 18,
+  "failed": [],
+  "fairness": {
+    "attribution": "DCT versus Fourier tests phase/translation compatibility; Fourier global versus adaptive isolates learned loss weights; adaptive versus routed isolates using those detached weights in support competition. No low-to-high ordering is imposed.",
+    "capacity_regime": "The sparse narrowband tasks contain 24 ground-truth causes but only four are active per episode. TXC has 64 unconstrained atoms; parameter-matched spectral arms have 255 band-limited atoms. The balanced versus high-crowded tasks test whether learned routing follows frequency-specific dictionary demand.",
+    "data": "All models receive identical seeded training episodes and episode-disjoint probe/eval episodes with one shared orthonormal observation dictionary.",
+    "noise": "The adaptive arms apply a synthetic-task noise-floor heuristic: the expected white-noise contribution sigma^2/T is subtracted and clamped from per-band power and residual estimates. Because reconstruction depends on the noisy input, this is not an unbiased residual correction. Main reconstruction loss still uses the original noisy observations.",
+    "parameters": "TXC uses 64 atoms and every spectral arm uses the same 255-atom dictionary. Total trainable parameters match to within 0.6% at d=16 and 0.2% at d=48; exact counts are recorded.",
+    "primary_metric": "Direct latent reconstruction R2 projects reconstructed observations onto known orthonormal emission directions, avoiding a wider-dictionary probe advantage.",
+    "support": "Every window model has nominal L0=W: TXC-post uses k_pos=W; spectral models use k_pos=1 and k_win=W with global BatchTopK."
+  },
+  "generated_at": "2026-07-30T05:53:42Z",
+  "missing_cell_ids": [],
+  "observed_cells": 18,
+  "ok_cells": 18,
+  "plan": {
+    "effective_assumed_usd_per_hour": 5.0,
+    "estimated_cost_usd": 2.35,
+    "estimated_gpu_hours": 0.469,
+    "estimated_prior_usd": 45.852423,
+    "evaluation_cells": 18,
+    "max_session_hours": 0.75,
+    "overall_cap_usd": 50.0,
+    "run_name": "spectral-matryoshka-routed-confirm-seed2-20260730",
+    "smoke": false,
+    "task_cell_counts": {
+      "hmm_alternating_t8_routed_screen": 4,
+      "hmm_slow_t8_routed_screen": 4,
+      "narrowband_sparse_balanced_t8": 5,
+      "narrowband_sparse_high_crowded_t8": 5
+    },
+    "total_optimizer_steps": 78000,
+    "unique_training_runs": 18,
+    "usable_budget_usd": 3.2,
+    "within_cost_plan": true,
+    "within_time_plan": true,
+    "worst_case_overall_usd": 49.352423
+  },
+  "run_name": "spectral-matryoshka-routed-confirm-seed2-20260730",
+  "schema_version": 1,
+  "smoke": false,
+  "unexpected_cell_ids": []
+}

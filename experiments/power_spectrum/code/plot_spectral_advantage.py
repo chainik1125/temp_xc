@@ -41,6 +41,7 @@ DEFAULT_FIGURES_DIR = POWER_ROOT / "figures"
 
 MODEL_ORDER = (
     "txc",
+    "sae",
     "spectral_global",
     "spectral_adaptive",
     "spectral_dct_global",
@@ -50,6 +51,7 @@ MODEL_ORDER = (
 )
 MODEL_LABELS = {
     "txc": "TXC-post",
+    "sae": "BatchTopK SAE",
     "spectral_global": "Spectral global",
     "spectral_adaptive": "Spectral adaptive weights",
     "spectral_dct_global": "Spectral DCT global",
@@ -59,6 +61,7 @@ MODEL_LABELS = {
 }
 MODEL_COLORS = {
     "txc": "#8C6D31",
+    "sae": "#D55E00",
     "spectral_global": "#0072B2",
     "spectral_adaptive": "#009E73",
     "spectral_dct_global": "#0072B2",
@@ -68,6 +71,7 @@ MODEL_COLORS = {
 }
 MODEL_MARKERS = {
     "txc": "s",
+    "sae": "v",
     "spectral_global": "^",
     "spectral_adaptive": "D",
     "spectral_dct_global": "^",
@@ -118,6 +122,7 @@ LEARNED_DIFFICULTY_MODELS = {
     "spectral_fourier_routed",
 }
 ROUTED_MODELS = {"spectral_fourier_routed"}
+OPTIONAL_BASELINES = {"sae"}
 
 EXPECTED_POWER_SEMANTICS = (
     "Expected latent DCT-band power: a data property, not a learned model weight."
@@ -280,12 +285,13 @@ def _validate_panel(
         if unknown:
             raise ValueError(f"{task}: unknown models {sorted(unknown)}")
         expected = set(EXPECTED_MODELS_BY_TASK.get(task, present))
-        unexpected = present - expected
+        unexpected = present - expected - OPTIONAL_BASELINES
         if unexpected:
             raise RuntimeError(f"{task}: models {sorted(unexpected)} are outside its task panel")
-        if not allow_incomplete and present != expected:
+        if not allow_incomplete:
             missing = expected - present
-            raise RuntimeError(f"{task}: missing models {sorted(missing)}")
+            if missing:
+                raise RuntimeError(f"{task}: missing models {sorted(missing)}")
         seed_sets = {
             model: {int(row["seed"]) for row in grouped[(task, model)]} for model in present
         }
@@ -357,6 +363,21 @@ def _performance_records(
                 ),
                 "parameter_count": int(_constant(counts, name=f"{task}/{model} parameter count")),
                 "direct_latent_r2": _metric_stats(selected, "direct_latent_r2"),
+                "direct_latent_r2_active": _metric_stats(
+                    selected,
+                    "direct_latent_r2_active",
+                    required=False,
+                ),
+                "inactive_to_active_energy_ratio": _metric_stats(
+                    selected,
+                    "inactive_to_active_energy_ratio",
+                    required=False,
+                ),
+                "band_localization_accuracy": _metric_stats(
+                    selected,
+                    "band_localization_accuracy",
+                    required=False,
+                ),
                 "latent_r2": _metric_stats(selected, "latent_r2", required=False),
                 "raw_projection_r2": _metric_stats(selected, "raw_projection_r2"),
                 "nmse": _metric_stats(selected, "nmse"),
@@ -442,7 +463,11 @@ def _frequency_diagnostics(
 ) -> list[dict[str, Any]]:
     records: list[dict[str, Any]] = []
     for task in tasks:
-        spectral_rows = {model: grouped.get((task, model), []) for model in MODEL_ORDER[1:]}
+        spectral_rows = {
+            model: grouped.get((task, model), [])
+            for model in MODEL_ORDER
+            if model not in {"txc", *OPTIONAL_BASELINES}
+        }
         present = {model: rows for model, rows in spectral_rows.items() if rows}
         if not present:
             continue
@@ -618,6 +643,91 @@ def _frequency_diagnostics(
     return records
 
 
+def _routing_trajectories(
+    grouped: dict[tuple[str, str], list[dict[str, Any]]],
+    tasks: Sequence[str],
+) -> list[dict[str, Any]]:
+    """Aggregate learned routed-score multipliers over training."""
+
+    records: list[dict[str, Any]] = []
+    for task in tasks:
+        for model in sorted(ROUTED_MODELS):
+            selected = grouped.get((task, model), [])
+            if not selected:
+                continue
+            histories = [
+                row.get("training", {}).get("metric_history", []) for row in selected
+            ]
+            has_routing = [
+                bool(history)
+                and any(
+                    key.startswith("frequency_routing_scale_")
+                    for key in history[0]
+                )
+                for history in histories
+            ]
+            if not any(has_routing):
+                continue
+            if not all(has_routing):
+                raise RuntimeError(f"{task}/{model}: routing history is missing for some seeds")
+
+            usage = selected[0]["metrics"]["spectral_usage"]
+            physical_bands = usage.get("frequency_bin_bands", usage["bands"])
+            band_labels = [
+                _band_label(band, basis=_temporal_basis(selected[0]))
+                for band in physical_bands
+            ]
+            band_count = len(band_labels)
+            steps_by_seed = [
+                {
+                    int(item["step"]): [
+                        float(item[f"frequency_routing_scale_{band}"])
+                        for band in range(band_count)
+                    ]
+                    for item in history
+                    if all(
+                        f"frequency_routing_scale_{band}" in item
+                        for band in range(band_count)
+                    )
+                }
+                for history in histories
+            ]
+            common_steps = sorted(
+                set.intersection(*(set(values) for values in steps_by_seed))
+            )
+            if not common_steps:
+                raise RuntimeError(f"{task}/{model}: no common routing-history steps")
+            values = np.asarray(
+                [
+                    [step_values[step] for step in common_steps]
+                    for step_values in steps_by_seed
+                ],
+                dtype=np.float64,
+            )
+            records.append(
+                {
+                    "task": task,
+                    "task_label": _task_label(task),
+                    "model": model,
+                    "model_label": MODEL_LABELS[model],
+                    "seeds": [int(row["seed"]) for row in selected],
+                    "steps": common_steps,
+                    "band_labels": band_labels,
+                    "routing_scale": {
+                        "semantics": ROUTING_SCALE_SEMANTICS,
+                        "mean": values.mean(axis=0).tolist(),
+                        "std": (
+                            values.std(axis=0, ddof=1)
+                            if values.shape[0] > 1
+                            else np.zeros_like(values[0])
+                        ).tolist(),
+                        "values": values.tolist(),
+                    },
+                }
+            )
+    return records
+
+
 def build_analysis(
     rows: Sequence[dict[str, Any]],
     *,
@@ -631,6 +741,7 @@ def build_analysis(
     performance = _performance_records(grouped, tasks)
     paired = _paired_delta_records(grouped, tasks)
     diagnostics = _frequency_diagnostics(grouped, tasks)
+    routing_trajectories = _routing_trajectories(grouped, tasks)
     present_models = {str(record["model"]) for record in performance}
     return {
         "schema_version": 1,
@@ -645,6 +756,7 @@ def build_analysis(
         "performance": performance,
         "paired_deltas_vs_txc": paired,
         "frequency_diagnostics": diagnostics,
+        "routing_trajectories": routing_trajectories,
         "semantic_guardrail": {
             "expected_power": EXPECTED_POWER_SEMANTICS,
             "selection": SELECTION_SEMANTICS,
@@ -691,6 +803,12 @@ def write_aggregate_csv(analysis: dict[str, Any], path: Path) -> Path:
         "parameter_count",
         "direct_latent_r2_mean",
         "direct_latent_r2_std",
+        "direct_latent_r2_active_mean",
+        "direct_latent_r2_active_std",
+        "inactive_to_active_energy_ratio_mean",
+        "inactive_to_active_energy_ratio_std",
+        "band_localization_accuracy_mean",
+        "band_localization_accuracy_std",
         "paired_delta_vs_txc_mean",
         "paired_delta_vs_txc_std",
         "raw_projection_r2_mean",
@@ -741,6 +859,36 @@ def write_aggregate_csv(analysis: dict[str, Any], path: Path) -> Path:
                 "parameter_count": record["parameter_count"],
                 "direct_latent_r2_mean": record["direct_latent_r2"]["mean"],
                 "direct_latent_r2_std": record["direct_latent_r2"]["std"],
+                "direct_latent_r2_active_mean": (
+                    record["direct_latent_r2_active"]["mean"]
+                    if record["direct_latent_r2_active"]
+                    else ""
+                ),
+                "direct_latent_r2_active_std": (
+                    record["direct_latent_r2_active"]["std"]
+                    if record["direct_latent_r2_active"]
+                    else ""
+                ),
+                "inactive_to_active_energy_ratio_mean": (
+                    record["inactive_to_active_energy_ratio"]["mean"]
+                    if record["inactive_to_active_energy_ratio"]
+                    else ""
+                ),
+                "inactive_to_active_energy_ratio_std": (
+                    record["inactive_to_active_energy_ratio"]["std"]
+                    if record["inactive_to_active_energy_ratio"]
+                    else ""
+                ),
+                "band_localization_accuracy_mean": (
+                    record["band_localization_accuracy"]["mean"]
+                    if record["band_localization_accuracy"]
+                    else ""
+                ),
+                "band_localization_accuracy_std": (
+                    record["band_localization_accuracy"]["std"]
+                    if record["band_localization_accuracy"]
+                    else ""
+                ),
                 "paired_delta_vs_txc_mean": (
                     0.0
                     if model == "txc"
@@ -800,7 +948,7 @@ def write_aggregate_csv(analysis: dict[str, Any], path: Path) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = path.with_name(f".{path.name}.tmp")
     with temporary.open("w", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         writer.writerows(flattened)
     os.replace(temporary, path)
@@ -1082,42 +1230,122 @@ def plot_frequency_diagnostics(
     )
 
 
+def plot_routing_trajectories(
+    analysis: dict[str, Any],
+    figures_dir: Path,
+) -> tuple[Path, Path] | None:
+    """Plot the transient learned score multipliers used by routed BatchTopK."""
+
+    records = analysis.get("routing_trajectories", [])
+    if not records:
+        return None
+    _configure_style()
+    columns = min(2, len(records))
+    rows = (len(records) + columns - 1) // columns
+    figure, axes = plt.subplots(
+        rows,
+        columns,
+        figsize=(5.6 * columns, 3.05 * rows),
+        squeeze=False,
+        sharey=True,
+    )
+    colors = ("#4C78A8", "#F58518", "#54A24B", "#E45756", "#B279A2")
+    for axis, record in zip(axes.flat, records, strict=False):
+        steps = np.asarray(record["steps"], dtype=np.float64)
+        mean = np.asarray(record["routing_scale"]["mean"], dtype=np.float64)
+        std = np.asarray(record["routing_scale"]["std"], dtype=np.float64)
+        for band, label in enumerate(record["band_labels"]):
+            color = colors[band % len(colors)]
+            axis.plot(
+                steps,
+                mean[:, band],
+                color=color,
+                linewidth=1.7,
+                label=label,
+            )
+            axis.fill_between(
+                steps,
+                mean[:, band] - std[:, band],
+                mean[:, band] + std[:, band],
+                color=color,
+                alpha=0.14,
+                linewidth=0,
+            )
+        axis.axhline(1.0, color="#606060", linewidth=0.8, linestyle="--")
+        axis.set_title(str(record["task_label"]).replace("\n", " "))
+        axis.set_xlabel("Optimizer step")
+        axis.grid(axis="y", color="#E2E2E2", linewidth=0.6)
+        axis.legend(frameon=False, ncol=2, fontsize=7)
+    for axis in axes.flat[len(records) :]:
+        axis.set_visible(False)
+    for row_axes in axes:
+        row_axes[0].set_ylabel("Learned routing score multiplier")
+    figure.suptitle(
+        "Spectral Matryoshka routing dynamics (1 = bandwidth prior)",
+        y=1.01,
+        fontsize=11,
+    )
+    figure.tight_layout()
+    return _save_figure(
+        figure,
+        figures_dir,
+        "spectral_matryoshka_routing_trajectories",
+    )
+
+
 def analyze(
-    results_path: Path,
+    results_path: Path | Sequence[Path],
     *,
     output_json: Path,
     output_csv: Path,
     figures_dir: Path,
     allow_incomplete: bool = False,
 ) -> dict[str, Any]:
-    rows = load_latest_ok_rows(results_path)
+    paths = [results_path] if isinstance(results_path, Path) else list(results_path)
+    if not paths:
+        raise ValueError("at least one results JSONL path is required")
+    rows = [row for path in paths for row in load_latest_ok_rows(path)]
     analysis = build_analysis(
         rows,
-        source=str(results_path),
+        source=";".join(str(path) for path in paths),
         allow_incomplete=allow_incomplete,
     )
     write_aggregate_json(analysis, output_json)
     write_aggregate_csv(analysis, output_csv)
     performance_paths = plot_performance(analysis, figures_dir)
     frequency_paths = plot_frequency_diagnostics(analysis, figures_dir)
-    return {
-        "analysis": analysis,
-        "outputs": {
-            "json": str(output_json),
-            "csv": str(output_csv),
-            "performance_png": str(performance_paths[0]),
-            "performance_pdf": str(performance_paths[1]),
-            "frequency_png": str(frequency_paths[0]),
-            "frequency_pdf": str(frequency_paths[1]),
-        },
+    routing_paths = plot_routing_trajectories(analysis, figures_dir)
+    outputs = {
+        "json": str(output_json),
+        "csv": str(output_csv),
+        "performance_png": str(performance_paths[0]),
+        "performance_pdf": str(performance_paths[1]),
+        "frequency_png": str(frequency_paths[0]),
+        "frequency_pdf": str(frequency_paths[1]),
     }
+    if routing_paths is not None:
+        outputs.update(
+            {
+                "routing_png": str(routing_paths[0]),
+                "routing_pdf": str(routing_paths[1]),
+            }
+        )
+    return {"analysis": analysis, "outputs": outputs}
 
 
 def main(argv: Iterable[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         description="Aggregate and plot the matched-parameter spectral-advantage run."
     )
-    parser.add_argument("--results", type=Path, default=DEFAULT_RESULTS)
+    parser.add_argument(
+        "--results",
+        type=Path,
+        action="append",
+        help=(
+            "Results JSONL to aggregate. Repeat for independent run directories; "
+            f"default: {DEFAULT_RESULTS}"
+        ),
+    )
     parser.add_argument("--output-json", type=Path, default=DEFAULT_JSON)
     parser.add_argument("--output-csv", type=Path, default=DEFAULT_CSV)
     parser.add_argument("--figures-dir", type=Path, default=DEFAULT_FIGURES_DIR)
@@ -1128,7 +1356,7 @@ def main(argv: Iterable[str] | None = None) -> int:
     )
     args = parser.parse_args(list(argv) if argv is not None else None)
     result = analyze(
-        args.results,
+        args.results or [DEFAULT_RESULTS],
         output_json=args.output_json,
         output_csv=args.output_csv,
         figures_dir=args.figures_dir,

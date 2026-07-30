@@ -374,3 +374,49 @@ def test_routed_rows_write_dynamic_figures_and_model_specific_csv(
         "frequency_pdf",
     ):
         assert Path(result["outputs"][key]).stat().st_size > 0
+
+
+def test_analyze_combines_independent_seed_jsonl_files(tmp_path) -> None:
+    rows = _routed_synthetic_rows()
+    results = []
+    for seed in (1, 2):
+        path = tmp_path / f"seed-{seed}.jsonl"
+        path.write_text(
+            "\n".join(json.dumps(row) for row in rows if row["seed"] == seed) + "\n"
+        )
+        results.append(path)
+    sae_rows = []
+    for row in rows:
+        if row["model"] != "txc" or not row["task"].startswith("narrowband_sparse"):
+            continue
+        sae = json.loads(json.dumps(row))
+        sae["cell_id"] = f"{row['cell_id']}-sae"
+        sae["model"] = "sae"
+        sae["d_sae"] = 512
+        sae["training"]["parameter_count"] = 49712
+        sae_rows.append(sae)
+    sae_path = tmp_path / "sae.jsonl"
+    sae_path.write_text("\n".join(json.dumps(row) for row in sae_rows) + "\n")
+    results.append(sae_path)
+
+    result = plot_spectral_advantage.analyze(
+        results,
+        output_json=tmp_path / "analysis.json",
+        output_csv=tmp_path / "analysis.csv",
+        figures_dir=tmp_path / "figures",
+    )
+
+    record = next(
+        record
+        for record in result["analysis"]["performance"]
+        if record["task"] == "narrowband_sparse_high_crowded_t8"
+        and record["model"] == "spectral_fourier_routed"
+    )
+    assert record["seeds"] == [1, 2]
+    sae_record = next(
+        record
+        for record in result["analysis"]["performance"]
+        if record["task"] == "narrowband_sparse_high_crowded_t8"
+        and record["model"] == "sae"
+    )
+    assert sae_record["parameter_count"] == 49712
