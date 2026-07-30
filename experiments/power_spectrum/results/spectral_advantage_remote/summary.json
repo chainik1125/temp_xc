@@ -1,0 +1,197 @@
+{
+  "aggregates": [
+    {
+      "family": "factorial_hmm",
+      "max": 0.7251836261009502,
+      "mean": 0.7191414084451867,
+      "mean_l0_per_window": 8.01904296875,
+      "mean_nmse": 0.4996349811553955,
+      "metric": "direct_latent_r2",
+      "min": 0.7130991907894232,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.7130991907894232,
+        "2": 0.7251836261009502
+      },
+      "std": 0.008544986155590932,
+      "task": "hmm_mixed_t8_matched_params"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.7003887746995988,
+      "mean": 0.7003139034498165,
+      "mean_l0_per_window": 8.0126953125,
+      "mean_nmse": 0.48635950684547424,
+      "metric": "direct_latent_r2",
+      "min": 0.7002390322000341,
+      "model": "spectral_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.7003887746995988,
+        "2": 0.7002390322000341
+      },
+      "std": 0.0001058839368740058,
+      "task": "hmm_mixed_t8_matched_params"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.6939006615307768,
+      "mean": 0.6937946989237183,
+      "mean_l0_per_window": 8.044921875,
+      "mean_nmse": 0.48890604078769684,
+      "metric": "direct_latent_r2",
+      "min": 0.6936887363166598,
+      "model": "spectral_adaptive",
+      "n": 2,
+      "seed_values": {
+        "1": 0.6939006615307768,
+        "2": 0.6936887363166598
+      },
+      "std": 0.00014985375600650504,
+      "task": "hmm_mixed_t8_matched_params"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.7160700604907566,
+      "mean": 0.7147859408798922,
+      "mean_l0_per_window": 8.04052734375,
+      "mean_nmse": 0.5887964963912964,
+      "metric": "direct_latent_r2",
+      "min": 0.7135018212690277,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.7135018212690277,
+        "2": 0.7160700604907566
+      },
+      "std": 0.001816019369393756,
+      "task": "narrowband_offgrid_t8_matched_params"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.3894287004049058,
+      "mean": 0.3846852229974079,
+      "mean_l0_per_window": 8.18359375,
+      "mean_nmse": 0.594885915517807,
+      "metric": "direct_latent_r2",
+      "min": 0.3799417455899101,
+      "model": "spectral_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.3799417455899101,
+        "2": 0.3894287004049058
+      },
+      "std": 0.006708290082493809,
+      "task": "narrowband_offgrid_t8_matched_params"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.3833470313312561,
+      "mean": 0.38280664748735804,
+      "mean_l0_per_window": 8.197265625,
+      "mean_nmse": 0.5942399501800537,
+      "metric": "direct_latent_r2",
+      "min": 0.38226626364346,
+      "model": "spectral_adaptive",
+      "n": 2,
+      "seed_values": {
+        "1": 0.3833470313312561,
+        "2": 0.38226626364346
+      },
+      "std": 0.0007642181609279139,
+      "task": "narrowband_offgrid_t8_matched_params"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.8164139776705294,
+      "mean": 0.8163505104118984,
+      "mean_l0_per_window": 15.8916015625,
+      "mean_nmse": 0.6082614064216614,
+      "metric": "direct_latent_r2",
+      "min": 0.8162870431532674,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.8164139776705294,
+        "2": 0.8162870431532674
+      },
+      "std": 8.975625792258585e-05,
+      "task": "narrowband_offgrid_t16_matched_params"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.6570041785333374,
+      "mean": 0.6549079363464951,
+      "mean_l0_per_window": 16.0732421875,
+      "mean_nmse": 0.5680122971534729,
+      "metric": "direct_latent_r2",
+      "min": 0.6528116941596528,
+      "model": "spectral_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.6570041785333374,
+        "2": 0.6528116941596528
+      },
+      "std": 0.0029645341306510017,
+      "task": "narrowband_offgrid_t16_matched_params"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.6574190108512195,
+      "mean": 0.6548780276803774,
+      "mean_l0_per_window": 16.06640625,
+      "mean_nmse": 0.5680956542491913,
+      "metric": "direct_latent_r2",
+      "min": 0.6523370445095353,
+      "model": "spectral_adaptive",
+      "n": 2,
+      "seed_values": {
+        "1": 0.6574190108512195,
+        "2": 0.6523370445095353
+      },
+      "std": 0.0035934928619666315,
+      "task": "narrowband_offgrid_t16_matched_params"
+    }
+  ],
+  "complete": true,
+  "expected_cells": 18,
+  "failed": [],
+  "fairness": {
+    "attribution": "Spectral global and learned-frequency differ only by the adaptive order-free band objective and four learned band logits; the historical fixed low-prefix Matryoshka loss is disabled.",
+    "data": "All models receive identical seeded representation-training episodes and episode-disjoint probe/eval episodes with one shared observation dictionary.",
+    "parameters": "Task-specific dictionary widths match total trainable parameters between TXC and both spectral arms to within 0.2%; exact counts are recorded per cell.",
+    "primary_metric": "Direct latent reconstruction R2 projects reconstructed observations onto the known emission directions, avoiding a wider-dictionary probe advantage.",
+    "support": "Every window model has nominal L0=W: TXC-post uses k_pos=W; spectral models use k_pos=1 and k_win=W with global BatchTopK."
+  },
+  "generated_at": "2026-07-30T05:01:47Z",
+  "missing_cell_ids": [],
+  "observed_cells": 18,
+  "ok_cells": 18,
+  "plan": {
+    "effective_assumed_usd_per_hour": 5.0,
+    "estimated_cost_usd": 4.35,
+    "estimated_gpu_hours": 0.87,
+    "estimated_prior_usd": 43.229452,
+    "evaluation_cells": 18,
+    "max_session_hours": 1.2,
+    "overall_cap_usd": 50.0,
+    "run_name": "spectral-advantage-learned-frequency-20260730",
+    "smoke": false,
+    "task_cell_counts": {
+      "hmm_mixed_t8_matched_params": 6,
+      "narrowband_offgrid_t16_matched_params": 6,
+      "narrowband_offgrid_t8_matched_params": 6
+    },
+    "total_optimizer_steps": 96000,
+    "unique_training_runs": 18,
+    "usable_budget_usd": 6.0,
+    "within_cost_plan": true,
+    "within_time_plan": true,
+    "worst_case_overall_usd": 49.729452
+  },
+  "run_name": "spectral-advantage-learned-frequency-20260730",
+  "schema_version": 1,
+  "smoke": false,
+  "unexpected_cell_ids": []
+}

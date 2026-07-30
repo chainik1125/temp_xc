@@ -289,6 +289,8 @@ def test_narrowband_sources_are_deterministic_simultaneous_and_recoverable() -> 
     assert torch.equal(first.states, second.states)
     assert torch.equal(first.phases, second.phases)
     assert torch.equal(first.amplitudes, second.amplitudes)
+    assert torch.equal(first.activity, second.activity)
+    assert first.activity.all()
     assert first.states.shape == (24, 32, 4, 2)
     assert first.emissions.shape == (4, 2, 12)
 
@@ -307,6 +309,57 @@ def test_narrowband_sources_are_deterministic_simultaneous_and_recoverable() -> 
         first.amplitudes[:, None, :].expand(-1, 32, -1),
         atol=1e-10,
     )
+
+
+def test_sparse_repeated_frequency_dictionary_has_exact_episode_support() -> None:
+    frequencies = (1.0 / 8,) * 4 + (2.0 / 8,) * 4 + (3.0 / 8,) * 4
+    batch = generate_narrowband_sources(
+        frequencies=frequencies,
+        d=24,
+        sigma=0.0,
+        n_seq=48,
+        seq_len=16,
+        seed=23,
+        active_sources_per_episode=3,
+        allow_repeated_frequencies=True,
+    )
+    assert batch.activity.shape == (48, 12)
+    assert torch.equal(
+        batch.activity.sum(dim=1),
+        torch.full((48,), 3),
+    )
+    assert torch.equal(
+        batch.states.norm(dim=-1) > 0,
+        batch.activity[:, None, :].expand(-1, 16, -1),
+    )
+    projected = torch.einsum("ntd,jcd->ntjc", batch.x, batch.emissions)
+    assert torch.allclose(projected, batch.states, atol=1e-10)
+
+
+def test_sparse_narrowband_dictionary_rejects_invalid_support() -> None:
+    with pytest.raises(ValueError, match="active_sources_per_episode"):
+        generate_narrowband_sources(
+            frequencies=(1.0 / 8, 1.0 / 8),
+            d=4,
+            sigma=0.0,
+            n_seq=2,
+            seq_len=8,
+            seed=0,
+            active_sources_per_episode=3,
+            allow_repeated_frequencies=True,
+        )
+    with pytest.raises(ValueError, match="sufficiently separated"):
+        generate_narrowband_sources(
+            frequencies=(0.125, 0.125, 0.15),
+            d=6,
+            sigma=0.0,
+            n_seq=2,
+            seq_len=8,
+            seed=0,
+            active_sources_per_episode=2,
+            allow_repeated_frequencies=True,
+            min_frequency_separation=0.05,
+        )
 
 
 def test_each_narrowband_cause_has_one_distinct_fourier_peak() -> None:

@@ -40,7 +40,6 @@ from experiments.power_spectrum.code.controlled_tasks import (
     NarrowbandSourceBatch,
     ShamirClockBatch,
     dct_basis,
-    expected_dct_energy,
     generate_factorial_hmm_splits,
     generate_narrowband_source_splits,
     generate_shamir_splits,
@@ -106,6 +105,11 @@ def _model_d_sae(task: dict[str, Any], model: dict[str, Any]) -> int:
     return int(overrides.get(model["name"], task["d_sae"]))
 
 
+def _model_hparams(task: dict[str, Any], model: dict[str, Any]) -> dict[str, Any]:
+    overrides = task.get("hparams_by_model", {}).get(model["name"], {})
+    return {**model.get("hparams", {}), **overrides}
+
+
 def _training_identity(
     config: dict[str, Any],
     task: dict[str, Any],
@@ -126,7 +130,7 @@ def _training_identity(
         "model": model["name"],
         "class_path": model["class_path"],
         "implementation_version": model["implementation_version"],
-        "hparams": model.get("hparams", {}),
+        "hparams": _model_hparams(task, model),
         "seed": int(seed),
         "d_in": int(task["d_in"]),
         "d_sae": _model_d_sae(task, model),
@@ -259,7 +263,7 @@ def _import_model(spec: dict[str, Any]):
 def _model_kwargs(cell: dict[str, Any]) -> dict[str, Any]:
     spec = cell["model_spec"]
     return {
-        **spec.get("hparams", {}),
+        **_model_hparams(cell["task_spec"], spec),
         "d_in": int(cell["d_in"]),
         "d_sae": int(cell["d_sae"]),
         "T": 1 if spec["consumes"] == "token" else int(cell["window"]),
@@ -315,6 +319,8 @@ def _materialize_group(
         emission_seed=0,
         amplitude_range=tuple(task.get("amplitude_range", (0.75, 1.25))),
         min_frequency_separation=float(task.get("min_frequency_separation", 1.0 / 16)),
+        active_sources_per_episode=task.get("active_sources_per_episode"),
+        allow_repeated_frequencies=bool(task.get("allow_repeated_frequencies", False)),
     )
 
 
@@ -400,6 +406,7 @@ def train_or_load(
     use_autocast = device == "cuda" and precision in {"bf16", "fp16"}
     autocast_dtype = torch.bfloat16 if precision == "bf16" else torch.float16
     last_metrics: dict[str, float] = {}
+    metric_history: list[dict[str, float | int]] = []
     started = time.monotonic()
     model.train()
     for step in range(n_steps):
@@ -445,6 +452,7 @@ def train_or_load(
         last_metrics["gradient_norm"] = float(gradient_norm.detach().item())
         log_every = int(training["log_every_steps"])
         if (step + 1) % log_every == 0 or step + 1 == n_steps:
+            metric_history.append({"step": step + 1, **last_metrics})
             print(
                 f"  train {cell['model']}/{cell['task']}/s{seed} "
                 f"{step + 1}/{n_steps} loss={last_metrics.get('loss', math.nan):.5f}",
@@ -471,6 +479,7 @@ def train_or_load(
         "device": device,
         "precision": precision,
         "last_metrics": last_metrics,
+        "metric_history": metric_history,
     }
 
 
@@ -660,10 +669,11 @@ def _spectral_usage(model, native_code: np.ndarray) -> dict[str, Any]:
     z = torch.from_numpy(code).to(device=device, dtype=torch.float32)
     decoder = model._dec_full().detach().float()
     reconstructed = torch.einsum("bh,htd->btd", z, decoder)
-    basis = dct_basis(reconstructed.shape[1]).to(
-        device=device,
-        dtype=torch.float32,
-    )
+    basis = getattr(
+        model,
+        "temporal_basis_v2",
+        dct_basis(reconstructed.shape[1]),
+    ).to(device=device, dtype=torch.float32)
     coefficients = torch.einsum("wt,btd->bwd", basis, reconstructed)
     decoded_frequency_energy = (
         coefficients.square().sum(dim=(0, 2)).cpu().numpy().astype(np.float64)
@@ -678,6 +688,10 @@ def _spectral_usage(model, native_code: np.ndarray) -> dict[str, Any]:
 
     usage = {
         "bands": [list(map(int, band)) for band in model.bands],
+        "temporal_basis": getattr(model, "temporal_basis_name", "dct"),
+        "frequency_bin_bands": [
+            list(map(int, band)) for band in getattr(model, "frequency_bin_bands", model.bands)
+        ],
         "band_slices": [[int(start), int(stop)] for start, stop in slices],
         "allocated_atoms": [int(value) for value in model.h_per_band],
         "nominal_k_per_band": [
@@ -702,6 +716,9 @@ def _spectral_usage(model, native_code: np.ndarray) -> dict[str, Any]:
             out=np.zeros_like(learned, dtype=np.float64),
             where=full_prior > 0,
         ).tolist()
+        usage["frequency_routing_scale"] = (
+            model.frequency_routing_scales().detach().float().cpu().tolist()
+        )
     return usage
 
 
@@ -980,10 +997,15 @@ def evaluate_hmm(
             )
             band_source_r2.append(source_values)
         recovered = np.asarray(band_source_r2, dtype=np.float64).T
-        expected_frequency = expected_dct_energy(
-            eval_data.lambdas,
-            window,
-        ).numpy()
+        states = eval_data.states[:, :window].to(torch.float32)
+        basis = getattr(
+            model,
+            "temporal_basis_v2",
+            dct_basis(window),
+        ).detach().to(device=states.device, dtype=states.dtype)
+        coefficients = torch.einsum("wt,ntj->nwj", basis, states)
+        expected_frequency = coefficients.square().sum(dim=0).T.numpy()
+        expected_frequency /= expected_frequency.sum(axis=1, keepdims=True)
         expected_band = np.stack(
             [expected_frequency[:, list(map(int, band))].sum(axis=1) for band in model.bands],
             axis=1,
@@ -993,6 +1015,8 @@ def evaluate_hmm(
         recovered_winner = recovered.argmax(axis=1)
         metrics["band_latent_r2_per_source"] = recovered.tolist()
         metrics["expected_dct_band_energy_per_source"] = expected_band.tolist()
+        metrics["expected_basis_band_energy_per_source"] = expected_band.tolist()
+        metrics["temporal_basis"] = getattr(model, "temporal_basis_name", "dct")
         metrics["expected_band_per_source"] = expected_winner.astype(int).tolist()
         metrics["recovered_band_per_source"] = recovered_winner.astype(int).tolist()
         metrics["band_localization_accuracy"] = float((expected_winner == recovered_winner).mean())
@@ -1057,6 +1081,42 @@ def evaluate_narrowband(
         dtype=np.float64,
     )
     direct_per_source = direct_per_quadrature.reshape(n_sources, 2).mean(axis=1)
+    sparse_activity = eval_data.activity.numpy()
+    active_direct_per_quadrature: np.ndarray | None = None
+    inactive_prediction_energy: np.ndarray | None = None
+    inactive_to_active_energy: np.ndarray | None = None
+    if not sparse_activity.all():
+        active_direct_per_quadrature = np.asarray(
+            [
+                r2_score(
+                    direct_target[sparse_activity[:, source], :, source, component].reshape(-1),
+                    direct_prediction[
+                        sparse_activity[:, source], :, source, component
+                    ].reshape(-1),
+                )
+                for source in range(n_sources)
+                for component in range(2)
+            ],
+            dtype=np.float64,
+        )
+        inactive_prediction_energy = np.asarray(
+            [
+                np.square(direct_prediction[~sparse_activity[:, source], :, source]).mean()
+                for source in range(n_sources)
+            ],
+            dtype=np.float64,
+        )
+        active_target_energy = np.asarray(
+            [
+                np.square(direct_target[sparse_activity[:, source], :, source]).mean()
+                for source in range(n_sources)
+            ],
+            dtype=np.float64,
+        )
+        inactive_to_active_energy = inactive_prediction_energy / np.maximum(
+            active_target_energy,
+            1e-12,
+        )
     raw_projection = torch.einsum(
         "ntd,jcd->ntjc",
         eval_data.x[:, :window],
@@ -1115,6 +1175,29 @@ def evaluate_narrowband(
         "frequencies": [float(value) for value in eval_data.frequencies],
         **_reconstruction_metrics(model, eval_data.x, window=window),
     }
+    if active_direct_per_quadrature is not None:
+        active_direct_per_source = active_direct_per_quadrature.reshape(n_sources, 2).mean(axis=1)
+        metrics.update(
+            {
+                "direct_latent_r2_active": float(active_direct_per_source.mean()),
+                "direct_latent_r2_active_per_source": active_direct_per_source.tolist(),
+                "direct_latent_r2_active_per_quadrature": (
+                    active_direct_per_quadrature.tolist()
+                ),
+                "inactive_latent_prediction_energy": float(
+                    inactive_prediction_energy.mean()
+                ),
+                "inactive_latent_prediction_energy_per_source": (
+                    inactive_prediction_energy.tolist()
+                ),
+                "inactive_to_active_energy_ratio": float(
+                    inactive_to_active_energy.mean()
+                ),
+                "inactive_to_active_energy_ratio_per_source": (
+                    inactive_to_active_energy.tolist()
+                ),
+            }
+        )
     usage = _spectral_usage(model, eval_native)
     if usage:
         metrics["spectral_usage"] = usage
@@ -1133,7 +1216,11 @@ def evaluate_narrowband(
         recovered = np.stack(band_source_r2, axis=1)
 
         states = eval_data.states[:, :window]
-        basis = dct_basis(window).to(dtype=states.dtype)
+        basis = getattr(
+            model,
+            "temporal_basis_v2",
+            dct_basis(window),
+        ).detach().to(device=states.device, dtype=states.dtype)
         coefficients = torch.einsum("wt,ntjc->nwjc", basis, states)
         expected_frequency = coefficients.square().sum(dim=(0, 3)).T.numpy()
         expected_frequency /= expected_frequency.sum(axis=1, keepdims=True)
@@ -1146,6 +1233,8 @@ def evaluate_narrowband(
         recovered_winner = recovered.argmax(axis=1)
         metrics["band_latent_r2_per_source"] = recovered.tolist()
         metrics["expected_dct_band_energy_per_source"] = expected_band.tolist()
+        metrics["expected_basis_band_energy_per_source"] = expected_band.tolist()
+        metrics["temporal_basis"] = getattr(model, "temporal_basis_name", "dct")
         metrics["expected_band_per_source"] = expected_winner.astype(int).tolist()
         metrics["recovered_band_per_source"] = recovered_winner.astype(int).tolist()
         metrics["band_localization_accuracy"] = float((expected_winner == recovered_winner).mean())

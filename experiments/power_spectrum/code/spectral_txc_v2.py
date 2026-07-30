@@ -39,6 +39,18 @@ Two opt-in objectives implement the proposed spectral penalties:
     two gradient directions are separated with stop-gradient operations, so a
     single ordinary optimizer performs the min-max update without allowing the
     weights to hide a difficult band.
+
+``temporal_basis="fourier"``
+    Uses a real orthonormal DFT basis and keeps every sine/cosine quadrature
+    pair in one band.  Unlike a DCT-only branch, a translated sinusoid remains
+    inside the same frequency subspace.
+
+``adaptive_frequency_routing_strength``
+    Uses the learned relative weights as detached score multipliers during
+    global BatchTopK support competition.  Selected code amplitudes are left
+    unchanged.  When a synthetic noise variance is supplied, the adaptive
+    statistics subtract its analytic per-basis-row contribution so the
+    adversary does not merely chase irreducible white noise.
 """
 
 from __future__ import annotations
@@ -46,14 +58,71 @@ from __future__ import annotations
 from collections.abc import Sequence
 
 import torch
+import torch.nn as nn
 
-from temp_bench.archs.spectral_txc import SpectralTXCBatchTopK, _dct_basis
+from temp_bench.archs.spectral_txc import (
+    SpectralTXCBatchTopK,
+    _dct_basis,
+    _split_evenly,
+)
+
+
+def _real_fourier_basis(length: int) -> torch.Tensor:
+    """Real orthonormal DFT basis with sine/cosine pairs kept explicit."""
+
+    time = torch.arange(length, dtype=torch.float32)
+    rows = [torch.ones(length) / float(length) ** 0.5]
+    for frequency in range(1, (length - 1) // 2 + 1):
+        angle = 2.0 * torch.pi * frequency * time / length
+        scale = (2.0 / length) ** 0.5
+        rows.extend((scale * torch.cos(angle), scale * torch.sin(angle)))
+    if length % 2 == 0:
+        rows.append(torch.cos(torch.pi * time) / float(length) ** 0.5)
+    return torch.stack(rows)
+
+
+def _fourier_bands(length: int, mode: str) -> tuple[list[list[int]], list[list[int]]]:
+    """Return basis-row bands and their physical non-negative Fourier bins."""
+
+    if mode == "full":
+        return [list(range(length))], [list(range(length // 2 + 1))]
+    if mode == "dcac":
+        ac_rows = list(range(1, length))
+        return [[0]] + ([ac_rows] if ac_rows else []), [[0]] + (
+            [list(range(1, length // 2 + 1))] if ac_rows else []
+        )
+    if mode != "multiband":
+        raise ValueError(f"unknown bands mode {mode!r} (use multiband|dcac|full)")
+
+    units: list[tuple[list[int], int]] = []
+    row = 1
+    for frequency in range(1, (length - 1) // 2 + 1):
+        units.append(([row, row + 1], frequency))
+        row += 2
+    if length % 2 == 0:
+        units.append(([row], length // 2))
+    if not units:
+        return [[0]], [[0]]
+    group_count = min(3, len(units))
+    base, remainder = divmod(len(units), group_count)
+    sizes = [base] * group_count
+    for offset in range(remainder):
+        sizes[group_count - 1 - offset] += 1
+    row_bands = [[0]]
+    frequency_bands = [[0]]
+    start = 0
+    for size in sizes:
+        group = units[start : start + size]
+        row_bands.append([index for rows, _ in group for index in rows])
+        frequency_bands.append([frequency for _, frequency in group])
+        start += size
+    return row_bands, frequency_bands
 
 
 class SpectralTXCV2(SpectralTXCBatchTopK):
     """Spectral TXC with controlled DC, support-allocation, and loss ablations."""
 
-    arch_version = "2.1.0-experimental"
+    arch_version = "2.2.0-experimental"
     _registry_name = "spectral_txc_v2"
 
     def __init__(
@@ -69,6 +138,7 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
         aux_k: int | None = None,
         threshold_start_step: int = 1000,
         threshold_beta: float = 0.999,
+        temporal_basis: str = "dct",
         dc_mode: str = "keep",
         selection_mode: str = "per_band",
         dominance_alpha: float = 0.0,
@@ -82,8 +152,14 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
         adaptive_frequency_floor: float = 0.2,
         adaptive_frequency_ema_beta: float = 0.99,
         adaptive_frequency_power_floor: float = 0.05,
+        adaptive_frequency_noise_variance: float = 0.0,
         adaptive_frequency_warmup_steps: int = 0,
+        adaptive_frequency_routing_strength: float = 0.0,
+        adaptive_frequency_routing_min: float = 0.5,
+        adaptive_frequency_routing_max: float = 2.0,
     ):
+        if temporal_basis not in {"dct", "fourier"}:
+            raise ValueError("temporal_basis must be 'dct' or 'fourier'")
         if dc_mode not in {"keep", "remove"}:
             raise ValueError("dc_mode must be 'keep' or 'remove'")
         if selection_mode not in {"per_band", "global"}:
@@ -115,8 +191,18 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
             raise ValueError("adaptive_frequency_ema_beta must lie in [0, 1)")
         if not 0 < adaptive_frequency_power_floor <= 1:
             raise ValueError("adaptive_frequency_power_floor must lie in (0, 1]")
+        if adaptive_frequency_noise_variance < 0:
+            raise ValueError("adaptive_frequency_noise_variance must be non-negative")
         if adaptive_frequency_warmup_steps < 0:
             raise ValueError("adaptive_frequency_warmup_steps must be non-negative")
+        if not 0 <= adaptive_frequency_routing_strength <= 1:
+            raise ValueError("adaptive_frequency_routing_strength must lie in [0, 1]")
+        if adaptive_frequency_routing_strength > 0 and adaptive_frequency_alpha == 0:
+            raise ValueError("adaptive frequency routing requires positive adaptive alphas")
+        if adaptive_frequency_routing_min <= 0:
+            raise ValueError("adaptive_frequency_routing_min must be positive")
+        if adaptive_frequency_routing_max < adaptive_frequency_routing_min:
+            raise ValueError("adaptive_frequency_routing_max must be at least the routing minimum")
         if dc_mode == "remove" and T < 2:
             raise ValueError("dc_mode='remove' needs T >= 2 (at least one AC bin)")
 
@@ -132,6 +218,22 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
             threshold_start_step=threshold_start_step,
             threshold_beta=threshold_beta,
         )
+        if temporal_basis == "fourier":
+            self._rebuild_fourier_parameterization(
+                d_in=d_in,
+                d_sae=d_sae,
+                length=T,
+                bands_mode=bands,
+            )
+        else:
+            self.frequency_bin_bands = [list(band) for band in self.bands]
+        self.temporal_basis_name = temporal_basis
+        temporal_basis_tensor = _dct_basis(T) if temporal_basis == "dct" else _real_fourier_basis(T)
+        self.register_buffer(
+            "temporal_basis_v2",
+            temporal_basis_tensor,
+            persistent=False,
+        )
         self.dc_mode = dc_mode
         self.selection_mode = selection_mode
         self.dominance_alpha = float(dominance_alpha)
@@ -145,9 +247,12 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
         self.adaptive_frequency_floor = float(adaptive_frequency_floor)
         self.adaptive_frequency_ema_beta = float(adaptive_frequency_ema_beta)
         self.adaptive_frequency_power_floor = float(adaptive_frequency_power_floor)
+        self.adaptive_frequency_noise_variance = float(adaptive_frequency_noise_variance)
         self.adaptive_frequency_warmup_steps = int(adaptive_frequency_warmup_steps)
+        self.adaptive_frequency_routing_strength = float(adaptive_frequency_routing_strength)
+        self.adaptive_frequency_routing_min = float(adaptive_frequency_routing_min)
+        self.adaptive_frequency_routing_max = float(adaptive_frequency_routing_max)
         self.k_win = self.k_pos * self._T
-        self.register_buffer("dct_basis_v2", _dct_basis(T), persistent=False)
 
         # A coefficient mask is preferable to merely omitting the DC-only
         # branch: it also removes w=0 from "full" and "dcac" mixed atoms.
@@ -215,6 +320,63 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
                 for b in range(self.n_bands):
                     self.enc_coef[b].copy_(self.dec_coef[b])
 
+    def _rebuild_fourier_parameterization(
+        self,
+        *,
+        d_in: int,
+        d_sae: int,
+        length: int,
+        bands_mode: str,
+    ) -> None:
+        """Replace the parent's DCT branches with real-Fourier branches."""
+
+        basis = _real_fourier_basis(length)
+        row_bands, frequency_bands = _fourier_bands(length, bands_mode)
+        self.bands = row_bands
+        self.frequency_bin_bands = frequency_bands
+        self.n_bands = len(row_bands)
+        self.h_per_band = _split_evenly(d_sae, self.n_bands, minimum=1)
+        self.k_per_band = _split_evenly(
+            self.k_pos * length,
+            self.n_bands,
+            minimum=1,
+        )
+        for b, (h_b, k_b) in enumerate(zip(self.h_per_band, self.k_per_band)):
+            if h_b < k_b:
+                raise ValueError(f"band {b}: h_b ({h_b}) < k_b ({k_b}); raise d_sae or lower k_pos")
+        self.band_slices = []
+        start = 0
+        for width in self.h_per_band:
+            self.band_slices.append((start, start + width))
+            start += width
+
+        self.enc_coef = nn.ParameterList()
+        self.dec_coef = nn.ParameterList()
+        self.b_enc = nn.ParameterList()
+        for b, (band, h_b) in enumerate(zip(row_bands, self.h_per_band)):
+            band_width = len(band)
+            scale = 1.0 / float(band_width * d_in) ** 0.5
+            self.enc_coef.append(nn.Parameter(torch.randn(h_b, band_width, d_in) * scale))
+            self.dec_coef.append(nn.Parameter(torch.randn(h_b, band_width, d_in) * scale))
+            self.b_enc.append(nn.Parameter(torch.zeros(h_b)))
+            name = f"psi_{b}"
+            value = basis[band].clone()
+            if name in self._buffers:
+                setattr(self, name, value)
+            else:
+                self.register_buffer(name, value, persistent=False)
+        self.b_dec = nn.Parameter(torch.zeros(length, d_in))
+        self.threshold = torch.full((self.n_bands,), -1.0)
+        self.num_tokens_since_fired = torch.zeros(d_sae, dtype=torch.long)
+        self.global_step = torch.tensor(0, dtype=torch.long)
+
+        with torch.no_grad():
+            self._normalize_decoder()
+            for b in range(self.n_bands):
+                self.enc_coef[b].copy_(self.dec_coef[b])
+        for decoder in self.dec_coef:
+            decoder.register_post_accumulate_grad_hook(self._project_dec_grad)
+
     def _frequency_mask(self, b: int) -> torch.Tensor:
         return getattr(self, f"frequency_mask_{b}")
 
@@ -241,21 +403,53 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
             return x - x.mean(dim=1, keepdim=True)
         return x
 
+    def frequency_routing_scales(self) -> torch.Tensor:
+        """Per-band score multipliers used only for support competition."""
+
+        full_weights = self.learned_frequency_weights()
+        full_prior = full_weights.new_zeros(self.n_bands)
+        full_prior[list(self.active_bands)] = self.frequency_weight_prior
+        ratio = torch.ones_like(full_weights)
+        active = full_prior > 0
+        ratio[active] = full_weights[active] / full_prior[active]
+        exponent = 0.5 * self.adaptive_frequency_routing_strength
+        return (
+            ratio.detach()
+            .pow(exponent)
+            .clamp(
+                self.adaptive_frequency_routing_min,
+                self.adaptive_frequency_routing_max,
+            )
+        )
+
+    def _selection_scores(self, pre: torch.Tensor) -> torch.Tensor:
+        if self.adaptive_frequency_routing_strength == 0:
+            return pre
+        scales = self.frequency_routing_scales().to(pre)
+        feature_scales = pre.new_ones(self._d_sae)
+        for b, (start, stop) in enumerate(self.band_slices):
+            feature_scales[start:stop] = scales[b]
+        return pre * feature_scales.unsqueeze(0)
+
     def _batchtopk_global(self, pre: torch.Tensor) -> torch.Tensor:
         """One support pool over all active bands, with total budget ``k_win``."""
         pre = pre * self.active_features.unsqueeze(0)
+        scores = self._selection_scores(pre)
         k_total = self.k_win * pre.shape[0]
-        flat = pre.reshape(-1)
-        if k_total >= flat.numel():
+        flat_values = pre.reshape(-1)
+        flat_scores = scores.reshape(-1)
+        if k_total >= flat_values.numel():
             return pre
-        top = flat.topk(k_total, sorted=False)
-        return torch.zeros_like(flat).scatter_(-1, top.indices, top.values).reshape_as(pre)
+        indices = flat_scores.topk(k_total, sorted=False).indices
+        values = flat_values[indices]
+        return torch.zeros_like(flat_values).scatter_(-1, indices, values).reshape_as(pre)
 
     def _select(self, pre: torch.Tensor) -> torch.Tensor:
         if self.selection_mode == "global":
             if (not self.training) and self.global_threshold.item() >= 0:
                 active = self.active_features.unsqueeze(0)
-                return pre * (pre > self.global_threshold) * active
+                scores = self._selection_scores(pre)
+                return pre * (scores > self.global_threshold) * active
             return self._batchtopk_global(pre)
 
         z = torch.zeros_like(pre)
@@ -285,7 +479,8 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
             return
         with torch.no_grad():
             if self.selection_mode == "global":
-                active = z[z > 0]
+                scores = self._selection_scores(z)
+                active = scores[z > 0]
                 current = active.min().float() if active.numel() else z.new_tensor(0.0)
                 if self.global_threshold.item() < 0:
                     self.global_threshold.copy_(current)
@@ -335,7 +530,7 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
     def _project_frequencies(self, x: torch.Tensor, frequencies: Sequence[int]) -> torch.Tensor:
         if not frequencies:
             return torch.zeros_like(x)
-        basis = self.dct_basis_v2.to(dtype=x.dtype)
+        basis = self.temporal_basis_v2.to(dtype=x.dtype)
         rows = basis[list(frequencies)]
         coefficients = torch.einsum("wt,btd->bwd", rows, x)
         return torch.einsum("wt,bwd->btd", rows, coefficients)
@@ -410,8 +605,13 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
             target = self._project_frequencies(x, kept)
             bias = self._project_frequencies(self.b_dec.unsqueeze(0), kept)
             residual = target - band_recons[b] - bias
-            errors.append(residual.float().square().mean() / width)
-            powers.append(target.float().square().mean() / width)
+            noise_per_basis_row = self.adaptive_frequency_noise_variance / self._T
+            errors.append(
+                (residual.float().square().mean() / width - noise_per_basis_row).clamp_min(0)
+            )
+            powers.append(
+                (target.float().square().mean() / width - noise_per_basis_row).clamp_min(0)
+            )
         return torch.stack(errors), torch.stack(powers)
 
     @torch.no_grad()
@@ -585,6 +785,8 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
         }
         for b, weight in enumerate(self.learned_frequency_weights()):
             metrics[f"frequency_weight_{b}"] = weight.detach()
+        for b, scale in enumerate(self.frequency_routing_scales()):
+            metrics[f"frequency_routing_scale_{b}"] = scale.detach()
         return metrics
 
     def post_step(self) -> None:

@@ -1,0 +1,195 @@
+{
+  "budget": {
+    "assumed_usd_per_gpu_hour": 4.0,
+    "cost_overhead_multiplier": 1.25,
+    "max_session_hours": 1.2,
+    "max_total_usd": 6.5,
+    "reserve_usd": 0.5
+  },
+  "fairness": {
+    "attribution": "Spectral global and learned-frequency differ only by the adaptive order-free band objective and four learned band logits; the historical fixed low-prefix Matryoshka loss is disabled.",
+    "data": "All models receive identical seeded representation-training episodes and episode-disjoint probe/eval episodes with one shared observation dictionary.",
+    "parameters": "Task-specific dictionary widths match total trainable parameters between TXC and both spectral arms to within 0.2%; exact counts are recorded per cell.",
+    "primary_metric": "Direct latent reconstruction R2 projects reconstructed observations onto the known emission directions, avoiding a wider-dictionary probe advantage.",
+    "support": "Every window model has nominal L0=W: TXC-post uses k_pos=W; spectral models use k_pos=1 and k_win=W with global BatchTopK."
+  },
+  "models": [
+    {
+      "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
+      "consumes": "window",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      },
+      "implementation_version": "1.0.0",
+      "label": "TXC-post",
+      "name": "txc",
+      "sparsity_rule": "window_length"
+    },
+    {
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "consumes": "window",
+      "hparams": {
+        "auxk_alpha": 0.03125,
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "dominance_alpha": 0.0,
+        "frequency_matryoshka_alpha": 0.0,
+        "selection_mode": "global"
+      },
+      "implementation_version": "2.1.0-experimental",
+      "label": "Spectral global",
+      "name": "spectral_global",
+      "sparsity_rule": "one_per_token"
+    },
+    {
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "consumes": "window",
+      "hparams": {
+        "adaptive_frequency_adversary_alpha": 0.1,
+        "adaptive_frequency_alpha": 0.1,
+        "adaptive_frequency_ema_beta": 0.99,
+        "adaptive_frequency_entropy": 0.2,
+        "adaptive_frequency_floor": 0.2,
+        "adaptive_frequency_power_floor": 0.05,
+        "adaptive_frequency_warmup_steps": 500,
+        "auxk_alpha": 0.03125,
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "dominance_alpha": 0.0,
+        "frequency_matryoshka_alpha": 0.0,
+        "selection_mode": "global"
+      },
+      "implementation_version": "2.1.0-experimental",
+      "label": "Spectral learned-frequency",
+      "name": "spectral_adaptive",
+      "sparsity_rule": "one_per_token"
+    }
+  ],
+  "overall_spend": {
+    "cap_usd": 50.0,
+    "estimated_prior_usd": 43.229452,
+    "note": "Conservative prior from controlled_frequency_provenance.json. The independent session ledger below leaves the combined worst case below the user's cap."
+  },
+  "planning": {
+    "estimated_eval_seconds_per_cell": 15.0,
+    "estimated_steps_per_second": 35.0,
+    "setup_seconds": 120.0
+  },
+  "run_name": "spectral-advantage-learned-frequency-20260730",
+  "schema_version": 1,
+  "seeds": [
+    1,
+    2
+  ],
+  "smoke": {
+    "models": [
+      "txc",
+      "spectral_global",
+      "spectral_adaptive"
+    ],
+    "n_steps": 2,
+    "seed": 1,
+    "tasks": [
+      "hmm_mixed_t8_matched_params",
+      "narrowband_offgrid_t8_matched_params",
+      "narrowband_offgrid_t16_matched_params"
+    ]
+  },
+  "split_seeds": {
+    "eval": 433,
+    "probe": 422,
+    "train": 411
+  },
+  "split_sizes": {
+    "eval": 2048,
+    "probe": 2048,
+    "train": 4096
+  },
+  "tasks": [
+    {
+      "d_in": 16,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "spectral_adaptive": 253,
+        "spectral_global": 254
+      },
+      "family": "factorial_hmm",
+      "group": "hmm_mixed_t8_matched_params",
+      "lambdas": [
+        0.9,
+        0.5,
+        -0.5,
+        -0.9
+      ],
+      "n_steps": 4000,
+      "name": "hmm_mixed_t8_matched_params",
+      "primary_metric": "direct_latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.5,
+      "window": 8
+    },
+    {
+      "amplitude_range": [
+        0.75,
+        1.25
+      ],
+      "d_in": 16,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "spectral_adaptive": 253,
+        "spectral_global": 254
+      },
+      "family": "narrowband_sources",
+      "frequencies": [
+        0.078125,
+        0.203125,
+        0.328125,
+        0.453125
+      ],
+      "group": "narrowband_offgrid_t8_matched_params",
+      "min_frequency_separation": 0.0625,
+      "n_steps": 6000,
+      "name": "narrowband_offgrid_t8_matched_params",
+      "primary_metric": "direct_latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.75,
+      "window": 8
+    },
+    {
+      "amplitude_range": [
+        0.75,
+        1.25
+      ],
+      "d_in": 16,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "spectral_adaptive": 255,
+        "spectral_global": 255
+      },
+      "family": "narrowband_sources",
+      "frequencies": [
+        0.078125,
+        0.203125,
+        0.328125,
+        0.453125
+      ],
+      "group": "narrowband_offgrid_t16_matched_params",
+      "min_frequency_separation": 0.0625,
+      "n_steps": 6000,
+      "name": "narrowband_offgrid_t16_matched_params",
+      "primary_metric": "direct_latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.75,
+      "window": 16
+    }
+  ],
+  "training": {
+    "batch_tokens": 1024,
+    "budget_check_every_steps": 100,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0003,
+    "log_every_steps": 1000,
+    "precision": "bf16",
+    "warmup_steps": 500
+  }
+}

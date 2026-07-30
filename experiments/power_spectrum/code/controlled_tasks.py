@@ -17,9 +17,10 @@ structure:
     direction, making latent-to-frequency attribution unambiguous.
 
 ``generate_narrowband_sources``
-    Simultaneously active independent sources at separated carrier
-    frequencies.  Every source owns a two-dimensional quadrature emission
-    plane, so random phase does not turn one cause into a mixture of bands.
+    Independent narrowband sources in orthogonal quadrature emission planes.
+    The default uses simultaneous separated carriers; optional sparse support
+    and repeated carriers create a larger dictionary of frequency-labelled
+    causes without sacrificing exact latent recovery.
 
 All three generators accept a fixed externally supplied observation dictionary.
 The split helpers use that facility to share only the observation coordinate
@@ -70,6 +71,7 @@ class NarrowbandSourceBatch:
     states: torch.Tensor
     phases: torch.Tensor
     amplitudes: torch.Tensor
+    activity: torch.Tensor
     emissions: torch.Tensor
     frequencies: torch.Tensor
 
@@ -402,8 +404,10 @@ def generate_narrowband_sources(
     emissions: torch.Tensor | None = None,
     amplitude_range: tuple[float, float] = (0.75, 1.25),
     min_frequency_separation: float = 1.0 / 16,
+    active_sources_per_episode: int | None = None,
+    allow_repeated_frequencies: bool = False,
 ) -> NarrowbandSourceBatch:
-    """Generate a simultaneous mixture of independent narrowband causes.
+    """Generate a mixture of independent narrowband causes.
 
     Each source ``j`` has its own carrier ``f_j`` in cycles/sample, random
     episode phase ``phi_j``, positive random amplitude ``a_j``, and orthogonal
@@ -415,7 +419,10 @@ def generate_narrowband_sources(
     The two quadratures are one *cause* at one carrier frequency.  They make
     its representation phase-invariant; they do not combine distinct
     frequencies.  The default carriers occupy separated exact Fourier bins
-    for both ``T=16`` and ``T=32``.
+    for both ``T=16`` and ``T=32``.  ``active_sources_per_episode`` optionally
+    selects an exact random subset of causes in every episode, while
+    ``allow_repeated_frequencies`` permits several distinct spatial causes to
+    share a carrier.
     """
 
     frequency_tensor = torch.as_tensor(frequencies, dtype=torch.float64).flatten()
@@ -427,14 +434,27 @@ def generate_narrowband_sources(
         raise ValueError("frequencies must lie strictly between DC and Nyquist")
     if min_frequency_separation <= 0:
         raise ValueError("min_frequency_separation must be positive")
-    sorted_frequencies = frequency_tensor.sort().values
-    separations = sorted_frequencies[1:] - sorted_frequencies[:-1]
-    if (separations + 1e-12 < min_frequency_separation).any():
-        raise ValueError(
-            "frequencies are not sufficiently separated: "
-            f"minimum required gap is {min_frequency_separation}"
-        )
     n_sources = frequency_tensor.numel()
+    frequencies_to_separate = (
+        torch.unique(frequency_tensor) if allow_repeated_frequencies else frequency_tensor
+    )
+    if frequencies_to_separate.numel() > 1:
+        sorted_frequencies = frequencies_to_separate.sort().values
+        separations = sorted_frequencies[1:] - sorted_frequencies[:-1]
+        if (separations + 1e-12 < min_frequency_separation).any():
+            raise ValueError(
+                "frequencies are not sufficiently separated: "
+                f"minimum required gap is {min_frequency_separation}"
+            )
+    if active_sources_per_episode is None:
+        n_active = n_sources
+    else:
+        n_active = int(active_sources_per_episode)
+        if not 1 <= n_active <= n_sources:
+            raise ValueError(
+                "active_sources_per_episode must lie between one and the "
+                f"number of sources ({n_sources}); got {n_active}"
+            )
     if 2 * n_sources > d:
         raise ValueError(
             f"need two orthonormal emission directions per source; got 2 * {n_sources} > d={d}"
@@ -491,12 +511,24 @@ def generate_narrowband_sources(
         dtype=torch.float64,
     )
     amplitudes = amplitude_low + (amplitude_high - amplitude_low) * amplitude_uniform
+    if n_active == n_sources:
+        activity = torch.ones(n_seq, n_sources, dtype=torch.bool)
+    else:
+        activity_scores = torch.rand(
+            n_seq,
+            n_sources,
+            generator=generator,
+            dtype=torch.float64,
+        )
+        selected = activity_scores.topk(n_active, dim=1, sorted=False).indices
+        activity = torch.zeros(n_seq, n_sources, dtype=torch.bool)
+        activity.scatter_(1, selected, True)
     time = torch.arange(seq_len, dtype=torch.float64) + 0.5
     angles = (
         2.0 * math.pi * time[None, :, None] * frequency_tensor[None, None, :] + phases[:, None, :]
     )
     unit_quadratures = torch.stack([torch.cos(angles), torch.sin(angles)], dim=-1)
-    states = amplitudes[:, None, :, None] * unit_quadratures
+    states = amplitudes[:, None, :, None] * activity[:, None, :, None] * unit_quadratures
     clean = torch.einsum("ntjc,jcd->ntd", states, fixed_emissions)
     noise = torch.randn(n_seq, seq_len, d, generator=generator, dtype=torch.float64)
     x = clean + float(sigma) * noise
@@ -505,6 +537,7 @@ def generate_narrowband_sources(
         states=states,
         phases=phases,
         amplitudes=amplitudes,
+        activity=activity,
         emissions=fixed_emissions,
         frequencies=frequency_tensor.clone(),
     )
@@ -521,6 +554,8 @@ def generate_narrowband_source_splits(
     emission_seed: int,
     amplitude_range: tuple[float, float] = (0.75, 1.25),
     min_frequency_separation: float = 1.0 / 16,
+    active_sources_per_episode: int | None = None,
+    allow_repeated_frequencies: bool = False,
 ) -> dict[str, NarrowbandSourceBatch]:
     """Generate independent narrowband episodes with one shared dictionary."""
 
@@ -543,6 +578,8 @@ def generate_narrowband_source_splits(
             emissions=emissions,
             amplitude_range=amplitude_range,
             min_frequency_separation=min_frequency_separation,
+            active_sources_per_episode=active_sources_per_episode,
+            allow_repeated_frequencies=allow_repeated_frequencies,
         )
         for name, size in split_sizes.items()
     }

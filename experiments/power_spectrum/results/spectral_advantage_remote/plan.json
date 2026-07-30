@@ -1,0 +1,22 @@
+{
+  "effective_assumed_usd_per_hour": 5.0,
+  "estimated_cost_usd": 4.35,
+  "estimated_gpu_hours": 0.87,
+  "estimated_prior_usd": 43.229452,
+  "evaluation_cells": 18,
+  "max_session_hours": 1.2,
+  "overall_cap_usd": 50.0,
+  "run_name": "spectral-advantage-learned-frequency-20260730",
+  "smoke": false,
+  "task_cell_counts": {
+    "hmm_mixed_t8_matched_params": 6,
+    "narrowband_offgrid_t16_matched_params": 6,
+    "narrowband_offgrid_t8_matched_params": 6
+  },
+  "total_optimizer_steps": 96000,
+  "unique_training_runs": 18,
+  "usable_budget_usd": 6.0,
+  "within_cost_plan": true,
+  "within_time_plan": true,
+  "worst_case_overall_usd": 49.729452
+}

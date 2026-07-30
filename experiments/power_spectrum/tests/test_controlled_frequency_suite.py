@@ -159,6 +159,51 @@ def test_advantage_plan_matches_support_parameters_and_overall_budget() -> None:
     assert txc_t16["k_pos"] == 16
 
 
+def test_task_specific_model_hparams_are_part_of_training_identity() -> None:
+    config = suite.load_config(suite.POWER_ROOT / "configs" / "spectral_advantage.json")
+    task = {**config["tasks"][0], "hparams_by_model": {"spectral_adaptive": {"x": 3}}}
+    model = next(model for model in config["models"] if model["name"] == "spectral_adaptive")
+    identity = suite._training_identity(config, task, model, 1, n_steps=4)
+    assert identity["hparams"]["x"] == 3
+    assert model["hparams"].get("x") is None
+
+
+def test_routed_screen_is_parameter_matched_and_frequency_order_free() -> None:
+    config = suite.load_config(
+        suite.POWER_ROOT / "configs" / "spectral_matryoshka_routed.json"
+    )
+    cells = suite.enumerate_cells(config)
+    plan = suite.build_plan(config)
+    assert len(cells) == 18
+    assert plan["within_cost_plan"]
+    assert plan["within_time_plan"]
+    assert plan["worst_case_overall_usd"] < config["overall_spend"]["cap_usd"]
+
+    sparse_tasks = [task for task in config["tasks"] if task["family"] == "narrowband_sources"]
+    assert [
+        [task["frequencies"].count(value) for value in (0.125, 0.25, 0.375)]
+        for task in sparse_tasks
+    ] == [[8, 8, 8], [3, 6, 15]]
+    assert all(task["active_sources_per_episode"] == 4 for task in sparse_tasks)
+
+    for task in config["tasks"]:
+        task_cells = [cell for cell in cells if cell["task"] == task["name"]]
+        counts = {}
+        for cell in task_cells:
+            cls = suite._import_model(cell["model_spec"])
+            model = cls(**suite._model_kwargs(cell))
+            counts[cell["model"]] = sum(parameter.numel() for parameter in model.parameters())
+            assert cell["k_pos"] == (cell["window"] if cell["model"] == "txc" else 1)
+        reference = counts["txc"]
+        for model_name, count in counts.items():
+            if model_name != "txc":
+                assert abs(count - reference) / reference < 0.006
+
+    routed = next(model for model in config["models"] if model["name"] == "spectral_fourier_routed")
+    assert routed["hparams"]["adaptive_frequency_routing_strength"] == 1.0
+    assert routed["hparams"]["frequency_matryoshka_alpha"] == 0.0
+
+
 def test_narrowband_evaluator_reports_direct_recovery_and_learned_weights() -> None:
     from experiments.power_spectrum.code.spectral_txc_v2 import SpectralTXCV2
 
@@ -198,6 +243,42 @@ def test_narrowband_evaluator_reports_direct_recovery_and_learned_weights() -> N
         1.0,
         rel_tol=1e-6,
     )
+
+
+def test_sparse_narrowband_evaluator_decomposes_active_and_inactive_error() -> None:
+    from experiments.power_spectrum.code.spectral_txc_v2 import SpectralTXCV2
+
+    splits = generate_narrowband_source_splits(
+        frequencies=(0.125, 0.125, 0.25, 0.25, 0.375, 0.375),
+        d=12,
+        sigma=0.1,
+        seq_len=8,
+        split_sizes={"train": 64, "probe": 64, "eval": 64},
+        split_seeds={"train": 61, "probe": 62, "eval": 63},
+        emission_seed=0,
+        active_sources_per_episode=2,
+        allow_repeated_frequencies=True,
+    )
+    model = SpectralTXCV2(
+        d_in=12,
+        d_sae=16,
+        T=8,
+        k_pos=1,
+        temporal_basis="fourier",
+        selection_mode="global",
+    )
+    model.eval()
+    metrics = suite.evaluate_narrowband(
+        model,
+        {"window": 8, "d_in": 12},
+        splits["probe"],
+        splits["eval"],
+        seed=1,
+    )
+    assert math.isfinite(metrics["direct_latent_r2_active"])
+    assert metrics["inactive_latent_prediction_energy"] >= 0
+    assert metrics["inactive_to_active_energy_ratio"] >= 0
+    assert len(metrics["direct_latent_r2_active_per_source"]) == 6
 
 
 def test_secret_selectivity_is_cross_split_and_rejects_one_off_fires() -> None:

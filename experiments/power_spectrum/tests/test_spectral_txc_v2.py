@@ -5,7 +5,11 @@ from __future__ import annotations
 import pytest
 import torch
 
-from experiments.power_spectrum.code.spectral_txc_v2 import SpectralTXCV2
+from experiments.power_spectrum.code.spectral_txc_v2 import (
+    SpectralTXCV2,
+    _fourier_bands,
+    _real_fourier_basis,
+)
 from temp_bench.archs.spectral_txc import SpectralTXCBatchTopK
 
 
@@ -50,6 +54,37 @@ def test_remove_dc_is_offset_invariant_and_masks_decoder_dc() -> None:
     )
     assert model.selection_k_per_band[0] == 0
     assert sum(model.selection_k_per_band) == model.k_win
+
+
+def test_real_fourier_basis_is_orthonormal_and_keeps_quadrature_pairs() -> None:
+    basis = _real_fourier_basis(16)
+    assert torch.allclose(basis @ basis.T, torch.eye(16), atol=2e-6)
+    row_bands, frequency_bands = _fourier_bands(16, "multiband")
+    assert [len(band) for band in row_bands] == [1, 4, 6, 5]
+    assert frequency_bands == [[0], [1, 2], [3, 4, 5], [6, 7, 8]]
+    assert sorted(index for band in row_bands for index in band) == list(range(16))
+
+
+def test_fourier_model_reconstructs_exact_band_projections() -> None:
+    model = SpectralTXCV2(
+        d_in=3,
+        d_sae=32,
+        T=8,
+        bands="multiband",
+        temporal_basis="fourier",
+        selection_mode="global",
+        adaptive_frequency_alpha=0.1,
+        adaptive_frequency_adversary_alpha=0.1,
+    )
+    x = torch.randn(6, 8, 3)
+    exact = [model._project_frequencies(x, band) for band in model.bands]
+    errors, _ = model._frequency_band_errors_and_power(x, exact)
+    assert torch.all(errors < 1e-10)
+    assert model.frequency_bin_bands == [[0], [1], [2], [3, 4]]
+    output = model.train_step(x)
+    assert torch.isfinite(output["loss"])
+    output["loss"].backward()
+    assert model.frequency_weight_logits.grad is not None
 
 
 def test_global_selection_removes_guaranteed_per_band_occupancy() -> None:
@@ -180,6 +215,48 @@ def test_adaptive_frequency_adversary_upweights_hard_band() -> None:
     assert torch.allclose(after.sum(), torch.tensor(1.0), atol=1e-6)
 
 
+def test_adaptive_frequency_routing_changes_support_not_code_values() -> None:
+    model = SpectralTXCV2(
+        d_in=3,
+        d_sae=32,
+        T=8,
+        k_pos=1,
+        bands="multiband",
+        selection_mode="global",
+        adaptive_frequency_alpha=0.1,
+        adaptive_frequency_adversary_alpha=0.1,
+        adaptive_frequency_routing_strength=1.0,
+    )
+    with torch.no_grad():
+        model.frequency_weight_logits.copy_(torch.tensor([-5.0, -5.0, -5.0, 5.0]))
+    pre = torch.ones(1, 32)
+    selected = model._batchtopk_global(pre)
+    start, stop = model.band_slices[-1]
+    assert torch.count_nonzero(selected) == model.k_win
+    assert torch.count_nonzero(selected[:, start:stop]) == model.k_win
+    assert torch.equal(selected[selected > 0], torch.ones(model.k_win))
+
+
+def test_adaptive_frequency_noise_floor_removes_expected_white_noise_power() -> None:
+    model = SpectralTXCV2(
+        d_in=3,
+        d_sae=16,
+        T=8,
+        k_pos=1,
+        bands="multiband",
+        selection_mode="global",
+        adaptive_frequency_alpha=0.1,
+        adaptive_frequency_adversary_alpha=0.1,
+        adaptive_frequency_noise_variance=0.25,
+    )
+    generator = torch.Generator().manual_seed(17)
+    samples = torch.randn(8192, 8, 3, generator=generator) * 0.5
+    zeros = [torch.zeros_like(samples) for _ in range(model.n_bands)]
+    errors, powers = model._frequency_band_errors_and_power(samples, zeros)
+    assert torch.all(errors < 0.002)
+    assert torch.all(powers < 0.002)
+
+
 def test_augmented_objective_is_additive_and_differentiable() -> None:
     model = SpectralTXCV2(
         d_in=5,
@@ -216,4 +293,11 @@ def test_invalid_experimental_modes_fail_loudly() -> None:
             d_sae=8,
             T=2,
             adaptive_frequency_alpha=0.1,
+        )
+    with pytest.raises(ValueError, match="routing requires"):
+        SpectralTXCV2(
+            d_in=4,
+            d_sae=8,
+            T=2,
+            adaptive_frequency_routing_strength=1.0,
         )
