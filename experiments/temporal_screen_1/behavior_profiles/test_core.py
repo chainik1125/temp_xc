@@ -7,6 +7,7 @@ from experiments.temporal_screen_1.behavior_profiles.core import (
     nearest_length_matching,
     paired_bootstrap_curve,
     reveal_counts,
+    spatial_mediation_summary,
     turn_on_summary,
 )
 
@@ -45,3 +46,28 @@ def test_paired_bootstrap_curve_shapes():
     result = paired_bootstrap_curve(values, n_bootstrap=20)
     assert result["mean"] == [4.5, 5.5, 6.5]
     assert len(result["ci_low"]) == 3
+
+
+def test_spatial_mediation_summary_recovers_refusal_sequence_gap():
+    result = spatial_mediation_summary(
+        baseline_target=31 / 32,
+        current_token_ablated=31 / 32,
+        all_positions_ablated=0.0,
+        baseline_neutral=0.0,
+        current_token_added=0.0,
+        all_positions_added=1.0,
+    )
+    assert result.current_token_necessity == 0.0
+    assert result.all_positions_necessity == 31 / 32
+    assert result.sequence_support_gap == 31 / 32
+    assert result.sequence_sufficiency_gap == 1.0
+
+
+def test_spatial_mediation_requires_complete_addition_panel():
+    with np.testing.assert_raises(ValueError):
+        spatial_mediation_summary(
+            baseline_target=1.0,
+            current_token_ablated=1.0,
+            all_positions_ablated=0.0,
+            baseline_neutral=0.0,
+        )

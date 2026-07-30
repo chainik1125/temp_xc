@@ -47,6 +47,37 @@ class TurnOnSummary:
         }
 
 
+@dataclass(frozen=True)
+class SpatialMediationSummary:
+    """Causal contribution of sequence positions beyond the current token.
+
+    Every scalar must use the same behavior metric, oriented so larger values
+    mean more of the target behavior.  Necessity is the clean primary result:
+    it compares current-token-only ablation with sequence-wide ablation.
+    Sufficiency is optional because repeated all-position addition generally
+    injects more total intervention energy than current-token-only addition.
+    """
+
+    baseline_target: float
+    current_token_ablated: float
+    all_positions_ablated: float
+    current_token_necessity: float
+    all_positions_necessity: float
+    sequence_support_gap: float
+    baseline_neutral: float | None = None
+    current_token_added: float | None = None
+    all_positions_added: float | None = None
+    current_token_sufficiency: float | None = None
+    all_positions_sufficiency: float | None = None
+    sequence_sufficiency_gap: float | None = None
+
+    def to_dict(self) -> dict[str, float | None]:
+        return {
+            field: getattr(self, field)
+            for field in self.__dataclass_fields__
+        }
+
+
 def reveal_counts(
     n_tokens: int,
     fractions: Sequence[float] = DEFAULT_REVEAL_FRACTIONS,
@@ -195,3 +226,76 @@ def paired_bootstrap_curve(
         "ci_high": np.quantile(boot, 0.975, axis=0).tolist(),
     }
 
+
+def spatial_mediation_summary(
+    *,
+    baseline_target: float,
+    current_token_ablated: float,
+    all_positions_ablated: float,
+    baseline_neutral: float | None = None,
+    current_token_added: float | None = None,
+    all_positions_added: float | None = None,
+) -> SpatialMediationSummary:
+    """Summarize current-token versus sequence-wide causal mediation.
+
+    ``sequence_support_gap`` is
+
+    ``metric(current-token ablation) - metric(all-position ablation)``.
+
+    It is in the behavior metric's natural units and avoids entropy or
+    cross-entropy proxies.  A positive value says that removing the feature
+    outside the current token has additional causal effect.  It does not by
+    itself distinguish diffuse support from one earlier bottleneck; lag-band
+    localization is the next stage.
+    """
+
+    values = [
+        baseline_target,
+        current_token_ablated,
+        all_positions_ablated,
+    ]
+    optional = [baseline_neutral, current_token_added, all_positions_added]
+    if not np.isfinite(np.asarray(values, dtype=float)).all():
+        raise ValueError("mediation metrics must be finite")
+    supplied = [value is not None for value in optional]
+    if any(supplied) and not all(supplied):
+        raise ValueError(
+            "baseline_neutral and both addition metrics must be supplied together"
+        )
+    if all(supplied) and not np.isfinite(np.asarray(optional, dtype=float)).all():
+        raise ValueError("addition metrics must be finite")
+
+    current_necessity = float(baseline_target - current_token_ablated)
+    all_necessity = float(baseline_target - all_positions_ablated)
+    sequence_gap = float(current_token_ablated - all_positions_ablated)
+    if not all(supplied):
+        return SpatialMediationSummary(
+            baseline_target=float(baseline_target),
+            current_token_ablated=float(current_token_ablated),
+            all_positions_ablated=float(all_positions_ablated),
+            current_token_necessity=current_necessity,
+            all_positions_necessity=all_necessity,
+            sequence_support_gap=sequence_gap,
+        )
+
+    assert baseline_neutral is not None
+    assert current_token_added is not None
+    assert all_positions_added is not None
+    current_sufficiency = float(current_token_added - baseline_neutral)
+    all_sufficiency = float(all_positions_added - baseline_neutral)
+    return SpatialMediationSummary(
+        baseline_target=float(baseline_target),
+        current_token_ablated=float(current_token_ablated),
+        all_positions_ablated=float(all_positions_ablated),
+        current_token_necessity=current_necessity,
+        all_positions_necessity=all_necessity,
+        sequence_support_gap=sequence_gap,
+        baseline_neutral=float(baseline_neutral),
+        current_token_added=float(current_token_added),
+        all_positions_added=float(all_positions_added),
+        current_token_sufficiency=current_sufficiency,
+        all_positions_sufficiency=all_sufficiency,
+        sequence_sufficiency_gap=float(
+            all_positions_added - current_token_added
+        ),
+    )
