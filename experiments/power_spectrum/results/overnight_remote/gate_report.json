@@ -1,0 +1,47 @@
+{
+  "abort": false,
+  "models": {
+    "spectral_v1": {
+      "failures": [],
+      "passed": true
+    },
+    "txc_post": {
+      "failures": [],
+      "passed": true
+    },
+    "txc_pre": {
+      "failures": [],
+      "passed": true
+    },
+    "v2_combined": {
+      "failures": [],
+      "passed": true
+    },
+    "v2_dominance": {
+      "failures": [],
+      "passed": true
+    },
+    "v2_freq_matryoshka": {
+      "failures": [],
+      "passed": true
+    },
+    "v2_global": {
+      "failures": [],
+      "passed": true
+    },
+    "v2_remove_dc": {
+      "failures": [],
+      "passed": true
+    }
+  },
+  "promoted_models": [
+    "txc_pre",
+    "txc_post",
+    "spectral_v1",
+    "v2_remove_dc",
+    "v2_dominance",
+    "v2_freq_matryoshka",
+    "v2_combined",
+    "v2_global"
+  ]
+}

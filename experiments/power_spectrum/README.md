@@ -8,6 +8,14 @@ The work has two linked goals:
 - test whether frequency-domain summaries distinguish temporal synthetic tasks;
 - improve a spectral crosscoder relative to a matched temporal crosscoder (TXC).
 
+Both goals are complete. The task screen shows that AC power routes periodic
+magnitude, cross-spectra are required for phase and direction, signed DC is
+task signal, and window sensitivity diagnoses localization. The complete
+120-cell main benchmark plus 15-cell control shows that temporal position
+mixing explains most of the gain over TXC, with an additional task-dependent
+multiband benefit on power-readable tasks. No v2 regularizer wins universally.
+The combined conservative compute estimate is $29.15 against a $50 cap.
+
 Read-only source material:
 
 - Francesco et al. source and figures:
@@ -37,6 +45,10 @@ host-side location is operational metadata rather than part of the experiment.
 - `analysis/theory_and_literature.md`: what the Francesco result does and does
   not imply, plus the proposed statistically controlled screen.
 - `analysis/task_screen_results.md`: three-seed synthetic screening results.
+- `analysis/benchmark_results.md`: matched learned-model results, ablations,
+  failure modes, and cost/provenance.
+- `results/provenance.json`: run IDs, source commits, integrity receipt, cost,
+  frozen-config checks, and raw-artifact hashes.
 - `code/spectral_txc_v2.py`: experiment-local spectral-crosscoder ablations.
 - `configs/overnight.json`: frozen matched benchmark and cost envelope.
 - `configs/matched_control.json`: bounded full-band, matched-window-support

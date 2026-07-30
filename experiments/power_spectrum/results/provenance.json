@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-29T23:45:55Z",
+  "branch": "codex/spectral-screen-overnight-20260729",
+  "worktree": ".worktrees/power-spectrum",
+  "integrity": {
+    "complete": true,
+    "main_expected_rows": 120,
+    "main_observed_rows": 120,
+    "control_expected_rows": 15,
+    "control_observed_rows": 15,
+    "failed_rows": 0,
+    "fairness_errors": 0,
+    "retried_cell_ids": 0
+  },
+  "cost": {
+    "description": "conservative estimated spend, not a provider invoice",
+    "main_usd": 27.483926,
+    "matched_control_usd": 1.666324,
+    "combined_usd": 29.15025,
+    "user_cap_usd": 50.0
+  },
+  "main": {
+    "source_commit": "0b10ecf069cb6f6de9d376b67cb278c47f6cd6b5",
+    "modal_app_id": "ap-haOBNN53r2c6WBw5kfifFt",
+    "modal_call_id": "fc-01KYQHJSX9CMJZTCMKNS3Q2Q3E",
+    "remote_directory": "overnight-20260729",
+    "session_status": "complete",
+    "app_state_after_completion": "stopped",
+    "tracked_config_matches_frozen_config": true,
+    "sha256": {
+      "tracked_config": "614d3c5df6414f9fdcb5180d97bc6a2bf0ca0cc082d872f88923f93024b5c68c",
+      "results": "a21a85cd9ce70c434b52dda961eda0fabdbadbd0f8a84464aaab9a8528b69327",
+      "summary": "b75ae11f8cbd6c363e0ee9d80ae2ab270254ccd1c9c7b04dc077f0cfa0590331",
+      "spend": "16ef2622965b238b071bcbd5d7218d1a4c78972a0601dd5188e62536b2337976",
+      "gate_report": "8d926191d80c7cf1c4725837c3268f9412644f8f942d150806f76bfd61bae084",
+      "frozen_config": "a518134ae3c3be0441d9008cf2f808680ffad59ad84ef20aea76a212cca5f689",
+      "plan": "5db63434773fee97328d278fa7c2ae20c078c0fa92bebbcc9ed16641574d3f52"
+    }
+  },
+  "matched_control": {
+    "source_commit": "cb3d890b8efad27e3ce177a7370737bfd0aeacd9",
+    "modal_app_id": "ap-IiJc39t93i3708q0XRwKiN",
+    "modal_call_id": "fc-01KYQN9AG879W8136AQGKQFMBY",
+    "remote_directory": "matched-control-20260729",
+    "session_status": "complete",
+    "tracked_config_matches_frozen_config": true,
+    "sha256": {
+      "tracked_config": "1517621164d0fd845f165485bde9ffd2ac94c5bb9b65100a44257d65e9290eb2",
+      "results": "5b9087680c46ba9afc69a67a10842958ee1d4ee75d034e28a120bc18d40ab886",
+      "summary": "25d9f53b06f6b5f3034d9cee0e36d6f735406dfe98b504644b2e2d60893779d7",
+      "spend": "4a879f4a1228c01f27a340ded7728cfb4740850eb5b3645653b63050c1be5cf4",
+      "gate_report": "49151df210808adbaeb9860d49ae9c28391d96f24e5f80b5f8dc55e6f6eccb60",
+      "frozen_config": "e512df20aaa2ef2f803425ca14bc1d62819f79d4f37444e67bd658ad9046f13a",
+      "plan": "eadf96a239b340e0551d2f1ea118226115a5989181834a260d108b81e9472aa3"
+    }
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "effective_assumed_usd_per_hour": 5.0,
+  "estimated_cost_usd": 35.75,
+  "estimated_gpu_hours": 7.15,
+  "fairness": {
+    "compute": "Every arm gets the same datasource, seed, optimizer steps, learning rate, d_sae, and approximately 1024 reconstructed token positions per step (batch_size*T).",
+    "reporting": "Parameter count, realized l0_per_window, realized l0_per_token, NMSE, and paired seed deltas versus both TXC baselines are all reported.",
+    "txc_post": "Position-mixing/nonlinearity comparator: nominal shared-window support is k_pos; it reuses each active atom across T decoded positions and is reported separately rather than called equal-support.",
+    "txc_pre": "Primary equal-code-support baseline: nominal shared-window support is at most k_pos*T, matching spectral's total per-band support."
+  },
+  "max_session_hours": 7.5,
+  "mode": "overnight",
+  "phase_cell_counts": {
+    "full": 120,
+    "gate": 40,
+    "smoke": 8
+  },
+  "run_name": "power-spectrum-synthetic-overnight-20260729",
+  "total_evaluations": 168,
+  "total_optimizer_steps": 2448000,
+  "unique_training_runs": 120,
+  "usable_budget_usd": 45.0,
+  "within_cost_plan": true,
+  "within_time_plan": true
+}
