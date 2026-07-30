@@ -25,7 +25,7 @@ import modal
 
 
 HERE = Path(__file__).resolve().parent
-REPO = HERE.parents[2]
+REPO = HERE.parents[2] if len(HERE.parents) > 2 else HERE
 DATA = REPO / "results" / "ward_backtracking"
 RESULT = HERE / "results" / "ward_known_feature_formation.json"
 
