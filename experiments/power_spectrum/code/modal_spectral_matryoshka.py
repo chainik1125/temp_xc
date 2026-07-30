@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -36,6 +37,9 @@ REMOTE_CONFIG = (
 FULL_RUN_DIR = Path("/vol/spectral-matryoshka-routed-20260730")
 CONFIRM_RUN_DIR = Path("/vol/spectral-matryoshka-routed-confirm-seed2-20260730")
 SAE_RUN_DIR = Path("/vol/spectral-matryoshka-sae-baseline-20260730")
+SAE_CALIBRATED_RUN_DIR = Path(
+    "/vol/spectral-matryoshka-sae-calibrated-20260730"
+)
 # Smoke and full results share one spend ledger. Their cell/checkpoint IDs are
 # disjoint, so this enforces one cumulative hard cap without contaminating the
 # non-smoke summary.
@@ -60,6 +64,13 @@ LOCAL_SAE_RESULTS = (
     / "power_spectrum"
     / "results"
     / "spectral_matryoshka_sae_remote"
+)
+LOCAL_SAE_CALIBRATED_RESULTS = (
+    LOCAL_ROOT
+    / "experiments"
+    / "power_spectrum"
+    / "results"
+    / "spectral_matryoshka_sae_calibrated_remote"
 )
 
 app = modal.App(APP_NAME)
@@ -99,6 +110,7 @@ def _sae_baseline_config(
     source: Path,
     *,
     estimated_prior_usd: float,
+    calibrated: bool = False,
 ) -> dict[str, Any]:
     """Make a matched-parameter token-SAE panel for the sparse tasks."""
 
@@ -132,6 +144,7 @@ def _sae_baseline_config(
             "implementation_version": "1.0.0",
             "consumes": "token",
             "sparsity_rule": "one_per_token",
+            "calibrate_inference_threshold": calibrated,
             "hparams": {"auxk_alpha": 0.03125},
         }
     ]
@@ -160,8 +173,13 @@ def _sae_baseline_config(
     config["fairness"].update(
         {
             "support": (
-                "The token SAE uses one active feature per token, hence nominal "
-                "L0=W per analysis window, matching TXC and the spectral arms."
+                "The token SAE trains with one active feature per token. "
+                + (
+                    "Its inference threshold is calibrated on the episode-disjoint "
+                    "probe split to L0=W per window before final evaluation."
+                    if calibrated
+                    else "Its nominal support is therefore L0=W per analysis window."
+                )
             ),
             "parameters": (
                 "The token SAE uses 512 atoms (49,712 trainable parameters), "
@@ -326,6 +344,93 @@ def fetch_sae_remote() -> dict[str, str]:
     }
 
 
+@app.function(
+    image=image,
+    gpu="A10G",
+    cpu=8,
+    memory=32768,
+    timeout=900,
+    volumes={"/vol": volume},
+)
+def run_sae_calibrated_remote(mode: str, estimated_prior_usd: float) -> dict:
+    if mode not in {"smoke", "full"}:
+        raise ValueError(f"unsupported mode {mode!r}")
+    SAE_CALIBRATED_RUN_DIR.mkdir(parents=True, exist_ok=True)
+    source_checkpoints = SAE_RUN_DIR / "checkpoints"
+    target_checkpoints = SAE_CALIBRATED_RUN_DIR / "checkpoints"
+    if not source_checkpoints.is_dir():
+        raise FileNotFoundError(
+            "matched-SAE checkpoints are missing; refusing to retrain implicitly"
+        )
+    shutil.copytree(source_checkpoints, target_checkpoints, dirs_exist_ok=True)
+    config = _sae_baseline_config(
+        REMOTE_CONFIG,
+        estimated_prior_usd=estimated_prior_usd,
+        calibrated=True,
+    )
+    config["budget"].update(
+        {
+            "max_total_usd": 0.5,
+            "reserve_usd": 0.1,
+            "max_session_hours": 0.1,
+        }
+    )
+    # The cell identities and 5k-step checkpoints are unchanged. This rate
+    # models checkpoint loading plus evaluation, not optimizer throughput.
+    config["planning"]["estimated_steps_per_second"] = 1000.0
+    config["overall_spend"]["note"] = (
+        "Conservative cumulative estimate through the initial SAE panel. "
+        "This evaluation-only rerun loads its frozen checkpoints and calibrates "
+        "the inference threshold on the probe split."
+    )
+    config_path = SAE_CALIBRATED_RUN_DIR / "launch_config.json"
+    config_path.write_text(json.dumps(config, indent=2, sort_keys=True) + "\n")
+    command = [
+        str(REMOTE_PYTHON),
+        "-m",
+        "experiments.power_spectrum.code.run_controlled_frequency_suite",
+        "--config",
+        str(config_path),
+        "--results-dir",
+        str(SAE_CALIBRATED_RUN_DIR),
+        "--mode",
+        mode,
+    ]
+    try:
+        _stream(command, timeout=800)
+    finally:
+        volume.commit()
+    payload: dict = {"mode": mode, "results_dir": str(SAE_CALIBRATED_RUN_DIR)}
+    for name in ("plan.json", "summary.json", "spend.json"):
+        path = SAE_CALIBRATED_RUN_DIR / name
+        if path.exists():
+            payload[name.removesuffix(".json")] = json.loads(path.read_text())
+    return payload
+
+
+@app.function(
+    image=image,
+    cpu=1,
+    memory=2048,
+    timeout=300,
+    volumes={"/vol": volume},
+)
+def fetch_sae_calibrated_remote() -> dict[str, str]:
+    volume.reload()
+    names = (
+        "frozen_config.json",
+        "plan.json",
+        "results.jsonl",
+        "spend.json",
+        "summary.json",
+    )
+    return {
+        name: (SAE_CALIBRATED_RUN_DIR / name).read_text()
+        for name in names
+        if (SAE_CALIBRATED_RUN_DIR / name).exists()
+    }
+
+
 @app.local_entrypoint()
 def main(stage: str = "plan", out: str = "", prior_usd: float = 0.0) -> None:
     if stage in {"plan", "confirm-plan", "sae-plan"}:
@@ -434,8 +539,35 @@ def main(stage: str = "plan", out: str = "", prior_usd: float = 0.0) -> None:
             )
         )
         return
+    if stage in {"sae-calibrated-smoke", "sae-calibrated-full"}:
+        mode = "smoke" if stage.endswith("smoke") else "full"
+        print(
+            json.dumps(
+                run_sae_calibrated_remote.remote(mode, prior_usd),
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return
+    if stage == "sae-calibrated-fetch":
+        files = fetch_sae_calibrated_remote.remote()
+        LOCAL_SAE_CALIBRATED_RESULTS.mkdir(parents=True, exist_ok=True)
+        for name, contents in files.items():
+            (LOCAL_SAE_CALIBRATED_RESULTS / name).write_text(contents)
+        print(
+            json.dumps(
+                {
+                    "files": sorted(files),
+                    "local_results": str(LOCAL_SAE_CALIBRATED_RESULTS),
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return
     raise SystemExit(
         "stage must be one of: plan, smoke, full, fetch, "
         "confirm-plan, confirm-full, confirm-fetch, "
-        "sae-plan, sae-smoke, sae-full, sae-fetch"
+        "sae-plan, sae-smoke, sae-full, sae-fetch, "
+        "sae-calibrated-smoke, sae-calibrated-full, sae-calibrated-fetch"
     )

@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
+import torch
 
 from experiments.power_spectrum.code import run_controlled_frequency_suite as suite
 from experiments.power_spectrum.code.controlled_tasks import (
@@ -47,6 +48,24 @@ def test_token_sae_training_is_reused_across_windows_and_support_is_matched() ->
         and cell["model"] in {"sae", "txc"}
         for cell in cells
     )
+
+
+def test_token_sae_inference_threshold_is_calibrated_on_probe_support() -> None:
+    probe = np.random.default_rng(7).normal(size=(64, 4, 8)).astype(np.float32)
+    model = BatchTopKSAE(d_in=8, d_sae=16, k_pos=1)
+    model.eval()
+
+    calibration = suite.calibrate_token_inference_threshold(
+        model,
+        torch.from_numpy(probe),
+        window=4,
+        target_l0_per_token=1,
+    )
+    code = model.encode(torch.from_numpy(probe))
+
+    assert calibration["target_l0_per_window"] == 4.0
+    assert calibration["probe_l0_per_window"] == 4.0
+    assert int((code != 0).sum()) == probe.shape[0] * probe.shape[1]
 
 
 def test_shamir_evaluator_has_exact_symbolic_oracle_on_fresh_episodes() -> None:

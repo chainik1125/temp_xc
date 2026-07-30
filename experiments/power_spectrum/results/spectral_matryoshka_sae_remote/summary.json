@@ -1,0 +1,79 @@
+{
+  "aggregates": [
+    {
+      "family": "narrowband_sources",
+      "max": 0.137274829161008,
+      "mean": 0.1341731080249654,
+      "mean_l0_per_window": 9.7490234375,
+      "mean_nmse": 0.7670940458774567,
+      "metric": "direct_latent_r2",
+      "min": 0.13107138688892284,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.13107138688892284,
+        "2": 0.137274829161008
+      },
+      "std": 0.0043864960972907025,
+      "task": "narrowband_sparse_balanced_t8"
+    },
+    {
+      "family": "narrowband_sources",
+      "max": 0.13839701818161465,
+      "mean": 0.13379858901714753,
+      "mean_l0_per_window": 9.59423828125,
+      "mean_nmse": 0.7698231935501099,
+      "metric": "direct_latent_r2",
+      "min": 0.12920015985268044,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.12920015985268044,
+        "2": 0.13839701818161465
+      },
+      "std": 0.006503160890001363,
+      "task": "narrowband_sparse_high_crowded_t8"
+    }
+  ],
+  "complete": true,
+  "expected_cells": 4,
+  "failed": [],
+  "fairness": {
+    "attribution": "This isolated panel adds only the missing matched-parameter token-SAE baseline on the exact same frozen sparse tasks.",
+    "capacity_regime": "The sparse narrowband tasks contain 24 ground-truth causes but only four are active per episode. TXC has 64 unconstrained atoms; parameter-matched spectral arms have 255 band-limited atoms. The balanced versus high-crowded tasks test whether learned routing follows frequency-specific dictionary demand.",
+    "data": "All models receive identical seeded training episodes and episode-disjoint probe/eval episodes with one shared orthonormal observation dictionary.",
+    "noise": "The adaptive arms apply a synthetic-task noise-floor heuristic: the expected white-noise contribution sigma^2/T is subtracted and clamped from per-band power and residual estimates. Because reconstruction depends on the noisy input, this is not an unbiased residual correction. Main reconstruction loss still uses the original noisy observations.",
+    "parameters": "The token SAE uses 512 atoms (49,712 trainable parameters), within 0.4% of TXC (49,600) and the spectral arms (49,503-49,507).",
+    "primary_metric": "Direct latent reconstruction R2 projects reconstructed observations onto known orthonormal emission directions, avoiding a wider-dictionary probe advantage.",
+    "support": "The token SAE uses one active feature per token, hence nominal L0=W per analysis window, matching TXC and the spectral arms."
+  },
+  "generated_at": "2026-07-30T06:03:12Z",
+  "missing_cell_ids": [],
+  "observed_cells": 4,
+  "ok_cells": 4,
+  "plan": {
+    "effective_assumed_usd_per_hour": 5.0,
+    "estimated_cost_usd": 0.71,
+    "estimated_gpu_hours": 0.143,
+    "estimated_prior_usd": 47.139677,
+    "evaluation_cells": 4,
+    "max_session_hours": 0.3,
+    "overall_cap_usd": 50.0,
+    "run_name": "spectral-matryoshka-matched-sae-20260730",
+    "smoke": false,
+    "task_cell_counts": {
+      "narrowband_sparse_balanced_t8": 2,
+      "narrowband_sparse_high_crowded_t8": 2
+    },
+    "total_optimizer_steps": 20000,
+    "unique_training_runs": 4,
+    "usable_budget_usd": 1.25,
+    "within_cost_plan": true,
+    "within_time_plan": true,
+    "worst_case_overall_usd": 48.539677
+  },
+  "run_name": "spectral-matryoshka-matched-sae-20260730",
+  "schema_version": 1,
+  "smoke": false,
+  "unexpected_cell_ids": []
+}

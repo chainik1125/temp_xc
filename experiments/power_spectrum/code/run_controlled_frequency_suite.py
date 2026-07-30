@@ -540,6 +540,60 @@ def reconstruct_windows(
     return torch.cat(outputs).numpy()
 
 
+@torch.no_grad()
+def calibrate_token_inference_threshold(
+    model,
+    probe_x: torch.Tensor,
+    *,
+    window: int,
+    target_l0_per_token: int,
+) -> dict[str, float]:
+    """Match a token SAE's inference support using only the probe split."""
+
+    if str(model.consumes) != "token":
+        raise ValueError("inference-threshold calibration requires a token model")
+    required = ("W_enc", "b_enc", "b_dec", "threshold")
+    missing = [name for name in required if not hasattr(model, name)]
+    if missing:
+        raise TypeError(
+            "token model does not expose threshold-calibration tensors: "
+            + ", ".join(missing)
+        )
+    if target_l0_per_token < 1:
+        raise ValueError("target_l0_per_token must be positive")
+
+    device = next(model.parameters()).device
+    tokens = probe_x[:, :window].reshape(-1, probe_x.shape[-1]).to(
+        device=device,
+        dtype=torch.float32,
+    )
+    post_relu = torch.relu((tokens - model.b_dec) @ model.W_enc + model.b_enc)
+    flat = post_relu.flatten()
+    target_active = target_l0_per_token * tokens.shape[0]
+    if target_active >= flat.numel():
+        raise ValueError("target support must be smaller than the dense code")
+
+    boundary = flat.topk(target_active + 1, sorted=True).values[-2:]
+    selected_floor = boundary[0]
+    unselected_ceiling = boundary[1]
+    if bool(selected_floor <= unselected_ceiling):
+        raise RuntimeError(
+            "cannot calibrate an exact threshold because boundary activations are tied"
+        )
+    threshold = (selected_floor + unselected_ceiling) / 2
+    model.threshold.copy_(threshold.to(dtype=model.threshold.dtype))
+    realized_active = int((flat > threshold).sum().item())
+    realized_l0_per_token = realized_active / tokens.shape[0]
+    return {
+        "threshold": float(threshold.item()),
+        "target_l0_per_token": float(target_l0_per_token),
+        "probe_l0_per_token": float(realized_l0_per_token),
+        "target_l0_per_window": float(target_l0_per_token * window),
+        "probe_l0_per_window": float(realized_l0_per_token * window),
+        "probe_tokens": float(tokens.shape[0]),
+    }
+
+
 def _row_shuffle(x: torch.Tensor, window: int, seed: int) -> torch.Tensor:
     generator = torch.Generator(device="cpu").manual_seed(seed)
     order = torch.rand(x.shape[0], window, generator=generator).argsort(dim=1)
@@ -1249,29 +1303,41 @@ def evaluate_cell(
         ShamirClockBatch | FactorialHMMBatch | NarrowbandSourceBatch,
     ],
 ) -> dict[str, Any]:
+    calibration = None
+    if bool(cell["model_spec"].get("calibrate_inference_threshold", False)):
+        calibration = calibrate_token_inference_threshold(
+            model,
+            splits["probe"].x,
+            window=int(cell["window"]),
+            target_l0_per_token=int(cell["k_pos"]),
+        )
     if cell["family"] == "shamir":
-        return evaluate_shamir(
+        metrics = evaluate_shamir(
             model,
             cell["task_spec"],
             splits["probe"],
             splits["eval"],
             seed=int(cell["seed"]),
         )
-    if cell["family"] == "factorial_hmm":
-        return evaluate_hmm(
+    elif cell["family"] == "factorial_hmm":
+        metrics = evaluate_hmm(
             model,
             cell["task_spec"],
             splits["probe"],
             splits["eval"],
             seed=int(cell["seed"]),
         )
-    return evaluate_narrowband(
-        model,
-        cell["task_spec"],
-        splits["probe"],
-        splits["eval"],
-        seed=int(cell["seed"]),
-    )
+    else:
+        metrics = evaluate_narrowband(
+            model,
+            cell["task_spec"],
+            splits["probe"],
+            splits["eval"],
+            seed=int(cell["seed"]),
+        )
+    if calibration is not None:
+        metrics["inference_threshold_calibration"] = calibration
+    return metrics
 
 
 def write_summary(
