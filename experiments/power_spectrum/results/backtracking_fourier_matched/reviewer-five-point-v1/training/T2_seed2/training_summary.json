@@ -1,0 +1,21 @@
+{
+  "cached": false,
+  "completed_steps": 20000,
+  "elapsed_seconds_this_process": 1471.151375113055,
+  "last_metrics": {
+    "auxk": 1.0854912996292114,
+    "dead": 45568.0,
+    "l0": 40.0,
+    "loss": 11.92565631866455,
+    "mse": 11.891735076904297
+  },
+  "parameter_match": {
+    "difference": -4,
+    "fourier_d_sae": 65532,
+    "fourier_parameters": 536911868,
+    "reference_txc_d_sae": 32768,
+    "reference_txc_parameters": 536911872,
+    "relative_difference": -7.450012206099998e-09
+  },
+  "status": "complete"
+}

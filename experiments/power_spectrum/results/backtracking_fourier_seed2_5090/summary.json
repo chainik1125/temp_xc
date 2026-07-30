@@ -1,0 +1,22 @@
+{
+  "cells": [
+    {
+      "cell": "T2_seed2",
+      "evaluation_status": "complete",
+      "training": null
+    },
+    {
+      "cell": "T4_seed2",
+      "evaluation_status": "complete",
+      "training": null
+    },
+    {
+      "cell": "T6_seed2",
+      "evaluation_status": "complete",
+      "training": null
+    }
+  ],
+  "protocol_version": "power-spectrum.backtracking-fourier.v1",
+  "run_fingerprint": "c66df26f973ffffb10fe5c3b525f51b8bb515a1df4a6f87aef7d90b5a351bc0f",
+  "status": "complete"
+}
