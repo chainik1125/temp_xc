@@ -1,0 +1,97 @@
+{
+  "baseline_snapshot": {
+    "coupling_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/data/setup_d_leaderboard.jsonl",
+    "denoising_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/data/denoising_probe_results.json",
+    "git_ref": "origin/dmitry-synthetic",
+    "renderer_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/make_c2_synth_panels.py"
+  },
+  "budget": {
+    "assumed_usd_per_gpu_hour": 4.0,
+    "cost_overhead_multiplier": 1.25,
+    "max_session_hours": 2.75,
+    "max_total_usd": 14.0,
+    "reserve_usd": 0.5
+  },
+  "model": {
+    "auxk_alpha": 0.03125,
+    "bands": "multiband",
+    "class_path": "temp_bench.archs.spectral_txc:SpectralTXCBatchTopK",
+    "d_sae": 40,
+    "implementation_version": "1.0.0",
+    "name": "spectral_v1"
+  },
+  "planning": {
+    "estimated_steps_per_second": {
+      "coupling": 150.0,
+      "denoising": 105.0
+    },
+    "eval_seconds_per_cell": {
+      "coupling": 2.0,
+      "denoising": 8.0
+    },
+    "setup_seconds": 180.0
+  },
+  "reporting": {
+    "comparison": "Published SAE/T-SAE/TXC values are read byte-for-byte from the pinned Figure 2 snapshot; only Spectral v1 is newly trained.",
+    "compatibility_caveat": "Spectral v1 uses the current BatchTopK plus AuxK backbone, while the published TopK SAE and TXC-base use the legacy TopK-to-ReLU backbone.",
+    "selection": "Best seed-mean (T, k_pos) cell with all three seeds. Denoising uses a focused 8-cell grid containing the paper-best TXC cell (T=2,k=17) and matched dense-code alternatives; Coupling uses T=5,k in {1,2}, containing the published best cell."
+  },
+  "run_name": "spectral-v1-paper-synthetic-20260729",
+  "schema_version": 1,
+  "seeds": [
+    1,
+    2,
+    42
+  ],
+  "tasks": {
+    "coupling": {
+      "datasource": "toy_coupled_noisy_K10_M20_d256_pB05_np10",
+      "grid": {
+        "5": [
+          1,
+          2
+        ]
+      },
+      "metric": "gauc",
+      "n_steps": 8000,
+      "paper_generator": "origin/final:purified/src/temp_bench/data/toy/coupled_noisy.py",
+      "train_data_seed": 0
+    },
+    "denoising": {
+      "datasource": "toy_markov_n20_d40_noisy",
+      "eval_data_seed": 42,
+      "eval_n_sequences": 2000,
+      "grid": {
+        "2": [
+          12,
+          17,
+          20
+        ],
+        "4": [
+          8,
+          10
+        ],
+        "5": [
+          6,
+          8
+        ],
+        "8": [
+          5
+        ]
+      },
+      "metric": "lp_mean_global_r2",
+      "n_steps": 30000,
+      "paper_generator": "origin/final:purified/src/temp_bench/data/toy/markov.py",
+      "train_data_seed": 0
+    }
+  },
+  "training": {
+    "batch_size": 1024,
+    "budget_check_every_steps": 250,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0003,
+    "n_steps": 30000,
+    "precision": "bf16",
+    "warmup_steps": 1000
+  }
+}

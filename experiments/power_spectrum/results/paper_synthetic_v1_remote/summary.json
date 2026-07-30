@@ -1,0 +1,69 @@
+{
+  "best_cells": {
+    "coupling": {
+      "T": 5,
+      "k_pos": 1,
+      "max": 0.9693877551020407,
+      "mean": 0.9693877551020407,
+      "min": 0.9693877551020407,
+      "n": 3,
+      "seed_values": [
+        0.9693877551020407,
+        0.9693877551020407,
+        0.9693877551020407
+      ],
+      "seeds": [
+        1,
+        2,
+        42
+      ],
+      "std": 0.0
+    },
+    "denoising": {
+      "T": 2,
+      "k_pos": 20,
+      "max": 0.43183462619781493,
+      "mean": 0.41165328224500025,
+      "min": 0.3939488261938095,
+      "n": 3,
+      "seed_values": [
+        0.43183462619781493,
+        0.40917639434337616,
+        0.3939488261938095
+      ],
+      "seeds": [
+        1,
+        2,
+        42
+      ],
+      "std": 0.01906396314368508
+    }
+  },
+  "complete": true,
+  "coupling_metric_note": "gauc filters time-mean decoder directions with norm <=1e-5; gauc_paper_raw is retained per row for sensitivity. At np10 the hidden-direction target matrix has rank 1.",
+  "expected_cells": 30,
+  "failed": [],
+  "generated_at": "2026-07-30T02:58:38Z",
+  "missing_cell_ids": [],
+  "observed_cells": 30,
+  "plan": {
+    "effective_assumed_usd_per_hour": 5.0,
+    "estimated_cost_usd": 10.5,
+    "estimated_gpu_hours": 2.1,
+    "max_session_hours": 2.75,
+    "run_name": "spectral-v1-paper-synthetic-20260729",
+    "smoke": false,
+    "task_cell_counts": {
+      "coupling": 6,
+      "denoising": 24
+    },
+    "total_cells": 30,
+    "total_optimizer_steps": 768000,
+    "usable_budget_usd": 13.5,
+    "within_cost_plan": true,
+    "within_time_plan": true
+  },
+  "run_name": "spectral-v1-paper-synthetic-20260729",
+  "schema_version": 1,
+  "unexpected_cell_ids": []
+}

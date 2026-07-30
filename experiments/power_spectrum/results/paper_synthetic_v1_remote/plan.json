@@ -1,0 +1,17 @@
+{
+  "effective_assumed_usd_per_hour": 5.0,
+  "estimated_cost_usd": 10.5,
+  "estimated_gpu_hours": 2.1,
+  "max_session_hours": 2.75,
+  "run_name": "spectral-v1-paper-synthetic-20260729",
+  "smoke": false,
+  "task_cell_counts": {
+    "coupling": 6,
+    "denoising": 24
+  },
+  "total_cells": 30,
+  "total_optimizer_steps": 768000,
+  "usable_budget_usd": 13.5,
+  "within_cost_plan": true,
+  "within_time_plan": true
+}

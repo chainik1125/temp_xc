@@ -1,0 +1,250 @@
+{
+  "architectures": [
+    "topk_sae",
+    "tsae_paper",
+    "txc_base",
+    "spectral_v1"
+  ],
+  "baseline_source": {
+    "coupling_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/data/setup_d_leaderboard.jsonl",
+    "coupling_sha256": "27216c80ddd70d0b4fd55f2d422cf30009223117ce103f12b4cd228cab68fcd0",
+    "denoising_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/data/denoising_probe_results.json",
+    "denoising_sha256": "8e1d613c70df9021e37f9f1d099bacf5172728fe423da84ec71e7ce26e0a8152",
+    "git_ref": "origin/dmitry-synthetic",
+    "renderer_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/make_c2_synth_panels.py",
+    "renderer_sha256": "a7753b71522e32dfcecf956e2e52ba5446105b3d4c17d65317ef8eb35cbe1a9b"
+  },
+  "notes": {
+    "backbone": "Spectral v1 is BatchTopK plus AuxK; the published TopK SAE and TXC-base use the legacy TopK-to-ReLU backbone.",
+    "coupling": "gauc filters time-mean decoder directions with norm <=1e-5; gauc_paper_raw is retained per row for sensitivity. At np10 the hidden-direction target matrix has rank 1.",
+    "selection": "Each bar is the best seed-mean hyperparameter cell. Published bars retain the historical renderer's duplicate rows; Spectral v1 requires all three configured seeds and is selected from the frozen focused grid."
+  },
+  "schema_version": 1,
+  "spectral_run": "spectral-v1-paper-synthetic-20260729",
+  "tasks": {
+    "coupling": {
+      "metric": "gauc",
+      "rows": [
+        {
+          "architecture": "topk_sae",
+          "k_pos": 1,
+          "label": "TopK SAE",
+          "max": 0.9285714285714284,
+          "mean": 0.8424036281179137,
+          "metric": "gauc",
+          "min": 0.7653061224489794,
+          "n": 9,
+          "seed_values": [
+            0.8061224489795917,
+            0.8265306122448979,
+            0.8673469387755102,
+            0.8061224489795917,
+            0.7653061224489794,
+            0.7653061224489794,
+            0.9081632653061222,
+            0.9081632653061222,
+            0.9285714285714284
+          ],
+          "seeds": [
+            1,
+            2,
+            42,
+            42,
+            2,
+            1,
+            42,
+            2,
+            1
+          ],
+          "source": "published Figure 2 snapshot",
+          "std": 0.06271798950539377,
+          "t_label": "default"
+        },
+        {
+          "architecture": "tsae_paper",
+          "k_pos": 1,
+          "label": "T-SAE",
+          "max": 0.9897959183673469,
+          "mean": 0.9897959183673469,
+          "metric": "gauc",
+          "min": 0.9897959183673469,
+          "n": 4,
+          "seed_values": [
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469
+          ],
+          "seeds": [
+            1,
+            2,
+            42,
+            42
+          ],
+          "source": "published Figure 2 snapshot",
+          "std": 0.0,
+          "t_label": "default"
+        },
+        {
+          "architecture": "txc_base",
+          "k_pos": 1,
+          "label": "TXC-base",
+          "max": 0.9897959183673469,
+          "mean": 0.9897959183673469,
+          "metric": "gauc",
+          "min": 0.9897959183673469,
+          "n": 9,
+          "seed_values": [
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469
+          ],
+          "seeds": [
+            1,
+            2,
+            42,
+            42,
+            2,
+            1,
+            42,
+            2,
+            1
+          ],
+          "source": "published Figure 2 snapshot",
+          "std": 0.0,
+          "t_label": "default"
+        },
+        {
+          "T": 5,
+          "architecture": "spectral_v1",
+          "delta_vs_txc": -0.020408163265306256,
+          "k_pos": 1,
+          "label": "Spectral v1",
+          "max": 0.9693877551020407,
+          "mean": 0.9693877551020407,
+          "metric": "gauc",
+          "min": 0.9693877551020407,
+          "n": 3,
+          "seed_values": [
+            0.9693877551020407,
+            0.9693877551020407,
+            0.9693877551020407
+          ],
+          "seeds": [
+            1,
+            2,
+            42
+          ],
+          "source": "new paper-recipe sweep",
+          "std": 0.0,
+          "t_label": "T=5"
+        }
+      ]
+    },
+    "denoising": {
+      "metric": "lp_mean_global_r2",
+      "rows": [
+        {
+          "architecture": "topk_sae",
+          "k_pos": 20,
+          "label": "TopK SAE",
+          "max": 0.3755850732326508,
+          "mean": 0.36298478444417315,
+          "metric": "lp_mean_global_r2",
+          "min": 0.35533055365085603,
+          "n": 3,
+          "seed_values": [
+            0.3755850732326508,
+            0.35803872644901275,
+            0.35533055365085603
+          ],
+          "seeds": [
+            42,
+            1,
+            2
+          ],
+          "source": "published Figure 2 snapshot",
+          "std": 0.01099586322854848,
+          "t_label": "default"
+        },
+        {
+          "architecture": "tsae_paper",
+          "k_pos": 20,
+          "label": "T-SAE",
+          "max": 0.38684957921504975,
+          "mean": 0.38191417654355364,
+          "metric": "lp_mean_global_r2",
+          "min": 0.37899514436721804,
+          "n": 3,
+          "seed_values": [
+            0.38684957921504975,
+            0.37899514436721804,
+            0.37989780604839324
+          ],
+          "seeds": [
+            2,
+            42,
+            1
+          ],
+          "source": "published Figure 2 snapshot",
+          "std": 0.004297947088439255,
+          "t_label": "default"
+        },
+        {
+          "architecture": "txc_base",
+          "k_pos": 17,
+          "label": "TXC-base",
+          "max": 0.49507788121700286,
+          "mean": 0.4829211582740148,
+          "metric": "lp_mean_global_r2",
+          "min": 0.47650026679039004,
+          "n": 3,
+          "seed_values": [
+            0.47650026679039004,
+            0.49507788121700286,
+            0.4771853268146515
+          ],
+          "seeds": [
+            2,
+            1,
+            42
+          ],
+          "source": "published Figure 2 snapshot",
+          "std": 0.010533601537159055,
+          "t_label": "T=2"
+        },
+        {
+          "T": 2,
+          "architecture": "spectral_v1",
+          "delta_vs_txc": -0.07126787602901452,
+          "k_pos": 20,
+          "label": "Spectral v1",
+          "max": 0.43183462619781493,
+          "mean": 0.41165328224500025,
+          "metric": "lp_mean_global_r2",
+          "min": 0.3939488261938095,
+          "n": 3,
+          "seed_values": [
+            0.43183462619781493,
+            0.40917639434337616,
+            0.3939488261938095
+          ],
+          "seeds": [
+            1,
+            2,
+            42
+          ],
+          "source": "new paper-recipe sweep",
+          "std": 0.01906396314368508,
+          "t_label": "T=2"
+        }
+      ]
+    }
+  }
+}
