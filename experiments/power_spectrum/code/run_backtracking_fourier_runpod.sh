@@ -46,6 +46,7 @@ args=(
   --steps "${BACKTRACKING_FOURIER_STEPS:-20000}"
   --batch-size "${BACKTRACKING_FOURIER_BATCH_SIZE:-1024}"
   --checkpoint-every "${BACKTRACKING_FOURIER_CHECKPOINT_EVERY:-1000}"
+  --memory-smoke-steps "${BACKTRACKING_FOURIER_MEMORY_SMOKE_STEPS:-1}"
   --encode-batch-size "${BACKTRACKING_FOURIER_ENCODE_BATCH_SIZE:-32}"
 )
 if [[ -n "${BACKTRACKING_FOURIER_WINDOWS:-}" ]]; then

@@ -361,7 +361,7 @@ def memory_smoke(
     config: FourierTrainConfig,
     device: str,
 ) -> dict:
-    """Run one exact-width/full-batch update without creating a checkpoint."""
+    """Run exact-width/full-batch updates without creating a checkpoint."""
 
     reference = _reference_imports()
     cache = np.load(activation_cache, mmap_mode="r")
@@ -376,35 +376,40 @@ def memory_smoke(
         dtype=_model_dtype(config, device),
     )
     optimizer = torch.optim.Adam(model.parameters(), lr=config.learning_rate)
-    raw = reference["materialize_windows"](
-        cache,
-        step=0,
-        window=config.window,
-        batch_size=config.batch_size,
-        schedule_seed=config.schedule_seed,
-        max_window=config.schedule_max_window,
-    )
-    batch = torch.from_numpy(raw).to(
-        device=device,
-        dtype=_model_dtype(config, device),
-    )
     started = time.monotonic()
-    optimizer.zero_grad(set_to_none=True)
-    with torch.autocast(
-        device_type="cuda" if device.startswith("cuda") else "cpu",
-        dtype=torch.bfloat16,
-        enabled=config.amp and device.startswith("cuda"),
-    ):
-        metrics = model.train_step(batch)
-    metrics["loss"].backward()
-    optimizer.step()
-    model.post_step()
+    metrics = None
+    for step in range(config.steps):
+        raw = reference["materialize_windows"](
+            cache,
+            step=step,
+            window=config.window,
+            batch_size=config.batch_size,
+            schedule_seed=config.schedule_seed,
+            max_window=config.schedule_max_window,
+        )
+        batch = torch.from_numpy(raw).to(
+            device=device,
+            dtype=_model_dtype(config, device),
+        )
+        optimizer.zero_grad(set_to_none=True)
+        with torch.autocast(
+            device_type="cuda" if device.startswith("cuda") else "cpu",
+            dtype=torch.bfloat16,
+            enabled=config.amp and device.startswith("cuda"),
+        ):
+            metrics = model.train_step(batch)
+        metrics["loss"].backward()
+        optimizer.step()
+        model.post_step()
     if device.startswith("cuda"):
         torch.cuda.synchronize()
     elapsed = time.monotonic() - started
+    assert metrics is not None
     payload: dict[str, object] = {
         "status": "complete",
         "elapsed_seconds": elapsed,
+        "steps": config.steps,
+        "steps_per_second": config.steps / elapsed,
         "config": asdict(config),
         "parameter_match": parameter_match(config),
         "metrics": {
@@ -644,6 +649,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--steps", type=int, default=20_000)
     parser.add_argument("--batch-size", type=int, default=1_024)
     parser.add_argument("--checkpoint-every", type=int, default=1_000)
+    parser.add_argument("--memory-smoke-steps", type=int, default=1)
     parser.add_argument("--encode-batch-size", type=int, default=32)
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--max-cells", type=int)
@@ -699,8 +705,16 @@ def main() -> None:
     seeds = _csv_ints(args.seeds, DEFAULT_SEEDS)
     if any(window not in DEFAULT_WINDOWS for window in windows):
         raise ValueError(f"windows must be a subset of {DEFAULT_WINDOWS}")
-    if min(args.steps, args.batch_size, args.checkpoint_every) < 1:
-        raise ValueError("steps, batch size, and checkpoint interval must be positive")
+    if min(
+        args.steps,
+        args.batch_size,
+        args.checkpoint_every,
+        args.memory_smoke_steps,
+    ) < 1:
+        raise ValueError(
+            "steps, memory-smoke steps, batch size, and checkpoint interval "
+            "must be positive"
+        )
 
     cells = [(seed, window) for seed in seeds for window in windows]
     if args.max_cells is not None:
@@ -743,7 +757,7 @@ def main() -> None:
         smoke_config = _config(
             window=max(windows),
             seed=seeds[0],
-            steps=1,
+            steps=args.memory_smoke_steps,
             batch_size=args.batch_size,
             checkpoint_every=1,
         )
