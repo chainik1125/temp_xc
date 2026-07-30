@@ -205,10 +205,15 @@ def run() -> dict:
         (len(flat), len(selected)),
         dtype=torch.float32,
     )
+    distributed_projection = torch.zeros(
+        len(flat),
+        dtype=torch.float32,
+    )
     selected_lookup = {
         int(feature): column for column, feature in enumerate(selected)
     }
     k = int(sae_checkpoint["config"]["k"])
+    cosine_cuda = cosine.to("cuda")
     with torch.inference_mode():
         for start in range(0, len(flat), 256):
             end = min(start + 256, len(flat))
@@ -216,6 +221,10 @@ def run() -> dict:
             pre = (batch - b_dec) @ w_enc.T + b_enc
             values, indices = torch.topk(pre, k=k, dim=-1)
             values = torch.relu(values)
+            distributed_projection[start:end] = torch.sum(
+                values * cosine_cuda[indices],
+                dim=-1,
+            ).cpu()
             for feature, column in selected_lookup.items():
                 selected_values[start:end, column] = torch.sum(
                     values * (indices == feature),
@@ -226,6 +235,11 @@ def run() -> dict:
         panel.shape[1],
         panel.shape[2],
         len(selected),
+    ).numpy()
+    distributed_projection = distributed_projection.reshape(
+        panel.shape[0],
+        panel.shape[1],
+        panel.shape[2],
     ).numpy()
 
     sae_curves = {}
@@ -249,6 +263,11 @@ def run() -> dict:
         }
         for feature in absolute_order[:64].tolist()
     ]
+    distributed_points = paired_scalar_curve(
+        distributed_projection[:, 0],
+        distributed_projection[:, 1],
+        offsets,
+    )
     prior_sae_result = (
         json.loads(sae_result_cache_path.read_text())
         if sae_result_cache_path.exists()
@@ -309,6 +328,16 @@ def run() -> dict:
             "tracked_features": [int(value) for value in selected],
             "curves": sae_curves,
             "summaries": sae_summaries,
+            "distributed_projection": {
+                "definition": (
+                    "sum_j z_j cosine(decoder_j, base_union), over the "
+                    "token's active TopK features; equivalently the "
+                    "base-union projection of the SAE reconstruction after "
+                    "dropping the constant decoder bias"
+                ),
+                "curve": curve_to_dict(distributed_points),
+                "summary": curve_summary(distributed_points),
+            },
             "prior_reconstruction": (
                 None
                 if prior_sae_result is None
