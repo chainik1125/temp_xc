@@ -521,6 +521,7 @@ def evaluate_dictionary(
         "protocol_version": PROTOCOL_VERSION,
         "reference_protocol_version": REFERENCE_PROTOCOL_VERSION,
         "reference_commit": REFERENCE_COMMIT,
+        "implementation_sha256": implementation_fingerprint(),
         "artifact_sha256": artifact_sha256,
         "cohort_sha256": cohort_sha256,
         "window": window,
@@ -633,6 +634,20 @@ def evaluate_dictionary(
 def _run_fingerprint(payload: dict) -> str:
     encoded = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
     return hashlib.sha256(encoded).hexdigest()
+
+
+def implementation_fingerprint() -> dict[str, str]:
+    """Hash the staged experimental source independently of its checkout."""
+
+    code_dir = Path(__file__).resolve().parent
+    paths = (
+        code_dir / "backtracking_fourier_xc.py",
+        Path(__file__).resolve(),
+    )
+    return {
+        path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+        for path in paths
+    }
 
 
 def activation_cache_inventory(path: Path) -> dict:
@@ -764,6 +779,7 @@ def main() -> None:
         "protocol_version": PROTOCOL_VERSION,
         "reference_protocol_version": REFERENCE_PROTOCOL_VERSION,
         "reference_commit": REFERENCE_COMMIT,
+        "implementation_sha256": implementation_fingerprint(),
         "phase": args.phase,
         "device": args.device,
         "artifact": str(args.artifact),
