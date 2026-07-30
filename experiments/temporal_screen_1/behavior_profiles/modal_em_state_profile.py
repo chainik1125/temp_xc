@@ -216,6 +216,17 @@ def run_profile(
 
     instant_array = np.stack(instant)
     prefix_mean_array = np.stack(prefix_mean)
+
+    # Causal masking makes the prompt-only state mathematically identical for
+    # every rollout of the same prompt.  Different total sequence lengths can
+    # nevertheless select different attention kernels and create tiny floating
+    # point differences.  Canonicalize progress zero within prompt so those
+    # numerical ties cannot be assigned arbitrary AUC order.
+    for group in np.unique(selection.groups):
+        group_indices = np.flatnonzero(selection.groups == group)
+        for values in (instant_array, prefix_mean_array):
+            values[group_indices, 0, :] = values[group_indices[0], 0, :]
+
     profiles = {}
     positionwise_profiles = {}
     for representation, values in {
@@ -303,6 +314,10 @@ def run_profile(
             "hook": f"model.model.layers[{layer}] output (resid_post)",
             "progress": progress,
             "progress_zero": "last rendered prompt token",
+            "progress_zero_canonicalization": (
+                "within each prompt, copy one prompt-only residual to every "
+                "rollout to remove sequence-length-kernel numerical noise"
+            ),
             "progress_one": "final re-encoded response token",
         },
         "token_audit": token_audit,
