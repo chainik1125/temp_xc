@@ -46,6 +46,8 @@ BACKTRACKING_FOURIER_PHASE=all \
   bash purified/experiments/power_spectrum/code/run_backtracking_fourier_runpod.sh
 ```
 
-Completed cells delete only their new optimizer-state file after evaluation.
-The model weights, sparse codes, fold predictions, band-only probes, and result
-JSON remain. Reruns recognize this completed-and-cleaned state.
+Completed cells delete only their new optimizer-state file after a successful
+20,000-step training return (or after evaluation when running eval-only). The
+model weights, training summary, sparse codes, fold predictions, band-only
+probes, and result JSON remain. Reruns recognize this completed-and-cleaned
+state.

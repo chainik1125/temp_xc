@@ -815,8 +815,13 @@ def main() -> None:
             )
         if (
             args.cleanup_optimizer_state
-            and evaluation is not None
-            and evaluation.get("status") == "complete"
+            and (
+                (training is not None and training.get("status") == "complete")
+                or (
+                    evaluation is not None
+                    and evaluation.get("status") == "complete"
+                )
+            )
         ):
             state_path = checkpoint_dir / "training_state.pt"
             if state_path.exists():
