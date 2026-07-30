@@ -1,0 +1,259 @@
+{
+  "schema_version": 1,
+  "run_name": "controlled-frequency-shamir-hmm-20260729",
+  "overall_spend": {
+    "cap_usd": 50.0,
+    "estimated_prior_usd": 37.6,
+    "note": "Prior estimate includes the completed overnight, matched-control, paper-synthetic, smoke, and calibration calls. This run has an independent stricter ledger below."
+  },
+  "budget": {
+    "max_total_usd": 9.0,
+    "reserve_usd": 0.5,
+    "assumed_usd_per_gpu_hour": 4.0,
+    "cost_overhead_multiplier": 1.25,
+    "max_session_hours": 1.65
+  },
+  "planning": {
+    "estimated_steps_per_second": 85.0,
+    "estimated_eval_seconds_per_cell": 12.0,
+    "setup_seconds": 120.0
+  },
+  "training": {
+    "batch_tokens": 1024,
+    "learning_rate": 0.0003,
+    "warmup_steps": 1000,
+    "gradient_clip_norm": 1.0,
+    "budget_check_every_steps": 100,
+    "log_every_steps": 1000,
+    "precision": "bf16"
+  },
+  "split_sizes": {
+    "train": 4096,
+    "probe": 2048,
+    "eval": 2048
+  },
+  "split_seeds": {
+    "train": 101,
+    "probe": 202,
+    "eval": 303
+  },
+  "models": [
+    {
+      "name": "sae",
+      "label": "BatchTopK SAE",
+      "class_path": "temp_bench.archs.batchtopk_sae:BatchTopKSAE",
+      "implementation_version": "1.0.0",
+      "consumes": "token",
+      "sparsity_rule": "one_per_token",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "txc",
+      "label": "TXC-post",
+      "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
+      "implementation_version": "1.0.0",
+      "consumes": "window",
+      "sparsity_rule": "window_length",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "spectral_v1",
+      "label": "Spectral v1",
+      "class_path": "temp_bench.archs.spectral_txc:SpectralTXCBatchTopK",
+      "implementation_version": "1.0.0",
+      "consumes": "window",
+      "sparsity_rule": "one_per_token",
+      "hparams": {
+        "auxk_alpha": 0.03125,
+        "bands": "multiband"
+      }
+    },
+    {
+      "name": "spectral_mat_global",
+      "label": "Spectral Matryoshka",
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "implementation_version": "2.0.0-experimental",
+      "consumes": "window",
+      "sparsity_rule": "one_per_token",
+      "skip_window_lengths": [
+        1
+      ],
+      "hparams": {
+        "auxk_alpha": 0.03125,
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "selection_mode": "global",
+        "dominance_alpha": 0.0,
+        "frequency_matryoshka_alpha": 0.1,
+        "frequency_matryoshka_decay": 1.0
+      }
+    }
+  ],
+  "seeds": [
+    1,
+    2
+  ],
+  "tasks": [
+    {
+      "name": "shamir_h1_w1",
+      "family": "shamir",
+      "group": "shamir_h1",
+      "h": 1,
+      "q": 31,
+      "d_in": 64,
+      "d_sae": 1024,
+      "sigma": 0.1,
+      "sequence_length": 16,
+      "window": 1,
+      "n_steps": 6000,
+      "primary_metric": "secret_recovery"
+    },
+    {
+      "name": "shamir_h1_w2",
+      "family": "shamir",
+      "group": "shamir_h1",
+      "h": 1,
+      "q": 31,
+      "d_in": 64,
+      "d_sae": 1024,
+      "sigma": 0.1,
+      "sequence_length": 16,
+      "window": 2,
+      "n_steps": 6000,
+      "primary_metric": "secret_recovery"
+    },
+    {
+      "name": "shamir_h1_w4",
+      "family": "shamir",
+      "group": "shamir_h1",
+      "h": 1,
+      "q": 31,
+      "d_in": 64,
+      "d_sae": 1024,
+      "sigma": 0.1,
+      "sequence_length": 16,
+      "window": 4,
+      "n_steps": 6000,
+      "primary_metric": "secret_recovery"
+    },
+    {
+      "name": "shamir_h2_w2",
+      "family": "shamir",
+      "group": "shamir_h2",
+      "h": 2,
+      "q": 11,
+      "d_in": 64,
+      "d_sae": 2048,
+      "sigma": 0.1,
+      "sequence_length": 16,
+      "window": 2,
+      "n_steps": 6000,
+      "primary_metric": "secret_recovery"
+    },
+    {
+      "name": "shamir_h2_w3",
+      "family": "shamir",
+      "group": "shamir_h2",
+      "h": 2,
+      "q": 11,
+      "d_in": 64,
+      "d_sae": 2048,
+      "sigma": 0.1,
+      "sequence_length": 16,
+      "window": 3,
+      "n_steps": 6000,
+      "primary_metric": "secret_recovery"
+    },
+    {
+      "name": "shamir_h2_w6",
+      "family": "shamir",
+      "group": "shamir_h2",
+      "h": 2,
+      "q": 11,
+      "d_in": 64,
+      "d_sae": 2048,
+      "sigma": 0.1,
+      "sequence_length": 16,
+      "window": 6,
+      "n_steps": 6000,
+      "primary_metric": "secret_recovery"
+    },
+    {
+      "name": "hmm_slow",
+      "family": "factorial_hmm",
+      "group": "hmm_slow",
+      "lambdas": [
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "d_in": 16,
+      "d_sae": 64,
+      "sigma": 0.5,
+      "sequence_length": 64,
+      "window": 8,
+      "n_steps": 4000,
+      "primary_metric": "latent_r2"
+    },
+    {
+      "name": "hmm_alternating",
+      "family": "factorial_hmm",
+      "group": "hmm_alternating",
+      "lambdas": [
+        -0.9,
+        -0.9,
+        -0.9,
+        -0.9
+      ],
+      "d_in": 16,
+      "d_sae": 64,
+      "sigma": 0.5,
+      "sequence_length": 64,
+      "window": 8,
+      "n_steps": 4000,
+      "primary_metric": "latent_r2"
+    },
+    {
+      "name": "hmm_mixed",
+      "family": "factorial_hmm",
+      "group": "hmm_mixed",
+      "lambdas": [
+        0.9,
+        0.5,
+        -0.5,
+        -0.9
+      ],
+      "d_in": 16,
+      "d_sae": 64,
+      "sigma": 0.5,
+      "sequence_length": 64,
+      "window": 8,
+      "n_steps": 4000,
+      "primary_metric": "latent_r2"
+    }
+  ],
+  "smoke": {
+    "tasks": [
+      "shamir_h2_w3",
+      "hmm_mixed"
+    ],
+    "models": [
+      "sae",
+      "txc",
+      "spectral_v1",
+      "spectral_mat_global"
+    ],
+    "seed": 1,
+    "n_steps": 2
+  },
+  "fairness": {
+    "support": "Nominal W active entries per analysis window: SAE uses one per token, TXC-post uses k_pos=W per shared window, and spectral models use k_pos=1 so k_win=W.",
+    "data": "All architectures share the same representation-training episodes and use episode-disjoint probe/eval episodes with a fixed shared observation dictionary.",
+    "parameters": "Sparsity and reconstructed token positions are matched; parameter counts are reported but not matched."
+  }
+}
