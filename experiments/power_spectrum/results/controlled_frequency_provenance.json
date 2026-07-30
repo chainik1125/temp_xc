@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-29",
+  "run_source_commit": "b66f1cb1f5b94f785f93401e71ac167583eab1bc",
+  "run_source_commit_subject": "Make latent selectivity cross-validated",
+  "controlled_function_call_id": "fc-01KYRGCPK206DGD2QYET2CSXDR",
+  "denoising_usage_function_call_id": "fc-01KYRGD9GFTPVMA830WSJYW8G5",
+  "integrity": {
+    "controlled_complete": true,
+    "controlled_expected_cells": 70,
+    "controlled_ok_cells": 70,
+    "controlled_failed_cells": 0,
+    "denoising_seeds": [
+      1,
+      2,
+      42
+    ]
+  },
+  "cost": {
+    "prior_conservative_estimate_usd": 37.6,
+    "controlled_ledger_estimate_usd": 4.549874,
+    "denoising_gpu_seconds": 777.296,
+    "denoising_estimate_at_effective_5_usd_per_hour": 1.079578,
+    "combined_conservative_estimate_usd": 43.229452,
+    "cap_usd": 50.0
+  },
+  "sha256": {
+    "controlled_frozen_config": "e30f04c626b55021c361918e1f17513d586467d2542c1dfac6e6508b79055a2e",
+    "controlled_results_jsonl": "f7d242c14fd56b056646ba134eef5831db017a23336877483420674b26126d78",
+    "controlled_summary": "84c6733e1af233ecd3f397aeda2e95cc797eb55a57ffa3dd7d0be4ace1ea09ba",
+    "controlled_spend": "b890e643e1563c390edaba224d3246460ee191dd3b8320a647894535f387d735",
+    "denoising_result": "2cf14a2a58dcd9622c790abb679f3cbddbdf5fdbfd2cb01f01cbfaeaa6809b04",
+    "analysis_json": "bd0fcc6ad9f818f43a0b6c6d99909e35276849633e4765a93198206f483ca870",
+    "analysis_csv": "277e3594ba4624fdaeb5f4848a51c34728163f10b3fb31708f05167d8cf04a3b"
+  }
+}

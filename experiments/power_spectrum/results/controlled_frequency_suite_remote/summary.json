@@ -1,0 +1,643 @@
+{
+  "aggregates": [
+    {
+      "family": "shamir",
+      "max": 0.0002584372779848969,
+      "mean": -0.0015282153297962071,
+      "mean_l0_per_window": 0.9990234375,
+      "mean_nmse": 0.39277026057243347,
+      "metric": "secret_recovery",
+      "min": -0.0033148679375773113,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.0002584372779848969,
+        "2": -0.0033148679375773113
+      },
+      "std": 0.0025267083491732952,
+      "task": "shamir_h1_w1"
+    },
+    {
+      "family": "shamir",
+      "max": -0.0032236752006573545,
+      "mean": -0.0035623332387431554,
+      "mean_l0_per_window": 0.99951171875,
+      "mean_nmse": 0.39279916882514954,
+      "metric": "secret_recovery",
+      "min": -0.003900991276828957,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": -0.003900991276828957,
+        "2": -0.0032236752006573545
+      },
+      "std": 0.00047893479046760417,
+      "task": "shamir_h1_w1"
+    },
+    {
+      "family": "shamir",
+      "max": -0.0001896178395699594,
+      "mean": -0.0009628941261398843,
+      "mean_l0_per_window": 0.99951171875,
+      "mean_nmse": 0.3927770256996155,
+      "metric": "secret_recovery",
+      "min": -0.0017361704127098092,
+      "model": "spectral_v1",
+      "n": 2,
+      "seed_values": {
+        "1": -0.0017361704127098092,
+        "2": -0.0001896178395699594
+      },
+      "std": 0.001093577811928692,
+      "task": "shamir_h1_w1"
+    },
+    {
+      "family": "shamir",
+      "max": 0.06040854265272019,
+      "mean": 0.05575115289934468,
+      "mean_l0_per_window": 1.99853515625,
+      "mean_nmse": 0.39175985753536224,
+      "metric": "secret_recovery",
+      "min": 0.05109376314596917,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.06040854265272019,
+        "2": 0.05109376314596917
+      },
+      "std": 0.006586543754481134,
+      "task": "shamir_h1_w2"
+    },
+    {
+      "family": "shamir",
+      "max": 0.05913578294780421,
+      "mean": 0.0530337273164229,
+      "mean_l0_per_window": 1.99951171875,
+      "mean_nmse": 0.3922395557165146,
+      "metric": "secret_recovery",
+      "min": 0.04693167168504159,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.05913578294780421,
+        "2": 0.04693167168504159
+      },
+      "std": 0.008629609832254569,
+      "task": "shamir_h1_w2"
+    },
+    {
+      "family": "shamir",
+      "max": 0.030579035253149228,
+      "mean": 0.025645662304704414,
+      "mean_l0_per_window": 2.017578125,
+      "mean_nmse": 0.6104728579521179,
+      "metric": "secret_recovery",
+      "min": 0.020712289356259597,
+      "model": "spectral_v1",
+      "n": 2,
+      "seed_values": {
+        "1": 0.030579035253149228,
+        "2": 0.020712289356259597
+      },
+      "std": 0.006976842931935202,
+      "task": "shamir_h1_w2"
+    },
+    {
+      "family": "shamir",
+      "max": 0.03606878684356055,
+      "mean": 0.03119390957237072,
+      "mean_l0_per_window": 2.02392578125,
+      "mean_nmse": 0.6087797582149506,
+      "metric": "secret_recovery",
+      "min": 0.02631903230118088,
+      "model": "spectral_mat_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.03606878684356055,
+        "2": 0.02631903230118088
+      },
+      "std": 0.006894117551821011,
+      "task": "shamir_h1_w2"
+    },
+    {
+      "family": "shamir",
+      "max": 0.1837609371235698,
+      "mean": 0.18106895913594018,
+      "mean_l0_per_window": 3.9970703125,
+      "mean_nmse": 0.39251893758773804,
+      "metric": "secret_recovery",
+      "min": 0.17837698114831052,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.1837609371235698,
+        "2": 0.17837698114831052
+      },
+      "std": 0.003807031779715673,
+      "task": "shamir_h1_w4"
+    },
+    {
+      "family": "shamir",
+      "max": 0.6658753903987389,
+      "mean": 0.6204449959408317,
+      "mean_l0_per_window": 4.13916015625,
+      "mean_nmse": 0.40744371712207794,
+      "metric": "secret_recovery",
+      "min": 0.5750146014829245,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.5750146014829245,
+        "2": 0.6658753903987389
+      },
+      "std": 0.06424827998633185,
+      "task": "shamir_h1_w4"
+    },
+    {
+      "family": "shamir",
+      "max": 0.4759260573865518,
+      "mean": 0.4632912338959661,
+      "mean_l0_per_window": 4.2763671875,
+      "mean_nmse": 0.6517195105552673,
+      "metric": "secret_recovery",
+      "min": 0.4506564104053804,
+      "model": "spectral_v1",
+      "n": 2,
+      "seed_values": {
+        "1": 0.4759260573865518,
+        "2": 0.4506564104053804
+      },
+      "std": 0.01786833873857647,
+      "task": "shamir_h1_w4"
+    },
+    {
+      "family": "shamir",
+      "max": 0.4272179012864317,
+      "mean": 0.4240182340112323,
+      "mean_l0_per_window": 4.20458984375,
+      "mean_nmse": 0.6465425491333008,
+      "metric": "secret_recovery",
+      "min": 0.4208185667360328,
+      "model": "spectral_mat_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.4272179012864317,
+        "2": 0.4208185667360328
+      },
+      "std": 0.004525012855668448,
+      "task": "shamir_h1_w4"
+    },
+    {
+      "family": "shamir",
+      "max": 0.010533108915760444,
+      "mean": 0.006922172229886402,
+      "mean_l0_per_window": 1.998046875,
+      "mean_nmse": 0.4063587933778763,
+      "metric": "secret_recovery",
+      "min": 0.00331123554401236,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.00331123554401236,
+        "2": 0.010533108915760444
+      },
+      "std": 0.005106635634033627,
+      "task": "shamir_h2_w2"
+    },
+    {
+      "family": "shamir",
+      "max": 0.020788644732343875,
+      "mean": 0.012510183069136012,
+      "mean_l0_per_window": 2.09130859375,
+      "mean_nmse": 0.41697366535663605,
+      "metric": "secret_recovery",
+      "min": 0.004231721405928149,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.004231721405928149,
+        "2": 0.020788644732343875
+      },
+      "std": 0.01170751275969429,
+      "task": "shamir_h2_w2"
+    },
+    {
+      "family": "shamir",
+      "max": 0.010596031742542525,
+      "mean": 0.0029486113322503968,
+      "mean_l0_per_window": 1.98779296875,
+      "mean_nmse": 0.5730039477348328,
+      "metric": "secret_recovery",
+      "min": -0.004698809078041731,
+      "model": "spectral_v1",
+      "n": 2,
+      "seed_values": {
+        "1": 0.010596031742542525,
+        "2": -0.004698809078041731
+      },
+      "std": 0.010815085661403946,
+      "task": "shamir_h2_w2"
+    },
+    {
+      "family": "shamir",
+      "max": 0.004296978272524634,
+      "mean": 0.004219821915274365,
+      "mean_l0_per_window": 1.9814453125,
+      "mean_nmse": 0.5733888149261475,
+      "metric": "secret_recovery",
+      "min": 0.004142665558024098,
+      "model": "spectral_mat_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.004296978272524634,
+        "2": 0.004142665558024098
+      },
+      "std": 0.00010911556684663283,
+      "task": "shamir_h2_w2"
+    },
+    {
+      "family": "shamir",
+      "max": 0.007426237406163063,
+      "mean": 0.004247285576738665,
+      "mean_l0_per_window": 2.998046875,
+      "mean_nmse": 0.4058205336332321,
+      "metric": "secret_recovery",
+      "min": 0.0010683337473142665,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.007426237406163063,
+        "2": 0.0010683337473142665
+      },
+      "std": 0.004495716791302746,
+      "task": "shamir_h2_w3"
+    },
+    {
+      "family": "shamir",
+      "max": 0.002830311374841012,
+      "mean": 0.000600869285222623,
+      "mean_l0_per_window": 3.0947265625,
+      "mean_nmse": 0.40577779710292816,
+      "metric": "secret_recovery",
+      "min": -0.0016285728043957657,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.002830311374841012,
+        "2": -0.0016285728043957657
+      },
+      "std": 0.0031529072396637384,
+      "task": "shamir_h2_w3"
+    },
+    {
+      "family": "shamir",
+      "max": 0.03190105225040598,
+      "mean": 0.024970937031074676,
+      "mean_l0_per_window": 3.05126953125,
+      "mean_nmse": 0.5783780515193939,
+      "metric": "secret_recovery",
+      "min": 0.018040821811743376,
+      "model": "spectral_v1",
+      "n": 2,
+      "seed_values": {
+        "1": 0.03190105225040598,
+        "2": 0.018040821811743376
+      },
+      "std": 0.009800662931986524,
+      "task": "shamir_h2_w3"
+    },
+    {
+      "family": "shamir",
+      "max": 0.008883312495478924,
+      "mean": 0.008771572066784424,
+      "mean_l0_per_window": 3.0478515625,
+      "mean_nmse": 0.5783837735652924,
+      "metric": "secret_recovery",
+      "min": 0.008659831638089921,
+      "model": "spectral_mat_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.008659831638089921,
+        "2": 0.008883312495478924
+      },
+      "std": 0.00015802482972514806,
+      "task": "shamir_h2_w3"
+    },
+    {
+      "family": "shamir",
+      "max": 0.017073548152348048,
+      "mean": 0.015693790926212023,
+      "mean_l0_per_window": 5.99658203125,
+      "mean_nmse": 0.4069218039512634,
+      "metric": "secret_recovery",
+      "min": 0.014314033700075997,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.014314033700075997,
+        "2": 0.017073548152348048
+      },
+      "std": 0.0019512713819838485,
+      "task": "shamir_h2_w6"
+    },
+    {
+      "family": "shamir",
+      "max": 0.1609410013264292,
+      "mean": 0.1349954722050069,
+      "mean_l0_per_window": 6.03662109375,
+      "mean_nmse": 0.4149438738822937,
+      "metric": "secret_recovery",
+      "min": 0.10904994308358461,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.10904994308358461,
+        "2": 0.1609410013264292
+      },
+      "std": 0.0366925191664615,
+      "task": "shamir_h2_w6"
+    },
+    {
+      "family": "shamir",
+      "max": 0.20149297595876742,
+      "mean": 0.19176312502028092,
+      "mean_l0_per_window": 6.29443359375,
+      "mean_nmse": 0.655653327703476,
+      "metric": "secret_recovery",
+      "min": 0.18203327408179443,
+      "model": "spectral_v1",
+      "n": 2,
+      "seed_values": {
+        "1": 0.18203327408179443,
+        "2": 0.20149297595876742
+      },
+      "std": 0.013760087157076188,
+      "task": "shamir_h2_w6"
+    },
+    {
+      "family": "shamir",
+      "max": 0.17496320176385033,
+      "mean": 0.15608057772004247,
+      "mean_l0_per_window": 6.24609375,
+      "mean_nmse": 0.6286474466323853,
+      "metric": "secret_recovery",
+      "min": 0.1371979536762346,
+      "model": "spectral_mat_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.1371979536762346,
+        "2": 0.17496320176385033
+      },
+      "std": 0.026704063015945374,
+      "task": "shamir_h2_w6"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.5506832198943526,
+      "mean": 0.5461850959567636,
+      "mean_l0_per_window": 8.1533203125,
+      "mean_nmse": 0.536322832107544,
+      "metric": "latent_r2",
+      "min": 0.5416869720191744,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.5416869720191744,
+        "2": 0.5506832198943526
+      },
+      "std": 0.006361307877773628,
+      "task": "hmm_slow"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.854814197780237,
+      "mean": 0.8434620513232298,
+      "mean_l0_per_window": 7.57568359375,
+      "mean_nmse": 0.47456593811511993,
+      "metric": "latent_r2",
+      "min": 0.8321099048662227,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.854814197780237,
+        "2": 0.8321099048662227
+      },
+      "std": 0.016054359481545207,
+      "task": "hmm_slow"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.8342771950602935,
+      "mean": 0.8191874989669767,
+      "mean_l0_per_window": 8.07666015625,
+      "mean_nmse": 0.46902239322662354,
+      "metric": "latent_r2",
+      "min": 0.8040978028736598,
+      "model": "spectral_v1",
+      "n": 2,
+      "seed_values": {
+        "1": 0.8040978028736598,
+        "2": 0.8342771950602935
+      },
+      "std": 0.021340052867256983,
+      "task": "hmm_slow"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.8672918620844587,
+      "mean": 0.8579109460268848,
+      "mean_l0_per_window": 7.7001953125,
+      "mean_nmse": 0.4621196389198303,
+      "metric": "latent_r2",
+      "min": 0.8485300299693107,
+      "model": "spectral_mat_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.8485300299693107,
+        "2": 0.8672918620844587
+      },
+      "std": 0.013266618716104723,
+      "task": "hmm_slow"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.5442231038277463,
+      "mean": 0.5412225616296129,
+      "mean_l0_per_window": 8.240234375,
+      "mean_nmse": 0.5352393090724945,
+      "metric": "latent_r2",
+      "min": 0.5382220194314795,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.5442231038277463,
+        "2": 0.5382220194314795
+      },
+      "std": 0.004243407471073024,
+      "task": "hmm_alternating"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.8485788557502776,
+      "mean": 0.8443948262571253,
+      "mean_l0_per_window": 7.6904296875,
+      "mean_nmse": 0.4690442234277725,
+      "metric": "latent_r2",
+      "min": 0.8402107967639729,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.8485788557502776,
+        "2": 0.8402107967639729
+      },
+      "std": 0.005917111254585053,
+      "task": "hmm_alternating"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.7473082073807379,
+      "mean": 0.7448707717741845,
+      "mean_l0_per_window": 8.32958984375,
+      "mean_nmse": 0.5193617343902588,
+      "metric": "latent_r2",
+      "min": 0.7424333361676311,
+      "model": "spectral_v1",
+      "n": 2,
+      "seed_values": {
+        "1": 0.7424333361676311,
+        "2": 0.7473082073807379
+      },
+      "std": 0.0034470544921989185,
+      "task": "hmm_alternating"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.8346054910817466,
+      "mean": 0.8262574395602812,
+      "mean_l0_per_window": 8.0322265625,
+      "mean_nmse": 0.48553861677646637,
+      "metric": "latent_r2",
+      "min": 0.8179093880388157,
+      "model": "spectral_mat_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.8179093880388157,
+        "2": 0.8346054910817466
+      },
+      "std": 0.01180592768104579,
+      "task": "hmm_alternating"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.5487508650017333,
+      "mean": 0.5481576280130833,
+      "mean_l0_per_window": 8.12060546875,
+      "mean_nmse": 0.5390625894069672,
+      "metric": "latent_r2",
+      "min": 0.5475643910244334,
+      "model": "sae",
+      "n": 2,
+      "seed_values": {
+        "1": 0.5475643910244334,
+        "2": 0.5487508650017333
+      },
+      "std": 0.0008389637950501143,
+      "task": "hmm_mixed"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.7487679279824773,
+      "mean": 0.7421059037881768,
+      "mean_l0_per_window": 7.966796875,
+      "mean_nmse": 0.5047605037689209,
+      "metric": "latent_r2",
+      "min": 0.7354438795938764,
+      "model": "txc",
+      "n": 2,
+      "seed_values": {
+        "1": 0.7354438795938764,
+        "2": 0.7487679279824773
+      },
+      "std": 0.009421524968437392,
+      "task": "hmm_mixed"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.7449920251149225,
+      "mean": 0.7383651684179247,
+      "mean_l0_per_window": 7.982421875,
+      "mean_nmse": 0.510637640953064,
+      "metric": "latent_r2",
+      "min": 0.7317383117209268,
+      "model": "spectral_v1",
+      "n": 2,
+      "seed_values": {
+        "1": 0.7317383117209268,
+        "2": 0.7449920251149225
+      },
+      "std": 0.009371790616797271,
+      "task": "hmm_mixed"
+    },
+    {
+      "family": "factorial_hmm",
+      "max": 0.7554978534141596,
+      "mean": 0.7503861645207859,
+      "mean_l0_per_window": 7.99658203125,
+      "mean_nmse": 0.5052708685398102,
+      "metric": "latent_r2",
+      "min": 0.745274475627412,
+      "model": "spectral_mat_global",
+      "n": 2,
+      "seed_values": {
+        "1": 0.745274475627412,
+        "2": 0.7554978534141596
+      },
+      "std": 0.007229019759641178,
+      "task": "hmm_mixed"
+    }
+  ],
+  "complete": true,
+  "expected_cells": 70,
+  "failed": [],
+  "fairness": {
+    "data": "All architectures share the same representation-training episodes and use episode-disjoint probe/eval episodes with a fixed shared observation dictionary.",
+    "parameters": "Sparsity and reconstructed token positions are matched; parameter counts are reported but not matched.",
+    "support": "Nominal W active entries per analysis window: SAE uses one per token, TXC-post uses k_pos=W per shared window, and spectral models use k_pos=1 so k_win=W."
+  },
+  "generated_at": "2026-07-30T04:11:37Z",
+  "missing_cell_ids": [],
+  "observed_cells": 70,
+  "ok_cells": 70,
+  "plan": {
+    "effective_assumed_usd_per_hour": 5.0,
+    "estimated_cost_usd": 6.63,
+    "estimated_gpu_hours": 1.325,
+    "estimated_prior_usd": 37.6,
+    "evaluation_cells": 70,
+    "max_session_hours": 1.65,
+    "overall_cap_usd": 50.0,
+    "run_name": "controlled-frequency-shamir-hmm-20260729",
+    "smoke": false,
+    "task_cell_counts": {
+      "hmm_alternating": 8,
+      "hmm_mixed": 8,
+      "hmm_slow": 8,
+      "shamir_h1_w1": 6,
+      "shamir_h1_w2": 8,
+      "shamir_h1_w4": 8,
+      "shamir_h2_w2": 8,
+      "shamir_h2_w3": 8,
+      "shamir_h2_w6": 8
+    },
+    "total_optimizer_steps": 324000,
+    "unique_training_runs": 62,
+    "usable_budget_usd": 8.5,
+    "within_cost_plan": true,
+    "within_time_plan": true,
+    "worst_case_overall_usd": 46.6
+  },
+  "run_name": "controlled-frequency-shamir-hmm-20260729",
+  "schema_version": 1,
+  "smoke": false,
+  "unexpected_cell_ids": []
+}

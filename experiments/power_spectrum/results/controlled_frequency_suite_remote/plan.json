@@ -1,0 +1,28 @@
+{
+  "effective_assumed_usd_per_hour": 5.0,
+  "estimated_cost_usd": 6.63,
+  "estimated_gpu_hours": 1.325,
+  "estimated_prior_usd": 37.6,
+  "evaluation_cells": 70,
+  "max_session_hours": 1.65,
+  "overall_cap_usd": 50.0,
+  "run_name": "controlled-frequency-shamir-hmm-20260729",
+  "smoke": false,
+  "task_cell_counts": {
+    "hmm_alternating": 8,
+    "hmm_mixed": 8,
+    "hmm_slow": 8,
+    "shamir_h1_w1": 6,
+    "shamir_h1_w2": 8,
+    "shamir_h1_w4": 8,
+    "shamir_h2_w2": 8,
+    "shamir_h2_w3": 8,
+    "shamir_h2_w6": 8
+  },
+  "total_optimizer_steps": 324000,
+  "unique_training_runs": 62,
+  "usable_budget_usd": 8.5,
+  "within_cost_plan": true,
+  "within_time_plan": true,
+  "worst_case_overall_usd": 46.6
+}

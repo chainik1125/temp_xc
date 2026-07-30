@@ -1,0 +1,259 @@
+{
+  "budget": {
+    "assumed_usd_per_gpu_hour": 4.0,
+    "cost_overhead_multiplier": 1.25,
+    "max_session_hours": 1.65,
+    "max_total_usd": 9.0,
+    "reserve_usd": 0.5
+  },
+  "fairness": {
+    "data": "All architectures share the same representation-training episodes and use episode-disjoint probe/eval episodes with a fixed shared observation dictionary.",
+    "parameters": "Sparsity and reconstructed token positions are matched; parameter counts are reported but not matched.",
+    "support": "Nominal W active entries per analysis window: SAE uses one per token, TXC-post uses k_pos=W per shared window, and spectral models use k_pos=1 so k_win=W."
+  },
+  "models": [
+    {
+      "class_path": "temp_bench.archs.batchtopk_sae:BatchTopKSAE",
+      "consumes": "token",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      },
+      "implementation_version": "1.0.0",
+      "label": "BatchTopK SAE",
+      "name": "sae",
+      "sparsity_rule": "one_per_token"
+    },
+    {
+      "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
+      "consumes": "window",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      },
+      "implementation_version": "1.0.0",
+      "label": "TXC-post",
+      "name": "txc",
+      "sparsity_rule": "window_length"
+    },
+    {
+      "class_path": "temp_bench.archs.spectral_txc:SpectralTXCBatchTopK",
+      "consumes": "window",
+      "hparams": {
+        "auxk_alpha": 0.03125,
+        "bands": "multiband"
+      },
+      "implementation_version": "1.0.0",
+      "label": "Spectral v1",
+      "name": "spectral_v1",
+      "sparsity_rule": "one_per_token"
+    },
+    {
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "consumes": "window",
+      "hparams": {
+        "auxk_alpha": 0.03125,
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "dominance_alpha": 0.0,
+        "frequency_matryoshka_alpha": 0.1,
+        "frequency_matryoshka_decay": 1.0,
+        "selection_mode": "global"
+      },
+      "implementation_version": "2.0.0-experimental",
+      "label": "Spectral Matryoshka",
+      "name": "spectral_mat_global",
+      "skip_window_lengths": [
+        1
+      ],
+      "sparsity_rule": "one_per_token"
+    }
+  ],
+  "overall_spend": {
+    "cap_usd": 50.0,
+    "estimated_prior_usd": 37.6,
+    "note": "Prior estimate includes the completed overnight, matched-control, paper-synthetic, smoke, and calibration calls. This run has an independent stricter ledger below."
+  },
+  "planning": {
+    "estimated_eval_seconds_per_cell": 12.0,
+    "estimated_steps_per_second": 85.0,
+    "setup_seconds": 120.0
+  },
+  "run_name": "controlled-frequency-shamir-hmm-20260729",
+  "schema_version": 1,
+  "seeds": [
+    1,
+    2
+  ],
+  "smoke": {
+    "models": [
+      "sae",
+      "txc",
+      "spectral_v1",
+      "spectral_mat_global"
+    ],
+    "n_steps": 2,
+    "seed": 1,
+    "tasks": [
+      "shamir_h2_w3",
+      "hmm_mixed"
+    ]
+  },
+  "split_seeds": {
+    "eval": 303,
+    "probe": 202,
+    "train": 101
+  },
+  "split_sizes": {
+    "eval": 2048,
+    "probe": 2048,
+    "train": 4096
+  },
+  "tasks": [
+    {
+      "d_in": 64,
+      "d_sae": 1024,
+      "family": "shamir",
+      "group": "shamir_h1",
+      "h": 1,
+      "n_steps": 6000,
+      "name": "shamir_h1_w1",
+      "primary_metric": "secret_recovery",
+      "q": 31,
+      "sequence_length": 16,
+      "sigma": 0.1,
+      "window": 1
+    },
+    {
+      "d_in": 64,
+      "d_sae": 1024,
+      "family": "shamir",
+      "group": "shamir_h1",
+      "h": 1,
+      "n_steps": 6000,
+      "name": "shamir_h1_w2",
+      "primary_metric": "secret_recovery",
+      "q": 31,
+      "sequence_length": 16,
+      "sigma": 0.1,
+      "window": 2
+    },
+    {
+      "d_in": 64,
+      "d_sae": 1024,
+      "family": "shamir",
+      "group": "shamir_h1",
+      "h": 1,
+      "n_steps": 6000,
+      "name": "shamir_h1_w4",
+      "primary_metric": "secret_recovery",
+      "q": 31,
+      "sequence_length": 16,
+      "sigma": 0.1,
+      "window": 4
+    },
+    {
+      "d_in": 64,
+      "d_sae": 2048,
+      "family": "shamir",
+      "group": "shamir_h2",
+      "h": 2,
+      "n_steps": 6000,
+      "name": "shamir_h2_w2",
+      "primary_metric": "secret_recovery",
+      "q": 11,
+      "sequence_length": 16,
+      "sigma": 0.1,
+      "window": 2
+    },
+    {
+      "d_in": 64,
+      "d_sae": 2048,
+      "family": "shamir",
+      "group": "shamir_h2",
+      "h": 2,
+      "n_steps": 6000,
+      "name": "shamir_h2_w3",
+      "primary_metric": "secret_recovery",
+      "q": 11,
+      "sequence_length": 16,
+      "sigma": 0.1,
+      "window": 3
+    },
+    {
+      "d_in": 64,
+      "d_sae": 2048,
+      "family": "shamir",
+      "group": "shamir_h2",
+      "h": 2,
+      "n_steps": 6000,
+      "name": "shamir_h2_w6",
+      "primary_metric": "secret_recovery",
+      "q": 11,
+      "sequence_length": 16,
+      "sigma": 0.1,
+      "window": 6
+    },
+    {
+      "d_in": 16,
+      "d_sae": 64,
+      "family": "factorial_hmm",
+      "group": "hmm_slow",
+      "lambdas": [
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "n_steps": 4000,
+      "name": "hmm_slow",
+      "primary_metric": "latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.5,
+      "window": 8
+    },
+    {
+      "d_in": 16,
+      "d_sae": 64,
+      "family": "factorial_hmm",
+      "group": "hmm_alternating",
+      "lambdas": [
+        -0.9,
+        -0.9,
+        -0.9,
+        -0.9
+      ],
+      "n_steps": 4000,
+      "name": "hmm_alternating",
+      "primary_metric": "latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.5,
+      "window": 8
+    },
+    {
+      "d_in": 16,
+      "d_sae": 64,
+      "family": "factorial_hmm",
+      "group": "hmm_mixed",
+      "lambdas": [
+        0.9,
+        0.5,
+        -0.5,
+        -0.9
+      ],
+      "n_steps": 4000,
+      "name": "hmm_mixed",
+      "primary_metric": "latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.5,
+      "window": 8
+    }
+  ],
+  "training": {
+    "batch_tokens": 1024,
+    "budget_check_every_steps": 100,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0003,
+    "log_every_steps": 1000,
+    "precision": "bf16",
+    "warmup_steps": 1000
+  }
+}
