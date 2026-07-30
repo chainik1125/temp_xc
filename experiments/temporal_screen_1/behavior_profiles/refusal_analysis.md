@@ -1,17 +1,19 @@
 ## Refusal prefix profile: result
 
-The clean result is that the published refusal direction forms *before or at*
-the point at which refusal becomes visible in generated text. This makes
-refusal a useful positive-control behaviour for a feature-formation screen:
-the internal readout, the generated behaviour, and a causal intervention all
-refer to the same known direction.
+The clean result is that the published refusal direction becomes decodable
+*before or at* the point at which refusal becomes visible in generated text.
+But the new spatial control adds an important qualification: this direction
+is a sequence-wide causal effector, not a one-token causal bottleneck. Refusal
+is therefore a useful positive control for separating *feature formation* from
+*where the formed feature is causally used*.
 
 The experiment used 32 held-out harmful instructions and 32 one-to-one
 length-matched harmless instructions with Llama-3-8B-Instruct. It revealed
 nine literal token prefixes from 0% to 100%, measured the published Arditi
 direction at layer 12 before generation, and greedily generated up to 48
 tokens. The exact Arditi directional ablation and direction addition were the
-causal controls.
+causal controls. A second control applied the same interventions only to the
+current autoregressive token.
 
 ![Refusal temporal profile](refusal_analysis.png)
 
@@ -46,27 +48,56 @@ a single noisy crossing as onset.
 - Median stable direction onset is 7 revealed prompt tokens. Median lexical
   refusal onset is 10 revealed prompt tokens.
 
-This supports a narrow temporal claim: under this reveal intervention, harmful
-evidence is consolidated into a known causal refusal state before the state is
-expressed as lexical refusal. It does **not** say that refusal has a universal
-seven-token horizon; the onset varies with where harmful information occurs
-in each instruction.
+This supports a narrow temporal claim: under this reveal intervention, a
+readout along the known refusal direction appears before lexical refusal. It
+does **not** say that refusal has a universal seven-token horizon; the onset
+varies with where harmful information occurs in each instruction. Nor does
+decodability at the assistant decision token imply that this token is the
+causal site.
 
-## Causal check
+## Spatial causal check
 
-The causal controls are unusually clean.
+The all-position and current-token controls give opposite answers.
 
 - Full harmful prompts refuse in 31/32 baseline generations and 0/32 after
-  all-layer ablation of the published direction.
+  all-position, all-layer ablation of the published direction.
+- The same harmful prompts still refuse in 31/32 generations when the
+  direction is ablated only at the current autoregressive token. The
+  intervention drives the measured decision-token projection to approximately
+  zero, but leaves the refusal-token log odds at 9.00 and behavior unchanged.
 - Full harmless prompts refuse in 0/32 baseline generations and 32/32 after
-  adding the single published direction at its selected layer.
+  adding the single published direction at every sequence position at its
+  selected layer.
+- The same harmless prompts refuse in 0/32 generations when the direction is
+  added only at the current token. The intervention makes the measured
+  decision-token projection large (mean 3.64), but refusal-token log odds
+  remain -9.42 and behavior is unchanged.
 - Ablated harmful prompts produce 0/32 lexical refusals at every reveal
-  fraction, while their measured direction projection is approximately zero.
+  fraction under the all-position intervention.
 
-So the measured direction is not merely correlated with the class label. In
-this setup it mediates the observed refusal and is sufficient to induce it.
-The fact that a single direction is a sufficient effector still does not imply
-that the prompt evidence used to form that direction came from a single token.
+This resolves the apparent ambiguity in “single direction.” One vector
+specifies a one-dimensional *feature axis*; it does not specify a single
+sequence position. The directional subspace is necessary and sufficient under
+the published sequence-wide interventions, but its value at the current token
+is neither necessary nor sufficient under the matched spatial controls. A
+strong current-token projection can be a readout of a computation whose causal
+support remains at earlier positions.
+
+The cache matters to this interpretation. On the initial prompt pass, the
+current-token control touches only the final prompt/assistant-decision token.
+On each subsequent cached generation step it touches the one current input
+token, but previously computed prompt keys and values remain intact. Attention
+can therefore retrieve refusal-relevant state from earlier prompt positions
+and reconstruct or use it even while the current residual direction is
+repeatedly removed. The all-position ablation, in contrast, also changes the
+prompt states from which those cached keys and values are formed.
+
+This rejects an *exclusive current-token bottleneck*. It does not yet prove
+that support is broadly distributed: one earlier token, a small set of
+positions, or a genuinely distributed pattern could all explain the result.
+A position-by-position ablation/addition sweep, ideally including direct
+key/value-cache interventions or uncached recomputation, is required to
+distinguish those possibilities.
 
 ## Important limitations
 
@@ -98,6 +129,10 @@ that the prompt evidence used to form that direction came from a single token.
 - This is one model, one published direction, deterministic greedy decoding,
   and a high-precision but incomplete lexical refusal classifier. It locates
   prompt-side formation, not a rollout-internal onset after generation begins.
+- The current-token control changes the last prefill position and each
+  one-token cached decoding step, not previously cached prompt states. Its
+  failure localizes causal support away from an exclusive current-token
+  bottleneck; it is not a complete spatial localization experiment.
 
 ## Reproduction
 

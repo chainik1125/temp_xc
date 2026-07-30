@@ -110,6 +110,12 @@ def analyze(payload: dict[str, Any]) -> dict[str, Any]:
     harmful = rows_for(rows, "harmful", "baseline")
     harmless = rows_for(rows, "harmless", "baseline")
     ablated = rows_for(rows, "harmful", "direction_ablation")
+    current_ablated = rows_for(
+        rows, "harmful", "current_token_ablation"
+    )
+    current_added = rows_for(
+        rows, "harmless", "current_token_addition"
+    )
     added = rows_for(rows, "harmless", "direction_addition")
     fractions = sorted({float(row["reveal_fraction"]) for row in harmful})
 
@@ -264,6 +270,16 @@ def analyze(payload: dict[str, Any]) -> dict[str, Any]:
     full_ablated = [
         row for row in ablated if float(row["reveal_fraction"]) == 1.0
     ]
+    full_current_ablated = [
+        row
+        for row in current_ablated
+        if float(row["reveal_fraction"]) == 1.0
+    ]
+    full_current_added = [
+        row
+        for row in current_added
+        if float(row["reveal_fraction"]) == 1.0
+    ]
     empty_harmful = [
         row for row in harmful if float(row["reveal_fraction"]) == 0.0
     ]
@@ -397,19 +413,129 @@ def analyze(payload: dict[str, Any]) -> dict[str, Any]:
             "prompt_rows": prompt_rows,
         },
         "causal_checks": {
-            "baseline_harmful_full_refusal_count": int(
-                sum(row["generated_refusal"] for row in full_harmful)
+            "intervention_scope": {
+                "current_token": (
+                    "last token in prompt prefill and the one-token input "
+                    "on each cached generation step"
+                ),
+                "all_positions": (
+                    "every prompt position in prefill and the one-token "
+                    "input on each cached generation step"
+                ),
+            },
+            "full_prompt_cells": {
+                "baseline_harmful": {
+                    "refusal_count": int(
+                        sum(
+                            row["generated_refusal"]
+                            for row in full_harmful
+                        )
+                    ),
+                    "n": len(full_harmful),
+                },
+                "current_token_ablation_harmful": {
+                    "refusal_count": int(
+                        sum(
+                            row["generated_refusal"]
+                            for row in full_current_ablated
+                        )
+                    ),
+                    "n": len(full_current_ablated),
+                    "direction_decision_mean": float(
+                        np.mean(
+                            [
+                                row[DIRECTION_DECISION]
+                                for row in full_current_ablated
+                            ]
+                        )
+                    ),
+                    "direction_source_mean": float(
+                        np.mean(
+                            [
+                                row[DIRECTION_SOURCE]
+                                for row in full_current_ablated
+                            ]
+                        )
+                    ),
+                    "refusal_log_odds_mean": float(
+                        np.mean(
+                            [
+                                row[REFUSAL_LOG_ODDS]
+                                for row in full_current_ablated
+                            ]
+                        )
+                    ),
+                },
+                "all_position_ablation_harmful": {
+                    "refusal_count": int(
+                        sum(
+                            row["generated_refusal"]
+                            for row in full_ablated
+                        )
+                    ),
+                    "n": len(full_ablated),
+                },
+                "baseline_harmless": {
+                    "refusal_count": int(
+                        sum(
+                            row["generated_refusal"]
+                            for row in full_harmless
+                        )
+                    ),
+                    "n": len(full_harmless),
+                },
+                "current_token_addition_harmless": {
+                    "refusal_count": int(
+                        sum(
+                            row["generated_refusal"]
+                            for row in full_current_added
+                        )
+                    ),
+                    "n": len(full_current_added),
+                    "direction_decision_mean": float(
+                        np.mean(
+                            [
+                                row[DIRECTION_DECISION]
+                                for row in full_current_added
+                            ]
+                        )
+                    ),
+                    "direction_source_mean": float(
+                        np.mean(
+                            [
+                                row[DIRECTION_SOURCE]
+                                for row in full_current_added
+                            ]
+                        )
+                    ),
+                    "refusal_log_odds_mean": float(
+                        np.mean(
+                            [
+                                row[REFUSAL_LOG_ODDS]
+                                for row in full_current_added
+                            ]
+                        )
+                    ),
+                },
+                "all_position_addition_harmless": {
+                    "refusal_count": int(
+                        sum(row["generated_refusal"] for row in added)
+                    ),
+                    "n": len(added),
+                },
+            },
+            "supported_claim": (
+                "The direction is a sequence-wide causal effector, but its "
+                "presence at only the current autoregressive token is "
+                "neither necessary nor sufficient in this intervention."
             ),
-            "ablated_harmful_full_refusal_count": int(
-                sum(row["generated_refusal"] for row in full_ablated)
+            "localization_limit": (
+                "Current-token interventions leave earlier prompt-position "
+                "states and their cached keys/values intact. The result "
+                "rejects an exclusive current-token bottleneck, but does "
+                "not distinguish distributed support from a bottleneck at "
+                "one or a few earlier positions."
             ),
-            "baseline_harmless_full_refusal_count": int(
-                sum(row["generated_refusal"] for row in full_harmless)
-            ),
-            "direction_added_harmless_full_refusal_count": int(
-                sum(row["generated_refusal"] for row in added)
-            ),
-            "n_per_cell": len(full_harmful),
         },
     }
 
@@ -425,8 +551,15 @@ def make_figure(
     harmful_aggregate = aggregate["baseline:harmful"]["metrics"]
     harmless_aggregate = aggregate["baseline:harmless"]["metrics"]
 
-    fig, axes = plt.subplots(2, 2, figsize=(10.5, 7.5))
-    ax = axes[0, 0]
+    fig, axes = plt.subplot_mosaic(
+        [
+            ["direction", "refusal", "spatial"],
+            ["auc", "onset", "spatial"],
+        ],
+        figsize=(15.5, 7.5),
+        width_ratios=[1.05, 1.05, 0.9],
+    )
+    ax = axes["direction"]
     for label, source, color in (
         ("harmful", harmful_aggregate, "#b33a3a"),
         ("length-matched harmless", harmless_aggregate, "#3a70b3"),
@@ -441,7 +574,7 @@ def make_figure(
     ax.set_ylabel("projection onto direction")
     ax.legend(frameon=False)
 
-    ax = axes[0, 1]
+    ax = axes["refusal"]
     ax.plot(
         fractions,
         curves["harmful_refusal_rate"],
@@ -468,7 +601,7 @@ def make_figure(
     ax.set_ylim(-0.04, 1.04)
     ax.legend(frameon=False)
 
-    ax = axes[1, 0]
+    ax = axes["auc"]
     auc = analysis["separability"]["auc_by_fraction"]
     for metric, label, color in (
         (DIRECTION_DECISION, "direction: decision", "#b33a3a"),
@@ -483,7 +616,7 @@ def make_figure(
     ax.set_ylim(0.35, 1.03)
     ax.legend(frameon=False, fontsize=8)
 
-    ax = axes[1, 1]
+    ax = axes["onset"]
     onset_rows = [
         row
         for row in analysis["prompt_onsets"]["prompt_rows"]
@@ -513,12 +646,70 @@ def make_figure(
     ax.set_xlabel("stable direction onset (prefix tokens)")
     ax.set_ylabel("lexical refusal onset (prefix tokens)")
 
-    for ax in axes.flat:
+    ax = axes["spatial"]
+    cells = analysis["causal_checks"]["full_prompt_cells"]
+    labels = [
+        "harmful\nbaseline",
+        "harmful\ncurrent-token ablate",
+        "harmful\nall-position ablate",
+        "harmless\nbaseline",
+        "harmless\ncurrent-token add",
+        "harmless\nall-position add",
+    ]
+    keys = [
+        "baseline_harmful",
+        "current_token_ablation_harmful",
+        "all_position_ablation_harmful",
+        "baseline_harmless",
+        "current_token_addition_harmless",
+        "all_position_addition_harmless",
+    ]
+    rates = [
+        cells[key]["refusal_count"] / cells[key]["n"]
+        for key in keys
+    ]
+    y = np.asarray([5, 4, 3, 2, 1, 0])
+    colors = [
+        "#b33a3a",
+        "#d68b32",
+        "#777777",
+        "#3a70b3",
+        "#6d94c6",
+        "#744c9e",
+    ]
+    ax.barh(y, rates, color=colors, alpha=0.88)
+    ax.set_yticks(y, labels)
+    ax.set_xlim(0, 1.08)
+    ax.set_xlabel("full-prompt refusal rate")
+    ax.set_title("One vector ≠ one-token bottleneck")
+    ax.axhline(2.5, color="#bbbbbb", linewidth=1)
+    for y_value, rate, key in zip(y, rates, keys, strict=True):
+        cell = cells[key]
+        ax.text(
+            min(rate + 0.025, 1.01),
+            y_value,
+            f"{cell['refusal_count']}/{cell['n']}",
+            va="center",
+            fontsize=9,
+        )
+    ax.text(
+        0.04,
+        2.65,
+        "Current-token-only interventions fail;\n"
+        "all-position interventions succeed.",
+        fontsize=9,
+        va="bottom",
+    )
+
+    for ax in axes.values():
         ax.set_xlabel(
             ax.get_xlabel() or "fraction of instruction tokens revealed"
         )
         ax.grid(alpha=0.18)
-    fig.suptitle("Refusal is an event-like, direction-mediated temporal profile")
+    fig.suptitle(
+        "Refusal-direction readout precedes behavior, "
+        "but is not a current-token bottleneck"
+    )
     fig.tight_layout()
     output.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(output, dpi=200, bbox_inches="tight")
@@ -554,6 +745,29 @@ def main() -> None:
         f"{onset['n_with_both_onsets']};",
         "median lag:",
         f"{onset['median_token_lag_refusal_minus_direction']:.1f} tokens",
+    )
+    cells = analysis["causal_checks"]["full_prompt_cells"]
+    print(
+        "harmful refusal baseline/current-token/all-position ablation:",
+        *[
+            cells[key]["refusal_count"] / cells[key]["n"]
+            for key in (
+                "baseline_harmful",
+                "current_token_ablation_harmful",
+                "all_position_ablation_harmful",
+            )
+        ],
+    )
+    print(
+        "harmless refusal baseline/current-token/all-position addition:",
+        *[
+            cells[key]["refusal_count"] / cells[key]["n"]
+            for key in (
+                "baseline_harmless",
+                "current_token_addition_harmless",
+                "all_position_addition_harmless",
+            )
+        ],
     )
     print(f"wrote {args.output_json}")
     print(f"wrote {args.output_figure}")

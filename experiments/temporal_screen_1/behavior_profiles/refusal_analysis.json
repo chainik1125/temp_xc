@@ -490,10 +490,43 @@
     ]
   },
   "causal_checks": {
-    "baseline_harmful_full_refusal_count": 31,
-    "ablated_harmful_full_refusal_count": 0,
-    "baseline_harmless_full_refusal_count": 0,
-    "direction_added_harmless_full_refusal_count": 32,
-    "n_per_cell": 32
+    "intervention_scope": {
+      "current_token": "last token in prompt prefill and the one-token input on each cached generation step",
+      "all_positions": "every prompt position in prefill and the one-token input on each cached generation step"
+    },
+    "full_prompt_cells": {
+      "baseline_harmful": {
+        "refusal_count": 31,
+        "n": 32
+      },
+      "current_token_ablation_harmful": {
+        "refusal_count": 31,
+        "n": 32,
+        "direction_decision_mean": 0.00019035162404179573,
+        "direction_source_mean": 2.5931396484375,
+        "refusal_log_odds_mean": 9.000446548685431
+      },
+      "all_position_ablation_harmful": {
+        "refusal_count": 0,
+        "n": 32
+      },
+      "baseline_harmless": {
+        "refusal_count": 0,
+        "n": 32
+      },
+      "current_token_addition_harmless": {
+        "refusal_count": 0,
+        "n": 32,
+        "direction_decision_mean": 3.63916015625,
+        "direction_source_mean": -0.08889579772949219,
+        "refusal_log_odds_mean": -9.422490753233433
+      },
+      "all_position_addition_harmless": {
+        "refusal_count": 32,
+        "n": 32
+      }
+    },
+    "supported_claim": "The direction is a sequence-wide causal effector, but its presence at only the current autoregressive token is neither necessary nor sufficient in this intervention.",
+    "localization_limit": "Current-token interventions leave earlier prompt-position states and their cached keys/values intact. The result rejects an exclusive current-token bottleneck, but does not distinguish distributed support from a bottleneck at one or a few earlier positions."
   }
 }
