@@ -1,0 +1,182 @@
+{
+  "budget": {
+    "assumed_usd_per_gpu_hour": 4.0,
+    "cost_overhead_multiplier": 1.25,
+    "max_session_hours": 0.1,
+    "max_total_usd": 0.5,
+    "reserve_usd": 0.1
+  },
+  "fairness": {
+    "attribution": "This isolated panel adds only the missing matched-parameter token-SAE baseline on the exact same frozen sparse tasks.",
+    "capacity_regime": "The sparse narrowband tasks contain 24 ground-truth causes but only four are active per episode. TXC has 64 unconstrained atoms; parameter-matched spectral arms have 255 band-limited atoms. The balanced versus high-crowded tasks test whether learned routing follows frequency-specific dictionary demand.",
+    "data": "All models receive identical seeded training episodes and episode-disjoint probe/eval episodes with one shared orthonormal observation dictionary.",
+    "noise": "The adaptive arms apply a synthetic-task noise-floor heuristic: the expected white-noise contribution sigma^2/T is subtracted and clamped from per-band power and residual estimates. Because reconstruction depends on the noisy input, this is not an unbiased residual correction. Main reconstruction loss still uses the original noisy observations.",
+    "parameters": "The token SAE uses 512 atoms (49,712 trainable parameters), within 0.4% of TXC (49,600) and the spectral arms (49,503-49,507).",
+    "primary_metric": "Direct latent reconstruction R2 projects reconstructed observations onto known orthonormal emission directions, avoiding a wider-dictionary probe advantage.",
+    "support": "The token SAE trains with one active feature per token. Its inference threshold is calibrated on the episode-disjoint probe split to L0=W per window before final evaluation."
+  },
+  "models": [
+    {
+      "calibrate_inference_threshold": true,
+      "class_path": "temp_bench.archs.batchtopk_sae:BatchTopKSAE",
+      "consumes": "token",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      },
+      "implementation_version": "1.0.0",
+      "label": "BatchTopK SAE",
+      "name": "sae",
+      "sparsity_rule": "one_per_token"
+    }
+  ],
+  "overall_spend": {
+    "cap_usd": 50.0,
+    "estimated_prior_usd": 47.231258,
+    "note": "Conservative cumulative estimate through the initial SAE panel. This evaluation-only rerun loads its frozen checkpoints and calibrates the inference threshold on the probe split."
+  },
+  "planning": {
+    "estimated_eval_seconds_per_cell": 15.0,
+    "estimated_steps_per_second": 1000.0,
+    "setup_seconds": 120.0
+  },
+  "run_name": "spectral-matryoshka-matched-sae-20260730",
+  "schema_version": 1,
+  "seeds": [
+    1,
+    2
+  ],
+  "smoke": {
+    "models": [
+      "sae"
+    ],
+    "n_steps": 2,
+    "seed": 1,
+    "tasks": [
+      "narrowband_sparse_balanced_t8",
+      "narrowband_sparse_high_crowded_t8"
+    ]
+  },
+  "split_seeds": {
+    "eval": 533,
+    "probe": 522,
+    "train": 511
+  },
+  "split_sizes": {
+    "eval": 2048,
+    "probe": 2048,
+    "train": 4096
+  },
+  "tasks": [
+    {
+      "active_sources_per_episode": 4,
+      "allow_repeated_frequencies": true,
+      "amplitude_range": [
+        0.8,
+        1.2
+      ],
+      "d_in": 48,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "sae": 512
+      },
+      "family": "narrowband_sources",
+      "frequencies": [
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375
+      ],
+      "group": "narrowband_sparse_balanced_t8",
+      "min_frequency_separation": 0.0625,
+      "models": [
+        "sae"
+      ],
+      "n_steps": 5000,
+      "name": "narrowband_sparse_balanced_t8",
+      "primary_metric": "direct_latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.25,
+      "window": 8
+    },
+    {
+      "active_sources_per_episode": 4,
+      "allow_repeated_frequencies": true,
+      "amplitude_range": [
+        0.8,
+        1.2
+      ],
+      "d_in": 48,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "sae": 512
+      },
+      "family": "narrowband_sources",
+      "frequencies": [
+        0.125,
+        0.125,
+        0.125,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375
+      ],
+      "group": "narrowband_sparse_high_crowded_t8",
+      "min_frequency_separation": 0.0625,
+      "models": [
+        "sae"
+      ],
+      "n_steps": 5000,
+      "name": "narrowband_sparse_high_crowded_t8",
+      "primary_metric": "direct_latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.25,
+      "window": 8
+    }
+  ],
+  "training": {
+    "batch_tokens": 1024,
+    "budget_check_every_steps": 100,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0003,
+    "log_every_steps": 500,
+    "precision": "bf16",
+    "warmup_steps": 500
+  }
+}

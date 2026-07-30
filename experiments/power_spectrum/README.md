@@ -16,8 +16,43 @@ mixing explains most of the gain over TXC, with an additional task-dependent
 multiband benefit on power-readable tasks. A subsequent 70-cell controlled
 suite shows that planted slow and fast HMM sources activate the expected DCT
 feature blocks, while exact polynomial-clock secret sharing remains a TXC
-strength rather than a spectral win. The final conservative compute estimate
-is $43.23 against a $50 cap.
+strength rather than a spectral win. A final routed-Fourier screen identifies
+the large-win regime as simultaneous random-phase narrowband causes rather
+than high frequency alone. The final conservative compute estimate is
+$47.245971 against a $50 cap.
+
+## Routed Fourier Spectral Matryoshka
+
+The final matched-parameter screen uses 24 exact-grid narrowband causes, four
+active per episode, with either balanced 8/8/8 or high-crowded 3/6/15
+frequency allocations. Across two seeds, Fourier spectral models reach
+direct latent reconstruction \(R^2=0.963/0.950\), versus \(0.762/0.760\) for
+TXC, \(0.835/0.837\) for DCT spectral, and \(0.127/0.125\) for a matched
+support- and parameter-budget BatchTopK SAE.
+
+The order-free learned Matryoshka weights do not improve the balanced task.
+Learned support routing adds a small \(+0.0039\) over Fourier global on the
+high-crowded task. Its high-frequency score multiplier rises transiently to
+1.106 before returning to one, so the router currently looks like a useful
+training curriculum rather than a stable learned allocation.
+
+On slow and alternating HMM controls, TXC remains better. Frequency is useful
+when it factorizes several simultaneous identities and phases; a single fast
+process is not enough.
+
+See `analysis/spectral_matryoshka_results.md` for the full protocol, tables,
+frequency-use interpretation, limitations, and cost accounting. Rebuild the
+combined analysis with:
+
+```bash
+uv run python -m experiments.power_spectrum.code.plot_spectral_advantage \
+  --results experiments/power_spectrum/results/spectral_matryoshka_routed_remote/results.jsonl \
+  --results experiments/power_spectrum/results/spectral_matryoshka_routed_seed2_remote/results.jsonl \
+  --results experiments/power_spectrum/results/spectral_matryoshka_sae_calibrated_remote/results.jsonl \
+  --output-json experiments/power_spectrum/results/spectral_matryoshka_routed_analysis.json \
+  --output-csv experiments/power_spectrum/results/spectral_matryoshka_routed_analysis.csv \
+  --figures-dir experiments/power_spectrum/figures/spectral_matryoshka_routed
+```
 
 ## Paper synthetic extension
 
@@ -160,6 +195,8 @@ host-side location is operational metadata rather than part of the experiment.
   failure modes, and cost/provenance.
 - `analysis/controlled_frequency_results.md`: exact polynomial-clock results,
   controlled frequency-HMM localization, and Denoising DC/AC usage.
+- `analysis/spectral_matryoshka_results.md`: the replicated multi-frequency
+  advantage, order-free learned routing, and matched SAE control.
 - `results/provenance.json`: run IDs, source commits, integrity receipt, cost,
   frozen-config checks, and raw-artifact hashes.
 - `code/spectral_txc_v2.py`: experiment-local spectral-crosscoder ablations.

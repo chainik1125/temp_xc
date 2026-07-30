@@ -2673,11 +2673,15 @@
       "temporal_basis": "fourier"
     }
   ],
-  "generated_at": "2026-07-30T05:58:14+00:00",
+  "generated_at": "2026-07-30T06:10:35+00:00",
   "models": [
     {
       "label": "TXC-post",
       "name": "txc"
+    },
+    {
+      "label": "BatchTopK SAE",
+      "name": "sae"
     },
     {
       "label": "Spectral DCT global",
@@ -2863,6 +2867,33 @@
       "baseline": "txc",
       "baseline_label": "TXC-post",
       "delta_direct_latent_r2": {
+        "max": -0.6270154275459145,
+        "mean": -0.635019665860414,
+        "min": -0.6430239041749135,
+        "n": 2,
+        "std": 0.011319702380831525,
+        "values": [
+          -0.6270154275459145,
+          -0.6430239041749135
+        ]
+      },
+      "model": "sae",
+      "model_label": "BatchTopK SAE",
+      "seed_values": {
+        "1": -0.6270154275459145,
+        "2": -0.6430239041749135
+      },
+      "seeds": [
+        1,
+        2
+      ],
+      "task": "narrowband_sparse_balanced_t8",
+      "task_label": "Sparse NB\nbalanced"
+    },
+    {
+      "baseline": "txc",
+      "baseline_label": "TXC-post",
+      "delta_direct_latent_r2": {
         "max": 0.08374416447598731,
         "mean": 0.07283878942832628,
         "min": 0.06193341438066524,
@@ -2966,6 +2997,33 @@
       ],
       "task": "narrowband_sparse_balanced_t8",
       "task_label": "Sparse NB\nbalanced"
+    },
+    {
+      "baseline": "txc",
+      "baseline_label": "TXC-post",
+      "delta_direct_latent_r2": {
+        "max": -0.6301768020911633,
+        "mean": -0.6347746107511126,
+        "min": -0.6393724194110619,
+        "n": 2,
+        "std": 0.006502283364096763,
+        "values": [
+          -0.6393724194110619,
+          -0.6301768020911633
+        ]
+      },
+      "model": "sae",
+      "model_label": "BatchTopK SAE",
+      "seed_values": {
+        "1": -0.6393724194110619,
+        "2": -0.6301768020911633
+      },
+      "seeds": [
+        1,
+        2
+      ],
+      "task": "narrowband_sparse_high_crowded_t8",
+      "task_label": "Sparse NB\nhigh crowded"
     },
     {
       "baseline": "txc",
@@ -3806,6 +3864,98 @@
       "window": 8
     },
     {
+      "band_localization_accuracy": null,
+      "d_sae": 512,
+      "direct_latent_r2": {
+        "max": 0.1291210347721686,
+        "mean": 0.12684402205405218,
+        "min": 0.12456700933593574,
+        "n": 2,
+        "std": 0.0032201822676562798,
+        "values": [
+          0.12456700933593574,
+          0.1291210347721686
+        ]
+      },
+      "direct_latent_r2_active": {
+        "max": 0.2272207346864028,
+        "mean": 0.22537769238088096,
+        "min": 0.22353465007535908,
+        "n": 2,
+        "std": 0.002606455424496393,
+        "values": [
+          0.2272207346864028,
+          0.22353465007535908
+        ]
+      },
+      "family": "narrowband_sources",
+      "inactive_to_active_energy_ratio": {
+        "max": 0.020474115856452615,
+        "mean": 0.019668711330236024,
+        "min": 0.018863306804019434,
+        "n": 2,
+        "std": 0.001139014004172179,
+        "values": [
+          0.020474115856452615,
+          0.018863306804019434
+        ]
+      },
+      "l0_per_window": {
+        "max": 8.3359375,
+        "mean": 8.33544921875,
+        "min": 8.3349609375,
+        "n": 2,
+        "std": 0.0006905339660024879,
+        "values": [
+          8.3359375,
+          8.3349609375
+        ]
+      },
+      "latent_r2": {
+        "max": 0.16019016796502447,
+        "mean": 0.15868433646490418,
+        "min": 0.1571785049647839,
+        "n": 2,
+        "std": 0.0021295673301187394,
+        "values": [
+          0.1571785049647839,
+          0.16019016796502447
+        ]
+      },
+      "model": "sae",
+      "model_label": "BatchTopK SAE",
+      "nmse": {
+        "max": 0.7904829382896423,
+        "mean": 0.7892358601093292,
+        "min": 0.7879887819290161,
+        "n": 2,
+        "std": 0.0017636348759383607,
+        "values": [
+          0.7904829382896423,
+          0.7879887819290161
+        ]
+      },
+      "parameter_count": 49712,
+      "raw_projection_r2": {
+        "max": 0.2565658914157312,
+        "mean": 0.2565658914157312,
+        "min": 0.2565658914157312,
+        "n": 2,
+        "std": 0.0,
+        "values": [
+          0.2565658914157312,
+          0.2565658914157312
+        ]
+      },
+      "seeds": [
+        1,
+        2
+      ],
+      "task": "narrowband_sparse_balanced_t8",
+      "task_label": "Sparse NB\nbalanced",
+      "window": 8
+    },
+    {
       "band_localization_accuracy": {
         "max": 1.0,
         "mean": 1.0,
@@ -4286,6 +4436,98 @@
         ]
       },
       "parameter_count": 49600,
+      "raw_projection_r2": {
+        "max": 0.2565658914157312,
+        "mean": 0.2565658914157312,
+        "min": 0.2565658914157312,
+        "n": 2,
+        "std": 0.0,
+        "values": [
+          0.2565658914157312,
+          0.2565658914157312
+        ]
+      },
+      "seeds": [
+        1,
+        2
+      ],
+      "task": "narrowband_sparse_high_crowded_t8",
+      "task_label": "Sparse NB\nhigh crowded",
+      "window": 8
+    },
+    {
+      "band_localization_accuracy": null,
+      "d_sae": 512,
+      "direct_latent_r2": {
+        "max": 0.129395492307223,
+        "mean": 0.12522257241227164,
+        "min": 0.12104965251732026,
+        "n": 2,
+        "std": 0.005901399910136734,
+        "values": [
+          0.12104965251732026,
+          0.129395492307223
+        ]
+      },
+      "direct_latent_r2_active": {
+        "max": 0.21847592530216212,
+        "mean": 0.21797681768426927,
+        "min": 0.21747771006637642,
+        "n": 2,
+        "std": 0.0007058447623077922,
+        "values": [
+          0.21847592530216212,
+          0.21747771006637642
+        ]
+      },
+      "family": "narrowband_sources",
+      "inactive_to_active_energy_ratio": {
+        "max": 0.019447486528297742,
+        "mean": 0.018526854947247817,
+        "min": 0.017606223366197892,
+        "n": 2,
+        "std": 0.0013019696678697892,
+        "values": [
+          0.019447486528297742,
+          0.017606223366197892
+        ]
+      },
+      "l0_per_window": {
+        "max": 8.05859375,
+        "mean": 8.03369140625,
+        "min": 8.0087890625,
+        "n": 2,
+        "std": 0.03521723226612688,
+        "values": [
+          8.0087890625,
+          8.05859375
+        ]
+      },
+      "latent_r2": {
+        "max": 0.15785259185803507,
+        "mean": 0.15448192319358225,
+        "min": 0.15111125452912944,
+        "n": 2,
+        "std": 0.004766845339535184,
+        "values": [
+          0.15111125452912944,
+          0.15785259185803507
+        ]
+      },
+      "model": "sae",
+      "model_label": "BatchTopK SAE",
+      "nmse": {
+        "max": 0.7965070605278015,
+        "mean": 0.795013815164566,
+        "min": 0.7935205698013306,
+        "n": 2,
+        "std": 0.0021117678446383454,
+        "values": [
+          0.7965070605278015,
+          0.7935205698013306
+        ]
+      },
+      "parameter_count": 49712,
       "raw_projection_r2": {
         "max": 0.2565658914157312,
         "mean": 0.2565658914157312,
@@ -5697,7 +5939,7 @@
     "routing_scale": "Routing scale: detached score multiplier used for support competition, not probability or spectral power.",
     "selection": "Selection-event share: the fraction of nonzero code selections observed in each band."
   },
-  "source": "experiments/power_spectrum/results/spectral_matryoshka_routed_remote/results.jsonl;experiments/power_spectrum/results/spectral_matryoshka_routed_seed2_remote/results.jsonl",
+  "source": "experiments/power_spectrum/results/spectral_matryoshka_routed_remote/results.jsonl;experiments/power_spectrum/results/spectral_matryoshka_routed_seed2_remote/results.jsonl;experiments/power_spectrum/results/spectral_matryoshka_sae_calibrated_remote/results.jsonl",
   "tasks": [
     {
       "label": "Slow HMM\n$T=8$",

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-30T06:10:00Z",
+  "overall_cap_usd": 50.0,
+  "conservative_total_usd": 47.245971,
+  "remaining_usd": 2.754029,
+  "starting_total_before_routed_screen_usd": 44.529297,
+  "runs": [
+    {
+      "name": "routed_seed_1",
+      "source_commit": "4b415cf21",
+      "results_dir": "results/spectral_matryoshka_routed_remote",
+      "spawn_receipt": "results/spectral_matryoshka_routed_spawn.json",
+      "estimated_spend_usd": 1.323126,
+      "non_smoke_cells": 18,
+      "failed_cells": 0
+    },
+    {
+      "name": "routed_seed_2",
+      "source_commit": "c3d84d01e",
+      "results_dir": "results/spectral_matryoshka_routed_seed2_remote",
+      "spawn_receipt": "results/spectral_matryoshka_routed_seed2_spawn.json",
+      "estimated_spend_usd": 1.287254,
+      "non_smoke_cells": 18,
+      "failed_cells": 0
+    },
+    {
+      "name": "matched_sae_training_and_initial_evaluation",
+      "source_commit": "6ce05fe08",
+      "results_dir": "results/spectral_matryoshka_sae_remote",
+      "spawn_receipt": "results/spectral_matryoshka_sae_spawn.json",
+      "estimated_spend_usd": 0.091581,
+      "non_smoke_cells": 4,
+      "failed_cells": 0,
+      "used_in_final_analysis": false,
+      "reason": "The moving inference threshold produced L0 above the target."
+    },
+    {
+      "name": "matched_sae_support_calibrated_evaluation",
+      "source_commit": "e9c2af750",
+      "results_dir": "results/spectral_matryoshka_sae_calibrated_remote",
+      "estimated_spend_usd": 0.014713,
+      "non_smoke_cells": 4,
+      "failed_cells": 0,
+      "used_in_final_analysis": true,
+      "checkpoint_source": "matched_sae_training_and_initial_evaluation",
+      "probe_target_l0_per_window": 8.0
+    }
+  ],
+  "analysis_inputs": [
+    "results/spectral_matryoshka_routed_remote/results.jsonl",
+    "results/spectral_matryoshka_routed_seed2_remote/results.jsonl",
+    "results/spectral_matryoshka_sae_calibrated_remote/results.jsonl"
+  ]
+}

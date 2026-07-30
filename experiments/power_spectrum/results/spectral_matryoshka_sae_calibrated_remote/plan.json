@@ -1,0 +1,21 @@
+{
+  "effective_assumed_usd_per_hour": 5.0,
+  "estimated_cost_usd": 0.28,
+  "estimated_gpu_hours": 0.056,
+  "estimated_prior_usd": 47.231258,
+  "evaluation_cells": 4,
+  "max_session_hours": 0.1,
+  "overall_cap_usd": 50.0,
+  "run_name": "spectral-matryoshka-matched-sae-20260730",
+  "smoke": false,
+  "task_cell_counts": {
+    "narrowband_sparse_balanced_t8": 2,
+    "narrowband_sparse_high_crowded_t8": 2
+  },
+  "total_optimizer_steps": 20000,
+  "unique_training_runs": 4,
+  "usable_budget_usd": 0.4,
+  "within_cost_plan": true,
+  "within_time_plan": true,
+  "worst_case_overall_usd": 47.731258
+}
