@@ -1,0 +1,83 @@
+{
+  "schema_version": "power-spectrum.backtracking-fourier-capsule.v1",
+  "status": "complete",
+  "date": "2026-07-30",
+  "branch": "codex/spectral-screen-overnight-20260729",
+  "results_commit": "8e469cd30a4f3cbd95fb56f7a50469544d2de986",
+  "comparison_kind": "recovered-artifact-sensitivity",
+  "direct_replication": false,
+  "model": {
+    "name": "FourierTopKXC",
+    "version": "backtracking-fourier-topk-v1",
+    "matryoshka": false,
+    "adaptive_frequency_objective": false,
+    "selection": "per-example global TopK(20*T), then ReLU",
+    "windows": [
+      1,
+      2,
+      4,
+      6,
+      10
+    ],
+    "seeds": [
+      1,
+      2,
+      42
+    ],
+    "training_steps": 20000,
+    "dictionary_widths": {
+      "1": 32768,
+      "2": 65532,
+      "4": 98298,
+      "6": 131064,
+      "10": 131067
+    }
+  },
+  "evaluation": {
+    "primary_metric": "question-grouped ordered PR-AUC",
+    "primary_probe_support": 32,
+    "folds": 5,
+    "rows": 20335,
+    "positive_rows": 2498
+  },
+  "provenance": {
+    "reference_commit": "d9c7fc7b22352394b6d1b91897cdb82d0b128f0e",
+    "reference_protocol": "2026-07-26.t16.1",
+    "artifact_sha256": "1681b7e6ef68ccc207a5d9af2c4ba3d4646056ccdca0bc3d5c09bc3b43c2125f",
+    "manifest_sha256": "14c4710360a01bdcd97db5c178d30b52cc108eb65414e6800da124ce79178654",
+    "cohort_sha256": "9137bda110780afc1965f453669d434100e1e495bd8f4dfaf8713c4bb6516c0d",
+    "reference_cohort_sha256": "f397f4caf6212825bd98b1b82be932ae634f01a716fd7e3642fd3d7640b27c0b",
+    "matches_reference_cohort": false
+  },
+  "compute": {
+    "provider": "RunPod",
+    "estimated_cost_usd": 37.0,
+    "cost_is_provider_invoice": false,
+    "budget_cap_usd": 50.0,
+    "all_training_eval_pods_exited": true,
+    "pod_ids": [
+      "2avn69d4ffd2u5",
+      "k0tc7emul0drpz",
+      "sh30z89jhcj6kz",
+      "j167od7mxxyw9t",
+      "7v6zptrgzmq1bs",
+      "5gv8q6y3xty26n"
+    ]
+  },
+  "verification": {
+    "complete_cells": 15,
+    "expected_cells": 15,
+    "focused_tests_passed": 21,
+    "ruff_passed": true,
+    "worktree_clean_at_results_commit": true
+  },
+  "canonical_artifacts": {
+    "analysis": "../analysis/backtracking_fourier_results.md",
+    "protocol": "../BACKTRACKING_FOURIER.md",
+    "results_root": "../results/backtracking_fourier_matched/reviewer-five-point-v1",
+    "publication_png": "../results/backtracking_fourier_matched/reviewer-five-point-v1/publication/backtracking_fourier_summary.png",
+    "publication_pdf": "../results/backtracking_fourier_matched/reviewer-five-point-v1/publication/backtracking_fourier_summary.pdf",
+    "publication_json": "../results/backtracking_fourier_matched/reviewer-five-point-v1/publication/backtracking_fourier_summary.json",
+    "publication_csv": "../results/backtracking_fourier_matched/reviewer-five-point-v1/publication/backtracking_fourier_summary.csv"
+  }
+}

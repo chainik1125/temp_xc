@@ -16,7 +16,9 @@ grows, showing that the model recruits substantial AC structure even though
 this does not translate into a long-window win. Because Aniket's exact
 activation artifact could not be recovered, this is explicitly a sensitivity
 analysis rather than a direct replication. See
-`analysis/backtracking_fourier_results.md`.
+`backtracking_fourier_20k/README.md` for the self-contained experiment
+capsule and `analysis/backtracking_fourier_results.md` for the scientific
+write-up.
 
 Both goals are complete. The task screen shows that AC power routes periodic
 magnitude, cross-spectra are required for phase and direction, signed DC is
@@ -209,6 +211,9 @@ host-side location is operational metadata rather than part of the experiment.
   advantage, order-free learned routing, and matched SAE control.
 - `analysis/backtracking_fourier_results.md`: the 20k parameter-matched plain
   Fourier backtracking curve, frequency-band use, and recovery boundary.
+- `backtracking_fourier_20k/`: self-contained index of the complete
+  backtracking experiment, including the frozen recipe, exact summary table,
+  manifest, compute record, reproduction commands, and artifact map.
 - `results/provenance.json`: run IDs, source commits, integrity receipt, cost,
   frozen-config checks, and raw-artifact hashes.
 - `code/spectral_txc_v2.py`: experiment-local spectral-crosscoder ablations.
