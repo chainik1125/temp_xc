@@ -1,0 +1,1368 @@
+{
+  "activation_cache": "/workspace/btk_tsae_seed42/paper_root/results/act_cache/fb2a74be884e512a/resid_post_L10.npy",
+  "artifact": "/workspace/txc-neurips-aniket/purified/artifacts/c7/sentence_acts_L10_T16.npz",
+  "cells": [
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 32768,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 911200,
+        "seed": 42,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 1
+      },
+      "parameter_match": {
+        "difference": 0,
+        "fourier_d_sae": 32768,
+        "fourier_parameters": 268472320,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 268472320,
+        "relative_difference": 0.0
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131067,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 911200,
+        "seed": 42,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 10
+      },
+      "parameter_match": {
+        "difference": -8197,
+        "fourier_d_sae": 131067,
+        "fourier_parameters": 2684420091,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 2684428288,
+        "relative_difference": -3.053536589761939e-06
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 65532,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 911200,
+        "seed": 42,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 2
+      },
+      "parameter_match": {
+        "difference": -4,
+        "fourier_d_sae": 65532,
+        "fourier_parameters": 536911868,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 536911872,
+        "relative_difference": -7.450012206099998e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 98298,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 911200,
+        "seed": 42,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 4
+      },
+      "parameter_match": {
+        "difference": -6,
+        "fourier_d_sae": 98298,
+        "fourier_parameters": 1073790970,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1073790976,
+        "relative_difference": -5.587679664016845e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131064,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 911200,
+        "seed": 42,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 6
+      },
+      "parameter_match": {
+        "difference": -8,
+        "fourier_d_sae": 131064,
+        "fourier_parameters": 1610670072,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1610670080,
+        "relative_difference": -4.96687689138672e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 32768,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907100,
+        "seed": 1,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 1
+      },
+      "parameter_match": {
+        "difference": 0,
+        "fourier_d_sae": 32768,
+        "fourier_parameters": 268472320,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 268472320,
+        "relative_difference": 0.0
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131067,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907100,
+        "seed": 1,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 10
+      },
+      "parameter_match": {
+        "difference": -8197,
+        "fourier_d_sae": 131067,
+        "fourier_parameters": 2684420091,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 2684428288,
+        "relative_difference": -3.053536589761939e-06
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 65532,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907100,
+        "seed": 1,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 2
+      },
+      "parameter_match": {
+        "difference": -4,
+        "fourier_d_sae": 65532,
+        "fourier_parameters": 536911868,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 536911872,
+        "relative_difference": -7.450012206099998e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 98298,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907100,
+        "seed": 1,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 4
+      },
+      "parameter_match": {
+        "difference": -6,
+        "fourier_d_sae": 98298,
+        "fourier_parameters": 1073790970,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1073790976,
+        "relative_difference": -5.587679664016845e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131064,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907100,
+        "seed": 1,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 6
+      },
+      "parameter_match": {
+        "difference": -8,
+        "fourier_d_sae": 131064,
+        "fourier_parameters": 1610670072,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1610670080,
+        "relative_difference": -4.96687689138672e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 32768,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 1
+      },
+      "parameter_match": {
+        "difference": 0,
+        "fourier_d_sae": 32768,
+        "fourier_parameters": 268472320,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 268472320,
+        "relative_difference": 0.0
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131067,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 10
+      },
+      "parameter_match": {
+        "difference": -8197,
+        "fourier_d_sae": 131067,
+        "fourier_parameters": 2684420091,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 2684428288,
+        "relative_difference": -3.053536589761939e-06
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 65532,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 2
+      },
+      "parameter_match": {
+        "difference": -4,
+        "fourier_d_sae": 65532,
+        "fourier_parameters": 536911868,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 536911872,
+        "relative_difference": -7.450012206099998e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 98298,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 4
+      },
+      "parameter_match": {
+        "difference": -6,
+        "fourier_d_sae": 98298,
+        "fourier_parameters": 1073790970,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1073790976,
+        "relative_difference": -5.587679664016845e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131064,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 6
+      },
+      "parameter_match": {
+        "difference": -8,
+        "fourier_d_sae": 131064,
+        "fourier_parameters": 1610670072,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1610670080,
+        "relative_difference": -4.96687689138672e-09
+      }
+    }
+  ],
+  "checkpoint_root": "/workspace/txc-neurips-aniket/checkpoints/backtracking_fourier_matched/reviewer-five-point-v1",
+  "device": "cuda:0",
+  "implementation_sha256": {
+    "backtracking_fourier_xc.py": "c986b6215623705ff7e8e4ba0a64723e4c7e9cfdc9f16715c6b538c6e1d42aad",
+    "run_backtracking_fourier.py": "d02a2dc07127694906d669429aab56fab9350fa88f79b4eb9faa318bd3289643"
+  },
+  "output_root": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_fourier_matched/reviewer-five-point-v1",
+  "phase": "train",
+  "protocol_version": "power-spectrum.backtracking-fourier.v1",
+  "reference_commit": "d9c7fc7b2",
+  "reference_protocol_version": "2026-07-26.t16.1",
+  "run_fingerprint": "11fe87828aeae056dbced66e1e717380284ece54409624708251c920ae50c6d3"
+}
+[fourier train] T=1 seed=42 step=100/20000 loss=44.8878 steps_per_second=15.9130
+[fourier train] T=1 seed=42 step=200/20000 loss=38.0551 steps_per_second=16.8157
+[fourier train] T=1 seed=42 step=300/20000 loss=30.6846 steps_per_second=17.2676
+[fourier train] T=1 seed=42 step=400/20000 loss=26.2689 steps_per_second=17.6077
+[fourier train] T=1 seed=42 step=500/20000 loss=23.1754 steps_per_second=17.7418
+[fourier train] T=1 seed=42 step=600/20000 loss=21.132 steps_per_second=17.6981
+[fourier train] T=1 seed=42 step=700/20000 loss=19.4699 steps_per_second=17.7650
+[fourier train] T=1 seed=42 step=800/20000 loss=18.5738 steps_per_second=17.6979
+[fourier train] T=1 seed=42 step=900/20000 loss=17.6154 steps_per_second=17.6529
+[fourier train] T=1 seed=42 step=1000/20000 loss=17.09 steps_per_second=17.5809
+[fourier train] T=1 seed=42 step=1100/20000 loss=16.6366 steps_per_second=17.0055
+[fourier train] T=1 seed=42 step=1200/20000 loss=16.2448 steps_per_second=17.0012
+[fourier train] T=1 seed=42 step=1300/20000 loss=15.7877 steps_per_second=16.9970
+[fourier train] T=1 seed=42 step=1400/20000 loss=15.7816 steps_per_second=16.9661
+[fourier train] T=1 seed=42 step=1500/20000 loss=15.5374 steps_per_second=16.9868
+[fourier train] T=1 seed=42 step=1600/20000 loss=15.4988 steps_per_second=16.9819
+[fourier train] T=1 seed=42 step=1700/20000 loss=15.2561 steps_per_second=17.0319
+[fourier train] T=1 seed=42 step=1800/20000 loss=15.1058 steps_per_second=17.0563
+Terminated
+{
+  "activation_cache": "/workspace/btk_tsae_seed42/paper_root/results/act_cache/fb2a74be884e512a/resid_post_L10.npy",
+  "artifact": "/workspace/txc-neurips-aniket/purified/artifacts/c7/sentence_acts_L10_T16.npz",
+  "cells": [
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 32768,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 911200,
+        "seed": 42,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 1
+      },
+      "parameter_match": {
+        "difference": 0,
+        "fourier_d_sae": 32768,
+        "fourier_parameters": 268472320,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 268472320,
+        "relative_difference": 0.0
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131067,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 911200,
+        "seed": 42,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 10
+      },
+      "parameter_match": {
+        "difference": -8197,
+        "fourier_d_sae": 131067,
+        "fourier_parameters": 2684420091,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 2684428288,
+        "relative_difference": -3.053536589761939e-06
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 65532,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 911200,
+        "seed": 42,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 2
+      },
+      "parameter_match": {
+        "difference": -4,
+        "fourier_d_sae": 65532,
+        "fourier_parameters": 536911868,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 536911872,
+        "relative_difference": -7.450012206099998e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 98298,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 911200,
+        "seed": 42,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 4
+      },
+      "parameter_match": {
+        "difference": -6,
+        "fourier_d_sae": 98298,
+        "fourier_parameters": 1073790970,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1073790976,
+        "relative_difference": -5.587679664016845e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131064,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 911200,
+        "seed": 42,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 6
+      },
+      "parameter_match": {
+        "difference": -8,
+        "fourier_d_sae": 131064,
+        "fourier_parameters": 1610670072,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1610670080,
+        "relative_difference": -4.96687689138672e-09
+      }
+    }
+  ],
+  "checkpoint_root": "/workspace/txc-neurips-aniket/checkpoints/backtracking_fourier_matched/reviewer-five-point-v1",
+  "device": "cuda:0",
+  "implementation_sha256": {
+    "backtracking_fourier_xc.py": "c986b6215623705ff7e8e4ba0a64723e4c7e9cfdc9f16715c6b538c6e1d42aad",
+    "run_backtracking_fourier.py": "d02a2dc07127694906d669429aab56fab9350fa88f79b4eb9faa318bd3289643"
+  },
+  "output_root": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_fourier_matched/reviewer-five-point-v1",
+  "phase": "train",
+  "protocol_version": "power-spectrum.backtracking-fourier.v1",
+  "reference_commit": "d9c7fc7b2",
+  "reference_protocol_version": "2026-07-26.t16.1",
+  "run_fingerprint": "f4a190c0b9b60087a868b0b9c19ca1d396dfa4f60fbfcdb4edad7b120b9ed87b"
+}
+[fourier train] T=1 seed=42 step=1100/20000 loss=16.6366 steps_per_second=16.8081
+[fourier train] T=1 seed=42 step=1200/20000 loss=16.2448 steps_per_second=17.3592
+[fourier train] T=1 seed=42 step=1300/20000 loss=15.7877 steps_per_second=17.7020
+[fourier train] T=1 seed=42 step=1400/20000 loss=15.7816 steps_per_second=17.7554
+[fourier train] T=1 seed=42 step=1500/20000 loss=15.5374 steps_per_second=18.2254
+[fourier train] T=1 seed=42 step=1600/20000 loss=15.4988 steps_per_second=18.5080
+[fourier train] T=1 seed=42 step=1700/20000 loss=15.2561 steps_per_second=18.6988
+[fourier train] T=1 seed=42 step=1800/20000 loss=15.1058 steps_per_second=18.8952
+[fourier train] T=1 seed=42 step=1900/20000 loss=14.887 steps_per_second=19.1317
+[fourier train] T=1 seed=42 step=2000/20000 loss=14.8427 steps_per_second=19.2548
+[fourier train] T=1 seed=42 step=2100/20000 loss=14.8768 steps_per_second=18.6951
+[fourier train] T=1 seed=42 step=2200/20000 loss=15.13 steps_per_second=18.8273
+[fourier train] T=1 seed=42 step=2300/20000 loss=14.7346 steps_per_second=18.9445
+[fourier train] T=1 seed=42 step=2400/20000 loss=14.8978 steps_per_second=19.0675
+[fourier train] T=1 seed=42 step=2500/20000 loss=14.734 steps_per_second=19.1747
+[fourier train] T=1 seed=42 step=2600/20000 loss=14.6413 steps_per_second=19.2954
+[fourier train] T=1 seed=42 step=2700/20000 loss=14.3148 steps_per_second=19.3730
+[fourier train] T=1 seed=42 step=2800/20000 loss=14.1601 steps_per_second=19.4717
+[fourier train] T=1 seed=42 step=2900/20000 loss=14.5231 steps_per_second=19.5183
+[fourier train] T=1 seed=42 step=3000/20000 loss=14.7921 steps_per_second=19.5600
+[fourier train] T=1 seed=42 step=3100/20000 loss=14.3615 steps_per_second=19.2434
+[fourier train] T=1 seed=42 step=3200/20000 loss=14.6148 steps_per_second=19.2935
+[fourier train] T=1 seed=42 step=3300/20000 loss=14.2035 steps_per_second=19.3410
+[fourier train] T=1 seed=42 step=3400/20000 loss=14.0466 steps_per_second=19.3971
+[fourier train] T=1 seed=42 step=3500/20000 loss=14.2234 steps_per_second=19.4477
+[fourier train] T=1 seed=42 step=3600/20000 loss=14.1702 steps_per_second=19.4876
+[fourier train] T=1 seed=42 step=3700/20000 loss=14.1728 steps_per_second=19.5032
+[fourier train] T=1 seed=42 step=3800/20000 loss=14.4455 steps_per_second=19.5183
+[fourier train] T=1 seed=42 step=3900/20000 loss=14.3199 steps_per_second=19.5463
+[fourier train] T=1 seed=42 step=4000/20000 loss=14.0694 steps_per_second=19.5652
+[fourier train] T=1 seed=42 step=4100/20000 loss=13.9839 steps_per_second=19.3688
+[fourier train] T=1 seed=42 step=4200/20000 loss=14.2 steps_per_second=19.4125
+[fourier train] T=1 seed=42 step=4300/20000 loss=14.0076 steps_per_second=19.4399
+[fourier train] T=1 seed=42 step=4400/20000 loss=13.8192 steps_per_second=19.4484
+[fourier train] T=1 seed=42 step=4500/20000 loss=13.9833 steps_per_second=19.4617
+[fourier train] T=1 seed=42 step=4600/20000 loss=14.1259 steps_per_second=19.4755
+[fourier train] T=1 seed=42 step=4700/20000 loss=13.9145 steps_per_second=19.5438
+[fourier train] T=1 seed=42 step=4800/20000 loss=13.9085 steps_per_second=19.6228
+[fourier train] T=1 seed=42 step=4900/20000 loss=13.7565 steps_per_second=19.6356
+[fourier train] T=1 seed=42 step=5000/20000 loss=13.8893 steps_per_second=19.6736
+[fourier train] T=1 seed=42 step=5100/20000 loss=14.0738 steps_per_second=19.5125
+[fourier train] T=1 seed=42 step=5200/20000 loss=13.9392 steps_per_second=19.5232
+[fourier train] T=1 seed=42 step=5300/20000 loss=14.0261 steps_per_second=19.5414
+[fourier train] T=1 seed=42 step=5400/20000 loss=14.0107 steps_per_second=19.5506
+[fourier train] T=1 seed=42 step=5500/20000 loss=13.8889 steps_per_second=19.5618
+[fourier train] T=1 seed=42 step=5600/20000 loss=14.01 steps_per_second=19.5704
+[fourier train] T=1 seed=42 step=5700/20000 loss=13.9858 steps_per_second=19.5900
+[fourier train] T=1 seed=42 step=5800/20000 loss=13.916 steps_per_second=19.6055
+[fourier train] T=1 seed=42 step=5900/20000 loss=13.6762 steps_per_second=19.6221
+[fourier train] T=1 seed=42 step=6000/20000 loss=13.776 steps_per_second=19.6279
+[fourier train] T=1 seed=42 step=6100/20000 loss=13.741 steps_per_second=19.4866
+[fourier train] T=1 seed=42 step=6200/20000 loss=13.7539 steps_per_second=19.5016
+[fourier train] T=1 seed=42 step=6300/20000 loss=13.7579 steps_per_second=19.5191
+[fourier train] T=1 seed=42 step=6400/20000 loss=13.7482 steps_per_second=19.5277
+[fourier train] T=1 seed=42 step=6500/20000 loss=13.8557 steps_per_second=19.5484
+[fourier train] T=1 seed=42 step=6600/20000 loss=13.6861 steps_per_second=19.5632
+[fourier train] T=1 seed=42 step=6700/20000 loss=13.5253 steps_per_second=19.5642
+[fourier train] T=1 seed=42 step=6800/20000 loss=13.6371 steps_per_second=19.5802
+[fourier train] T=1 seed=42 step=6900/20000 loss=13.8181 steps_per_second=19.6000
+[fourier train] T=1 seed=42 step=7000/20000 loss=13.7717 steps_per_second=19.6189
+[fourier train] T=1 seed=42 step=7100/20000 loss=13.7292 steps_per_second=19.5062
+[fourier train] T=1 seed=42 step=7200/20000 loss=13.6248 steps_per_second=19.5203
+[fourier train] T=1 seed=42 step=7300/20000 loss=13.7666 steps_per_second=19.5392
+[fourier train] T=1 seed=42 step=7400/20000 loss=13.874 steps_per_second=19.5576
+[fourier train] T=1 seed=42 step=7500/20000 loss=13.5828 steps_per_second=19.5811
+[fourier train] T=1 seed=42 step=7600/20000 loss=13.65 steps_per_second=19.5951
+[fourier train] T=1 seed=42 step=7700/20000 loss=13.685 steps_per_second=19.6164
+[fourier train] T=1 seed=42 step=7800/20000 loss=13.7155 steps_per_second=19.6285
+[fourier train] T=1 seed=42 step=7900/20000 loss=13.8366 steps_per_second=19.6334
+[fourier train] T=1 seed=42 step=8000/20000 loss=13.6853 steps_per_second=19.6486
+[fourier train] T=1 seed=42 step=8100/20000 loss=13.6194 steps_per_second=19.5458
+[fourier train] T=1 seed=42 step=8200/20000 loss=13.5604 steps_per_second=19.5572
+[fourier train] T=1 seed=42 step=8300/20000 loss=13.6531 steps_per_second=19.5691
+[fourier train] T=1 seed=42 step=8400/20000 loss=13.6147 steps_per_second=19.5793
+[fourier train] T=1 seed=42 step=8500/20000 loss=13.6876 steps_per_second=19.5951
+[fourier train] T=1 seed=42 step=8600/20000 loss=13.6688 steps_per_second=19.6008
+[fourier train] T=1 seed=42 step=8700/20000 loss=13.764 steps_per_second=19.6069
+[fourier train] T=1 seed=42 step=8800/20000 loss=13.6329 steps_per_second=19.6152
+[fourier train] T=1 seed=42 step=8900/20000 loss=13.5797 steps_per_second=19.6247
+[fourier train] T=1 seed=42 step=9000/20000 loss=13.5533 steps_per_second=19.6244
+[fourier train] T=1 seed=42 step=9100/20000 loss=13.6987 steps_per_second=19.5265
+[fourier train] T=1 seed=42 step=9200/20000 loss=13.2559 steps_per_second=19.5276
+[fourier train] T=1 seed=42 step=9300/20000 loss=13.5064 steps_per_second=19.5325
+[fourier train] T=1 seed=42 step=9400/20000 loss=13.4167 steps_per_second=19.5372
+[fourier train] T=1 seed=42 step=9500/20000 loss=13.7744 steps_per_second=19.5430
+[fourier train] T=1 seed=42 step=9600/20000 loss=13.7637 steps_per_second=19.5475
+[fourier train] T=1 seed=42 step=9700/20000 loss=13.3341 steps_per_second=19.5483
+[fourier train] T=1 seed=42 step=9800/20000 loss=13.572 steps_per_second=19.5491
+[fourier train] T=1 seed=42 step=9900/20000 loss=13.3793 steps_per_second=19.5416
+[fourier train] T=1 seed=42 step=10000/20000 loss=13.4394 steps_per_second=19.5300
+[fourier train] T=1 seed=42 step=10100/20000 loss=13.5741 steps_per_second=19.4552
+[fourier train] T=1 seed=42 step=10200/20000 loss=13.5183 steps_per_second=19.4646
+[fourier train] T=1 seed=42 step=10300/20000 loss=13.4438 steps_per_second=19.4706
+[fourier train] T=1 seed=42 step=10400/20000 loss=13.3103 steps_per_second=19.4676
+[fourier train] T=1 seed=42 step=10500/20000 loss=13.5338 steps_per_second=19.4625
+[fourier train] T=1 seed=42 step=10600/20000 loss=13.5188 steps_per_second=19.4631
+[fourier train] T=1 seed=42 step=10700/20000 loss=13.6899 steps_per_second=19.4653
+[fourier train] T=1 seed=42 step=10800/20000 loss=13.4824 steps_per_second=19.4664
+[fourier train] T=1 seed=42 step=10900/20000 loss=13.4156 steps_per_second=19.4707
+[fourier train] T=1 seed=42 step=11000/20000 loss=13.3839 steps_per_second=19.4732
+[fourier train] T=1 seed=42 step=11100/20000 loss=13.4706 steps_per_second=19.4029
+[fourier train] T=1 seed=42 step=11200/20000 loss=13.6334 steps_per_second=19.4052
+[fourier train] T=1 seed=42 step=11300/20000 loss=13.6208 steps_per_second=19.4040
+[fourier train] T=1 seed=42 step=11400/20000 loss=13.7373 steps_per_second=19.4084
+[fourier train] T=1 seed=42 step=11500/20000 loss=13.5954 steps_per_second=19.4141
+[fourier train] T=1 seed=42 step=11600/20000 loss=13.748 steps_per_second=19.4163
+[fourier train] T=1 seed=42 step=11700/20000 loss=13.6249 steps_per_second=19.4221
+[fourier train] T=1 seed=42 step=11800/20000 loss=13.4084 steps_per_second=19.4266
+[fourier train] T=1 seed=42 step=11900/20000 loss=13.3382 steps_per_second=19.4287
+[fourier train] T=1 seed=42 step=12000/20000 loss=13.459 steps_per_second=19.4336
+[fourier train] T=1 seed=42 step=12100/20000 loss=13.6335 steps_per_second=19.3643
+[fourier train] T=1 seed=42 step=12200/20000 loss=13.4623 steps_per_second=19.3690
+[fourier train] T=1 seed=42 step=12300/20000 loss=13.7337 steps_per_second=19.3744
+[fourier train] T=1 seed=42 step=12400/20000 loss=13.6343 steps_per_second=19.3794
+[fourier train] T=1 seed=42 step=12500/20000 loss=13.4645 steps_per_second=19.3815
+[fourier train] T=1 seed=42 step=12600/20000 loss=13.5243 steps_per_second=19.3869
+[fourier train] T=1 seed=42 step=12700/20000 loss=13.6405 steps_per_second=19.3915
+[fourier train] T=1 seed=42 step=12800/20000 loss=13.6 steps_per_second=19.3944
+[fourier train] T=1 seed=42 step=12900/20000 loss=13.5277 steps_per_second=19.3990
+[fourier train] T=1 seed=42 step=13000/20000 loss=13.7266 steps_per_second=19.4012
+[fourier train] T=1 seed=42 step=13100/20000 loss=13.7819 steps_per_second=19.3437
+[fourier train] T=1 seed=42 step=13200/20000 loss=13.3916 steps_per_second=19.3511
+[fourier train] T=1 seed=42 step=13300/20000 loss=13.6245 steps_per_second=19.3540
+[fourier train] T=1 seed=42 step=13400/20000 loss=13.7076 steps_per_second=19.3589
+[fourier train] T=1 seed=42 step=13500/20000 loss=13.408 steps_per_second=19.3665
+[fourier train] T=1 seed=42 step=13600/20000 loss=13.5759 steps_per_second=19.3688
+[fourier train] T=1 seed=42 step=13700/20000 loss=13.6282 steps_per_second=19.3759
+[fourier train] T=1 seed=42 step=13800/20000 loss=13.2488 steps_per_second=19.3807
+[fourier train] T=1 seed=42 step=13900/20000 loss=13.3663 steps_per_second=19.3832
+[fourier train] T=1 seed=42 step=14000/20000 loss=13.4426 steps_per_second=19.3867
+[fourier train] T=1 seed=42 step=14100/20000 loss=13.524 steps_per_second=19.3313
+[fourier train] T=1 seed=42 step=14200/20000 loss=13.3629 steps_per_second=19.3363
+[fourier train] T=1 seed=42 step=14300/20000 loss=13.6243 steps_per_second=19.3383
+[fourier train] T=1 seed=42 step=14400/20000 loss=13.5197 steps_per_second=19.3384
+[fourier train] T=1 seed=42 step=14500/20000 loss=13.354 steps_per_second=19.3432
+[fourier train] T=1 seed=42 step=14600/20000 loss=13.5699 steps_per_second=19.3473
+[fourier train] T=1 seed=42 step=14700/20000 loss=13.5598 steps_per_second=19.3519
+[fourier train] T=1 seed=42 step=14800/20000 loss=13.5822 steps_per_second=19.3562
+[fourier train] T=1 seed=42 step=14900/20000 loss=13.1749 steps_per_second=19.3559
+[fourier train] T=1 seed=42 step=15000/20000 loss=13.228 steps_per_second=19.3627
+[fourier train] T=1 seed=42 step=15100/20000 loss=13.3293 steps_per_second=19.3089
+[fourier train] T=1 seed=42 step=15200/20000 loss=13.6038 steps_per_second=19.3130
+[fourier train] T=1 seed=42 step=15300/20000 loss=13.4648 steps_per_second=19.3152
+[fourier train] T=1 seed=42 step=15400/20000 loss=13.3849 steps_per_second=19.3180
+[fourier train] T=1 seed=42 step=15500/20000 loss=13.3858 steps_per_second=19.3223
+[fourier train] T=1 seed=42 step=15600/20000 loss=13.4297 steps_per_second=19.3245
+[fourier train] T=1 seed=42 step=15700/20000 loss=13.4289 steps_per_second=19.3261
+[fourier train] T=1 seed=42 step=15800/20000 loss=13.3128 steps_per_second=19.3297
+[fourier train] T=1 seed=42 step=15900/20000 loss=13.3349 steps_per_second=19.3314
+[fourier train] T=1 seed=42 step=16000/20000 loss=13.4372 steps_per_second=19.3317
+[fourier train] T=1 seed=42 step=16100/20000 loss=13.3753 steps_per_second=19.2843
+[fourier train] T=1 seed=42 step=16200/20000 loss=13.497 steps_per_second=19.2858
+[fourier train] T=1 seed=42 step=16300/20000 loss=13.3331 steps_per_second=19.2904
+[fourier train] T=1 seed=42 step=16400/20000 loss=13.3136 steps_per_second=19.2924
+[fourier train] T=1 seed=42 step=16500/20000 loss=13.5085 steps_per_second=19.2970
+[fourier train] T=1 seed=42 step=16600/20000 loss=13.5533 steps_per_second=19.3016
+[fourier train] T=1 seed=42 step=16700/20000 loss=13.4214 steps_per_second=19.3079
+[fourier train] T=1 seed=42 step=16800/20000 loss=13.2959 steps_per_second=19.3118
+[fourier train] T=1 seed=42 step=16900/20000 loss=13.3599 steps_per_second=19.3144
+[fourier train] T=1 seed=42 step=17000/20000 loss=13.3409 steps_per_second=19.3138
+[fourier train] T=1 seed=42 step=17100/20000 loss=13.3688 steps_per_second=19.2733
+[fourier train] T=1 seed=42 step=17200/20000 loss=13.3651 steps_per_second=19.2724
+[fourier train] T=1 seed=42 step=17300/20000 loss=13.5181 steps_per_second=19.2751
+[fourier train] T=1 seed=42 step=17400/20000 loss=13.3416 steps_per_second=19.2793
+[fourier train] T=1 seed=42 step=17500/20000 loss=13.375 steps_per_second=19.2820
+[fourier train] T=1 seed=42 step=17600/20000 loss=13.5874 steps_per_second=19.2857
+[fourier train] T=1 seed=42 step=17700/20000 loss=13.3404 steps_per_second=19.2896
+[fourier train] T=1 seed=42 step=17800/20000 loss=13.4085 steps_per_second=19.2897
+[fourier train] T=1 seed=42 step=17900/20000 loss=13.3803 steps_per_second=19.2915
+[fourier train] T=1 seed=42 step=18000/20000 loss=13.5612 steps_per_second=19.2959
+[fourier train] T=1 seed=42 step=18100/20000 loss=13.4777 steps_per_second=19.2542
+[fourier train] T=1 seed=42 step=18200/20000 loss=13.2921 steps_per_second=19.2578
+[fourier train] T=1 seed=42 step=18300/20000 loss=13.3818 steps_per_second=19.2618
+[fourier train] T=1 seed=42 step=18400/20000 loss=13.546 steps_per_second=19.2644
+[fourier train] T=1 seed=42 step=18500/20000 loss=13.5028 steps_per_second=19.2661
+[fourier train] T=1 seed=42 step=18600/20000 loss=13.1773 steps_per_second=19.2701
+[fourier train] T=1 seed=42 step=18700/20000 loss=13.2513 steps_per_second=19.2720
+[fourier train] T=1 seed=42 step=18800/20000 loss=13.367 steps_per_second=19.2712
+[fourier train] T=1 seed=42 step=18900/20000 loss=13.2797 steps_per_second=19.2694
+[fourier train] T=1 seed=42 step=19000/20000 loss=13.3958 steps_per_second=19.2687
+[fourier train] T=1 seed=42 step=19100/20000 loss=13.311 steps_per_second=19.2260
+[fourier train] T=1 seed=42 step=19200/20000 loss=13.1228 steps_per_second=19.2294
+[fourier train] T=1 seed=42 step=19300/20000 loss=13.5947 steps_per_second=19.2316
+[fourier train] T=1 seed=42 step=19400/20000 loss=13.2682 steps_per_second=19.2362
+[fourier train] T=1 seed=42 step=19500/20000 loss=13.3873 steps_per_second=19.2376
+[fourier train] T=1 seed=42 step=19600/20000 loss=13.5219 steps_per_second=19.2403
+[fourier train] T=1 seed=42 step=19700/20000 loss=13.4045 steps_per_second=19.2442
+[fourier train] T=1 seed=42 step=19800/20000 loss=13.1666 steps_per_second=19.2491
+[fourier train] T=1 seed=42 step=19900/20000 loss=13.2112 steps_per_second=19.2517
+[fourier train] T=1 seed=42 step=20000/20000 loss=13.4617 steps_per_second=19.2567
+{"cell": "T1_seed42", "evaluation_status": null, "training": {"cached": false, "completed_steps": 20000, "elapsed_seconds_this_process": 988.6445971250068, "last_metrics": {"auxk": 1.0000585317611694, "dead": 1344.0, "l0": 20.0, "loss": 13.461678504943848, "mse": 13.430426597595215}, "parameter_match": {"difference": 0, "fourier_d_sae": 32768, "fourier_parameters": 268472320, "reference_txc_d_sae": 32768, "reference_txc_parameters": 268472320, "relative_difference": 0.0}, "status": "complete"}}
+[fourier train] T=10 seed=42 step=100/20000 loss=41.0212 steps_per_second=2.5068
+[fourier train] T=10 seed=42 step=200/20000 loss=35.1588 steps_per_second=2.5026
+[fourier train] T=10 seed=42 step=300/20000 loss=27.9363 steps_per_second=2.5021
+[fourier train] T=10 seed=42 step=400/20000 loss=23.1341 steps_per_second=2.5031
+[fourier train] T=10 seed=42 step=500/20000 loss=20.5869 steps_per_second=2.5026
+[fourier train] T=10 seed=42 step=600/20000 loss=18.9934 steps_per_second=2.5022
+[fourier train] T=10 seed=42 step=700/20000 loss=17.7474 steps_per_second=2.5018
+[fourier train] T=10 seed=42 step=800/20000 loss=16.9449 steps_per_second=2.5016
+[fourier train] T=10 seed=42 step=900/20000 loss=16.0409 steps_per_second=2.4835
+[fourier train] T=10 seed=42 step=1000/20000 loss=15.4459 steps_per_second=2.4798
+[fourier train] T=10 seed=42 step=1100/20000 loss=14.7204 steps_per_second=2.3538
+[fourier train] T=10 seed=42 step=1200/20000 loss=14.3348 steps_per_second=2.3536
+[fourier train] T=10 seed=42 step=1300/20000 loss=13.7013 steps_per_second=2.3552
+[fourier train] T=10 seed=42 step=1400/20000 loss=13.1015 steps_per_second=2.3558
+[fourier train] T=10 seed=42 step=1500/20000 loss=12.7404 steps_per_second=2.3557
+[fourier train] T=10 seed=42 step=1600/20000 loss=12.6489 steps_per_second=2.3614
+[fourier train] T=10 seed=42 step=1700/20000 loss=12.018 steps_per_second=2.3643
+[fourier train] T=10 seed=42 step=1800/20000 loss=11.8236 steps_per_second=2.3651
+[fourier train] T=10 seed=42 step=1900/20000 loss=11.6712 steps_per_second=2.3713
+[fourier train] T=10 seed=42 step=2000/20000 loss=11.9297 steps_per_second=2.3740
+[fourier train] T=10 seed=42 step=2100/20000 loss=11.5084 steps_per_second=2.3228
+[fourier train] T=10 seed=42 step=2200/20000 loss=11.4206 steps_per_second=2.3272
+[fourier train] T=10 seed=42 step=2300/20000 loss=11.2163 steps_per_second=2.3332
+[fourier train] T=10 seed=42 step=2400/20000 loss=11.3898 steps_per_second=2.3365
+[fourier train] T=10 seed=42 step=2500/20000 loss=11.0854 steps_per_second=2.3392
+[fourier train] T=10 seed=42 step=2600/20000 loss=10.9475 steps_per_second=2.3422
+{
+  "activation_cache": "/workspace/fourier_data/act_cache/fb2a74be884e512a/resid_post_L10.npy",
+  "artifact": "/workspace/txc-neurips-aniket/purified/artifacts/c7/sentence_acts_L10_T16.npz",
+  "cells": [
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 32768,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 1
+      },
+      "parameter_match": {
+        "difference": 0,
+        "fourier_d_sae": 32768,
+        "fourier_parameters": 268472320,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 268472320,
+        "relative_difference": 0.0
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131067,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 10
+      },
+      "parameter_match": {
+        "difference": -8197,
+        "fourier_d_sae": 131067,
+        "fourier_parameters": 2684420091,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 2684428288,
+        "relative_difference": -3.053536589761939e-06
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 65532,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 2
+      },
+      "parameter_match": {
+        "difference": -4,
+        "fourier_d_sae": 65532,
+        "fourier_parameters": 536911868,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 536911872,
+        "relative_difference": -7.450012206099998e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 98298,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 4
+      },
+      "parameter_match": {
+        "difference": -6,
+        "fourier_d_sae": 98298,
+        "fourier_parameters": 1073790970,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1073790976,
+        "relative_difference": -5.587679664016845e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131064,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 6
+      },
+      "parameter_match": {
+        "difference": -8,
+        "fourier_d_sae": 131064,
+        "fourier_parameters": 1610670072,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1610670080,
+        "relative_difference": -4.96687689138672e-09
+      }
+    }
+  ],
+  "checkpoint_root": "/workspace/txc-neurips-aniket/checkpoints/backtracking_fourier_matched/reviewer-five-point-v1",
+  "device": "cuda:0",
+  "implementation_sha256": {
+    "backtracking_fourier_xc.py": "c986b6215623705ff7e8e4ba0a64723e4c7e9cfdc9f16715c6b538c6e1d42aad",
+    "run_backtracking_fourier.py": "d02a2dc07127694906d669429aab56fab9350fa88f79b4eb9faa318bd3289643"
+  },
+  "output_root": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_fourier_matched/reviewer-five-point-v1",
+  "phase": "train",
+  "protocol_version": "power-spectrum.backtracking-fourier.v1",
+  "reference_commit": "d9c7fc7b2",
+  "reference_protocol_version": "2026-07-26.t16.1",
+  "run_fingerprint": "4fa0cbe112729bba2d1693cca50ce127ea42362fda725f5a4c105c4a999d8ec8"
+}
+[fourier train] T=1 seed=2 step=100/20000 loss=44.4673 steps_per_second=17.9962
+[fourier train] T=1 seed=2 step=200/20000 loss=37.7588 steps_per_second=18.4067
+[fourier train] T=1 seed=2 step=300/20000 loss=30.7848 steps_per_second=18.5296
+[fourier train] T=1 seed=2 step=400/20000 loss=26.6292 steps_per_second=18.8069
+[fourier train] T=1 seed=2 step=500/20000 loss=23.7346 steps_per_second=18.8336
+[fourier train] T=1 seed=2 step=600/20000 loss=21.3065 steps_per_second=18.8349
+[fourier train] T=1 seed=2 step=700/20000 loss=20.1911 steps_per_second=18.7947
+[fourier train] T=1 seed=2 step=800/20000 loss=18.7639 steps_per_second=18.7439
+[fourier train] T=1 seed=2 step=900/20000 loss=17.6547 steps_per_second=18.7234
+[fourier train] T=1 seed=2 step=1000/20000 loss=17.1831 steps_per_second=18.7797
+[fourier train] T=1 seed=2 step=1100/20000 loss=16.4735 steps_per_second=18.2511
+[fourier train] T=1 seed=2 step=1200/20000 loss=16.3214 steps_per_second=18.3609
+[fourier train] T=1 seed=2 step=1300/20000 loss=16.4048 steps_per_second=18.3984
+[fourier train] T=1 seed=2 step=1400/20000 loss=16.0427 steps_per_second=18.4524
+[fourier train] T=1 seed=2 step=1500/20000 loss=16.095 steps_per_second=18.4397
+[fourier train] T=1 seed=2 step=1600/20000 loss=15.7799 steps_per_second=18.4821
+[fourier train] T=1 seed=2 step=1700/20000 loss=15.4752 steps_per_second=18.5090
+[fourier train] T=1 seed=2 step=1800/20000 loss=15.567 steps_per_second=18.5095
+[fourier train] T=1 seed=2 step=1900/20000 loss=15.3805 steps_per_second=18.5093
+[fourier train] T=1 seed=2 step=2000/20000 loss=15.3239 steps_per_second=18.5466
+[fourier train] T=1 seed=2 step=2100/20000 loss=15.2337 steps_per_second=18.2500
+[fourier train] T=1 seed=2 step=2200/20000 loss=15.1849 steps_per_second=18.2616
+[fourier train] T=1 seed=2 step=2300/20000 loss=15.1831 steps_per_second=18.2892
+[fourier train] T=1 seed=2 step=2400/20000 loss=15.1513 steps_per_second=18.3116
+[fourier train] T=1 seed=2 step=2500/20000 loss=14.6191 steps_per_second=18.3468
+[fourier train] T=1 seed=2 step=2600/20000 loss=15.1071 steps_per_second=18.3666
+[fourier train] T=1 seed=2 step=2700/20000 loss=14.4315 steps_per_second=18.3863
+[fourier train] T=1 seed=2 step=2800/20000 loss=14.6377 steps_per_second=18.4141
+[fourier train] T=1 seed=2 step=2900/20000 loss=14.7192 steps_per_second=18.4426
+[fourier train] T=1 seed=2 step=3000/20000 loss=14.7844 steps_per_second=18.4664
+[fourier train] T=1 seed=2 step=3100/20000 loss=14.8359 steps_per_second=18.2612
+[fourier train] T=1 seed=2 step=3200/20000 loss=14.6014 steps_per_second=18.2610
+[fourier train] T=1 seed=2 step=3300/20000 loss=14.6884 steps_per_second=18.2576
+[fourier train] T=1 seed=2 step=3400/20000 loss=14.4798 steps_per_second=18.2753
+[fourier train] T=1 seed=2 step=3500/20000 loss=14.5436 steps_per_second=18.3001
+[fourier train] T=1 seed=2 step=3600/20000 loss=14.8844 steps_per_second=18.3247
+[fourier train] T=1 seed=2 step=3700/20000 loss=14.5036 steps_per_second=18.3308
+[fourier train] T=1 seed=2 step=3800/20000 loss=14.4402 steps_per_second=18.3425
+[fourier train] T=1 seed=2 step=3900/20000 loss=14.6211 steps_per_second=18.3481
+[fourier train] T=1 seed=2 step=4000/20000 loss=14.5134 steps_per_second=18.3683
+[fourier train] T=1 seed=2 step=4100/20000 loss=14.3118 steps_per_second=18.2094
+[fourier train] T=1 seed=2 step=4200/20000 loss=14.3073 steps_per_second=18.2321
+[fourier train] T=1 seed=2 step=4300/20000 loss=14.3751 steps_per_second=18.2522
+[fourier train] T=1 seed=2 step=4400/20000 loss=14.1851 steps_per_second=18.2452
+[fourier train] T=1 seed=2 step=4500/20000 loss=14.4935 steps_per_second=18.2666
+[fourier train] T=1 seed=2 step=4600/20000 loss=14.0384 steps_per_second=18.2651
+[fourier train] T=1 seed=2 step=4700/20000 loss=14.2114 steps_per_second=18.2623
+[fourier train] T=1 seed=2 step=4800/20000 loss=14.3282 steps_per_second=18.2685
+[fourier train] T=1 seed=2 step=4900/20000 loss=14.2396 steps_per_second=18.2800
+[fourier train] T=1 seed=2 step=5000/20000 loss=14.1185 steps_per_second=18.2857
+[fourier train] T=1 seed=2 step=5100/20000 loss=14.2742 steps_per_second=18.1704
+[fourier train] T=1 seed=2 step=5200/20000 loss=14.1984 steps_per_second=18.1845
+[fourier train] T=1 seed=2 step=5300/20000 loss=13.788 steps_per_second=18.1901
+[fourier train] T=1 seed=2 step=5400/20000 loss=14.1267 steps_per_second=18.1980
+[fourier train] T=1 seed=2 step=5500/20000 loss=13.8679 steps_per_second=18.2150
+[fourier train] T=1 seed=2 step=5600/20000 loss=14.2054 steps_per_second=18.2746
+[fourier train] T=1 seed=2 step=5700/20000 loss=14.4233 steps_per_second=18.2841
+[fourier train] T=1 seed=2 step=5800/20000 loss=14.0764 steps_per_second=18.3041
+[fourier train] T=1 seed=2 step=5900/20000 loss=14.0673 steps_per_second=18.3034
+[fourier train] T=1 seed=2 step=6000/20000 loss=13.8827 steps_per_second=18.3119
+[fourier train] T=1 seed=2 step=6100/20000 loss=14.1191 steps_per_second=18.1902
+[fourier train] T=1 seed=2 step=6200/20000 loss=13.9577 steps_per_second=18.2006
+[fourier train] T=1 seed=2 step=6300/20000 loss=13.9727 steps_per_second=18.2062
+[fourier train] T=1 seed=2 step=6400/20000 loss=13.8782 steps_per_second=18.2158
+[fourier train] T=1 seed=2 step=6500/20000 loss=14.3231 steps_per_second=18.2241
+[fourier train] T=1 seed=2 step=6600/20000 loss=13.8802 steps_per_second=18.2299
+[fourier train] T=1 seed=2 step=6700/20000 loss=14.1474 steps_per_second=18.2340
+[fourier train] T=1 seed=2 step=6800/20000 loss=14.0972 steps_per_second=18.2337
+[fourier train] T=1 seed=2 step=6900/20000 loss=14.247 steps_per_second=18.2517
+[fourier train] T=1 seed=2 step=7000/20000 loss=13.8614 steps_per_second=18.2648
+[fourier train] T=1 seed=2 step=7100/20000 loss=13.9168 steps_per_second=18.1655
+[fourier train] T=1 seed=2 step=7200/20000 loss=14.2706 steps_per_second=18.1705
+[fourier train] T=1 seed=2 step=7300/20000 loss=13.9945 steps_per_second=18.1793
+[fourier train] T=1 seed=2 step=7400/20000 loss=13.9516 steps_per_second=18.1918
+[fourier train] T=1 seed=2 step=7500/20000 loss=14.0517 steps_per_second=18.2018
+[fourier train] T=1 seed=2 step=7600/20000 loss=13.8043 steps_per_second=18.2190
+[fourier train] T=1 seed=2 step=7700/20000 loss=14.0261 steps_per_second=18.2180
+[fourier train] T=1 seed=2 step=7800/20000 loss=13.7228 steps_per_second=18.2219
+[fourier train] T=1 seed=2 step=7900/20000 loss=14.0382 steps_per_second=18.2260
+[fourier train] T=1 seed=2 step=8000/20000 loss=13.7309 steps_per_second=18.2291
+[fourier train] T=1 seed=2 step=8100/20000 loss=14.104 steps_per_second=18.1499
+[fourier train] T=1 seed=2 step=8200/20000 loss=14.1157 steps_per_second=18.1639
+[fourier train] T=1 seed=2 step=8300/20000 loss=13.7809 steps_per_second=18.1683
+[fourier train] T=1 seed=2 step=8400/20000 loss=13.8908 steps_per_second=18.1643
+[fourier train] T=1 seed=2 step=8500/20000 loss=13.7142 steps_per_second=18.1714
+[fourier train] T=1 seed=2 step=8600/20000 loss=13.6243 steps_per_second=18.1723
+[fourier train] T=1 seed=2 step=8700/20000 loss=13.8894 steps_per_second=18.1804
+[fourier train] T=1 seed=2 step=8800/20000 loss=13.6721 steps_per_second=18.1917
+[fourier train] T=1 seed=2 step=8900/20000 loss=13.8825 steps_per_second=18.2065
+[fourier train] T=1 seed=2 step=9000/20000 loss=13.486 steps_per_second=18.2239
+[fourier train] T=1 seed=2 step=9100/20000 loss=13.7255 steps_per_second=18.1548
+[fourier train] T=1 seed=2 step=9200/20000 loss=13.6609 steps_per_second=18.1654
+[fourier train] T=1 seed=2 step=9300/20000 loss=13.8539 steps_per_second=18.1803
+[fourier train] T=1 seed=2 step=9400/20000 loss=13.8478 steps_per_second=18.1909
+[fourier train] T=1 seed=2 step=9500/20000 loss=13.5744 steps_per_second=18.1998
+[fourier train] T=1 seed=2 step=9600/20000 loss=13.785 steps_per_second=18.2081
+[fourier train] T=1 seed=2 step=9700/20000 loss=13.6748 steps_per_second=18.2144
+[fourier train] T=1 seed=2 step=9800/20000 loss=13.8654 steps_per_second=18.2135
+[fourier train] T=1 seed=2 step=9900/20000 loss=13.836 steps_per_second=18.2164
+[fourier train] T=1 seed=2 step=10000/20000 loss=13.7758 steps_per_second=18.2190
+[fourier train] T=1 seed=2 step=10100/20000 loss=13.6608 steps_per_second=18.1632
+[fourier train] T=1 seed=2 step=10200/20000 loss=14.1252 steps_per_second=18.1576
+[fourier train] T=1 seed=2 step=10300/20000 loss=13.8448 steps_per_second=18.1550
+[fourier train] T=1 seed=2 step=10400/20000 loss=13.7916 steps_per_second=18.1643
+[fourier train] T=1 seed=2 step=10500/20000 loss=13.8101 steps_per_second=18.1642
+[fourier train] T=1 seed=2 step=10600/20000 loss=13.8116 steps_per_second=18.1558
+[fourier train] T=1 seed=2 step=10700/20000 loss=13.5824 steps_per_second=18.1618
+[fourier train] T=1 seed=2 step=10800/20000 loss=14.118 steps_per_second=18.1618
+[fourier train] T=1 seed=2 step=10900/20000 loss=13.6466 steps_per_second=18.1646
+[fourier train] T=1 seed=2 step=11000/20000 loss=13.6268 steps_per_second=18.1680
+[fourier train] T=1 seed=2 step=11100/20000 loss=13.7097 steps_per_second=18.1114
+[fourier train] T=1 seed=2 step=11200/20000 loss=13.8716 steps_per_second=18.1186
+[fourier train] T=1 seed=2 step=11300/20000 loss=13.8173 steps_per_second=18.1195
+[fourier train] T=1 seed=2 step=11400/20000 loss=13.6495 steps_per_second=18.1280
+[fourier train] T=1 seed=2 step=11500/20000 loss=13.8389 steps_per_second=18.1307
+[fourier train] T=1 seed=2 step=11600/20000 loss=13.8611 steps_per_second=18.1347
+[fourier train] T=1 seed=2 step=11700/20000 loss=13.7058 steps_per_second=18.1323
+[fourier train] T=1 seed=2 step=11800/20000 loss=13.8654 steps_per_second=18.1301
+[fourier train] T=1 seed=2 step=11900/20000 loss=13.9111 steps_per_second=18.1337
+[fourier train] T=1 seed=2 step=12000/20000 loss=13.7161 steps_per_second=18.1359
+[fourier train] T=1 seed=2 step=12100/20000 loss=13.8049 steps_per_second=18.0846
+[fourier train] T=1 seed=2 step=12200/20000 loss=13.7513 steps_per_second=18.0879
+[fourier train] T=1 seed=2 step=12300/20000 loss=13.9863 steps_per_second=18.0946
+[fourier train] T=1 seed=2 step=12400/20000 loss=13.9512 steps_per_second=18.1009
+[fourier train] T=1 seed=2 step=12500/20000 loss=13.5 steps_per_second=18.1059
+[fourier train] T=1 seed=2 step=12600/20000 loss=13.6331 steps_per_second=18.1045
+[fourier train] T=1 seed=2 step=12700/20000 loss=13.9076 steps_per_second=18.1125
+[fourier train] T=1 seed=2 step=12800/20000 loss=13.6746 steps_per_second=18.1103
+[fourier train] T=1 seed=2 step=12900/20000 loss=13.7873 steps_per_second=18.1083
+[fourier train] T=1 seed=2 step=13000/20000 loss=13.7721 steps_per_second=18.1065
+[fourier train] T=1 seed=2 step=13100/20000 loss=13.7409 steps_per_second=18.0506
+[fourier train] T=1 seed=2 step=13200/20000 loss=13.4498 steps_per_second=18.0510
+[fourier train] T=1 seed=2 step=13300/20000 loss=13.5133 steps_per_second=18.0517
+[fourier train] T=1 seed=2 step=13400/20000 loss=13.7764 steps_per_second=18.0529
+[fourier train] T=1 seed=2 step=13500/20000 loss=13.7196 steps_per_second=18.0567
+[fourier train] T=1 seed=2 step=13600/20000 loss=13.5193 steps_per_second=18.0612
+[fourier train] T=1 seed=2 step=13700/20000 loss=13.9037 steps_per_second=18.0625
+[fourier train] T=1 seed=2 step=13800/20000 loss=13.6533 steps_per_second=18.0691
+[fourier train] T=1 seed=2 step=13900/20000 loss=13.7025 steps_per_second=18.0713
+[fourier train] T=1 seed=2 step=14000/20000 loss=13.5515 steps_per_second=18.0721
+[fourier train] T=1 seed=2 step=14100/20000 loss=13.6099 steps_per_second=18.0244
+[fourier train] T=1 seed=2 step=14200/20000 loss=13.6413 steps_per_second=18.0261
+[fourier train] T=1 seed=2 step=14300/20000 loss=13.784 steps_per_second=18.0340
+[fourier train] T=1 seed=2 step=14400/20000 loss=13.9269 steps_per_second=18.0417
+[fourier train] T=1 seed=2 step=14500/20000 loss=13.7417 steps_per_second=18.0447
+[fourier train] T=1 seed=2 step=14600/20000 loss=13.8261 steps_per_second=18.0434
+[fourier train] T=1 seed=2 step=14700/20000 loss=13.9056 steps_per_second=18.0463
+[fourier train] T=1 seed=2 step=14800/20000 loss=13.6147 steps_per_second=18.0560
+[fourier train] T=1 seed=2 step=14900/20000 loss=13.5891 steps_per_second=18.0637
+[fourier train] T=1 seed=2 step=15000/20000 loss=13.631 steps_per_second=18.0712
+[fourier train] T=1 seed=2 step=15100/20000 loss=13.5508 steps_per_second=18.0334
+[fourier train] T=1 seed=2 step=15200/20000 loss=13.5892 steps_per_second=18.0426
+[fourier train] T=1 seed=2 step=15300/20000 loss=13.294 steps_per_second=18.0476
+[fourier train] T=1 seed=2 step=15400/20000 loss=13.5212 steps_per_second=18.0524
+[fourier train] T=1 seed=2 step=15500/20000 loss=13.7715 steps_per_second=18.0539
+[fourier train] T=1 seed=2 step=15600/20000 loss=13.5962 steps_per_second=18.0606
+[fourier train] T=1 seed=2 step=15700/20000 loss=13.6384 steps_per_second=18.0756
+[fourier train] T=1 seed=2 step=15800/20000 loss=13.7328 steps_per_second=18.0790
+[fourier train] T=1 seed=2 step=15900/20000 loss=13.5425 steps_per_second=18.0835
+[fourier train] T=1 seed=2 step=16000/20000 loss=13.5764 steps_per_second=18.0845
+[fourier train] T=1 seed=2 step=16100/20000 loss=13.5531 steps_per_second=18.0442
+[fourier train] T=1 seed=2 step=16200/20000 loss=13.7027 steps_per_second=18.0512
+[fourier train] T=1 seed=2 step=16300/20000 loss=13.6542 steps_per_second=18.0500
+[fourier train] T=1 seed=2 step=16400/20000 loss=13.6456 steps_per_second=18.0544
+[fourier train] T=1 seed=2 step=16500/20000 loss=13.3431 steps_per_second=18.0589
+[fourier train] T=1 seed=2 step=16600/20000 loss=13.8384 steps_per_second=18.0622
+[fourier train] T=1 seed=2 step=16700/20000 loss=13.8259 steps_per_second=18.0646
+[fourier train] T=1 seed=2 step=16800/20000 loss=13.5529 steps_per_second=18.0674
+[fourier train] T=1 seed=2 step=16900/20000 loss=13.6792 steps_per_second=18.0681
+[fourier train] T=1 seed=2 step=17000/20000 loss=13.7434 steps_per_second=18.0686
+[fourier train] T=1 seed=2 step=17100/20000 loss=13.4984 steps_per_second=18.0314
+[fourier train] T=1 seed=2 step=17200/20000 loss=13.4966 steps_per_second=18.0343
+[fourier train] T=1 seed=2 step=17300/20000 loss=13.7627 steps_per_second=18.0382
+[fourier train] T=1 seed=2 step=17400/20000 loss=13.4026 steps_per_second=18.0390
+[fourier train] T=1 seed=2 step=17500/20000 loss=13.5342 steps_per_second=18.0387
+[fourier train] T=1 seed=2 step=17600/20000 loss=13.4127 steps_per_second=18.0368
+[fourier train] T=1 seed=2 step=17700/20000 loss=13.5615 steps_per_second=18.0362
+[fourier train] T=1 seed=2 step=17800/20000 loss=13.5394 steps_per_second=18.0388
+[fourier train] T=1 seed=2 step=17900/20000 loss=13.5818 steps_per_second=18.0419
+[fourier train] T=1 seed=2 step=18000/20000 loss=13.4766 steps_per_second=18.0492
+[fourier train] T=1 seed=2 step=18100/20000 loss=13.5752 steps_per_second=18.0145
+[fourier train] T=1 seed=2 step=18200/20000 loss=13.5951 steps_per_second=18.0135
+[fourier train] T=1 seed=2 step=18300/20000 loss=13.6552 steps_per_second=18.0142
+[fourier train] T=1 seed=2 step=18400/20000 loss=13.5268 steps_per_second=18.0119
+[fourier train] T=1 seed=2 step=18500/20000 loss=13.6439 steps_per_second=18.0145
+[fourier train] T=1 seed=2 step=18600/20000 loss=13.3924 steps_per_second=18.0150
+[fourier train] T=1 seed=2 step=18700/20000 loss=13.5668 steps_per_second=18.0141
+[fourier train] T=1 seed=2 step=18800/20000 loss=13.3153 steps_per_second=18.0137
+[fourier train] T=1 seed=2 step=18900/20000 loss=13.7181 steps_per_second=18.0176
+[fourier train] T=1 seed=2 step=19000/20000 loss=13.4092 steps_per_second=18.0184
+[fourier train] T=1 seed=2 step=19100/20000 loss=13.6406 steps_per_second=17.9877
+[fourier train] T=1 seed=2 step=19200/20000 loss=13.4266 steps_per_second=17.9870
+[fourier train] T=1 seed=2 step=19300/20000 loss=13.3482 steps_per_second=17.9855
+[fourier train] T=1 seed=2 step=19400/20000 loss=13.4808 steps_per_second=17.9851
+[fourier train] T=1 seed=2 step=19500/20000 loss=13.3078 steps_per_second=17.9826
+[fourier train] T=1 seed=2 step=19600/20000 loss=13.4459 steps_per_second=17.9827
+[fourier train] T=1 seed=2 step=19700/20000 loss=13.4413 steps_per_second=17.9848
+[fourier train] T=1 seed=2 step=19800/20000 loss=13.4402 steps_per_second=17.9891
+[fourier train] T=1 seed=2 step=19900/20000 loss=13.5584 steps_per_second=17.9918
+[fourier train] T=1 seed=2 step=20000/20000 loss=13.3236 steps_per_second=17.9908
+{"cell": "T1_seed2", "evaluation_status": null, "training": {"cached": false, "completed_steps": 20000, "elapsed_seconds_this_process": 1113.742262381129, "last_metrics": {"auxk": 0.9997663497924805, "dead": 1624.0, "l0": 20.0, "loss": 13.323589324951172, "mse": 13.292346954345703}, "parameter_match": {"difference": 0, "fourier_d_sae": 32768, "fourier_parameters": 268472320, "reference_txc_d_sae": 32768, "reference_txc_parameters": 268472320, "relative_difference": 0.0}, "status": "complete"}}
+[fourier train] T=10 seed=2 step=100/20000 loss=40.8309 steps_per_second=2.5515
+[fourier train] T=10 seed=2 step=200/20000 loss=35.0804 steps_per_second=2.5361
+[fourier train] T=10 seed=2 step=300/20000 loss=28.0058 steps_per_second=2.5263
+[fourier train] T=10 seed=2 step=400/20000 loss=23.6087 steps_per_second=2.5286
+[fourier train] T=10 seed=2 step=500/20000 loss=20.8437 steps_per_second=2.5317
+[fourier train] T=10 seed=2 step=600/20000 loss=19.1929 steps_per_second=2.5307
+[fourier train] T=10 seed=2 step=700/20000 loss=18.049 steps_per_second=2.5335
+[fourier train] T=10 seed=2 step=800/20000 loss=16.9099 steps_per_second=2.5341
+[fourier train] T=10 seed=2 step=900/20000 loss=15.8721 steps_per_second=2.5360
+[fourier train] T=10 seed=2 step=1000/20000 loss=15.4495 steps_per_second=2.5332
+[fourier train] T=10 seed=2 step=1100/20000 loss=14.7128 steps_per_second=2.4103
+[fourier train] T=10 seed=2 step=1200/20000 loss=14.306 steps_per_second=2.4156
+[fourier train] T=10 seed=2 step=1300/20000 loss=13.7142 steps_per_second=2.4170
+[fourier train] T=10 seed=2 step=1400/20000 loss=13.5551 steps_per_second=2.4169
+[fourier train] T=10 seed=2 step=1500/20000 loss=12.9155 steps_per_second=2.4183
+[fourier train] T=10 seed=2 step=1600/20000 loss=12.545 steps_per_second=2.4207
+[fourier train] T=10 seed=2 step=1700/20000 loss=12.2182 steps_per_second=2.4232
+[fourier train] T=10 seed=2 step=1800/20000 loss=12.0157 steps_per_second=2.4260
+[fourier train] T=10 seed=2 step=1900/20000 loss=12.0003 steps_per_second=2.4282
+[fourier train] T=10 seed=2 step=2000/20000 loss=11.8329 steps_per_second=2.4270
+[fourier train] T=10 seed=2 step=2100/20000 loss=11.8221 steps_per_second=2.3183
+[fourier train] T=10 seed=2 step=2200/20000 loss=11.3429 steps_per_second=2.2768
+[fourier train] T=10 seed=2 step=2300/20000 loss=11.579 steps_per_second=2.2427
+[fourier train] T=10 seed=2 step=2400/20000 loss=11.0478 steps_per_second=2.2129
+[fourier train] T=10 seed=2 step=2500/20000 loss=10.9577 steps_per_second=2.1852
+[fourier train] T=10 seed=2 step=2600/20000 loss=11.0779 steps_per_second=2.1622
+[fourier train] T=10 seed=2 step=2700/20000 loss=10.8935 steps_per_second=2.1409
+[fourier train] T=10 seed=2 step=2800/20000 loss=10.6208 steps_per_second=2.1211
+[fourier train] T=10 seed=2 step=2900/20000 loss=10.6168 steps_per_second=2.1038
+[fourier train] T=10 seed=2 step=3000/20000 loss=10.8786 steps_per_second=2.0879
+[fourier train] T=10 seed=2 step=3100/20000 loss=10.5408 steps_per_second=2.0693
+[fourier train] T=10 seed=2 step=3200/20000 loss=10.4807 steps_per_second=2.0805
+[fourier train] T=10 seed=2 step=3300/20000 loss=10.4028 steps_per_second=2.0912
+[fourier train] T=10 seed=2 step=3400/20000 loss=10.4255 steps_per_second=2.1013
+[fourier train] T=10 seed=2 step=3500/20000 loss=10.2939 steps_per_second=2.1109
+[fourier train] T=10 seed=2 step=3600/20000 loss=10.5106 steps_per_second=2.1201
+[fourier train] T=10 seed=2 step=3700/20000 loss=10.1809 steps_per_second=2.1287
+[fourier train] T=10 seed=2 step=3800/20000 loss=10.2384 steps_per_second=2.1368
+[fourier train] T=10 seed=2 step=3900/20000 loss=10.1865 steps_per_second=2.1433
+[fourier train] T=10 seed=2 step=4000/20000 loss=10.3371 steps_per_second=2.1492
+[fourier train] T=10 seed=2 step=4100/20000 loss=10.106 steps_per_second=2.1320
+[fourier train] T=10 seed=2 step=4200/20000 loss=10.0948 steps_per_second=2.1390
+[fourier train] T=10 seed=2 step=4300/20000 loss=9.89357 steps_per_second=2.1452
+[fourier train] T=10 seed=2 step=4400/20000 loss=9.77639 steps_per_second=2.1491
+[fourier train] T=10 seed=2 step=4500/20000 loss=10.0842 steps_per_second=2.1544
+[fourier train] T=10 seed=2 step=4600/20000 loss=9.69247 steps_per_second=2.1593
+[fourier train] T=10 seed=2 step=4700/20000 loss=9.74672 steps_per_second=2.1635
+[fourier train] T=10 seed=2 step=4800/20000 loss=9.85947 steps_per_second=2.1695
+[fourier train] T=10 seed=2 step=4900/20000 loss=9.79061 steps_per_second=2.1749
+[fourier train] T=10 seed=2 step=5000/20000 loss=9.79515 steps_per_second=2.1800
+[fourier train] T=10 seed=2 step=5100/20000 loss=9.73255 steps_per_second=2.1651
+[fourier train] T=10 seed=2 step=5200/20000 loss=9.77987 steps_per_second=2.1700
+[fourier train] T=10 seed=2 step=5300/20000 loss=9.33332 steps_per_second=2.1750
+[fourier train] T=10 seed=2 step=5400/20000 loss=9.65246 steps_per_second=2.1803
+[fourier train] T=10 seed=2 step=5500/20000 loss=9.7603 steps_per_second=2.1848
+[fourier train] T=10 seed=2 step=5600/20000 loss=9.57632 steps_per_second=2.1884
+[fourier train] T=10 seed=2 step=5700/20000 loss=9.69895 steps_per_second=2.1928
+[fourier train] T=10 seed=2 step=5800/20000 loss=9.58878 steps_per_second=2.1972
+[fourier train] T=10 seed=2 step=5900/20000 loss=9.53589 steps_per_second=2.2010
+[fourier train] T=10 seed=2 step=6000/20000 loss=9.41715 steps_per_second=2.2046
+[fourier train] T=10 seed=2 step=6100/20000 loss=9.42744 steps_per_second=2.1914
+[fourier train] T=10 seed=2 step=6200/20000 loss=9.34175 steps_per_second=2.1957
+[fourier train] T=10 seed=2 step=6300/20000 loss=9.44553 steps_per_second=2.1989
+[fourier train] T=10 seed=2 step=6400/20000 loss=9.21751 steps_per_second=2.2012
+[fourier train] T=10 seed=2 step=6500/20000 loss=9.61173 steps_per_second=2.2023
+[fourier train] T=10 seed=2 step=6600/20000 loss=9.31569 steps_per_second=2.2051
+[fourier train] T=10 seed=2 step=6700/20000 loss=9.37746 steps_per_second=2.2078
+[fourier train] T=10 seed=2 step=6800/20000 loss=9.30837 steps_per_second=2.2101
+[fourier train] T=10 seed=2 step=6900/20000 loss=9.39121 steps_per_second=2.2130
+[fourier train] T=10 seed=2 step=7000/20000 loss=9.11479 steps_per_second=2.2165
+[fourier train] T=10 seed=2 step=7100/20000 loss=9.26922 steps_per_second=2.2045
+[fourier train] T=10 seed=2 step=7200/20000 loss=9.26001 steps_per_second=2.2075
+[fourier train] T=10 seed=2 step=7300/20000 loss=9.36399 steps_per_second=2.2101
+[fourier train] T=10 seed=2 step=7400/20000 loss=9.39376 steps_per_second=2.2126
+[fourier train] T=10 seed=2 step=7500/20000 loss=9.40616 steps_per_second=2.2152
+[fourier train] T=10 seed=2 step=7600/20000 loss=9.06943 steps_per_second=2.2178
+[fourier train] T=10 seed=2 step=7700/20000 loss=9.29442 steps_per_second=2.2203
+[fourier train] T=10 seed=2 step=7800/20000 loss=9.25521 steps_per_second=2.2225
+[fourier train] T=10 seed=2 step=7900/20000 loss=9.15015 steps_per_second=2.2246
+[fourier train] T=10 seed=2 step=8000/20000 loss=8.96495 steps_per_second=2.2268
+[fourier train] T=10 seed=2 step=8100/20000 loss=9.28069 steps_per_second=2.2158
+[fourier train] T=10 seed=2 step=8200/20000 loss=9.4993 steps_per_second=2.2183
+[fourier train] T=10 seed=2 step=8300/20000 loss=8.96946 steps_per_second=2.2208
+[fourier train] T=10 seed=2 step=8400/20000 loss=9.32744 steps_per_second=2.2233
+[fourier train] T=10 seed=2 step=8500/20000 loss=9.16069 steps_per_second=2.2259
+[fourier train] T=10 seed=2 step=8600/20000 loss=8.83086 steps_per_second=2.2285
+[fourier train] T=10 seed=2 step=8700/20000 loss=9.21215 steps_per_second=2.2306
+[fourier train] T=10 seed=2 step=8800/20000 loss=9.06983 steps_per_second=2.2324
+[fourier train] T=10 seed=2 step=8900/20000 loss=9.39742 steps_per_second=2.2343
+[fourier train] T=10 seed=2 step=9000/20000 loss=8.95582 steps_per_second=2.2365
+[fourier train] T=10 seed=2 step=9100/20000 loss=9.0102 steps_per_second=2.2273
+[fourier train] T=10 seed=2 step=9200/20000 loss=8.78736 steps_per_second=2.2292
+[fourier train] T=10 seed=2 step=9300/20000 loss=9.12413 steps_per_second=2.2313
+[fourier train] T=10 seed=2 step=9400/20000 loss=8.84444 steps_per_second=2.2332
+[fourier train] T=10 seed=2 step=9500/20000 loss=8.89279 steps_per_second=2.2346
+[fourier train] T=10 seed=2 step=9600/20000 loss=9.12048 steps_per_second=2.2361
+[fourier train] T=10 seed=2 step=9700/20000 loss=9.00628 steps_per_second=2.2375
+[fourier train] T=10 seed=2 step=9800/20000 loss=8.93525 steps_per_second=2.2396
+[fourier train] T=10 seed=2 step=9900/20000 loss=8.84721 steps_per_second=2.2403
+[fourier train] T=10 seed=2 step=10000/20000 loss=8.95712 steps_per_second=2.2422
+[fourier train] T=10 seed=2 step=10100/20000 loss=8.83362 steps_per_second=2.2328
+[fourier train] T=10 seed=2 step=10200/20000 loss=9.1103 steps_per_second=2.2340
+[fourier train] T=10 seed=2 step=10300/20000 loss=9.09932 steps_per_second=2.2356
+[fourier train] T=10 seed=2 step=10400/20000 loss=8.9735 steps_per_second=2.2376
+[fourier train] T=10 seed=2 step=10500/20000 loss=9.02826 steps_per_second=2.2393
+[fourier train] T=10 seed=2 step=10600/20000 loss=8.9171 steps_per_second=2.2412
+[fourier train] T=10 seed=2 step=10700/20000 loss=8.89786 steps_per_second=2.2429
+[fourier train] T=10 seed=2 step=10800/20000 loss=8.96719 steps_per_second=2.2444
+[fourier train] T=10 seed=2 step=10900/20000 loss=8.84808 steps_per_second=2.2460
+[fourier train] T=10 seed=2 step=11000/20000 loss=8.84126 steps_per_second=2.2474
+[fourier train] T=10 seed=2 step=11100/20000 loss=8.86283 steps_per_second=2.2390
+[fourier train] T=10 seed=2 step=11200/20000 loss=8.83419 steps_per_second=2.2409
+[fourier train] T=10 seed=2 step=11300/20000 loss=8.80818 steps_per_second=2.2423
+[fourier train] T=10 seed=2 step=11400/20000 loss=8.81072 steps_per_second=2.2435
+[fourier train] T=10 seed=2 step=11500/20000 loss=8.86657 steps_per_second=2.2455
+[fourier train] T=10 seed=2 step=11600/20000 loss=8.9749 steps_per_second=2.2470
+[fourier train] T=10 seed=2 step=11700/20000 loss=8.7112 steps_per_second=2.2484
+[fourier train] T=10 seed=2 step=11800/20000 loss=9.06557 steps_per_second=2.2501
+[fourier train] T=10 seed=2 step=11900/20000 loss=9.05118 steps_per_second=2.2510
+[fourier train] T=10 seed=2 step=12000/20000 loss=8.7202 steps_per_second=2.2510
+[fourier train] T=10 seed=2 step=12100/20000 loss=8.94855 steps_per_second=2.2438
+[fourier train] T=10 seed=2 step=12200/20000 loss=8.77394 steps_per_second=2.2451
+[fourier train] T=10 seed=2 step=12300/20000 loss=9.02165 steps_per_second=2.2467
+[fourier train] T=10 seed=2 step=12400/20000 loss=9.01628 steps_per_second=2.2481
+[fourier train] T=10 seed=2 step=12500/20000 loss=8.70768 steps_per_second=2.2496
+[fourier train] T=10 seed=2 step=12600/20000 loss=8.74014 steps_per_second=2.2513
+[fourier train] T=10 seed=2 step=12700/20000 loss=8.79139 steps_per_second=2.2530
+[fourier train] T=10 seed=2 step=12800/20000 loss=8.77504 steps_per_second=2.2546
+[fourier train] T=10 seed=2 step=12900/20000 loss=9.0457 steps_per_second=2.2560
+[fourier train] T=10 seed=2 step=13000/20000 loss=8.79177 steps_per_second=2.2478
+[fourier train] T=10 seed=2 step=13100/20000 loss=8.68414 steps_per_second=2.2412
+[fourier train] T=10 seed=2 step=13200/20000 loss=8.81575 steps_per_second=2.2420
+[fourier train] T=10 seed=2 step=13300/20000 loss=8.8125 steps_per_second=2.2435
+[fourier train] T=10 seed=2 step=13400/20000 loss=8.98988 steps_per_second=2.2440
+[fourier train] T=10 seed=2 step=13500/20000 loss=8.98618 steps_per_second=2.2445
+[fourier train] T=10 seed=2 step=13600/20000 loss=8.85523 steps_per_second=2.2445
+[fourier train] T=10 seed=2 step=13700/20000 loss=9.0149 steps_per_second=2.2455
+[fourier train] T=10 seed=2 step=13800/20000 loss=8.68376 steps_per_second=2.2466
+[fourier train] T=10 seed=2 step=13900/20000 loss=8.76284 steps_per_second=2.2464
+[fourier train] T=10 seed=2 step=14000/20000 loss=8.7828 steps_per_second=2.2467
+[fourier train] T=10 seed=2 step=14100/20000 loss=8.80395 steps_per_second=2.2396
+[fourier train] T=10 seed=2 step=14200/20000 loss=8.74608 steps_per_second=2.2404
+[fourier train] T=10 seed=2 step=14300/20000 loss=8.85023 steps_per_second=2.2281
+[fourier train] T=10 seed=2 step=14400/20000 loss=8.83548 steps_per_second=2.2061
+[fourier train] T=10 seed=2 step=14500/20000 loss=8.83255 steps_per_second=2.1852
+[fourier train] T=10 seed=2 step=14600/20000 loss=8.79424 steps_per_second=2.1636
+[fourier train] T=10 seed=2 step=14700/20000 loss=8.73757 steps_per_second=2.1437
+[fourier train] T=10 seed=2 step=14800/20000 loss=8.76867 steps_per_second=2.1245
+[fourier train] T=10 seed=2 step=14900/20000 loss=8.91116 steps_per_second=2.1073
+[fourier train] T=10 seed=2 step=15000/20000 loss=8.72407 steps_per_second=2.0913
+[fourier train] T=10 seed=2 step=15100/20000 loss=8.90315 steps_per_second=2.0860
+[fourier train] T=10 seed=2 step=15200/20000 loss=8.80222 steps_per_second=2.0874
+[fourier train] T=10 seed=2 step=15300/20000 loss=8.86495 steps_per_second=2.0889
+[fourier train] T=10 seed=2 step=15400/20000 loss=8.62132 steps_per_second=2.0901
+[fourier train] T=10 seed=2 step=15500/20000 loss=8.82398 steps_per_second=2.0911
+[fourier train] T=10 seed=2 step=15600/20000 loss=8.82762 steps_per_second=2.0925
+[fourier train] T=10 seed=2 step=15700/20000 loss=8.61948 steps_per_second=2.0937
+[fourier train] T=10 seed=2 step=15800/20000 loss=8.7474 steps_per_second=2.0950
+[fourier train] T=10 seed=2 step=15900/20000 loss=8.83404 steps_per_second=2.0965
+[fourier train] T=10 seed=2 step=16000/20000 loss=8.67596 steps_per_second=2.0984
+[fourier train] T=10 seed=2 step=16100/20000 loss=8.5678 steps_per_second=2.0936
+[fourier train] T=10 seed=2 step=16200/20000 loss=8.83625 steps_per_second=2.0953
+[fourier train] T=10 seed=2 step=16300/20000 loss=8.86862 steps_per_second=2.0971
+[fourier train] T=10 seed=2 step=16400/20000 loss=8.52399 steps_per_second=2.0985
+[fourier train] T=10 seed=2 step=16500/20000 loss=8.54034 steps_per_second=2.0999
+[fourier train] T=10 seed=2 step=16600/20000 loss=8.99283 steps_per_second=2.1010
+[fourier train] T=10 seed=2 step=16700/20000 loss=8.60826 steps_per_second=2.0967
+[fourier train] T=10 seed=2 step=16800/20000 loss=8.57665 steps_per_second=2.0983
+[fourier train] T=10 seed=2 step=16900/20000 loss=8.8689 steps_per_second=2.0922
+[fourier train] T=10 seed=2 step=17000/20000 loss=8.7903 steps_per_second=2.0923
+[fourier train] T=10 seed=2 step=17100/20000 loss=8.55545 steps_per_second=2.0875
+[fourier train] T=10 seed=2 step=17200/20000 loss=8.65932 steps_per_second=2.0882
+[fourier train] T=10 seed=2 step=17300/20000 loss=8.80423 steps_per_second=2.0888
+[fourier train] T=10 seed=2 step=17400/20000 loss=8.55742 steps_per_second=2.0892
+[fourier train] T=10 seed=2 step=17500/20000 loss=8.81752 steps_per_second=2.0894
+[fourier train] T=10 seed=2 step=17600/20000 loss=8.74266 steps_per_second=2.0897
+[fourier train] T=10 seed=2 step=17700/20000 loss=8.68058 steps_per_second=2.0913
+[fourier train] T=10 seed=2 step=17800/20000 loss=8.59595 steps_per_second=2.0929
+[fourier train] T=10 seed=2 step=17900/20000 loss=8.70878 steps_per_second=2.0944
+[fourier train] T=10 seed=2 step=18000/20000 loss=8.73233 steps_per_second=2.0958
+[fourier train] T=10 seed=2 step=18100/20000 loss=8.77155 steps_per_second=2.0920
+[fourier train] T=10 seed=2 step=18200/20000 loss=8.77203 steps_per_second=2.0938
+[fourier train] T=10 seed=2 step=18300/20000 loss=8.65486 steps_per_second=2.0955
+[fourier train] T=10 seed=2 step=18400/20000 loss=8.49981 steps_per_second=2.0971
+[fourier train] T=10 seed=2 step=18500/20000 loss=8.82187 steps_per_second=2.0987
+[fourier train] T=10 seed=2 step=18600/20000 loss=8.57299 steps_per_second=2.1004
+[fourier train] T=10 seed=2 step=18700/20000 loss=8.68162 steps_per_second=2.0904
+[fourier train] T=10 seed=2 step=18800/20000 loss=8.60409 steps_per_second=2.0771
+[fourier train] T=10 seed=2 step=18900/20000 loss=8.70241 steps_per_second=2.0653
+[fourier train] T=10 seed=2 step=19000/20000 loss=8.61737 steps_per_second=2.0527
+[fourier train] T=10 seed=2 step=19100/20000 loss=8.82718 steps_per_second=2.0498
+[fourier train] T=10 seed=2 step=19200/20000 loss=8.6142 steps_per_second=2.0515
+[fourier train] T=10 seed=2 step=19300/20000 loss=8.36419 steps_per_second=2.0528
+[fourier train] T=10 seed=2 step=19400/20000 loss=8.48858 steps_per_second=2.0543
+[fourier train] T=10 seed=2 step=19500/20000 loss=8.46455 steps_per_second=2.0558
+[fourier train] T=10 seed=2 step=19600/20000 loss=8.75801 steps_per_second=2.0573
+[fourier train] T=10 seed=2 step=19700/20000 loss=8.64315 steps_per_second=2.0495
+[fourier train] T=10 seed=2 step=19800/20000 loss=8.62665 steps_per_second=2.0374
+[fourier train] T=10 seed=2 step=19900/20000 loss=8.40639 steps_per_second=2.0248
+[fourier train] T=10 seed=2 step=20000/20000 loss=8.74268 steps_per_second=2.0127
+{"cell": "T10_seed2", "evaluation_status": null, "training": {"cached": false, "completed_steps": 20000, "elapsed_seconds_this_process": 9958.369436621899, "last_metrics": {"auxk": 1.044421672821045, "dead": 35584.0, "l0": 200.0, "loss": 8.74267578125, "mse": 8.710037231445312}, "parameter_match": {"difference": -8197, "fourier_d_sae": 131067, "fourier_parameters": 2684420091, "reference_txc_d_sae": 32768, "reference_txc_parameters": 2684428288, "relative_difference": -3.053536589761939e-06}, "status": "complete"}}
+Terminated
