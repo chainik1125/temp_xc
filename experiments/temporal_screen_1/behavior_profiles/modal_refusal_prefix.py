@@ -387,6 +387,15 @@ def run_profile(
         unit = direction_unit_gpu.to(value)
         return value - (value @ unit).unsqueeze(-1) * unit
 
+    def ablate_current_token_tensor(value):
+        """Remove the direction only at the autoregressive decision token."""
+
+        output = value.clone()
+        unit = direction_unit_gpu.to(value)
+        current = output[:, -1, :]
+        output[:, -1, :] = current - (current @ unit).unsqueeze(-1) * unit
+        return output
+
     def pre_ablation(_module, args):
         return (ablate_tensor(args[0]), *args[1:])
 
@@ -394,6 +403,17 @@ def run_profile(
         if isinstance(output, tuple):
             return (ablate_tensor(output[0]), *output[1:])
         return ablate_tensor(output)
+
+    def pre_current_token_ablation(_module, args):
+        return (ablate_current_token_tensor(args[0]), *args[1:])
+
+    def output_current_token_ablation(_module, _args, output):
+        if isinstance(output, tuple):
+            return (
+                ablate_current_token_tensor(output[0]),
+                *output[1:],
+            )
+        return ablate_current_token_tensor(output)
 
     ablation_pre_hooks = [
         (block, pre_ablation) for block in model.model.layers
@@ -403,6 +423,16 @@ def run_profile(
     ] + [
         (block.mlp, output_ablation) for block in model.model.layers
     ]
+    current_token_ablation_pre_hooks = [
+        (block, pre_current_token_ablation) for block in model.model.layers
+    ]
+    current_token_ablation_output_hooks = [
+        (block.self_attn, output_current_token_ablation)
+        for block in model.model.layers
+    ] + [
+        (block.mlp, output_current_token_ablation)
+        for block in model.model.layers
+    ]
 
     def add_direction(_module, args):
         return (
@@ -410,8 +440,19 @@ def run_profile(
             *args[1:],
         )
 
+    def add_direction_current_token(_module, args):
+        output = args[0].clone()
+        output[:, -1, :] = output[:, -1, :] + direction_gpu.to(output)
+        return (output, *args[1:])
+
     actadd_pre_hooks = [
         (model.model.layers[source_layer], add_direction)
+    ]
+    current_token_actadd_pre_hooks = [
+        (
+            model.model.layers[source_layer],
+            add_direction_current_token,
+        )
     ]
 
     def score_records(
@@ -612,11 +653,43 @@ def run_profile(
             flush=True,
         )
 
-    # The published sufficiency control: add the same direction to harmless
-    # full prompts.  It is a validation point, not another temporal curve.
+    harmful_full = [
+        row for row in harmful_records if row["reveal_fraction"] == 1.0
+    ]
     harmless_full = [
         row for row in harmless_records if row["reveal_fraction"] == 1.0
     ]
+
+    # Does the causal bottleneck reside in the current autoregressive state?
+    # These controls intervene only at the last token in the initial prompt
+    # pass and at the one-token state on every cached generation step.
+    current_token_ablated = score_records(
+        harmful_full,
+        condition="current_token_ablation",
+        pre_hooks=current_token_ablation_pre_hooks,
+        output_hooks=current_token_ablation_output_hooks,
+    )
+    generate_records(
+        harmful_full,
+        current_token_ablated,
+        pre_hooks=current_token_ablation_pre_hooks,
+        output_hooks=current_token_ablation_output_hooks,
+    )
+    rows.extend(current_token_ablated)
+    current_token_added = score_records(
+        harmless_full,
+        condition="current_token_addition",
+        pre_hooks=current_token_actadd_pre_hooks,
+    )
+    generate_records(
+        harmless_full,
+        current_token_added,
+        pre_hooks=current_token_actadd_pre_hooks,
+    )
+    rows.extend(current_token_added)
+
+    # The published sufficiency control: add the same direction at every
+    # sequence position to harmless full prompts.
     actadd_scored = score_records(
         harmless_full,
         condition="direction_addition",
@@ -630,6 +703,32 @@ def run_profile(
     rows.extend(actadd_scored)
 
     aggregate = _aggregate(rows)
+    full_prompt_rates = {}
+    for condition, cohort in (
+        ("baseline", "harmful"),
+        ("baseline", "harmless"),
+        ("direction_ablation", "harmful"),
+        ("current_token_ablation", "harmful"),
+        ("current_token_addition", "harmless"),
+        ("direction_addition", "harmless"),
+    ):
+        cell = [
+            row
+            for row in rows
+            if row["condition"] == condition
+            and row["cohort"] == cohort
+            and row["reveal_fraction"] == 1.0
+        ]
+        full_prompt_rates[f"{condition}:{cohort}"] = float(
+            np.mean([row["generated_refusal"] for row in cell])
+        )
+    aggregate["spatial_mediation"] = {
+        "intervention_scope": (
+            "current autoregressive token on the initial prompt pass and "
+            "each cached generation step"
+        ),
+        "full_prompt_generated_refusal_rate": full_prompt_rates,
+    }
     payload = {
         "method": "prefix-reveal refusal-direction formation and mediation",
         "model": MODEL_ID,
