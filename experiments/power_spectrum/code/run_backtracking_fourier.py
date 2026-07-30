@@ -38,6 +38,15 @@ EXPECTED_REFERENCE_COHORT_SHA256 = (
 EXPECTED_OFFICIAL_ARTIFACT_SHA256 = (
     "1656f6be2cd85fb85c8b246b9b27933f73ef40cfaac84078169dfd3bbbe27810"
 )
+EXPECTED_RECOVERED_ARTIFACT_SHA256 = (
+    "1681b7e6ef68ccc207a5d9af2c4ba3d4646056ccdca0bc3d5c09bc3b43c2125f"
+)
+EXPECTED_RECOVERED_MANIFEST_SHA256 = (
+    "14c4710360a01bdcd97db5c178d30b52cc108eb65414e6800da124ce79178654"
+)
+EXPECTED_RECOVERED_COHORT_SHA256 = (
+    "9137bda110780afc1965f453669d434100e1e495bd8f4dfaf8713c4bb6516c0d"
+)
 RECOVERED_ROWS = 20_335
 RECOVERED_POSITIVE_ROWS = 2_498
 DEFAULT_WINDOWS = (1, 2, 4, 6, 10)
@@ -769,6 +778,7 @@ def recovered_artifact_inventory(
     official_digest = reference["sha256"](reference_artifact)
     with np.load(reference_artifact, allow_pickle=True) as official:
         official_keys = official["keys"].astype(str)
+        official_labels = official["is_bt"].astype(np.uint8)
         official_x = official["X"]
         official_index = {
             key: index for index, key in enumerate(official_keys.tolist())
@@ -785,16 +795,26 @@ def recovered_artifact_inventory(
             official_x,
             recovered_official_rows,
         )
+        labels_match_official = all_keys_official and np.array_equal(
+            labels,
+            official_labels[recovered_official_rows],
+        )
 
     expected_shape = (RECOVERED_ROWS, len(ARTIFACT_OFFSETS), 4_096)
     cohort = manifest.get("cohort", {})
     tail = manifest.get("tail_replacement", {})
     checks = {
         "artifact_sha256_ok": artifact_digest == manifest.get("artifact_sha256"),
+        "artifact_sha256_pinned": artifact_digest
+        == EXPECTED_RECOVERED_ARTIFACT_SHA256,
+        "manifest_sha256_pinned": manifest_digest
+        == EXPECTED_RECOVERED_MANIFEST_SHA256,
         "artifact_shape_ok": shape == expected_shape,
         "artifact_dtype_ok": dtype == "float32",
         "artifact_offsets_ok": offsets.tolist() == list(ARTIFACT_OFFSETS),
         "cohort_sha256_ok": cohort_digest == cohort.get("sha256"),
+        "cohort_sha256_pinned": cohort_digest
+        == EXPECTED_RECOVERED_COHORT_SHA256,
         "cohort_rows_ok": len(keys) == int(cohort.get("rows", -1)),
         "positive_rows_ok": positive_rows
         == int(cohort.get("positive_rows", -1))
@@ -810,6 +830,7 @@ def recovered_artifact_inventory(
         == EXPECTED_OFFICIAL_ARTIFACT_SHA256
         == tail.get("source_artifact_sha256"),
         "all_keys_in_official_artifact": all_keys_official,
+        "labels_match_official_artifact": labels_match_official,
         "official_tail_bit_exact": official_tail_exact,
         "tail_replacement_declared": tail.get("bit_exact_after_replacement")
         is True,
