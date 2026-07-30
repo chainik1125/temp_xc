@@ -44,6 +44,95 @@ def empirical_auc(positive: list[float], negative: list[float]) -> float:
     return float(np.mean(comparisons > 0) + 0.5 * np.mean(comparisons == 0))
 
 
+def bootstrap_mean_interval(
+    values: np.ndarray,
+    *,
+    seed: int,
+    n_bootstrap: int = 20_000,
+) -> tuple[float, float]:
+    """Return a paired-bootstrap percentile interval for a mean effect."""
+
+    array = np.asarray(values, dtype=float)
+    if array.ndim != 1 or not len(array):
+        raise ValueError("values must be a non-empty one-dimensional array")
+    rng = np.random.default_rng(seed)
+    samples = rng.integers(
+        0,
+        len(array),
+        size=(n_bootstrap, len(array)),
+    )
+    boot_means = array[samples].mean(axis=1)
+    low, high = np.quantile(boot_means, [0.025, 0.975])
+    return float(low), float(high)
+
+
+def paired_condition_effect(
+    baseline: dict[str, dict[str, Any]],
+    condition: dict[str, dict[str, Any]],
+    *,
+    seed: int,
+) -> dict[str, Any]:
+    """Summarize a condition against baseline on the same prompt IDs."""
+
+    prompt_ids = sorted(set(baseline) & set(condition))
+    if set(prompt_ids) != set(baseline) or set(prompt_ids) != set(condition):
+        raise ValueError("baseline and condition prompt IDs must match")
+    baseline_refusal = np.asarray(
+        [int(baseline[prompt_id]["generated_refusal"]) for prompt_id in prompt_ids]
+    )
+    condition_refusal = np.asarray(
+        [
+            int(condition[prompt_id]["generated_refusal"])
+            for prompt_id in prompt_ids
+        ]
+    )
+    refusal_reduction = baseline_refusal - condition_refusal
+    log_odds_reduction = np.asarray(
+        [
+            baseline[prompt_id][REFUSAL_LOG_ODDS]
+            - condition[prompt_id][REFUSAL_LOG_ODDS]
+            for prompt_id in prompt_ids
+        ],
+        dtype=float,
+    )
+    refusal_ci = bootstrap_mean_interval(refusal_reduction, seed=seed)
+    log_odds_ci = bootstrap_mean_interval(
+        log_odds_reduction,
+        seed=seed + 10_000,
+    )
+    transitions = Counter(
+        zip(
+            baseline_refusal.tolist(),
+            condition_refusal.tolist(),
+            strict=True,
+        )
+    )
+    return {
+        "n_paired_prompts": len(prompt_ids),
+        "baseline_refusal_rate": float(baseline_refusal.mean()),
+        "condition_refusal_rate": float(condition_refusal.mean()),
+        "paired_refusal_rate_reduction": float(refusal_reduction.mean()),
+        "paired_refusal_rate_reduction_ci95": list(refusal_ci),
+        "baseline_refuses_condition_does_not": int(
+            transitions[(1, 0)]
+        ),
+        "baseline_does_not_condition_refuses": int(
+            transitions[(0, 1)]
+        ),
+        "paired_mean_refusal_log_odds_reduction": float(
+            log_odds_reduction.mean()
+        ),
+        "paired_mean_refusal_log_odds_reduction_ci95": list(log_odds_ci),
+        "changed_response_count": int(
+            sum(
+                baseline[prompt_id]["response_sha256"]
+                != condition[prompt_id]["response_sha256"]
+                for prompt_id in prompt_ids
+            )
+        ),
+    }
+
+
 def prompt_index(row: dict[str, Any]) -> int:
     return int(row["prompt_id"].split("-")[1])
 
@@ -295,6 +384,45 @@ def analyze(payload: dict[str, Any]) -> dict[str, Any]:
     ablated_refusal_curve = curve(
         ablated, fractions, "generated_refusal"
     )
+    baseline_full_by_prompt = {
+        row["prompt_id"]: row for row in full_harmful
+    }
+    lag_effects = []
+    for index, band in enumerate(
+        payload["aggregate"]["prompt_lag_localization"]["bands"]
+    ):
+        condition_rows = rows_for(
+            rows,
+            "harmful",
+            band["condition"],
+        )
+        condition_by_prompt = {
+            row["prompt_id"]: row
+            for row in condition_rows
+            if float(row["reveal_fraction"]) == 1.0
+        }
+        lag_effects.append(
+            {
+                "condition": band["condition"],
+                "low_lag_inclusive": band["low_lag_inclusive"],
+                "high_lag_inclusive": band["high_lag_inclusive"],
+            }
+            | paired_condition_effect(
+                baseline_full_by_prompt,
+                condition_by_prompt,
+                seed=20260729 + index,
+            )
+        )
+    finite_lag_effects = [
+        effect
+        for effect in lag_effects
+        if effect["high_lag_inclusive"] is not None
+    ]
+    all_prior_effect = next(
+        effect
+        for effect in lag_effects
+        if effect["high_lag_inclusive"] is None
+    )
 
     def first_auc_at_least(values: list[float], cutoff: float) -> float | None:
         return next(
@@ -411,6 +539,44 @@ def analyze(payload: dict[str, Any]) -> dict[str, Any]:
                 np.mean(token_lags_array)
             ),
             "prompt_rows": prompt_rows,
+        },
+        "prompt_lag_localization": {
+            "coordinate": (
+                "absolute token lag from the final rendered assistant "
+                "decision-state token; lag zero is not ablated"
+            ),
+            "scope": (
+                "all-layer directional ablation at selected prompt-pass "
+                "positions; cached generation-token states are untouched"
+            ),
+            "coordinate_caveat": (
+                "Rendered lags include chat-template and instruction tokens; "
+                "high-lag bands can also include left padding for shorter "
+                "prompts."
+            ),
+            "paired_effects": lag_effects,
+            "largest_finite_band_refusal_rate_reduction": float(
+                max(
+                    effect["paired_refusal_rate_reduction"]
+                    for effect in finite_lag_effects
+                )
+            ),
+            "sum_finite_band_marginal_refusal_rate_reductions": float(
+                sum(
+                    effect["paired_refusal_rate_reduction"]
+                    for effect in finite_lag_effects
+                )
+            ),
+            "all_prior_refusal_rate_reduction": float(
+                all_prior_effect["paired_refusal_rate_reduction"]
+            ),
+            "interpretation": (
+                "No tested finite band is individually sufficient to remove "
+                "refusal, whereas ablating all prior prompt positions removes "
+                "every baseline refusal. This is compatible with redundant "
+                "distributed support or non-additive interactions across "
+                "positions, not a uniquely localized lag."
+            ),
         },
         "causal_checks": {
             "intervention_scope": {
@@ -530,11 +696,11 @@ def analyze(payload: dict[str, Any]) -> dict[str, Any]:
                 "neither necessary nor sufficient in this intervention."
             ),
             "localization_limit": (
-                "Current-token interventions leave earlier prompt-position "
-                "states and their cached keys/values intact. The result "
-                "rejects an exclusive current-token bottleneck, but does "
-                "not distinguish distributed support from a bottleneck at "
-                "one or a few earlier positions."
+                "Current-token and finite prompt-band interventions leave "
+                "other prompt-position states and their cached keys/values "
+                "intact. The controls reject a unique bottleneck in any "
+                "tested band, but cannot distinguish redundant distributed "
+                "support from non-additive interactions across positions."
             ),
         },
     }
@@ -554,9 +720,9 @@ def make_figure(
     fig, axes = plt.subplot_mosaic(
         [
             ["direction", "refusal", "spatial"],
-            ["auc", "onset", "spatial"],
+            ["auc", "onset", "lags"],
         ],
-        figsize=(15.5, 7.5),
+        figsize=(15.5, 8.4),
         width_ratios=[1.05, 1.05, 0.9],
     )
     ax = axes["direction"]
@@ -649,12 +815,12 @@ def make_figure(
     ax = axes["spatial"]
     cells = analysis["causal_checks"]["full_prompt_cells"]
     labels = [
-        "harmful\nbaseline",
-        "harmful\ncurrent-token ablate",
-        "harmful\nall-position ablate",
-        "harmless\nbaseline",
-        "harmless\ncurrent-token add",
-        "harmless\nall-position add",
+        "harmful: baseline",
+        "harmful: current ablate",
+        "harmful: all-position ablate",
+        "harmless: baseline",
+        "harmless: current add",
+        "harmless: all-position add",
     ]
     keys = [
         "baseline_harmful",
@@ -679,27 +845,71 @@ def make_figure(
     ]
     ax.barh(y, rates, color=colors, alpha=0.88)
     ax.set_yticks(y, labels)
-    ax.set_xlim(0, 1.08)
+    ax.set_xlim(0, 1.13)
     ax.set_xlabel("full-prompt refusal rate")
     ax.set_title("One vector ≠ one-token bottleneck")
     ax.axhline(2.5, color="#bbbbbb", linewidth=1)
+    ax.tick_params(axis="y", labelsize=8)
     for y_value, rate, key in zip(y, rates, keys, strict=True):
         cell = cells[key]
         ax.text(
-            min(rate + 0.025, 1.01),
+            min(rate + 0.025, 1.02),
             y_value,
             f"{cell['refusal_count']}/{cell['n']}",
             va="center",
             fontsize=9,
         )
-    ax.text(
-        0.04,
-        2.65,
-        "Current-token-only interventions fail;\n"
-        "all-position interventions succeed.",
-        fontsize=9,
-        va="bottom",
+    ax = axes["lags"]
+    effects = analysis["prompt_lag_localization"]["paired_effects"]
+    lag_labels = [
+        (
+            "all prior"
+            if effect["high_lag_inclusive"] is None
+            else (
+                f"{effect['low_lag_inclusive']}"
+                f"–{effect['high_lag_inclusive']}"
+            )
+        )
+        + (
+            "  ("
+            f"{round(effect['condition_refusal_rate'] * effect['n_paired_prompts'])}"
+            f"/{effect['n_paired_prompts']})"
+        )
+        for effect in effects
+    ]
+    reductions = np.asarray(
+        [effect["paired_refusal_rate_reduction"] for effect in effects]
     )
+    interval_low = np.asarray(
+        [
+            effect["paired_refusal_rate_reduction_ci95"][0]
+            for effect in effects
+        ]
+    )
+    interval_high = np.asarray(
+        [
+            effect["paired_refusal_rate_reduction_ci95"][1]
+            for effect in effects
+        ]
+    )
+    lag_y = np.arange(len(effects))[::-1]
+    lag_colors = ["#d68b32"] * (len(effects) - 1) + ["#744c9e"]
+    ax.barh(
+        lag_y,
+        reductions,
+        color=lag_colors,
+        alpha=0.88,
+        xerr=np.vstack(
+            [reductions - interval_low, interval_high - reductions]
+        ),
+        error_kw={"capsize": 3, "elinewidth": 1},
+    )
+    ax.set_yticks(lag_y, lag_labels)
+    ax.tick_params(axis="y", labelsize=8)
+    ax.axvline(0, color="#777777", linewidth=1)
+    ax.set_xlim(-0.03, 1.05)
+    ax.set_xlabel("paired refusal-rate reduction")
+    ax.set_title("No finite prompt-lag band is sufficient")
 
     for ax in axes.values():
         ax.set_xlabel(
@@ -707,8 +917,8 @@ def make_figure(
         )
         ax.grid(alpha=0.18)
     fig.suptitle(
-        "Refusal-direction readout precedes behavior, "
-        "but is not a current-token bottleneck"
+        "Refusal-direction readout precedes behavior; "
+        "causal support spans prior prompt positions"
     )
     fig.tight_layout()
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -768,6 +978,15 @@ def main() -> None:
                 "all_position_addition_harmless",
             )
         ],
+    )
+    lag_effects = analysis["prompt_lag_localization"]["paired_effects"]
+    print(
+        "prompt-lag refusal rates:",
+        {
+            effect["condition"].removeprefix("prompt_lag_ablation_"):
+            effect["condition_refusal_rate"]
+            for effect in lag_effects
+        },
     )
     print(f"wrote {args.output_json}")
     print(f"wrote {args.output_figure}")

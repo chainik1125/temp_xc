@@ -489,6 +489,143 @@
       }
     ]
   },
+  "prompt_lag_localization": {
+    "coordinate": "absolute token lag from the final rendered assistant decision-state token; lag zero is not ablated",
+    "scope": "all-layer directional ablation at selected prompt-pass positions; cached generation-token states are untouched",
+    "coordinate_caveat": "Rendered lags include chat-template and instruction tokens; high-lag bands can also include left padding for shorter prompts.",
+    "paired_effects": [
+      {
+        "condition": "prompt_lag_ablation_1_4",
+        "low_lag_inclusive": 1,
+        "high_lag_inclusive": 4,
+        "n_paired_prompts": 32,
+        "baseline_refusal_rate": 0.96875,
+        "condition_refusal_rate": 0.84375,
+        "paired_refusal_rate_reduction": 0.125,
+        "paired_refusal_rate_reduction_ci95": [
+          0.03125,
+          0.25
+        ],
+        "baseline_refuses_condition_does_not": 4,
+        "baseline_does_not_condition_refuses": 0,
+        "paired_mean_refusal_log_odds_reduction": 4.016652965918183,
+        "paired_mean_refusal_log_odds_reduction_ci95": [
+          2.922573853936046,
+          5.193890541652216
+        ],
+        "changed_response_count": 14
+      },
+      {
+        "condition": "prompt_lag_ablation_5_8",
+        "low_lag_inclusive": 5,
+        "high_lag_inclusive": 8,
+        "n_paired_prompts": 32,
+        "baseline_refusal_rate": 0.96875,
+        "condition_refusal_rate": 0.96875,
+        "paired_refusal_rate_reduction": 0.0,
+        "paired_refusal_rate_reduction_ci95": [
+          0.0,
+          0.0
+        ],
+        "baseline_refuses_condition_does_not": 0,
+        "baseline_does_not_condition_refuses": 0,
+        "paired_mean_refusal_log_odds_reduction": 0.44662397541105747,
+        "paired_mean_refusal_log_odds_reduction_ci95": [
+          0.16587617308832706,
+          0.8019670276902607
+        ],
+        "changed_response_count": 5
+      },
+      {
+        "condition": "prompt_lag_ablation_9_16",
+        "low_lag_inclusive": 9,
+        "high_lag_inclusive": 16,
+        "n_paired_prompts": 32,
+        "baseline_refusal_rate": 0.96875,
+        "condition_refusal_rate": 0.9375,
+        "paired_refusal_rate_reduction": 0.03125,
+        "paired_refusal_rate_reduction_ci95": [
+          0.0,
+          0.09375
+        ],
+        "baseline_refuses_condition_does_not": 1,
+        "baseline_does_not_condition_refuses": 0,
+        "paired_mean_refusal_log_odds_reduction": 1.735157961025834,
+        "paired_mean_refusal_log_odds_reduction_ci95": [
+          0.795309287821874,
+          2.9510950557887545
+        ],
+        "changed_response_count": 10
+      },
+      {
+        "condition": "prompt_lag_ablation_17_32",
+        "low_lag_inclusive": 17,
+        "high_lag_inclusive": 32,
+        "n_paired_prompts": 32,
+        "baseline_refusal_rate": 0.96875,
+        "condition_refusal_rate": 0.875,
+        "paired_refusal_rate_reduction": 0.09375,
+        "paired_refusal_rate_reduction_ci95": [
+          0.0,
+          0.21875
+        ],
+        "baseline_refuses_condition_does_not": 3,
+        "baseline_does_not_condition_refuses": 0,
+        "paired_mean_refusal_log_odds_reduction": 1.8813240118324757,
+        "paired_mean_refusal_log_odds_reduction_ci95": [
+          0.6942931923549622,
+          3.3761281147133535
+        ],
+        "changed_response_count": 14
+      },
+      {
+        "condition": "prompt_lag_ablation_33_64",
+        "low_lag_inclusive": 33,
+        "high_lag_inclusive": 64,
+        "n_paired_prompts": 32,
+        "baseline_refusal_rate": 0.96875,
+        "condition_refusal_rate": 0.9375,
+        "paired_refusal_rate_reduction": 0.03125,
+        "paired_refusal_rate_reduction_ci95": [
+          0.0,
+          0.09375
+        ],
+        "baseline_refuses_condition_does_not": 1,
+        "baseline_does_not_condition_refuses": 0,
+        "paired_mean_refusal_log_odds_reduction": 0.39143281802535057,
+        "paired_mean_refusal_log_odds_reduction_ci95": [
+          0.030261177476495506,
+          0.9593038111925107
+        ],
+        "changed_response_count": 7
+      },
+      {
+        "condition": "prompt_lag_ablation_all_prior",
+        "low_lag_inclusive": 1,
+        "high_lag_inclusive": null,
+        "n_paired_prompts": 32,
+        "baseline_refusal_rate": 0.96875,
+        "condition_refusal_rate": 0.0,
+        "paired_refusal_rate_reduction": 0.96875,
+        "paired_refusal_rate_reduction_ci95": [
+          0.90625,
+          1.0
+        ],
+        "baseline_refuses_condition_does_not": 31,
+        "baseline_does_not_condition_refuses": 0,
+        "paired_mean_refusal_log_odds_reduction": 17.3175852522254,
+        "paired_mean_refusal_log_odds_reduction_ci95": [
+          15.739250578638167,
+          18.91919359667226
+        ],
+        "changed_response_count": 32
+      }
+    ],
+    "largest_finite_band_refusal_rate_reduction": 0.125,
+    "sum_finite_band_marginal_refusal_rate_reductions": 0.28125,
+    "all_prior_refusal_rate_reduction": 0.96875,
+    "interpretation": "No tested finite band is individually sufficient to remove refusal, whereas ablating all prior prompt positions removes every baseline refusal. This is compatible with redundant distributed support or non-additive interactions across positions, not a uniquely localized lag."
+  },
   "causal_checks": {
     "intervention_scope": {
       "current_token": "last token in prompt prefill and the one-token input on each cached generation step",
@@ -527,6 +664,6 @@
       }
     },
     "supported_claim": "The direction is a sequence-wide causal effector, but its presence at only the current autoregressive token is neither necessary nor sufficient in this intervention.",
-    "localization_limit": "Current-token interventions leave earlier prompt-position states and their cached keys/values intact. The result rejects an exclusive current-token bottleneck, but does not distinguish distributed support from a bottleneck at one or a few earlier positions."
+    "localization_limit": "Current-token and finite prompt-band interventions leave other prompt-position states and their cached keys/values intact. The controls reject a unique bottleneck in any tested band, but cannot distinguish redundant distributed support from non-additive interactions across positions."
   }
 }

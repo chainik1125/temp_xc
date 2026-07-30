@@ -13,7 +13,8 @@ nine literal token prefixes from 0% to 100%, measured the published Arditi
 direction at layer 12 before generation, and greedily generated up to 48
 tokens. The exact Arditi directional ablation and direction addition were the
 causal controls. A second control applied the same interventions only to the
-current autoregressive token.
+current autoregressive token. A final all-layer ablation localized prompt-side
+support into rendered-token lag bands.
 
 ![Refusal temporal profile](refusal_analysis.png)
 
@@ -92,12 +93,52 @@ and reconstruct or use it even while the current residual direction is
 repeatedly removed. The all-position ablation, in contrast, also changes the
 prompt states from which those cached keys and values are formed.
 
-This rejects an *exclusive current-token bottleneck*. It does not yet prove
-that support is broadly distributed: one earlier token, a small set of
-positions, or a genuinely distributed pattern could all explain the result.
-A position-by-position ablation/addition sweep, ideally including direct
-key/value-cache interventions or uncached recomputation, is required to
-distinguish those possibilities.
+This rejects an *exclusive current-token bottleneck*. The prompt-lag control
+below tests whether causal support instead localizes to one contiguous region.
+
+## Prompt-lag localization
+
+The final control ablates the direction at prior prompt positions in absolute
+lag bands, at every layer and in attention/MLP outputs. Lag zero is the final
+rendered assistant-decision token and is never touched. Crucially, the hook
+returns without intervention on the one-token cached generation forwards:
+generated-token states are untouched. The control therefore asks which
+directional support already written into prompt states, and hence prompt
+keys/values, is needed later.
+
+Effects are paired to each prompt's baseline generation. Positive values mean
+the band ablation reduced refusal.
+
+| Rendered prompt lag | Refusal | Paired reduction (95% bootstrap CI) | Mean log-odds reduction (95% CI) |
+|---|---:|---:|---:|
+| 1–4 | 27/32 | 0.125 [0.031, 0.250] | 4.02 [2.92, 5.19] |
+| 5–8 | 31/32 | 0.000 [0.000, 0.000] | 0.45 [0.17, 0.80] |
+| 9–16 | 30/32 | 0.031 [0.000, 0.094] | 1.74 [0.80, 2.95] |
+| 17–32 | 28/32 | 0.094 [0.000, 0.219] | 1.88 [0.69, 3.38] |
+| 33–64 | 30/32 | 0.031 [0.000, 0.094] | 0.39 [0.03, 0.96] |
+| All prior positions | 0/32 | 0.969 [0.906, 1.000] | 17.32 [15.74, 18.92] |
+
+No finite band is sufficient to eliminate refusal. The largest binary effect
+is only 4/32 baseline refusals for lags 1–4, while ablating *all* prior prompt
+positions removes all 31 baseline refusals. Even the sum of the five marginal
+rate reductions is 0.281, far below the 0.969 all-prior effect. The smoother
+log-odds score moves in every band, including lags 5–8 where no generation
+crosses the lexical decision boundary.
+
+This is strong evidence against a uniquely localized contiguous lag band.
+The natural remaining explanations are redundant support across positions,
+or non-additive/conjunctive interactions in which other positions compensate
+for any one finite ablation but fail when all prior support is removed. The
+experiment does not distinguish those explanations, and the band effects
+should not be added as if they were independent.
+
+The lag coordinate is easy to misread. It is relative to the final token of
+the *rendered chat prompt*, not the end of the raw instruction. The bands
+therefore include assistant-header and other chat-template tokens as well as
+instruction tokens; lags 1–4 in particular cannot be called “the final four
+instruction tokens.” For short prompts, high-lag bands can also extend into
+left padding. This is causal spatial localization in the rendered sequence,
+not yet semantic localization in the task text.
 
 ## Important limitations
 
@@ -133,6 +174,9 @@ distinguish those possibilities.
   one-token cached decoding step, not previously cached prompt states. Its
   failure localizes causal support away from an exclusive current-token
   bottleneck; it is not a complete spatial localization experiment.
+- Prompt-lag confidence intervals are paired percentile-bootstrap summaries
+  of only 32 prompts. They are descriptive, uncorrected for testing several
+  bands, and do not account for the fact that band effects can interact.
 
 ## Reproduction
 
