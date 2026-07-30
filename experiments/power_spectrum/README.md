@@ -16,6 +16,50 @@ mixing explains most of the gain over TXC, with an additional task-dependent
 multiband benefit on power-readable tasks. No v2 regularizer wins universally.
 The combined conservative compute estimate is $29.15 against a $50 cap.
 
+## Paper synthetic extension
+
+`configs/paper_synthetic_v1.json` freezes a new Spectral-v1 evaluation on the
+two synthetic tasks used in Figure 2 of the paper:
+
+- Denoising: best full-code hidden-state linear-probe
+  `R²_global` on `toy_markov_n20_d40_noisy`;
+- Coupling: best static decoder `gAUC` on the maximum-overlap
+  `toy_coupled_noisy_K10_M20_d256_pB05_np10` regime.
+
+The runner ports the historical generators, data seeds, training recipe,
+hyperparameter grids, and evaluation definitions into this isolated
+experiment. Published TopK SAE, T-SAE, and TXC-base numbers are extracted
+byte-for-byte from the pinned Figure 2 data rather than re-trained under the
+newer repository protocol:
+
+```bash
+uv run python -m experiments.power_spectrum.code.extract_paper_baselines
+uv run python -m experiments.power_spectrum.code.run_paper_synthetic_v1 \
+  --mode plan
+uv run --with modal modal run \
+  experiments/power_spectrum/code/modal_paper_synthetic_v1.py --stage smoke
+uv run --with modal modal run --detach \
+  experiments/power_spectrum/code/modal_paper_synthetic_v1.py --stage full
+```
+
+After the durable run completes:
+
+```bash
+uv run --with modal modal run \
+  experiments/power_spectrum/code/modal_paper_synthetic_v1.py --stage fetch
+uv run python -m experiments.power_spectrum.code.analyze_paper_synthetic_v1
+uv run python -m experiments.power_spectrum.code.plot_paper_synthetic_v1
+```
+
+The plan contains 213 three-seed cells and 4,674,000 optimizer steps. Its
+conservative estimate is 1.42 A10G hours and $7.08, with a $14 hard ledger
+cap and 2.75-hour inner deadline. The Coupling evaluator filters near-zero
+time-mean decoder atoms before cosine normalization: non-DC DCT atoms have
+mathematically zero time mean, and normalizing float32 cancellation residue
+would create arbitrary directions. The raw historical calculation is retained
+as `gauc_paper_raw` for sensitivity. This maximum-overlap Coupling target is
+rank one, so Denoising is the more discriminating result.
+
 Read-only source material:
 
 - Francesco et al. source and figures:

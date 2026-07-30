@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "run_name": "spectral-v1-paper-synthetic-20260729",
+  "baseline_snapshot": {
+    "git_ref": "origin/dmitry-synthetic",
+    "denoising_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/data/denoising_probe_results.json",
+    "coupling_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/data/setup_d_leaderboard.jsonl",
+    "renderer_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/make_c2_synth_panels.py"
+  },
+  "budget": {
+    "max_total_usd": 14.0,
+    "reserve_usd": 1.0,
+    "assumed_usd_per_gpu_hour": 4.0,
+    "cost_overhead_multiplier": 1.25,
+    "max_session_hours": 2.75
+  },
+  "planning": {
+    "setup_seconds": 180.0,
+    "eval_seconds_per_cell": {
+      "denoising": 12.0,
+      "coupling": 2.0
+    },
+    "estimated_steps_per_second": {
+      "denoising": 1800.0,
+      "coupling": 700.0
+    }
+  },
+  "training": {
+    "n_steps": 30000,
+    "batch_size": 1024,
+    "learning_rate": 0.0003,
+    "warmup_steps": 1000,
+    "gradient_clip_norm": 1.0,
+    "precision": "bf16",
+    "budget_check_every_steps": 250
+  },
+  "model": {
+    "name": "spectral_v1",
+    "class_path": "temp_bench.archs.spectral_txc:SpectralTXCBatchTopK",
+    "implementation_version": "1.0.0",
+    "d_sae": 40,
+    "bands": "multiband",
+    "auxk_alpha": 0.03125
+  },
+  "seeds": [
+    1,
+    2,
+    42
+  ],
+  "tasks": {
+    "denoising": {
+      "datasource": "toy_markov_n20_d40_noisy",
+      "metric": "lp_mean_global_r2",
+      "n_steps": 30000,
+      "paper_generator": "origin/final:purified/src/temp_bench/data/toy/markov.py",
+      "train_data_seed": 0,
+      "eval_data_seed": 42,
+      "eval_n_sequences": 2000,
+      "grid": {
+        "2": [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 17, 20],
+        "4": [1, 2, 3, 4, 5, 6, 8, 10],
+        "5": [1, 2, 3, 4, 5, 6, 8],
+        "6": [1, 2, 3, 4, 5, 6],
+        "8": [1, 2, 3, 4, 5],
+        "10": [1, 2, 3, 4],
+        "12": [1, 2, 3]
+      }
+    },
+    "coupling": {
+      "datasource": "toy_coupled_noisy_K10_M20_d256_pB05_np10",
+      "metric": "gauc",
+      "n_steps": 8000,
+      "paper_generator": "origin/final:purified/src/temp_bench/data/toy/coupled_noisy.py",
+      "train_data_seed": 0,
+      "grid": {
+        "2": [1, 2, 3],
+        "4": [1, 2, 3],
+        "5": [1, 2, 3, 4, 5, 6, 7, 8],
+        "6": [1, 2, 3],
+        "8": [1, 2, 3],
+        "10": [1, 2, 3],
+        "12": [1, 2, 3]
+      }
+    }
+  },
+  "reporting": {
+    "selection": "Best seed-mean (T, k_pos) cell with all three seeds, matching the published renderer's best-cell convention.",
+    "comparison": "Published SAE/T-SAE/TXC values are read byte-for-byte from the pinned Figure 2 snapshot; only Spectral v1 is newly trained.",
+    "compatibility_caveat": "Spectral v1 uses the current BatchTopK plus AuxK backbone, while the published TopK SAE and TXC-base use the legacy TopK-to-ReLU backbone."
+  }
+}

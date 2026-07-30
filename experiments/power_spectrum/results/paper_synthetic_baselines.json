@@ -1,0 +1,171 @@
+{
+  "schema_version": 1,
+  "selection_rule": "Published renderer: best seed-mean (t_label, k_pos) cell; cells require at least two rows and retain historical duplicate rows.",
+  "source": {
+    "coupling_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/data/setup_d_leaderboard.jsonl",
+    "coupling_sha256": "27216c80ddd70d0b4fd55f2d422cf30009223117ce103f12b4cd228cab68fcd0",
+    "denoising_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/data/denoising_probe_results.json",
+    "denoising_sha256": "8e1d613c70df9021e37f9f1d099bacf5172728fe423da84ec71e7ce26e0a8152",
+    "git_ref": "origin/dmitry-synthetic",
+    "renderer_path": "dmitry/pre_purified/c2_synthetic_paper_fig2/make_c2_synth_panels.py",
+    "renderer_sha256": "a7753b71522e32dfcecf956e2e52ba5446105b3d4c17d65317ef8eb35cbe1a9b"
+  },
+  "tasks": {
+    "coupling": {
+      "architectures": {
+        "topk_sae": {
+          "architecture": "topk_sae",
+          "k_pos": 1,
+          "max": 0.9285714285714284,
+          "mean": 0.8424036281179137,
+          "min": 0.7653061224489794,
+          "n": 9,
+          "seed_values": [
+            0.8061224489795917,
+            0.8265306122448979,
+            0.8673469387755102,
+            0.8061224489795917,
+            0.7653061224489794,
+            0.7653061224489794,
+            0.9081632653061222,
+            0.9081632653061222,
+            0.9285714285714284
+          ],
+          "seeds": [
+            1,
+            2,
+            42,
+            42,
+            2,
+            1,
+            42,
+            2,
+            1
+          ],
+          "std": 0.06271798950539377,
+          "t_label": "default"
+        },
+        "tsae_paper": {
+          "architecture": "tsae_paper",
+          "k_pos": 1,
+          "max": 0.9897959183673469,
+          "mean": 0.9897959183673469,
+          "min": 0.9897959183673469,
+          "n": 4,
+          "seed_values": [
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469
+          ],
+          "seeds": [
+            1,
+            2,
+            42,
+            42
+          ],
+          "std": 0.0,
+          "t_label": "default"
+        },
+        "txc_base": {
+          "architecture": "txc_base",
+          "k_pos": 1,
+          "max": 0.9897959183673469,
+          "mean": 0.9897959183673469,
+          "min": 0.9897959183673469,
+          "n": 9,
+          "seed_values": [
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469,
+            0.9897959183673469
+          ],
+          "seeds": [
+            1,
+            2,
+            42,
+            42,
+            2,
+            1,
+            42,
+            2,
+            1
+          ],
+          "std": 0.0,
+          "t_label": "default"
+        }
+      },
+      "metric": "gauc"
+    },
+    "denoising": {
+      "architectures": {
+        "topk_sae": {
+          "architecture": "topk_sae",
+          "k_pos": 20,
+          "max": 0.3755850732326508,
+          "mean": 0.36298478444417315,
+          "min": 0.35533055365085603,
+          "n": 3,
+          "seed_values": [
+            0.3755850732326508,
+            0.35803872644901275,
+            0.35533055365085603
+          ],
+          "seeds": [
+            42,
+            1,
+            2
+          ],
+          "std": 0.01099586322854848,
+          "t_label": "default"
+        },
+        "tsae_paper": {
+          "architecture": "tsae_paper",
+          "k_pos": 20,
+          "max": 0.38684957921504975,
+          "mean": 0.38191417654355364,
+          "min": 0.37899514436721804,
+          "n": 3,
+          "seed_values": [
+            0.38684957921504975,
+            0.37899514436721804,
+            0.37989780604839324
+          ],
+          "seeds": [
+            2,
+            42,
+            1
+          ],
+          "std": 0.004297947088439255,
+          "t_label": "default"
+        },
+        "txc_base": {
+          "architecture": "txc_base",
+          "k_pos": 17,
+          "max": 0.49507788121700286,
+          "mean": 0.4829211582740148,
+          "min": 0.47650026679039004,
+          "n": 3,
+          "seed_values": [
+            0.47650026679039004,
+            0.49507788121700286,
+            0.4771853268146515
+          ],
+          "seeds": [
+            2,
+            1,
+            42
+          ],
+          "std": 0.010533601537159055,
+          "t_label": "T=2"
+        }
+      },
+      "metric": "lp_mean_global_r2"
+    }
+  }
+}
