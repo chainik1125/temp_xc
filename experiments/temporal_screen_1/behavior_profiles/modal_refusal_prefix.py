@@ -74,6 +74,13 @@ image = (
 
 
 FRACTIONS = (0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1.0)
+PROMPT_LAG_BANDS = (
+    ("1_4", 1, 4),
+    ("5_8", 5, 8),
+    ("9_16", 9, 16),
+    ("17_32", 17, 32),
+    ("33_64", 33, 64),
+)
 CHAT_PREFIX = (
     "<|start_header_id|>user<|end_header_id|>\n\n"
 )
@@ -396,6 +403,31 @@ def run_profile(
         output[:, -1, :] = current - (current @ unit).unsqueeze(-1) * unit
         return output
 
+    def ablate_prompt_lag_band_tensor(value, low: int, high: int | None):
+        """Remove the direction at prior positions on the prompt pass only."""
+
+        # Cached generation forwards have sequence length one.  Leaving those
+        # states untouched isolates support already stored in prompt K/Vs.
+        if value.shape[1] <= 1:
+            return value
+        output = value.clone()
+        unit = direction_unit_gpu.to(value)
+        if high is None:
+            selected = output[:, :-1, :]
+            output[:, :-1, :] = (
+                selected - (selected @ unit).unsqueeze(-1) * unit
+            )
+            return output
+        start = max(0, value.shape[1] - 1 - high)
+        stop = max(0, value.shape[1] - low)
+        if start >= stop:
+            return value
+        selected = output[:, start:stop, :]
+        output[:, start:stop, :] = (
+            selected - (selected @ unit).unsqueeze(-1) * unit
+        )
+        return output
+
     def pre_ablation(_module, args):
         return (ablate_tensor(args[0]), *args[1:])
 
@@ -433,6 +465,29 @@ def run_profile(
         (block.mlp, output_current_token_ablation)
         for block in model.model.layers
     ]
+
+    def prompt_lag_hooks(low: int, high: int | None):
+        def pre_hook(_module, args):
+            return (
+                ablate_prompt_lag_band_tensor(args[0], low, high),
+                *args[1:],
+            )
+
+        def output_hook(_module, _args, output):
+            if isinstance(output, tuple):
+                return (
+                    ablate_prompt_lag_band_tensor(output[0], low, high),
+                    *output[1:],
+                )
+            return ablate_prompt_lag_band_tensor(output, low, high)
+
+        pre_hooks = [(block, pre_hook) for block in model.model.layers]
+        output_hooks = [
+            (block.self_attn, output_hook) for block in model.model.layers
+        ] + [
+            (block.mlp, output_hook) for block in model.model.layers
+        ]
+        return pre_hooks, output_hooks
 
     def add_direction(_module, args):
         return (
@@ -688,6 +743,34 @@ def run_profile(
     )
     rows.extend(current_token_added)
 
+    prompt_lag_conditions = []
+    for label, low, high in (
+        *PROMPT_LAG_BANDS,
+        ("all_prior", 1, None),
+    ):
+        pre_hooks, output_hooks = prompt_lag_hooks(low, high)
+        condition = f"prompt_lag_ablation_{label}"
+        scored = score_records(
+            harmful_full,
+            condition=condition,
+            pre_hooks=pre_hooks,
+            output_hooks=output_hooks,
+        )
+        generate_records(
+            harmful_full,
+            scored,
+            pre_hooks=pre_hooks,
+            output_hooks=output_hooks,
+        )
+        rows.extend(scored)
+        prompt_lag_conditions.append(
+            {
+                "condition": condition,
+                "low_lag_inclusive": low,
+                "high_lag_inclusive": high,
+            }
+        )
+
     # The published sufficiency control: add the same direction at every
     # sequence position to harmless full prompts.
     actadd_scored = score_records(
@@ -728,6 +811,37 @@ def run_profile(
             "each cached generation step"
         ),
         "full_prompt_generated_refusal_rate": full_prompt_rates,
+    }
+    aggregate["prompt_lag_localization"] = {
+        "lag_zero": "final assistant decision-state token",
+        "scope": (
+            "prompt-pass residual/attention/MLP states only; cached "
+            "generation-token states are untouched"
+        ),
+        "bands": [
+            condition
+            | {
+                "generated_refusal_rate": float(
+                    np.mean(
+                        [
+                            row["generated_refusal"]
+                            for row in rows
+                            if row["condition"] == condition["condition"]
+                        ]
+                    )
+                ),
+                "mean_refusal_log_odds": float(
+                    np.mean(
+                        [
+                            row["refusal_log_odds"]
+                            for row in rows
+                            if row["condition"] == condition["condition"]
+                        ]
+                    )
+                ),
+            }
+            for condition in prompt_lag_conditions
+        ],
     }
     payload = {
         "method": "prefix-reveal refusal-direction formation and mediation",
@@ -789,6 +903,12 @@ def run_profile(
             (
                 "This tests the published Llama-3 direction, not yet a TXC "
                 "or conventional-SAE factorization of refusal."
+            ),
+            (
+                "Prompt lag bands are relative to the final rendered "
+                "assistant decision token and therefore include chat-template "
+                "tokens as well as instruction tokens. Band effects may be "
+                "non-additive."
             ),
         ],
     }
