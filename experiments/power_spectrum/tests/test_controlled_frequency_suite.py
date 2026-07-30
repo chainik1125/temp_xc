@@ -146,3 +146,32 @@ def test_secret_selectivity_is_cross_split_and_rejects_one_off_fires() -> None:
     assert result["selective_feature_count"] == 1
     assert result["top_q_selectivity"] == 1.0
     assert result["top_q_secret_coverage"] == 0.25
+
+
+def test_seed_compatible_results_copies_only_current_successes(tmp_path) -> None:
+    config = suite.load_config(
+        suite.POWER_ROOT / "configs" / "controlled_frequency_suite.json"
+    )
+    expected = suite.enumerate_cells(config)
+    source = tmp_path / "source"
+    destination = tmp_path / "destination"
+    source.mkdir()
+    keep = {**expected[0], "status": "ok", "smoke": False}
+    skip_failed = {**expected[1], "status": "failed", "smoke": False}
+    skip_unexpected = {
+        **expected[2],
+        "cell_id": "not-in-reduced-plan",
+        "status": "ok",
+        "smoke": False,
+    }
+    for row in (keep, skip_failed, skip_unexpected):
+        suite._append_jsonl(source / "results.jsonl", row)
+
+    assert suite.seed_compatible_results(
+        config,
+        source,
+        destination,
+        smoke=False,
+    ) == 1
+    copied = suite.latest_results(destination / "results.jsonl")
+    assert set(copied) == {keep["cell_id"]}

@@ -31,7 +31,8 @@ REMOTE_CONFIG = (
     / "configs"
     / "controlled_frequency_suite.json"
 )
-FULL_RUN_DIR = Path("/vol/controlled-frequency-suite-20260729")
+INITIAL_FULL_RUN_DIR = Path("/vol/controlled-frequency-suite-20260729")
+FULL_RUN_DIR = Path("/vol/controlled-frequency-suite-reviewer-reuse-20260729")
 SMOKE_RUN_DIR = Path("/vol/controlled-frequency-suite-smoke-20260729")
 USAGE_DIR = Path("/vol/denoising-frequency-usage-20260729")
 LOCAL_CONTROLLED_RESULTS = (
@@ -76,6 +77,8 @@ def run_controlled_remote(mode: str) -> dict:
         "--mode",
         mode,
     ]
+    if mode == "full":
+        command.extend(["--seed-results-dir", str(INITIAL_FULL_RUN_DIR)])
     try:
         _stream(command, timeout=6200)
     finally:

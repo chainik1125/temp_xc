@@ -1050,16 +1050,54 @@ def write_summary(
     return summary
 
 
+def seed_compatible_results(
+    config: dict[str, Any],
+    source_dir: Path,
+    destination_dir: Path,
+    *,
+    smoke: bool,
+) -> int:
+    """Copy completed cells that are still present after a plan reduction."""
+
+    source_path = source_dir / "results.jsonl"
+    if not source_path.exists():
+        return 0
+    expected_ids = {
+        cell["cell_id"] for cell in enumerate_cells(config, smoke=smoke)
+    }
+    existing = latest_results(destination_dir / "results.jsonl")
+    copied = 0
+    for cell_id, row in latest_results(source_path).items():
+        if (
+            cell_id in expected_ids
+            and cell_id not in existing
+            and row.get("status") == "ok"
+            and bool(row.get("smoke")) == smoke
+        ):
+            _append_jsonl(destination_dir / "results.jsonl", row)
+            copied += 1
+    return copied
+
+
 def run(
     config: dict[str, Any],
     results_dir: Path,
     *,
     smoke: bool,
+    seed_results_dir: Path | None = None,
 ) -> int:
     plan = build_plan(config, smoke=smoke)
     if not plan["within_cost_plan"] or not plan["within_time_plan"]:
         raise RuntimeError(f"refusing out-of-plan run: {plan}")
     results_dir.mkdir(parents=True, exist_ok=True)
+    if seed_results_dir is not None:
+        copied = seed_compatible_results(
+            config,
+            seed_results_dir,
+            results_dir,
+            smoke=smoke,
+        )
+        print(f"[seed] copied {copied} compatible completed cells", flush=True)
     _atomic_json(results_dir / "frozen_config.json", config)
     _atomic_json(results_dir / "plan.json", plan)
     config_hash = hashlib.sha256(_canonical_json(config).encode()).hexdigest()
@@ -1176,13 +1214,19 @@ def main(argv: Iterable[str] | None = None) -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     parser.add_argument("--results-dir", type=Path, default=DEFAULT_RESULTS)
+    parser.add_argument("--seed-results-dir", type=Path)
     parser.add_argument("--mode", choices=("plan", "smoke", "full"), default="plan")
     args = parser.parse_args(list(argv) if argv is not None else None)
     config = load_config(args.config)
     if args.mode == "plan":
         print(json.dumps(build_plan(config), indent=2, sort_keys=True))
         return 0
-    return run(config, args.results_dir, smoke=args.mode == "smoke")
+    return run(
+        config,
+        args.results_dir,
+        smoke=args.mode == "smoke",
+        seed_results_dir=args.seed_results_dir,
+    )
 
 
 if __name__ == "__main__":
