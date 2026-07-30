@@ -1,0 +1,17 @@
+{
+  "amp": true,
+  "bands": "multiband",
+  "batch_size": 1024,
+  "checkpoint_every": 1000,
+  "d_in": 4096,
+  "d_sae": 65532,
+  "k_pos": 20,
+  "learning_rate": 0.0003,
+  "reference_txc_d_sae": 32768,
+  "schedule_max_window": 16,
+  "schedule_seed": 907100,
+  "seed": 1,
+  "steps": 20000,
+  "warmup_steps": 1000,
+  "window": 2
+}

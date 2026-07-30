@@ -8,6 +8,16 @@ The work has two linked goals:
 - test whether frequency-domain summaries distinguish temporal synthetic tasks;
 - improve a spectral crosscoder relative to a matched temporal crosscoder (TXC).
 
+The later parameter-matched backtracking extension is also complete. A plain
+Fourier XC trained for 20,000 steps matches TXC at \(T=1\), leads only at
+\(T=2\) on the recovered evaluation cohort, and trails by 0.015 PR-AUC at
+\(T=10\). Its DC activation-mass share falls from 100% to 56% as the window
+grows, showing that the model recruits substantial AC structure even though
+this does not translate into a long-window win. Because Aniket's exact
+activation artifact could not be recovered, this is explicitly a sensitivity
+analysis rather than a direct replication. See
+`analysis/backtracking_fourier_results.md`.
+
 Both goals are complete. The task screen shows that AC power routes periodic
 magnitude, cross-spectra are required for phase and direction, signed DC is
 task signal, and window sensitivity diagnoses localization. The complete
@@ -197,6 +207,8 @@ host-side location is operational metadata rather than part of the experiment.
   controlled frequency-HMM localization, and Denoising DC/AC usage.
 - `analysis/spectral_matryoshka_results.md`: the replicated multi-frequency
   advantage, order-free learned routing, and matched SAE control.
+- `analysis/backtracking_fourier_results.md`: the 20k parameter-matched plain
+  Fourier backtracking curve, frequency-band use, and recovery boundary.
 - `results/provenance.json`: run IDs, source commits, integrity receipt, cost,
   frozen-config checks, and raw-artifact hashes.
 - `code/spectral_txc_v2.py`: experiment-local spectral-crosscoder ablations.

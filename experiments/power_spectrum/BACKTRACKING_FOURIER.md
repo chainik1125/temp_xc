@@ -73,3 +73,22 @@ Fourier results on this artifact must not be presented as directly
 bit-exact-comparable to Aniket's published TXC values. The published TXC curve
 can be shown as a dashed reference, with the artifact mismatch stated in the
 figure and results text.
+
+## Completed result
+
+The 15-cell, three-seed sweep is complete. The recovered-cohort Fourier
+PR-AUC curve at the fixed 32-feature probe is 0.2184, 0.2428, 0.2429, 0.2446,
+and 0.2398 for \(T=1,2,4,6,10\). Aniket's pinned TXC curve is 0.2178, 0.2289,
+0.2466, 0.2512, and 0.2548. Thus the plain Fourier model has a
+recovered-cohort advantage at \(T=2\), is close at \(T=4\) and \(T=6\), and
+loses by 0.0150 PR-AUC at \(T=10\).
+
+DC activation-mass share declines monotonically from 1.000 at \(T=1\) to
+0.559 at \(T=10\). The remaining 0.441 is carried by AC blocks, so the
+representation is not merely using DC features even though DC remains the
+largest component.
+
+See `analysis/backtracking_fourier_results.md` for the complete table,
+frequency-use interpretation, provenance boundary, and compute accounting.
+The comparison plot and machine-readable summary are in
+`results/backtracking_fourier_matched/reviewer-five-point-v1/publication/`.

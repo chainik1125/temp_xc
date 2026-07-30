@@ -1,0 +1,704 @@
+{
+  "activation_cache": "/workspace/fourier_data/act_cache/fb2a74be884e512a/resid_post_L10.npy",
+  "allow_recovered_artifact": false,
+  "artifact": "/workspace/fourier_eval/sentence_acts_L10_T16.recovered.npz",
+  "band_probes": false,
+  "cells": [
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 65532,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907100,
+        "seed": 1,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 2
+      },
+      "parameter_match": {
+        "difference": -4,
+        "fourier_d_sae": 65532,
+        "fourier_parameters": 536911868,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 536911872,
+        "relative_difference": -7.450012206099998e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 98298,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907100,
+        "seed": 1,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 4
+      },
+      "parameter_match": {
+        "difference": -6,
+        "fourier_d_sae": 98298,
+        "fourier_parameters": 1073790970,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1073790976,
+        "relative_difference": -5.587679664016845e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131064,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907100,
+        "seed": 1,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 6
+      },
+      "parameter_match": {
+        "difference": -8,
+        "fourier_d_sae": 131064,
+        "fourier_parameters": 1610670072,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1610670080,
+        "relative_difference": -4.96687689138672e-09
+      }
+    }
+  ],
+  "checkpoint_root": "/workspace/txc-neurips-aniket/checkpoints/backtracking_fourier_matched/reviewer-five-point-v1",
+  "device": "cuda:0",
+  "implementation_sha256": {
+    "backtracking_fourier_xc.py": "c986b6215623705ff7e8e4ba0a64723e4c7e9cfdc9f16715c6b538c6e1d42aad",
+    "run_backtracking_fourier.py": "4b390ff0909cb00977b20191eabc2a94c5f590ab28d12639ab18baf21f085567"
+  },
+  "output_root": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_fourier_matched/reviewer-five-point-v1",
+  "phase": "train",
+  "protocol_version": "power-spectrum.backtracking-fourier.v1",
+  "reference_commit": "d9c7fc7b2",
+  "reference_protocol_version": "2026-07-26.t16.1",
+  "run_fingerprint": "4596728e28ef933edc3852585f83afa51587225cc18e0f2430e37363fe270526"
+}
+[fourier train] T=2 seed=1 step=100/20000 loss=43.4593 steps_per_second=14.7148
+[fourier train] T=2 seed=1 step=200/20000 loss=37.3093 steps_per_second=15.2919
+[fourier train] T=2 seed=1 step=300/20000 loss=30.4253 steps_per_second=15.4845
+[fourier train] T=2 seed=1 step=400/20000 loss=25.6115 steps_per_second=15.5894
+[fourier train] T=2 seed=1 step=500/20000 loss=22.3551 steps_per_second=15.6754
+[fourier train] T=2 seed=1 step=600/20000 loss=19.8166 steps_per_second=15.6958
+[fourier train] T=2 seed=1 step=700/20000 loss=18.4583 steps_per_second=15.7304
+[fourier train] T=2 seed=1 step=800/20000 loss=17.7043 steps_per_second=15.7640
+[fourier train] T=2 seed=1 step=900/20000 loss=16.9605 steps_per_second=15.7880
+[fourier train] T=2 seed=1 step=1000/20000 loss=16.1663 steps_per_second=15.8018
+[fourier train] T=2 seed=1 step=1100/20000 loss=15.6269 steps_per_second=15.1682
+[fourier train] T=2 seed=1 step=1200/20000 loss=15.6468 steps_per_second=15.2409
+[fourier train] T=2 seed=1 step=1300/20000 loss=15.2585 steps_per_second=15.3050
+[fourier train] T=2 seed=1 step=1400/20000 loss=15.1024 steps_per_second=15.3566
+[fourier train] T=2 seed=1 step=1500/20000 loss=14.8078 steps_per_second=15.4090
+[fourier train] T=2 seed=1 step=1600/20000 loss=14.3949 steps_per_second=15.4330
+[fourier train] T=2 seed=1 step=1700/20000 loss=14.3094 steps_per_second=15.4554
+[fourier train] T=2 seed=1 step=1800/20000 loss=14.1183 steps_per_second=15.4848
+[fourier train] T=2 seed=1 step=1900/20000 loss=14.1218 steps_per_second=15.5263
+[fourier train] T=2 seed=1 step=2000/20000 loss=13.8329 steps_per_second=15.5623
+[fourier train] T=2 seed=1 step=2100/20000 loss=14.2144 steps_per_second=15.2520
+[fourier train] T=2 seed=1 step=2200/20000 loss=13.8794 steps_per_second=15.2991
+[fourier train] T=2 seed=1 step=2300/20000 loss=13.5832 steps_per_second=15.3408
+[fourier train] T=2 seed=1 step=2400/20000 loss=13.439 steps_per_second=15.3875
+[fourier train] T=2 seed=1 step=2500/20000 loss=13.5396 steps_per_second=15.4181
+[fourier train] T=2 seed=1 step=2600/20000 loss=13.3234 steps_per_second=15.4502
+[fourier train] T=2 seed=1 step=2700/20000 loss=13.3547 steps_per_second=15.4724
+[fourier train] T=2 seed=1 step=2800/20000 loss=13.1781 steps_per_second=15.5014
+[fourier train] T=2 seed=1 step=2900/20000 loss=13.2282 steps_per_second=15.5219
+[fourier train] T=2 seed=1 step=3000/20000 loss=13.0908 steps_per_second=15.5530
+[fourier train] T=2 seed=1 step=3100/20000 loss=13.0557 steps_per_second=15.3395
+[fourier train] T=2 seed=1 step=3200/20000 loss=13.0578 steps_per_second=15.3672
+[fourier train] T=2 seed=1 step=3300/20000 loss=12.9021 steps_per_second=15.3924
+[fourier train] T=2 seed=1 step=3400/20000 loss=13.0468 steps_per_second=15.4228
+[fourier train] T=2 seed=1 step=3500/20000 loss=13.1244 steps_per_second=15.4461
+[fourier train] T=2 seed=1 step=3600/20000 loss=12.9593 steps_per_second=15.4699
+[fourier train] T=2 seed=1 step=3700/20000 loss=12.9519 steps_per_second=15.4891
+[fourier train] T=2 seed=1 step=3800/20000 loss=12.8928 steps_per_second=15.5048
+[fourier train] T=2 seed=1 step=3900/20000 loss=12.8084 steps_per_second=15.5236
+[fourier train] T=2 seed=1 step=4000/20000 loss=12.8095 steps_per_second=15.5343
+[fourier train] T=2 seed=1 step=4100/20000 loss=12.9759 steps_per_second=15.3762
+[fourier train] T=2 seed=1 step=4200/20000 loss=12.9336 steps_per_second=15.3955
+[fourier train] T=2 seed=1 step=4300/20000 loss=12.5409 steps_per_second=15.4095
+[fourier train] T=2 seed=1 step=4400/20000 loss=12.9184 steps_per_second=15.4286
+[fourier train] T=2 seed=1 step=4500/20000 loss=12.6885 steps_per_second=15.4452
+[fourier train] T=2 seed=1 step=4600/20000 loss=12.9423 steps_per_second=15.4592
+[fourier train] T=2 seed=1 step=4700/20000 loss=12.5492 steps_per_second=15.4722
+[fourier train] T=2 seed=1 step=4800/20000 loss=12.4138 steps_per_second=15.4873
+[fourier train] T=2 seed=1 step=4900/20000 loss=12.5528 steps_per_second=15.5005
+[fourier train] T=2 seed=1 step=5000/20000 loss=12.6135 steps_per_second=15.5108
+[fourier train] T=2 seed=1 step=5100/20000 loss=12.5528 steps_per_second=15.3797
+[fourier train] T=2 seed=1 step=5200/20000 loss=12.656 steps_per_second=15.3940
+[fourier train] T=2 seed=1 step=5300/20000 loss=12.5811 steps_per_second=15.3806
+[fourier train] T=2 seed=1 step=5400/20000 loss=12.6059 steps_per_second=15.3480
+[fourier train] T=2 seed=1 step=5500/20000 loss=12.4168 steps_per_second=15.3041
+[fourier train] T=2 seed=1 step=5600/20000 loss=12.4745 steps_per_second=15.2617
+[fourier train] T=2 seed=1 step=5700/20000 loss=12.4791 steps_per_second=15.2181
+[fourier train] T=2 seed=1 step=5800/20000 loss=12.7436 steps_per_second=15.1766
+[fourier train] T=2 seed=1 step=5900/20000 loss=12.5192 steps_per_second=15.1380
+[fourier train] T=2 seed=1 step=6000/20000 loss=12.3423 steps_per_second=15.1011
+[fourier train] T=2 seed=1 step=6100/20000 loss=12.6898 steps_per_second=14.9559
+[fourier train] T=2 seed=1 step=6200/20000 loss=12.5931 steps_per_second=14.9275
+[fourier train] T=2 seed=1 step=6300/20000 loss=12.5194 steps_per_second=14.8978
+[fourier train] T=2 seed=1 step=6400/20000 loss=12.4204 steps_per_second=14.8710
+[fourier train] T=2 seed=1 step=6500/20000 loss=12.3814 steps_per_second=14.8468
+[fourier train] T=2 seed=1 step=6600/20000 loss=12.1552 steps_per_second=14.8212
+[fourier train] T=2 seed=1 step=6700/20000 loss=12.462 steps_per_second=14.7968
+[fourier train] T=2 seed=1 step=6800/20000 loss=12.3145 steps_per_second=14.7738
+[fourier train] T=2 seed=1 step=6900/20000 loss=12.2109 steps_per_second=14.7503
+[fourier train] T=2 seed=1 step=7000/20000 loss=12.3861 steps_per_second=14.7263
+[fourier train] T=2 seed=1 step=7100/20000 loss=12.5273 steps_per_second=14.6146
+[fourier train] T=2 seed=1 step=7200/20000 loss=12.5396 steps_per_second=14.5940
+[fourier train] T=2 seed=1 step=7300/20000 loss=12.3288 steps_per_second=14.5738
+[fourier train] T=2 seed=1 step=7400/20000 loss=12.3689 steps_per_second=14.5541
+[fourier train] T=2 seed=1 step=7500/20000 loss=12.3181 steps_per_second=14.5345
+[fourier train] T=2 seed=1 step=7600/20000 loss=12.3542 steps_per_second=14.5137
+[fourier train] T=2 seed=1 step=7700/20000 loss=12.4111 steps_per_second=14.4966
+[fourier train] T=2 seed=1 step=7800/20000 loss=12.4371 steps_per_second=14.4785
+[fourier train] T=2 seed=1 step=7900/20000 loss=12.4722 steps_per_second=14.4620
+[fourier train] T=2 seed=1 step=8000/20000 loss=12.2558 steps_per_second=14.4443
+[fourier train] T=2 seed=1 step=8100/20000 loss=12.0816 steps_per_second=14.3521
+[fourier train] T=2 seed=1 step=8200/20000 loss=12.0499 steps_per_second=14.3371
+[fourier train] T=2 seed=1 step=8300/20000 loss=12.0891 steps_per_second=14.3217
+[fourier train] T=2 seed=1 step=8400/20000 loss=12.2492 steps_per_second=14.3070
+[fourier train] T=2 seed=1 step=8500/20000 loss=12.296 steps_per_second=14.2925
+[fourier train] T=2 seed=1 step=8600/20000 loss=12.2335 steps_per_second=14.2781
+[fourier train] T=2 seed=1 step=8700/20000 loss=12.2046 steps_per_second=14.2642
+[fourier train] T=2 seed=1 step=8800/20000 loss=12.2658 steps_per_second=14.2507
+[fourier train] T=2 seed=1 step=8900/20000 loss=12.2612 steps_per_second=14.2376
+[fourier train] T=2 seed=1 step=9000/20000 loss=11.8643 steps_per_second=14.2249
+[fourier train] T=2 seed=1 step=9100/20000 loss=12.2978 steps_per_second=14.1476
+[fourier train] T=2 seed=1 step=9200/20000 loss=12.1064 steps_per_second=14.1363
+[fourier train] T=2 seed=1 step=9300/20000 loss=12.2521 steps_per_second=14.1254
+[fourier train] T=2 seed=1 step=9400/20000 loss=12.281 steps_per_second=14.1146
+[fourier train] T=2 seed=1 step=9500/20000 loss=12.3461 steps_per_second=14.1032
+[fourier train] T=2 seed=1 step=9600/20000 loss=11.9578 steps_per_second=14.0940
+[fourier train] T=2 seed=1 step=9700/20000 loss=12.2364 steps_per_second=14.0856
+[fourier train] T=2 seed=1 step=9800/20000 loss=12.1866 steps_per_second=14.0768
+[fourier train] T=2 seed=1 step=9900/20000 loss=12.1452 steps_per_second=14.0685
+[fourier train] T=2 seed=1 step=10000/20000 loss=11.9887 steps_per_second=14.0606
+[fourier train] T=2 seed=1 step=10100/20000 loss=12.1655 steps_per_second=13.9922
+[fourier train] T=2 seed=1 step=10200/20000 loss=12.2879 steps_per_second=13.9855
+[fourier train] T=2 seed=1 step=10300/20000 loss=12.2664 steps_per_second=13.9787
+[fourier train] T=2 seed=1 step=10400/20000 loss=12.0043 steps_per_second=13.9709
+[fourier train] T=2 seed=1 step=10500/20000 loss=12.2944 steps_per_second=13.9644
+[fourier train] T=2 seed=1 step=10600/20000 loss=12.3795 steps_per_second=13.9579
+[fourier train] T=2 seed=1 step=10700/20000 loss=12.2833 steps_per_second=13.9507
+[fourier train] T=2 seed=1 step=10800/20000 loss=12.1104 steps_per_second=13.9425
+[fourier train] T=2 seed=1 step=10900/20000 loss=11.9164 steps_per_second=13.9360
+[fourier train] T=2 seed=1 step=11000/20000 loss=12.4031 steps_per_second=13.9302
+[fourier train] T=2 seed=1 step=11100/20000 loss=12.3256 steps_per_second=13.8695
+[fourier train] T=2 seed=1 step=11200/20000 loss=11.9146 steps_per_second=13.8641
+[fourier train] T=2 seed=1 step=11300/20000 loss=12.0093 steps_per_second=13.8584
+[fourier train] T=2 seed=1 step=11400/20000 loss=11.9994 steps_per_second=13.8519
+[fourier train] T=2 seed=1 step=11500/20000 loss=11.9961 steps_per_second=13.8450
+[fourier train] T=2 seed=1 step=11600/20000 loss=12.1463 steps_per_second=13.8389
+[fourier train] T=2 seed=1 step=11700/20000 loss=12.1485 steps_per_second=13.8343
+[fourier train] T=2 seed=1 step=11800/20000 loss=12.1408 steps_per_second=13.8296
+[fourier train] T=2 seed=1 step=11900/20000 loss=11.9139 steps_per_second=13.8243
+[fourier train] T=2 seed=1 step=12000/20000 loss=11.9518 steps_per_second=13.8188
+[fourier train] T=2 seed=1 step=12100/20000 loss=11.8628 steps_per_second=13.7662
+[fourier train] T=2 seed=1 step=12200/20000 loss=12.1001 steps_per_second=13.7618
+[fourier train] T=2 seed=1 step=12300/20000 loss=11.9745 steps_per_second=13.7572
+[fourier train] T=2 seed=1 step=12400/20000 loss=12.0823 steps_per_second=13.7524
+[fourier train] T=2 seed=1 step=12500/20000 loss=11.8546 steps_per_second=13.7482
+[fourier train] T=2 seed=1 step=12600/20000 loss=12.0055 steps_per_second=13.7442
+[fourier train] T=2 seed=1 step=12700/20000 loss=12.075 steps_per_second=13.7400
+[fourier train] T=2 seed=1 step=12800/20000 loss=11.9617 steps_per_second=13.7353
+[fourier train] T=2 seed=1 step=12900/20000 loss=12.1198 steps_per_second=13.7318
+[fourier train] T=2 seed=1 step=13000/20000 loss=12.0211 steps_per_second=13.7277
+[fourier train] T=2 seed=1 step=13100/20000 loss=11.9714 steps_per_second=13.6803
+[fourier train] T=2 seed=1 step=13200/20000 loss=11.9546 steps_per_second=13.6772
+[fourier train] T=2 seed=1 step=13300/20000 loss=12.0132 steps_per_second=13.6747
+[fourier train] T=2 seed=1 step=13400/20000 loss=12.2203 steps_per_second=13.6725
+[fourier train] T=2 seed=1 step=13500/20000 loss=11.8965 steps_per_second=13.6694
+[fourier train] T=2 seed=1 step=13600/20000 loss=12.0715 steps_per_second=13.6657
+[fourier train] T=2 seed=1 step=13700/20000 loss=12.0694 steps_per_second=13.6622
+[fourier train] T=2 seed=1 step=13800/20000 loss=12.2205 steps_per_second=13.6599
+[fourier train] T=2 seed=1 step=13900/20000 loss=12.0825 steps_per_second=13.6564
+[fourier train] T=2 seed=1 step=14000/20000 loss=11.843 steps_per_second=13.6539
+[fourier train] T=2 seed=1 step=14100/20000 loss=11.8681 steps_per_second=13.6122
+[fourier train] T=2 seed=1 step=14200/20000 loss=11.8284 steps_per_second=13.6099
+[fourier train] T=2 seed=1 step=14300/20000 loss=11.8276 steps_per_second=13.6102
+[fourier train] T=2 seed=1 step=14400/20000 loss=11.8652 steps_per_second=13.6099
+[fourier train] T=2 seed=1 step=14500/20000 loss=12.0721 steps_per_second=13.6102
+[fourier train] T=2 seed=1 step=14600/20000 loss=12.1144 steps_per_second=13.6096
+[fourier train] T=2 seed=1 step=14700/20000 loss=12.0505 steps_per_second=13.6093
+[fourier train] T=2 seed=1 step=14800/20000 loss=11.7884 steps_per_second=13.6088
+[fourier train] T=2 seed=1 step=14900/20000 loss=12.0252 steps_per_second=13.6069
+[fourier train] T=2 seed=1 step=15000/20000 loss=11.8865 steps_per_second=13.6052
+[fourier train] T=2 seed=1 step=15100/20000 loss=11.8875 steps_per_second=13.5672
+[fourier train] T=2 seed=1 step=15200/20000 loss=11.9916 steps_per_second=13.5666
+[fourier train] T=2 seed=1 step=15300/20000 loss=11.7949 steps_per_second=13.5670
+[fourier train] T=2 seed=1 step=15400/20000 loss=11.7497 steps_per_second=13.5675
+[fourier train] T=2 seed=1 step=15500/20000 loss=11.903 steps_per_second=13.5673
+[fourier train] T=2 seed=1 step=15600/20000 loss=12.0467 steps_per_second=13.5659
+[fourier train] T=2 seed=1 step=15700/20000 loss=11.9381 steps_per_second=13.5644
+[fourier train] T=2 seed=1 step=15800/20000 loss=12.0835 steps_per_second=13.5635
+[fourier train] T=2 seed=1 step=15900/20000 loss=12.0056 steps_per_second=13.5622
+[fourier train] T=2 seed=1 step=16000/20000 loss=12.0492 steps_per_second=13.5608
+[fourier train] T=2 seed=1 step=16100/20000 loss=12.0065 steps_per_second=13.5250
+[fourier train] T=2 seed=1 step=16200/20000 loss=11.7354 steps_per_second=13.5234
+[fourier train] T=2 seed=1 step=16300/20000 loss=12.1358 steps_per_second=13.5228
+[fourier train] T=2 seed=1 step=16400/20000 loss=11.9804 steps_per_second=13.5216
+[fourier train] T=2 seed=1 step=16500/20000 loss=11.895 steps_per_second=13.5205
+[fourier train] T=2 seed=1 step=16600/20000 loss=11.9121 steps_per_second=13.5191
+[fourier train] T=2 seed=1 step=16700/20000 loss=12.0778 steps_per_second=13.5175
+[fourier train] T=2 seed=1 step=16800/20000 loss=11.7054 steps_per_second=13.5158
+[fourier train] T=2 seed=1 step=16900/20000 loss=11.9114 steps_per_second=13.5138
+[fourier train] T=2 seed=1 step=17000/20000 loss=11.9782 steps_per_second=13.5119
+[fourier train] T=2 seed=1 step=17100/20000 loss=12.0065 steps_per_second=13.4801
+[fourier train] T=2 seed=1 step=17200/20000 loss=12.0063 steps_per_second=13.4797
+[fourier train] T=2 seed=1 step=17300/20000 loss=11.8411 steps_per_second=13.4787
+[fourier train] T=2 seed=1 step=17400/20000 loss=11.8353 steps_per_second=13.4786
+[fourier train] T=2 seed=1 step=17500/20000 loss=11.9415 steps_per_second=13.4780
+[fourier train] T=2 seed=1 step=17600/20000 loss=11.809 steps_per_second=13.4780
+[fourier train] T=2 seed=1 step=17700/20000 loss=11.9093 steps_per_second=13.4778
+[fourier train] T=2 seed=1 step=17800/20000 loss=11.8806 steps_per_second=13.4786
+[fourier train] T=2 seed=1 step=17900/20000 loss=11.8347 steps_per_second=13.4784
+[fourier train] T=2 seed=1 step=18000/20000 loss=12.0487 steps_per_second=13.4784
+[fourier train] T=2 seed=1 step=18100/20000 loss=11.88 steps_per_second=13.4496
+[fourier train] T=2 seed=1 step=18200/20000 loss=11.8043 steps_per_second=13.4503
+[fourier train] T=2 seed=1 step=18300/20000 loss=11.6967 steps_per_second=13.4493
+[fourier train] T=2 seed=1 step=18400/20000 loss=11.6038 steps_per_second=13.4495
+[fourier train] T=2 seed=1 step=18500/20000 loss=12.0704 steps_per_second=13.4493
+[fourier train] T=2 seed=1 step=18600/20000 loss=11.6948 steps_per_second=13.4485
+[fourier train] T=2 seed=1 step=18700/20000 loss=12.1038 steps_per_second=13.4482
+[fourier train] T=2 seed=1 step=18800/20000 loss=11.7807 steps_per_second=13.4473
+[fourier train] T=2 seed=1 step=18900/20000 loss=11.7463 steps_per_second=13.4465
+[fourier train] T=2 seed=1 step=19000/20000 loss=11.72 steps_per_second=13.4457
+[fourier train] T=2 seed=1 step=19100/20000 loss=11.9489 steps_per_second=13.4165
+[fourier train] T=2 seed=1 step=19200/20000 loss=11.594 steps_per_second=13.4159
+[fourier train] T=2 seed=1 step=19300/20000 loss=11.7661 steps_per_second=13.4153
+[fourier train] T=2 seed=1 step=19400/20000 loss=11.8377 steps_per_second=13.4153
+[fourier train] T=2 seed=1 step=19500/20000 loss=11.8854 steps_per_second=13.4144
+[fourier train] T=2 seed=1 step=19600/20000 loss=11.8066 steps_per_second=13.4138
+[fourier train] T=2 seed=1 step=19700/20000 loss=11.9505 steps_per_second=13.4134
+[fourier train] T=2 seed=1 step=19800/20000 loss=11.7068 steps_per_second=13.4125
+[fourier train] T=2 seed=1 step=19900/20000 loss=11.9615 steps_per_second=13.4119
+[fourier train] T=2 seed=1 step=20000/20000 loss=11.8157 steps_per_second=13.4112
+{"cell": "T2_seed1", "evaluation_status": null, "training": {"cached": false, "completed_steps": 20000, "elapsed_seconds_this_process": 1494.2043125859927, "last_metrics": {"auxk": 1.0869415998458862, "dead": 44032.0, "l0": 40.0, "loss": 11.815665245056152, "mse": 11.781698226928711}, "parameter_match": {"difference": -4, "fourier_d_sae": 65532, "fourier_parameters": 536911868, "reference_txc_d_sae": 32768, "reference_txc_parameters": 536911872, "relative_difference": -7.450012206099998e-09}, "status": "complete"}}
+[fourier train] T=4 seed=1 step=100/20000 loss=42.3352 steps_per_second=8.2115
+[fourier train] T=4 seed=1 step=200/20000 loss=36.2316 steps_per_second=8.2521
+[fourier train] T=4 seed=1 step=300/20000 loss=28.712 steps_per_second=8.2769
+[fourier train] T=4 seed=1 step=400/20000 loss=24.1652 steps_per_second=8.2841
+[fourier train] T=4 seed=1 step=500/20000 loss=21.3983 steps_per_second=8.2870
+[fourier train] T=4 seed=1 step=600/20000 loss=19.3622 steps_per_second=8.2949
+[fourier train] T=4 seed=1 step=700/20000 loss=18.3979 steps_per_second=8.3045
+[fourier train] T=4 seed=1 step=800/20000 loss=17.4317 steps_per_second=8.3063
+[fourier train] T=4 seed=1 step=900/20000 loss=16.8527 steps_per_second=8.3116
+[fourier train] T=4 seed=1 step=1000/20000 loss=16.104 steps_per_second=8.3197
+[fourier train] T=4 seed=1 step=1100/20000 loss=15.3777 steps_per_second=7.9691
+[fourier train] T=4 seed=1 step=1200/20000 loss=15.2331 steps_per_second=8.0043
+[fourier train] T=4 seed=1 step=1300/20000 loss=14.9466 steps_per_second=8.0304
+[fourier train] T=4 seed=1 step=1400/20000 loss=14.7872 steps_per_second=8.0523
+[fourier train] T=4 seed=1 step=1500/20000 loss=14.3787 steps_per_second=8.0698
+[fourier train] T=4 seed=1 step=1600/20000 loss=14.0225 steps_per_second=8.0870
+[fourier train] T=4 seed=1 step=1700/20000 loss=13.7584 steps_per_second=8.1022
+[fourier train] T=4 seed=1 step=1800/20000 loss=13.5545 steps_per_second=8.1150
+[fourier train] T=4 seed=1 step=1900/20000 loss=13.6689 steps_per_second=8.1272
+[fourier train] T=4 seed=1 step=2000/20000 loss=13.1845 steps_per_second=8.1378
+[fourier train] T=4 seed=1 step=2100/20000 loss=13.7741 steps_per_second=7.9640
+[fourier train] T=4 seed=1 step=2200/20000 loss=13.2051 steps_per_second=7.9828
+[fourier train] T=4 seed=1 step=2300/20000 loss=12.8971 steps_per_second=7.9970
+[fourier train] T=4 seed=1 step=2400/20000 loss=12.9028 steps_per_second=8.0103
+[fourier train] T=4 seed=1 step=2500/20000 loss=12.9919 steps_per_second=7.9911
+[fourier train] T=4 seed=1 step=2600/20000 loss=12.5967 steps_per_second=8.0039
+[fourier train] T=4 seed=1 step=2700/20000 loss=12.6407 steps_per_second=8.0146
+[fourier train] T=4 seed=1 step=2800/20000 loss=12.5522 steps_per_second=7.9781
+[fourier train] T=4 seed=1 step=2900/20000 loss=12.4918 steps_per_second=7.9363
+[fourier train] T=4 seed=1 step=3000/20000 loss=12.3792 steps_per_second=7.8990
+[fourier train] T=4 seed=1 step=3100/20000 loss=12.3062 steps_per_second=7.7470
+[fourier train] T=4 seed=1 step=3200/20000 loss=12.3357 steps_per_second=7.7158
+[fourier train] T=4 seed=1 step=3300/20000 loss=12.1617 steps_per_second=7.6886
+[fourier train] T=4 seed=1 step=3400/20000 loss=12.327 steps_per_second=7.6613
+[fourier train] T=4 seed=1 step=3500/20000 loss=12.3727 steps_per_second=7.6347
+[fourier train] T=4 seed=1 step=3600/20000 loss=12.3202 steps_per_second=7.6109
+[fourier train] T=4 seed=1 step=3700/20000 loss=12.1918 steps_per_second=7.5902
+[fourier train] T=4 seed=1 step=3800/20000 loss=12.0292 steps_per_second=7.5710
+[fourier train] T=4 seed=1 step=3900/20000 loss=12.0626 steps_per_second=7.5523
+[fourier train] T=4 seed=1 step=4000/20000 loss=11.9546 steps_per_second=7.5355
+[fourier train] T=4 seed=1 step=4100/20000 loss=12.1792 steps_per_second=7.4403
+[fourier train] T=4 seed=1 step=4200/20000 loss=12.1603 steps_per_second=7.4268
+[fourier train] T=4 seed=1 step=4300/20000 loss=11.6817 steps_per_second=7.4146
+[fourier train] T=4 seed=1 step=4400/20000 loss=12.1866 steps_per_second=7.4027
+[fourier train] T=4 seed=1 step=4500/20000 loss=11.9722 steps_per_second=7.3912
+[fourier train] T=4 seed=1 step=4600/20000 loss=12.0581 steps_per_second=7.3806
+[fourier train] T=4 seed=1 step=4700/20000 loss=11.6954 steps_per_second=7.3698
+[fourier train] T=4 seed=1 step=4800/20000 loss=11.6272 steps_per_second=7.3593
+[fourier train] T=4 seed=1 step=4900/20000 loss=11.7724 steps_per_second=7.3500
+[fourier train] T=4 seed=1 step=5000/20000 loss=11.6817 steps_per_second=7.3411
+[fourier train] T=4 seed=1 step=5100/20000 loss=11.5919 steps_per_second=7.2714
+[fourier train] T=4 seed=1 step=5200/20000 loss=11.8014 steps_per_second=7.2640
+[fourier train] T=4 seed=1 step=5300/20000 loss=11.6947 steps_per_second=7.2572
+[fourier train] T=4 seed=1 step=5400/20000 loss=11.6289 steps_per_second=7.2507
+[fourier train] T=4 seed=1 step=5500/20000 loss=11.5137 steps_per_second=7.2446
+[fourier train] T=4 seed=1 step=5600/20000 loss=11.4774 steps_per_second=7.2382
+[fourier train] T=4 seed=1 step=5700/20000 loss=11.5846 steps_per_second=7.2322
+[fourier train] T=4 seed=1 step=5800/20000 loss=11.666 steps_per_second=7.2263
+[fourier train] T=4 seed=1 step=5900/20000 loss=11.4396 steps_per_second=7.2206
+[fourier train] T=4 seed=1 step=6000/20000 loss=11.4582 steps_per_second=7.2152
+[fourier train] T=4 seed=1 step=6100/20000 loss=11.7466 steps_per_second=7.1598
+[fourier train] T=4 seed=1 step=6200/20000 loss=11.5245 steps_per_second=7.1560
+[fourier train] T=4 seed=1 step=6300/20000 loss=11.4335 steps_per_second=7.1513
+[fourier train] T=4 seed=1 step=6400/20000 loss=11.5039 steps_per_second=7.1469
+[fourier train] T=4 seed=1 step=6500/20000 loss=11.4642 steps_per_second=7.1433
+[fourier train] T=4 seed=1 step=6600/20000 loss=11.2353 steps_per_second=7.1396
+[fourier train] T=4 seed=1 step=6700/20000 loss=11.4679 steps_per_second=7.1361
+[fourier train] T=4 seed=1 step=6800/20000 loss=11.342 steps_per_second=7.1326
+[fourier train] T=4 seed=1 step=6900/20000 loss=11.2381 steps_per_second=7.1295
+[fourier train] T=4 seed=1 step=7000/20000 loss=11.4304 steps_per_second=7.1261
+[fourier train] T=4 seed=1 step=7100/20000 loss=11.4776 steps_per_second=7.0815
+[fourier train] T=4 seed=1 step=7200/20000 loss=11.6812 steps_per_second=7.0788
+[fourier train] T=4 seed=1 step=7300/20000 loss=11.2788 steps_per_second=7.0767
+[fourier train] T=4 seed=1 step=7400/20000 loss=11.3937 steps_per_second=7.0741
+[fourier train] T=4 seed=1 step=7500/20000 loss=11.3592 steps_per_second=7.0723
+[fourier train] T=4 seed=1 step=7600/20000 loss=11.3826 steps_per_second=7.0704
+[fourier train] T=4 seed=1 step=7700/20000 loss=11.3801 steps_per_second=7.0684
+[fourier train] T=4 seed=1 step=7800/20000 loss=11.3248 steps_per_second=7.0666
+[fourier train] T=4 seed=1 step=7900/20000 loss=11.2771 steps_per_second=7.0647
+[fourier train] T=4 seed=1 step=8000/20000 loss=11.328 steps_per_second=7.0627
+[fourier train] T=4 seed=1 step=8100/20000 loss=11.0097 steps_per_second=7.0247
+[fourier train] T=4 seed=1 step=8200/20000 loss=11.0417 steps_per_second=7.0232
+[fourier train] T=4 seed=1 step=8300/20000 loss=11.0655 steps_per_second=7.0220
+[fourier train] T=4 seed=1 step=8400/20000 loss=11.2069 steps_per_second=7.0209
+[fourier train] T=4 seed=1 step=8500/20000 loss=11.2794 steps_per_second=7.0197
+[fourier train] T=4 seed=1 step=8600/20000 loss=11.2617 steps_per_second=7.0185
+[fourier train] T=4 seed=1 step=8700/20000 loss=11.2047 steps_per_second=7.0172
+[fourier train] T=4 seed=1 step=8800/20000 loss=11.2332 steps_per_second=7.0161
+[fourier train] T=4 seed=1 step=8900/20000 loss=11.3927 steps_per_second=7.0151
+[fourier train] T=4 seed=1 step=9000/20000 loss=10.9607 steps_per_second=7.0139
+[fourier train] T=4 seed=1 step=9100/20000 loss=11.2431 steps_per_second=6.9815
+[fourier train] T=4 seed=1 step=9200/20000 loss=11.1949 steps_per_second=6.9810
+[fourier train] T=4 seed=1 step=9300/20000 loss=11.1804 steps_per_second=6.9806
+[fourier train] T=4 seed=1 step=9400/20000 loss=11.2068 steps_per_second=6.9802
+[fourier train] T=4 seed=1 step=9500/20000 loss=11.3153 steps_per_second=6.9797
+[fourier train] T=4 seed=1 step=9600/20000 loss=10.8763 steps_per_second=6.9795
+[fourier train] T=4 seed=1 step=9700/20000 loss=11.2062 steps_per_second=6.9786
+[fourier train] T=4 seed=1 step=9800/20000 loss=11.1943 steps_per_second=6.9779
+[fourier train] T=4 seed=1 step=9900/20000 loss=11.1452 steps_per_second=6.9774
+[fourier train] T=4 seed=1 step=10000/20000 loss=10.9768 steps_per_second=6.9769
+[fourier train] T=4 seed=1 step=10100/20000 loss=11.0797 steps_per_second=6.9482
+[fourier train] T=4 seed=1 step=10200/20000 loss=11.3493 steps_per_second=6.9480
+[fourier train] T=4 seed=1 step=10300/20000 loss=11.2645 steps_per_second=6.9476
+[fourier train] T=4 seed=1 step=10400/20000 loss=11.0092 steps_per_second=6.9472
+[fourier train] T=4 seed=1 step=10500/20000 loss=11.2231 steps_per_second=6.9472
+[fourier train] T=4 seed=1 step=10600/20000 loss=11.2328 steps_per_second=6.9473
+[fourier train] T=4 seed=1 step=10700/20000 loss=11.2176 steps_per_second=6.9468
+[fourier train] T=4 seed=1 step=10800/20000 loss=11.0831 steps_per_second=6.9466
+[fourier train] T=4 seed=1 step=10900/20000 loss=10.8962 steps_per_second=6.9465
+[fourier train] T=4 seed=1 step=11000/20000 loss=11.314 steps_per_second=6.9462
+[fourier train] T=4 seed=1 step=11100/20000 loss=11.3021 steps_per_second=6.9210
+[fourier train] T=4 seed=1 step=11200/20000 loss=10.9402 steps_per_second=6.9209
+[fourier train] T=4 seed=1 step=11300/20000 loss=11.1207 steps_per_second=6.9208
+[fourier train] T=4 seed=1 step=11400/20000 loss=10.9012 steps_per_second=6.9209
+[fourier train] T=4 seed=1 step=11500/20000 loss=10.9026 steps_per_second=6.9206
+[fourier train] T=4 seed=1 step=11600/20000 loss=11.1535 steps_per_second=6.9207
+[fourier train] T=4 seed=1 step=11700/20000 loss=11.0973 steps_per_second=6.9212
+[fourier train] T=4 seed=1 step=11800/20000 loss=10.9849 steps_per_second=6.9219
+[fourier train] T=4 seed=1 step=11900/20000 loss=10.8917 steps_per_second=6.9221
+[fourier train] T=4 seed=1 step=12000/20000 loss=10.9285 steps_per_second=6.9227
+[fourier train] T=4 seed=1 step=12100/20000 loss=10.9628 steps_per_second=6.9007
+[fourier train] T=4 seed=1 step=12200/20000 loss=11.0226 steps_per_second=6.9019
+[fourier train] T=4 seed=1 step=12300/20000 loss=10.9037 steps_per_second=6.9028
+[fourier train] T=4 seed=1 step=12400/20000 loss=11.0763 steps_per_second=6.9039
+[fourier train] T=4 seed=1 step=12500/20000 loss=10.8059 steps_per_second=6.9048
+[fourier train] T=4 seed=1 step=12600/20000 loss=11.0635 steps_per_second=6.9055
+[fourier train] T=4 seed=1 step=12700/20000 loss=10.9487 steps_per_second=6.9060
+[fourier train] T=4 seed=1 step=12800/20000 loss=10.9088 steps_per_second=6.9066
+[fourier train] T=4 seed=1 step=12900/20000 loss=11.0698 steps_per_second=6.9072
+[fourier train] T=4 seed=1 step=13000/20000 loss=10.8633 steps_per_second=6.9080
+[fourier train] T=4 seed=1 step=13100/20000 loss=10.8034 steps_per_second=6.8861
+[fourier train] T=4 seed=1 step=13200/20000 loss=10.8348 steps_per_second=6.8869
+[fourier train] T=4 seed=1 step=13300/20000 loss=10.8811 steps_per_second=6.8881
+[fourier train] T=4 seed=1 step=13400/20000 loss=11.2835 steps_per_second=6.8889
+[fourier train] T=4 seed=1 step=13500/20000 loss=10.6994 steps_per_second=6.8898
+[fourier train] T=4 seed=1 step=13600/20000 loss=10.9114 steps_per_second=6.8905
+[fourier train] T=4 seed=1 step=13700/20000 loss=10.9966 steps_per_second=6.8912
+[fourier train] T=4 seed=1 step=13800/20000 loss=11.2047 steps_per_second=6.8918
+[fourier train] T=4 seed=1 step=13900/20000 loss=11.1026 steps_per_second=6.8925
+[fourier train] T=4 seed=1 step=14000/20000 loss=10.7361 steps_per_second=6.8933
+[fourier train] T=4 seed=1 step=14100/20000 loss=10.7764 steps_per_second=6.8748
+[fourier train] T=4 seed=1 step=14200/20000 loss=10.8261 steps_per_second=6.8757
+[fourier train] T=4 seed=1 step=14300/20000 loss=10.7516 steps_per_second=6.8765
+[fourier train] T=4 seed=1 step=14400/20000 loss=10.8333 steps_per_second=6.8773
+[fourier train] T=4 seed=1 step=14500/20000 loss=11.1669 steps_per_second=6.8781
+[fourier train] T=4 seed=1 step=14600/20000 loss=11.058 steps_per_second=6.8787
+[fourier train] T=4 seed=1 step=14700/20000 loss=11.0298 steps_per_second=6.8788
+[fourier train] T=4 seed=1 step=14800/20000 loss=10.6882 steps_per_second=6.8791
+[fourier train] T=4 seed=1 step=14900/20000 loss=10.9834 steps_per_second=6.8794
+[fourier train] T=4 seed=1 step=15000/20000 loss=10.7853 steps_per_second=6.8798
+[fourier train] T=4 seed=1 step=15100/20000 loss=10.8181 steps_per_second=6.8617
+[fourier train] T=4 seed=1 step=15200/20000 loss=10.9063 steps_per_second=6.8622
+[fourier train] T=4 seed=1 step=15300/20000 loss=10.7238 steps_per_second=6.8627
+[fourier train] T=4 seed=1 step=15400/20000 loss=10.6125 steps_per_second=6.8633
+[fourier train] T=4 seed=1 step=15500/20000 loss=10.7936 steps_per_second=6.8640
+[fourier train] T=4 seed=1 step=15600/20000 loss=10.9432 steps_per_second=6.8647
+[fourier train] T=4 seed=1 step=15700/20000 loss=10.9158 steps_per_second=6.8653
+[fourier train] T=4 seed=1 step=15800/20000 loss=11.0436 steps_per_second=6.8659
+[fourier train] T=4 seed=1 step=15900/20000 loss=11.002 steps_per_second=6.8663
+[fourier train] T=4 seed=1 step=16000/20000 loss=10.9772 steps_per_second=6.8667
+[fourier train] T=4 seed=1 step=16100/20000 loss=10.8845 steps_per_second=6.8508
+[fourier train] T=4 seed=1 step=16200/20000 loss=10.7271 steps_per_second=6.8515
+[fourier train] T=4 seed=1 step=16300/20000 loss=11.0434 steps_per_second=6.8523
+[fourier train] T=4 seed=1 step=16400/20000 loss=10.9241 steps_per_second=6.8531
+[fourier train] T=4 seed=1 step=16500/20000 loss=10.7553 steps_per_second=6.8538
+[fourier train] T=4 seed=1 step=16600/20000 loss=10.8887 steps_per_second=6.8545
+[fourier train] T=4 seed=1 step=16700/20000 loss=11.0499 steps_per_second=6.8552
+[fourier train] T=4 seed=1 step=16800/20000 loss=10.6169 steps_per_second=6.8559
+[fourier train] T=4 seed=1 step=16900/20000 loss=10.8056 steps_per_second=6.8568
+[fourier train] T=4 seed=1 step=17000/20000 loss=10.921 steps_per_second=6.8577
+[fourier train] T=4 seed=1 step=17100/20000 loss=10.9257 steps_per_second=6.8425
+[fourier train] T=4 seed=1 step=17200/20000 loss=10.9554 steps_per_second=6.8431
+[fourier train] T=4 seed=1 step=17300/20000 loss=10.8057 steps_per_second=6.8438
+[fourier train] T=4 seed=1 step=17400/20000 loss=10.7079 steps_per_second=6.8448
+[fourier train] T=4 seed=1 step=17500/20000 loss=10.9024 steps_per_second=6.8455
+[fourier train] T=4 seed=1 step=17600/20000 loss=10.7373 steps_per_second=6.8463
+[fourier train] T=4 seed=1 step=17700/20000 loss=10.7813 steps_per_second=6.8470
+[fourier train] T=4 seed=1 step=17800/20000 loss=10.7792 steps_per_second=6.8476
+[fourier train] T=4 seed=1 step=17900/20000 loss=10.7668 steps_per_second=6.8484
+[fourier train] T=4 seed=1 step=18000/20000 loss=10.9905 steps_per_second=6.8492
+[fourier train] T=4 seed=1 step=18100/20000 loss=10.7578 steps_per_second=6.8354
+[fourier train] T=4 seed=1 step=18200/20000 loss=10.6599 steps_per_second=6.8364
+[fourier train] T=4 seed=1 step=18300/20000 loss=10.5859 steps_per_second=6.8373
+[fourier train] T=4 seed=1 step=18400/20000 loss=10.6123 steps_per_second=6.8382
+[fourier train] T=4 seed=1 step=18500/20000 loss=10.887 steps_per_second=6.8389
+[fourier train] T=4 seed=1 step=18600/20000 loss=10.6623 steps_per_second=6.8396
+[fourier train] T=4 seed=1 step=18700/20000 loss=11.0443 steps_per_second=6.8403
+[fourier train] T=4 seed=1 step=18800/20000 loss=10.6642 steps_per_second=6.8412
+[fourier train] T=4 seed=1 step=18900/20000 loss=10.7983 steps_per_second=6.8420
+[fourier train] T=4 seed=1 step=19000/20000 loss=10.7093 steps_per_second=6.8428
+[fourier train] T=4 seed=1 step=19100/20000 loss=10.8579 steps_per_second=6.8298
+[fourier train] T=4 seed=1 step=19200/20000 loss=10.5393 steps_per_second=6.8307
+[fourier train] T=4 seed=1 step=19300/20000 loss=10.7824 steps_per_second=6.8315
+[fourier train] T=4 seed=1 step=19400/20000 loss=10.6493 steps_per_second=6.8323
+[fourier train] T=4 seed=1 step=19500/20000 loss=10.7811 steps_per_second=6.8331
+[fourier train] T=4 seed=1 step=19600/20000 loss=10.6715 steps_per_second=6.8339
+[fourier train] T=4 seed=1 step=19700/20000 loss=10.8271 steps_per_second=6.8348
+[fourier train] T=4 seed=1 step=19800/20000 loss=10.7987 steps_per_second=6.8356
+[fourier train] T=4 seed=1 step=19900/20000 loss=10.8403 steps_per_second=6.8365
+[fourier train] T=4 seed=1 step=20000/20000 loss=10.718 steps_per_second=6.8374
+{"cell": "T4_seed1", "evaluation_status": null, "training": {"cached": false, "completed_steps": 20000, "elapsed_seconds_this_process": 2930.987648630049, "last_metrics": {"auxk": 1.1081242561340332, "dead": 54272.0, "l0": 80.0, "loss": 10.717995643615723, "mse": 10.683366775512695}, "parameter_match": {"difference": -6, "fourier_d_sae": 98298, "fourier_parameters": 1073790970, "reference_txc_d_sae": 32768, "reference_txc_parameters": 1073790976, "relative_difference": -5.587679664016845e-09}, "status": "complete"}}
+[fourier train] T=6 seed=1 step=100/20000 loss=41.5618 steps_per_second=5.6932
+[fourier train] T=6 seed=1 step=200/20000 loss=35.7611 steps_per_second=5.7039
+[fourier train] T=6 seed=1 step=300/20000 loss=28.0389 steps_per_second=5.7115
+[fourier train] T=6 seed=1 step=400/20000 loss=23.6524 steps_per_second=5.7051
+[fourier train] T=6 seed=1 step=500/20000 loss=20.9771 steps_per_second=5.7066
+[fourier train] T=6 seed=1 step=600/20000 loss=18.9907 steps_per_second=5.7058
+[fourier train] T=6 seed=1 step=700/20000 loss=18.0225 steps_per_second=5.7065
+[fourier train] T=6 seed=1 step=800/20000 loss=17.1249 steps_per_second=5.7036
+[fourier train] T=6 seed=1 step=900/20000 loss=16.5262 steps_per_second=5.7002
+[fourier train] T=6 seed=1 step=1000/20000 loss=15.7904 steps_per_second=5.7020
+[fourier train] T=6 seed=1 step=1100/20000 loss=15.0675 steps_per_second=5.4534
+[fourier train] T=6 seed=1 step=1200/20000 loss=14.9086 steps_per_second=5.4719
+[fourier train] T=6 seed=1 step=1300/20000 loss=14.6031 steps_per_second=5.4892
+[fourier train] T=6 seed=1 step=1400/20000 loss=14.3494 steps_per_second=5.5040
+[fourier train] T=6 seed=1 step=1500/20000 loss=14.0683 steps_per_second=5.5174
+[fourier train] T=6 seed=1 step=1600/20000 loss=13.6736 steps_per_second=5.5296
+[fourier train] T=6 seed=1 step=1700/20000 loss=13.4148 steps_per_second=5.4895
+[fourier train] T=6 seed=1 step=1800/20000 loss=13.1563 steps_per_second=5.4395
+[fourier train] T=6 seed=1 step=1900/20000 loss=13.2419 steps_per_second=5.3963
+[fourier train] T=6 seed=1 step=2000/20000 loss=12.7083 steps_per_second=5.3574
+[fourier train] T=6 seed=1 step=2100/20000 loss=13.2648 steps_per_second=5.2104
+[fourier train] T=6 seed=1 step=2200/20000 loss=12.7622 steps_per_second=5.1837
+[fourier train] T=6 seed=1 step=2300/20000 loss=12.5071 steps_per_second=5.1598
+[fourier train] T=6 seed=1 step=2400/20000 loss=12.5015 steps_per_second=5.1387
+[fourier train] T=6 seed=1 step=2500/20000 loss=12.5642 steps_per_second=5.1192
+[fourier train] T=6 seed=1 step=2600/20000 loss=12.2125 steps_per_second=5.1022
+[fourier train] T=6 seed=1 step=2700/20000 loss=12.139 steps_per_second=5.0856
+[fourier train] T=6 seed=1 step=2800/20000 loss=12.0684 steps_per_second=5.0697
+[fourier train] T=6 seed=1 step=2900/20000 loss=12.0413 steps_per_second=5.0557
+[fourier train] T=6 seed=1 step=3000/20000 loss=12.0007 steps_per_second=5.0409
+[fourier train] T=6 seed=1 step=3100/20000 loss=11.8516 steps_per_second=4.9604
+[fourier train] T=6 seed=1 step=3200/20000 loss=11.8741 steps_per_second=4.9519
+[fourier train] T=6 seed=1 step=3300/20000 loss=11.6435 steps_per_second=4.9441
+[fourier train] T=6 seed=1 step=3400/20000 loss=11.9037 steps_per_second=4.9361
+[fourier train] T=6 seed=1 step=3500/20000 loss=11.8689 steps_per_second=4.9293
+[fourier train] T=6 seed=1 step=3600/20000 loss=11.8996 steps_per_second=4.9224
+[fourier train] T=6 seed=1 step=3700/20000 loss=11.7446 steps_per_second=4.9155
+[fourier train] T=6 seed=1 step=3800/20000 loss=11.6338 steps_per_second=4.9084
+[fourier train] T=6 seed=1 step=3900/20000 loss=11.6241 steps_per_second=4.9021
+[fourier train] T=6 seed=1 step=4000/20000 loss=11.5116 steps_per_second=4.8968
+[fourier train] T=6 seed=1 step=4100/20000 loss=11.7362 steps_per_second=4.8425
+[fourier train] T=6 seed=1 step=4200/20000 loss=11.6797 steps_per_second=4.8383
+[fourier train] T=6 seed=1 step=4300/20000 loss=11.1907 steps_per_second=4.8348
+[fourier train] T=6 seed=1 step=4400/20000 loss=11.7526 steps_per_second=4.8299
+[fourier train] T=6 seed=1 step=4500/20000 loss=11.5115 steps_per_second=4.8255
+[fourier train] T=6 seed=1 step=4600/20000 loss=11.6009 steps_per_second=4.8210
+[fourier train] T=6 seed=1 step=4700/20000 loss=11.2663 steps_per_second=4.8172
+[fourier train] T=6 seed=1 step=4800/20000 loss=11.2647 steps_per_second=4.8131
+[fourier train] T=6 seed=1 step=4900/20000 loss=11.2422 steps_per_second=4.8093
+[fourier train] T=6 seed=1 step=5000/20000 loss=11.1642 steps_per_second=4.8057
+[fourier train] T=6 seed=1 step=5100/20000 loss=11.2225 steps_per_second=4.7633
+[fourier train] T=6 seed=1 step=5200/20000 loss=11.4139 steps_per_second=4.7609
+[fourier train] T=6 seed=1 step=5300/20000 loss=11.2839 steps_per_second=4.7585
+[fourier train] T=6 seed=1 step=5400/20000 loss=11.2133 steps_per_second=4.7562
+[fourier train] T=6 seed=1 step=5500/20000 loss=11.0769 steps_per_second=4.7543
+[fourier train] T=6 seed=1 step=5600/20000 loss=11.0288 steps_per_second=4.7519
+[fourier train] T=6 seed=1 step=5700/20000 loss=11.0628 steps_per_second=4.7500
+[fourier train] T=6 seed=1 step=5800/20000 loss=11.2098 steps_per_second=4.7481
+[fourier train] T=6 seed=1 step=5900/20000 loss=10.9864 steps_per_second=4.7460
+[fourier train] T=6 seed=1 step=6000/20000 loss=10.9568 steps_per_second=4.7446
+[fourier train] T=6 seed=1 step=6100/20000 loss=11.2943 steps_per_second=4.7117
+[fourier train] T=6 seed=1 step=6200/20000 loss=11.0937 steps_per_second=4.7102
+[fourier train] T=6 seed=1 step=6300/20000 loss=10.9704 steps_per_second=4.7093
+[fourier train] T=6 seed=1 step=6400/20000 loss=11.0788 steps_per_second=4.7084
+[fourier train] T=6 seed=1 step=6500/20000 loss=10.9947 steps_per_second=4.7075
+[fourier train] T=6 seed=1 step=6600/20000 loss=10.834 steps_per_second=4.7064
+[fourier train] T=6 seed=1 step=6700/20000 loss=10.9602 steps_per_second=4.7057
+[fourier train] T=6 seed=1 step=6800/20000 loss=10.8609 steps_per_second=4.7051
+[fourier train] T=6 seed=1 step=6900/20000 loss=10.7303 steps_per_second=4.7047
+[fourier train] T=6 seed=1 step=7000/20000 loss=10.992 steps_per_second=4.7042
+[fourier train] T=6 seed=1 step=7100/20000 loss=11.0764 steps_per_second=4.6767
+[fourier train] T=6 seed=1 step=7200/20000 loss=11.1931 steps_per_second=4.6762
+[fourier train] T=6 seed=1 step=7300/20000 loss=10.8391 steps_per_second=4.6758
+[fourier train] T=6 seed=1 step=7400/20000 loss=10.9478 steps_per_second=4.6752
+[fourier train] T=6 seed=1 step=7500/20000 loss=10.9583 steps_per_second=4.6747
+[fourier train] T=6 seed=1 step=7600/20000 loss=10.9132 steps_per_second=4.6746
+[fourier train] T=6 seed=1 step=7700/20000 loss=10.9282 steps_per_second=4.6744
+[fourier train] T=6 seed=1 step=7800/20000 loss=10.8982 steps_per_second=4.6744
+[fourier train] T=6 seed=1 step=7900/20000 loss=10.7971 steps_per_second=4.6742
+[fourier train] T=6 seed=1 step=8000/20000 loss=10.8982 steps_per_second=4.6741
+[fourier train] T=6 seed=1 step=8100/20000 loss=10.5665 steps_per_second=4.6513
+[fourier train] T=6 seed=1 step=8200/20000 loss=10.5849 steps_per_second=4.6514
+[fourier train] T=6 seed=1 step=8300/20000 loss=10.5843 steps_per_second=4.6517
+[fourier train] T=6 seed=1 step=8400/20000 loss=10.7434 steps_per_second=4.6520
+[fourier train] T=6 seed=1 step=8500/20000 loss=10.8116 steps_per_second=4.6525
+[fourier train] T=6 seed=1 step=8600/20000 loss=10.8832 steps_per_second=4.6524
+[fourier train] T=6 seed=1 step=8700/20000 loss=10.7491 steps_per_second=4.6526
+[fourier train] T=6 seed=1 step=8800/20000 loss=10.7846 steps_per_second=4.6529
+[fourier train] T=6 seed=1 step=8900/20000 loss=10.937 steps_per_second=4.6532
+[fourier train] T=6 seed=1 step=9000/20000 loss=10.5562 steps_per_second=4.6533
+[fourier train] T=6 seed=1 step=9100/20000 loss=10.7644 steps_per_second=4.6330
+[fourier train] T=6 seed=1 step=9200/20000 loss=10.7112 steps_per_second=4.6333
+[fourier train] T=6 seed=1 step=9300/20000 loss=10.6767 steps_per_second=4.6337
+[fourier train] T=6 seed=1 step=9400/20000 loss=10.695 steps_per_second=4.6339
+[fourier train] T=6 seed=1 step=9500/20000 loss=10.8101 steps_per_second=4.6345
+[fourier train] T=6 seed=1 step=9600/20000 loss=10.4309 steps_per_second=4.6350
+[fourier train] T=6 seed=1 step=9700/20000 loss=10.7441 steps_per_second=4.6356
+[fourier train] T=6 seed=1 step=9800/20000 loss=10.677 steps_per_second=4.6362
+[fourier train] T=6 seed=1 step=9900/20000 loss=10.6814 steps_per_second=4.6368
+[fourier train] T=6 seed=1 step=10000/20000 loss=10.4908 steps_per_second=4.6372
+[fourier train] T=6 seed=1 step=10100/20000 loss=10.5364 steps_per_second=4.6193
+[fourier train] T=6 seed=1 step=10200/20000 loss=10.9082 steps_per_second=4.6199
+[fourier train] T=6 seed=1 step=10300/20000 loss=10.7757 steps_per_second=4.6207
+[fourier train] T=6 seed=1 step=10400/20000 loss=10.4382 steps_per_second=4.6213
+[fourier train] T=6 seed=1 step=10500/20000 loss=10.6723 steps_per_second=4.6220
+[fourier train] T=6 seed=1 step=10600/20000 loss=10.7334 steps_per_second=4.6225
+[fourier train] T=6 seed=1 step=10700/20000 loss=10.7122 steps_per_second=4.6232
+[fourier train] T=6 seed=1 step=10800/20000 loss=10.5817 steps_per_second=4.6238
+[fourier train] T=6 seed=1 step=10900/20000 loss=10.3843 steps_per_second=4.6244
+[fourier train] T=6 seed=1 step=11000/20000 loss=10.7635 steps_per_second=4.6249
+[fourier train] T=6 seed=1 step=11100/20000 loss=10.8481 steps_per_second=4.6091
+[fourier train] T=6 seed=1 step=11200/20000 loss=10.3651 steps_per_second=4.6097
+[fourier train] T=6 seed=1 step=11300/20000 loss=10.6238 steps_per_second=4.6106
+[fourier train] T=6 seed=1 step=11400/20000 loss=10.4408 steps_per_second=4.6109
+[fourier train] T=6 seed=1 step=11500/20000 loss=10.3566 steps_per_second=4.6117
+[fourier train] T=6 seed=1 step=11600/20000 loss=10.6361 steps_per_second=4.6125
+[fourier train] T=6 seed=1 step=11700/20000 loss=10.5388 steps_per_second=4.6131
+[fourier train] T=6 seed=1 step=11800/20000 loss=10.4876 steps_per_second=4.6137
+[fourier train] T=6 seed=1 step=11900/20000 loss=10.4003 steps_per_second=4.6143
+[fourier train] T=6 seed=1 step=12000/20000 loss=10.4411 steps_per_second=4.6151
+[fourier train] T=6 seed=1 step=12100/20000 loss=10.4942 steps_per_second=4.6004
+[fourier train] T=6 seed=1 step=12200/20000 loss=10.5437 steps_per_second=4.6008
+[fourier train] T=6 seed=1 step=12300/20000 loss=10.3349 steps_per_second=4.6013
+[fourier train] T=6 seed=1 step=12400/20000 loss=10.5514 steps_per_second=4.6018
+[fourier train] T=6 seed=1 step=12500/20000 loss=10.3415 steps_per_second=4.6021
+[fourier train] T=6 seed=1 step=12600/20000 loss=10.576 steps_per_second=4.6026
+[fourier train] T=6 seed=1 step=12700/20000 loss=10.4982 steps_per_second=4.6027
+[fourier train] T=6 seed=1 step=12800/20000 loss=10.4566 steps_per_second=4.6030
+[fourier train] T=6 seed=1 step=12900/20000 loss=10.5934 steps_per_second=4.6036
+[fourier train] T=6 seed=1 step=13000/20000 loss=10.2627 steps_per_second=4.6039
+[fourier train] T=6 seed=1 step=13100/20000 loss=10.3384 steps_per_second=4.5903
+[fourier train] T=6 seed=1 step=13200/20000 loss=10.3491 steps_per_second=4.5908
+[fourier train] T=6 seed=1 step=13300/20000 loss=10.3238 steps_per_second=4.5914
+[fourier train] T=6 seed=1 step=13400/20000 loss=10.6963 steps_per_second=4.5919
+[fourier train] T=6 seed=1 step=13500/20000 loss=10.1559 steps_per_second=4.5926
+[fourier train] T=6 seed=1 step=13600/20000 loss=10.4376 steps_per_second=4.5931
+[fourier train] T=6 seed=1 step=13700/20000 loss=10.4957 steps_per_second=4.5936
+[fourier train] T=6 seed=1 step=13800/20000 loss=10.6404 steps_per_second=4.5942
+[fourier train] T=6 seed=1 step=13900/20000 loss=10.5558 steps_per_second=4.5947
+[fourier train] T=6 seed=1 step=14000/20000 loss=10.3053 steps_per_second=4.5949
+[fourier train] T=6 seed=1 step=14100/20000 loss=10.2534 steps_per_second=4.5823
+[fourier train] T=6 seed=1 step=14200/20000 loss=10.3205 steps_per_second=4.5827
+[fourier train] T=6 seed=1 step=14300/20000 loss=10.2095 steps_per_second=4.5833
+[fourier train] T=6 seed=1 step=14400/20000 loss=10.2697 steps_per_second=4.5840
+[fourier train] T=6 seed=1 step=14500/20000 loss=10.635 steps_per_second=4.5848
+[fourier train] T=6 seed=1 step=14600/20000 loss=10.5258 steps_per_second=4.5854
+[fourier train] T=6 seed=1 step=14700/20000 loss=10.4165 steps_per_second=4.5860
+[fourier train] T=6 seed=1 step=14800/20000 loss=10.2201 steps_per_second=4.5868
+[fourier train] T=6 seed=1 step=14900/20000 loss=10.58 steps_per_second=4.5872
+[fourier train] T=6 seed=1 step=15000/20000 loss=10.275 steps_per_second=4.5879
+[fourier train] T=6 seed=1 step=15100/20000 loss=10.3222 steps_per_second=4.5767
+[fourier train] T=6 seed=1 step=15200/20000 loss=10.429 steps_per_second=4.5772
+[fourier train] T=6 seed=1 step=15300/20000 loss=10.2602 steps_per_second=4.5779
+[fourier train] T=6 seed=1 step=15400/20000 loss=10.1218 steps_per_second=4.5786
+[fourier train] T=6 seed=1 step=15500/20000 loss=10.2911 steps_per_second=4.5791
+[fourier train] T=6 seed=1 step=15600/20000 loss=10.3945 steps_per_second=4.5796
+[fourier train] T=6 seed=1 step=15700/20000 loss=10.3251 steps_per_second=4.5800
+[fourier train] T=6 seed=1 step=15800/20000 loss=10.4678 steps_per_second=4.5803
+[fourier train] T=6 seed=1 step=15900/20000 loss=10.5103 steps_per_second=4.5807
+[fourier train] T=6 seed=1 step=16000/20000 loss=10.4898 steps_per_second=4.5812
+[fourier train] T=6 seed=1 step=16100/20000 loss=10.3754 steps_per_second=4.5706
+[fourier train] T=6 seed=1 step=16200/20000 loss=10.2794 steps_per_second=4.5710
+[fourier train] T=6 seed=1 step=16300/20000 loss=10.5876 steps_per_second=4.5715
+[fourier train] T=6 seed=1 step=16400/20000 loss=10.3862 steps_per_second=4.5720
+[fourier train] T=6 seed=1 step=16500/20000 loss=10.2754 steps_per_second=4.5727
+[fourier train] T=6 seed=1 step=16600/20000 loss=10.3121 steps_per_second=4.5732
+[fourier train] T=6 seed=1 step=16700/20000 loss=10.5668 steps_per_second=4.5736
+[fourier train] T=6 seed=1 step=16800/20000 loss=10.0971 steps_per_second=4.5740
+[fourier train] T=6 seed=1 step=16900/20000 loss=10.3483 steps_per_second=4.5743
+[fourier train] T=6 seed=1 step=17000/20000 loss=10.3401 steps_per_second=4.5747
+[fourier train] T=6 seed=1 step=17100/20000 loss=10.3663 steps_per_second=4.5651
+[fourier train] T=6 seed=1 step=17200/20000 loss=10.3903 steps_per_second=4.5656
+[fourier train] T=6 seed=1 step=17300/20000 loss=10.2927 steps_per_second=4.5661
+[fourier train] T=6 seed=1 step=17400/20000 loss=10.1452 steps_per_second=4.5665
+[fourier train] T=6 seed=1 step=17500/20000 loss=10.281 steps_per_second=4.5671
+[fourier train] T=6 seed=1 step=17600/20000 loss=10.156 steps_per_second=4.5674
+[fourier train] T=6 seed=1 step=17700/20000 loss=10.318 steps_per_second=4.5680
+[fourier train] T=6 seed=1 step=17800/20000 loss=10.246 steps_per_second=4.5687
+[fourier train] T=6 seed=1 step=17900/20000 loss=10.2288 steps_per_second=4.5691
+[fourier train] T=6 seed=1 step=18000/20000 loss=10.4777 steps_per_second=4.5694
+[fourier train] T=6 seed=1 step=18100/20000 loss=10.1529 steps_per_second=4.5602
+[fourier train] T=6 seed=1 step=18200/20000 loss=10.1783 steps_per_second=4.5608
+[fourier train] T=6 seed=1 step=18300/20000 loss=10.0034 steps_per_second=4.5613
+[fourier train] T=6 seed=1 step=18400/20000 loss=10.161 steps_per_second=4.5617
+[fourier train] T=6 seed=1 step=18500/20000 loss=10.3701 steps_per_second=4.5622
+[fourier train] T=6 seed=1 step=18600/20000 loss=10.2152 steps_per_second=4.5626
+[fourier train] T=6 seed=1 step=18700/20000 loss=10.525 steps_per_second=4.5631
+[fourier train] T=6 seed=1 step=18800/20000 loss=10.0969 steps_per_second=4.5635
+[fourier train] T=6 seed=1 step=18900/20000 loss=10.2948 steps_per_second=4.5641
+[fourier train] T=6 seed=1 step=19000/20000 loss=10.2277 steps_per_second=4.5647
+[fourier train] T=6 seed=1 step=19100/20000 loss=10.3379 steps_per_second=4.5561
+[fourier train] T=6 seed=1 step=19200/20000 loss=10.0585 steps_per_second=4.5566
+[fourier train] T=6 seed=1 step=19300/20000 loss=10.2648 steps_per_second=4.5570
+[fourier train] T=6 seed=1 step=19400/20000 loss=10.1019 steps_per_second=4.5575
+[fourier train] T=6 seed=1 step=19500/20000 loss=10.2518 steps_per_second=4.5580
+[fourier train] T=6 seed=1 step=19600/20000 loss=10.1628 steps_per_second=4.5585
+[fourier train] T=6 seed=1 step=19700/20000 loss=10.3341 steps_per_second=4.5590
+[fourier train] T=6 seed=1 step=19800/20000 loss=10.2283 steps_per_second=4.5594
+[fourier train] T=6 seed=1 step=19900/20000 loss=10.2873 steps_per_second=4.5599
+[fourier train] T=6 seed=1 step=20000/20000 loss=10.2082 steps_per_second=4.5603
+{"cell": "T6_seed1", "evaluation_status": null, "training": {"cached": false, "completed_steps": 20000, "elapsed_seconds_this_process": 4393.977072819136, "last_metrics": {"auxk": 1.1004250049591064, "dead": 76288.0, "l0": 120.0, "loss": 10.208169937133789, "mse": 10.173781394958496}, "parameter_match": {"difference": -8, "fourier_d_sae": 131064, "fourier_parameters": 1610670072, "reference_txc_d_sae": 32768, "reference_txc_parameters": 1610670080, "relative_difference": -4.96687689138672e-09}, "status": "complete"}}

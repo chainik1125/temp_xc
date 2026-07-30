@@ -1,0 +1,43 @@
+{
+  "config": {
+    "amp": true,
+    "bands": "multiband",
+    "batch_size": 1024,
+    "checkpoint_every": 1,
+    "d_in": 4096,
+    "d_sae": 131064,
+    "k_pos": 20,
+    "learning_rate": 0.0003,
+    "reference_txc_d_sae": 32768,
+    "schedule_max_window": 16,
+    "schedule_seed": 907100,
+    "seed": 1,
+    "steps": 1,
+    "warmup_steps": 1000,
+    "window": 6
+  },
+  "cuda": {
+    "device_name": "NVIDIA GeForce RTX 5090",
+    "peak_allocated_bytes": 16176106496,
+    "peak_reserved_bytes": 16416505856
+  },
+  "elapsed_seconds": 0.6985003370791674,
+  "metrics": {
+    "auxk": 0.0,
+    "dead": 0.0,
+    "l0": 120.0,
+    "loss": 43.05916976928711,
+    "mse": 43.05916976928711
+  },
+  "parameter_match": {
+    "difference": -8,
+    "fourier_d_sae": 131064,
+    "fourier_parameters": 1610670072,
+    "reference_txc_d_sae": 32768,
+    "reference_txc_parameters": 1610670080,
+    "relative_difference": -4.96687689138672e-09
+  },
+  "status": "complete",
+  "steps": 1,
+  "steps_per_second": 1.4316385360407649
+}
