@@ -51,3 +51,25 @@ Completed cells delete only their new optimizer-state file after a successful
 model weights, training summary, sparse codes, fold predictions, band-only
 probes, and result JSON remain. Reruns recognize this completed-and-cleaned
 state.
+
+## Evaluation-artifact recovery
+
+Aniket's bit-exact T16 evaluation artifact was not present in the Git history,
+the attached RunPod volumes, or the public experiment handoff. Replaying the
+frozen extractor in the current CUDA environment introduces small numerical
+drift, so the strict artifact gate correctly rejects the replay.
+
+The fallback is therefore marked as a *sensitivity analysis*, not an exact
+replication. It:
+
+- retains the published 20,335-row count and 2,498-row class balance;
+- selects the lowest replay-RMSE candidates within each class, preserving
+  source order;
+- copies the six offsets available in the official artifact bit-for-bit;
+- records the different cohort hash and replay-error quantiles in a manifest;
+- requires the explicit `--allow-recovered-artifact` flag at evaluation.
+
+Fourier results on this artifact must not be presented as directly
+bit-exact-comparable to Aniket's published TXC values. The published TXC curve
+can be shown as a dashed reference, with the artifact mismatch stated in the
+figure and results text.

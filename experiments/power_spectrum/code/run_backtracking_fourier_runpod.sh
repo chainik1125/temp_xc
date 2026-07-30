@@ -61,5 +61,8 @@ fi
 if [[ "${BACKTRACKING_FOURIER_KEEP_OPTIMIZER_STATE:-0}" != "1" ]]; then
   args+=(--cleanup-optimizer-state)
 fi
+if [[ "${BACKTRACKING_FOURIER_ALLOW_RECOVERED_ARTIFACT:-0}" == "1" ]]; then
+  args+=(--allow-recovered-artifact)
+fi
 
 "$PYTHON" -m experiments.power_spectrum.code.run_backtracking_fourier "${args[@]}"

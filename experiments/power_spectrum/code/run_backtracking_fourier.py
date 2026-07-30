@@ -31,6 +31,15 @@ from experiments.power_spectrum.code.backtracking_fourier_xc import (
 PROTOCOL_VERSION = "power-spectrum.backtracking-fourier.v1"
 REFERENCE_PROTOCOL_VERSION = "2026-07-26.t16.1"
 REFERENCE_COMMIT = "d9c7fc7b2"
+RECOVERED_ARTIFACT_SCHEMA = "power-spectrum.backtracking-recovery-artifact.v1"
+EXPECTED_REFERENCE_COHORT_SHA256 = (
+    "f397f4caf6212825bd98b1b82be932ae634f01a716fd7e3642fd3d7640b27c0b"
+)
+EXPECTED_OFFICIAL_ARTIFACT_SHA256 = (
+    "1656f6be2cd85fb85c8b246b9b27933f73ef40cfaac84078169dfd3bbbe27810"
+)
+RECOVERED_ROWS = 20_335
+RECOVERED_POSITIVE_ROWS = 2_498
 DEFAULT_WINDOWS = (1, 2, 4, 6, 10)
 DEFAULT_SEEDS = (1, 2, 42)
 ARTIFACT_OFFSETS = tuple(range(-23, -7))
@@ -485,6 +494,7 @@ def evaluate_dictionary(
     artifact: Path,
     artifact_sha256: str,
     cohort_sha256: str,
+    artifact_provenance: dict | None,
     checkpoint_dir: Path,
     output_dir: Path,
     window: int,
@@ -495,15 +505,29 @@ def evaluate_dictionary(
     """Evaluate using Aniket's artifact, controls, grouped folds, and probe."""
 
     reference = _reference_imports()
+    model_path = checkpoint_dir / "model.safetensors"
     result_path = output_dir / "result.json"
     if result_path.exists():
         completed = json.loads(result_path.read_text())
-        if (
-            completed.get("status") != "complete"
-            or completed.get("protocol_version") != PROTOCOL_VERSION
-            or completed.get("window") != window
-            or completed.get("seed") != seed
-        ):
+        cached_fingerprint = completed.get("code_fingerprint", {})
+        expected_implementation = implementation_fingerprint()
+        checks = {
+            "status": completed.get("status") == "complete",
+            "protocol": completed.get("protocol_version") == PROTOCOL_VERSION,
+            "window": completed.get("window") == window,
+            "seed": completed.get("seed") == seed,
+            "artifact": completed.get("artifact_sha256") == artifact_sha256,
+            "cohort": completed.get("cohort_sha256") == cohort_sha256,
+            "provenance": completed.get("artifact_provenance")
+            == artifact_provenance,
+            "checkpoint": cached_fingerprint.get("fourier_checkpoint_sha256")
+            == reference["sha256"](model_path),
+            "implementation": cached_fingerprint.get(
+                "implementation_sha256"
+            )
+            == expected_implementation,
+        }
+        if not all(checks.values()):
             raise ValueError(f"stale result at {result_path}")
         return completed
 
@@ -516,7 +540,6 @@ def evaluate_dictionary(
 
     code_dir = output_dir / "codes"
     code_dir.mkdir(parents=True, exist_ok=True)
-    model_path = checkpoint_dir / "model.safetensors"
     fingerprint = {
         "protocol_version": PROTOCOL_VERSION,
         "reference_protocol_version": REFERENCE_PROTOCOL_VERSION,
@@ -524,6 +547,7 @@ def evaluate_dictionary(
         "implementation_sha256": implementation_fingerprint(),
         "artifact_sha256": artifact_sha256,
         "cohort_sha256": cohort_sha256,
+        "artifact_provenance": artifact_provenance,
         "window": window,
         "window_offsets": list(ARTIFACT_OFFSETS[-window:]),
         "seed": seed,
@@ -603,6 +627,7 @@ def evaluate_dictionary(
         "artifact": str(artifact.resolve()),
         "artifact_sha256": artifact_sha256,
         "cohort_sha256": cohort_sha256,
+        "artifact_provenance": artifact_provenance,
         "window": window,
         "window_offsets": list(ARTIFACT_OFFSETS[-window:]),
         "seed": seed,
@@ -681,6 +706,137 @@ def activation_cache_inventory(path: Path) -> dict:
     return inventory
 
 
+def _cohort_sha256(keys: np.ndarray, labels: np.ndarray) -> str:
+    """Hash the ordered cohort using Aniket's frozen protocol definition."""
+
+    if len(keys) != len(labels):
+        raise ValueError("keys and labels must have the same length")
+    digest = hashlib.sha256()
+    for key, label in zip(keys, labels):
+        encoded = str(key).encode("utf-8")
+        digest.update(len(encoded).to_bytes(8, "little"))
+        digest.update(encoded)
+        digest.update(int(label).to_bytes(1, "little", signed=False))
+    return digest.hexdigest()
+
+
+def recovered_artifact_inventory(
+    artifact: Path,
+    manifest_path: Path,
+    reference_artifact: Path,
+    activation_cache: Path,
+) -> dict:
+    """Validate the explicitly marked, non-bit-exact sensitivity artifact."""
+
+    if not artifact.exists() or not manifest_path.exists():
+        raise ValueError("missing recovered artifact or manifest")
+    manifest = json.loads(manifest_path.read_text())
+    if (
+        manifest.get("schema_version") != RECOVERED_ARTIFACT_SCHEMA
+        or manifest.get("status") != "complete"
+    ):
+        raise ValueError("invalid recovered-artifact manifest schema or status")
+
+    reference = _reference_imports()
+    from experiments.power_spectrum.code.build_backtracking_recovery_artifact import (
+        _stored_npz_memmap,
+        _tail_matches_official,
+    )
+
+    artifact_digest = reference["sha256"](artifact)
+    manifest_digest = reference["sha256"](manifest_path)
+    recovered_x = _stored_npz_memmap(artifact, "X")
+    with np.load(artifact, allow_pickle=False) as payload:
+        required = {"X", "is_bt", "keys", "offsets"}
+        if set(payload.files) != required:
+            raise ValueError(f"recovered artifact arrays differ: {payload.files}")
+        labels = payload["is_bt"].astype(np.uint8)
+        keys = payload["keys"].astype(str)
+        offsets = payload["offsets"].astype(np.int32)
+        shape = tuple(int(value) for value in recovered_x.shape)
+        dtype = str(recovered_x.dtype)
+        cohort_digest = _cohort_sha256(keys, labels)
+        positive_rows = int(labels.sum())
+
+    official_digest = reference["sha256"](reference_artifact)
+    with np.load(reference_artifact, allow_pickle=True) as official:
+        official_keys = official["keys"].astype(str)
+        official_x = official["X"]
+        official_index = {
+            key: index for index, key in enumerate(official_keys.tolist())
+        }
+        recovered_keys = keys.tolist()
+        all_keys_official = all(key in official_index for key in recovered_keys)
+        recovered_official_rows = (
+            np.asarray([official_index[key] for key in recovered_keys])
+            if all_keys_official
+            else np.asarray([], dtype=np.int64)
+        )
+        official_tail_exact = all_keys_official and _tail_matches_official(
+            recovered_x,
+            official_x,
+            recovered_official_rows,
+        )
+
+    expected_shape = (RECOVERED_ROWS, len(ARTIFACT_OFFSETS), 4_096)
+    cohort = manifest.get("cohort", {})
+    tail = manifest.get("tail_replacement", {})
+    checks = {
+        "artifact_sha256_ok": artifact_digest == manifest.get("artifact_sha256"),
+        "artifact_shape_ok": shape == expected_shape,
+        "artifact_dtype_ok": dtype == "float32",
+        "artifact_offsets_ok": offsets.tolist() == list(ARTIFACT_OFFSETS),
+        "cohort_sha256_ok": cohort_digest == cohort.get("sha256"),
+        "cohort_rows_ok": len(keys) == int(cohort.get("rows", -1)),
+        "positive_rows_ok": positive_rows
+        == int(cohort.get("positive_rows", -1))
+        == RECOVERED_POSITIVE_ROWS,
+        "binary_labels_ok": set(np.unique(labels).tolist()).issubset({0, 1}),
+        "unique_keys_ok": len(keys) == len(set(keys.tolist())),
+        "reference_mismatch_declared": cohort.get("matches_reference") is False,
+        "reference_cohort_sha256_ok": cohort.get(
+            "expected_reference_sha256"
+        )
+        == EXPECTED_REFERENCE_COHORT_SHA256,
+        "official_artifact_sha256_ok": official_digest
+        == EXPECTED_OFFICIAL_ARTIFACT_SHA256
+        == tail.get("source_artifact_sha256"),
+        "all_keys_in_official_artifact": all_keys_official,
+        "official_tail_bit_exact": official_tail_exact,
+        "tail_replacement_declared": tail.get("bit_exact_after_replacement")
+        is True,
+        "provenance_warning_present": bool(manifest.get("provenance_warning")),
+    }
+    if not all(checks.values()):
+        raise ValueError(
+            f"recovered-artifact contract failed: {checks}"
+        )
+
+    cache = activation_cache_inventory(activation_cache)
+    return {
+        **cache,
+        "artifact": str(artifact),
+        "artifact_manifest": str(manifest_path),
+        "artifact_manifest_sha256": manifest_digest,
+        "artifact_sha256": artifact_digest,
+        "artifact_shape": list(shape),
+        "artifact_dtype": dtype,
+        "common_cohort_rows": len(keys),
+        "common_cohort_sha256": cohort_digest,
+        "recovery_provenance": {
+            "schema_version": RECOVERED_ARTIFACT_SCHEMA,
+            "expected_reference_cohort_sha256": cohort.get(
+                "expected_reference_sha256"
+            ),
+            "matches_reference_cohort": False,
+            "manifest_sha256": manifest_digest,
+            "manifest": manifest,
+            "provenance_warning": manifest["provenance_warning"],
+        },
+        **checks,
+    }
+
+
 def _parser() -> argparse.ArgumentParser:
     root = Path(os.environ.get("TXC_RUNPOD_ROOT", "/workspace/txc-neurips-aniket"))
     c7 = root / "purified/artifacts/c7"
@@ -700,6 +856,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--max-cells", type=int)
     parser.add_argument("--cleanup-optimizer-state", action="store_true")
+    parser.add_argument("--allow-recovered-artifact", action="store_true")
     parser.add_argument(
         "--artifact",
         type=Path,
@@ -786,6 +943,7 @@ def main() -> None:
         "activation_cache": str(args.activation_cache),
         "output_root": str(args.output_root),
         "checkpoint_root": str(args.checkpoint_root),
+        "allow_recovered_artifact": args.allow_recovered_artifact,
         "cells": [
             {
                 "config": asdict(config),
@@ -820,6 +978,13 @@ def main() -> None:
 
     if args.phase == "train":
         inventory = activation_cache_inventory(args.activation_cache)
+    elif args.allow_recovered_artifact:
+        inventory = recovered_artifact_inventory(
+            args.artifact,
+            args.artifact_manifest,
+            args.reference_artifact,
+            args.activation_cache,
+        )
     else:
         inventory = reference["artifact_inventory"](
             args.artifact,
@@ -856,6 +1021,7 @@ def main() -> None:
                 artifact=args.artifact,
                 artifact_sha256=inventory["artifact_sha256"],
                 cohort_sha256=inventory["common_cohort_sha256"],
+                artifact_provenance=inventory.get("recovery_provenance"),
                 checkpoint_dir=checkpoint_dir,
                 output_dir=output_dir,
                 window=config.window,
