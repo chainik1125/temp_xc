@@ -635,6 +635,37 @@ def _run_fingerprint(payload: dict) -> str:
     return hashlib.sha256(encoded).hexdigest()
 
 
+def activation_cache_inventory(path: Path) -> dict:
+    """Validate the pinned training cache without requiring eval artifacts."""
+
+    from experiments.backtracking_assets import CACHE_SHA256, CACHE_SHAPE
+
+    reference = _reference_imports()
+    if not path.exists():
+        raise ValueError(f"missing activation cache: {path}")
+    cache = np.load(path, mmap_mode="r")
+    shape = tuple(int(value) for value in cache.shape)
+    dtype = str(cache.dtype)
+    digest = reference["sha256"](path)
+    inventory = {
+        "activation_cache": str(path),
+        "activation_cache_shape": list(shape),
+        "activation_cache_dtype": dtype,
+        "activation_cache_sha256": digest,
+        "activation_cache_shape_ok": shape == CACHE_SHAPE,
+        "activation_cache_dtype_ok": dtype == "float16",
+        "activation_cache_sha256_ok": digest == CACHE_SHA256,
+    }
+    checks = {
+        name: value
+        for name, value in inventory.items()
+        if name.endswith("_ok")
+    }
+    if not all(checks.values()):
+        raise ValueError(f"activation-cache contract failed: {inventory}")
+    return inventory
+
+
 def _parser() -> argparse.ArgumentParser:
     root = Path(os.environ.get("TXC_RUNPOD_ROOT", "/workspace/txc-neurips-aniket"))
     c7 = root / "purified/artifacts/c7"
@@ -771,14 +802,17 @@ def main() -> None:
         print(json.dumps(result, indent=2, sort_keys=True), flush=True)
         return
 
-    inventory = reference["artifact_inventory"](
-        args.artifact,
-        args.artifact_manifest,
-        args.reference_artifact,
-        args.activation_cache,
-        strict_full=True,
-    )
-    reference["assert_inventory"](inventory, strict_full=True)
+    if args.phase == "train":
+        inventory = activation_cache_inventory(args.activation_cache)
+    else:
+        inventory = reference["artifact_inventory"](
+            args.artifact,
+            args.artifact_manifest,
+            args.reference_artifact,
+            args.activation_cache,
+            strict_full=True,
+        )
+        reference["assert_inventory"](inventory, strict_full=True)
     args.output_root.mkdir(parents=True, exist_ok=True)
     args.checkpoint_root.mkdir(parents=True, exist_ok=True)
     _atomic_json(
