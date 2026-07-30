@@ -122,6 +122,9 @@ hooks.
 | Harmful refusal, baseline / current-token ablation / all-position ablation | 31/32 / 31/32 / 0/32 |
 | Harmless refusal, baseline / current-token addition / all-position addition | 0/32 / 0/32 / 32/32 |
 | Causal sequence-support gap \(D_{\rm seq}\) | 0.96875 |
+| Harmful refusal after ablating prompt lags 1–4 / 5–8 / 9–16 | 27/32 / 31/32 / 30/32 |
+| Harmful refusal after ablating prompt lags 17–32 / 33–64 | 28/32 / 30/32 |
+| Harmful refusal after ablating all prior prompt positions | 0/32 |
 
 This establishes a clean distinction:
 
@@ -132,8 +135,11 @@ This establishes a clean distinction:
 
 Thus “mediated by one direction” does not imply “stored at one token.” Earlier
 prompt states or their cached keys and values retain causally relevant support.
-The next localization step is a logarithmic lag-band sweep followed by
-refinement within positive bands.
+The geometric-band result does not isolate one dominant prior band: removing
+any single band leaves most refusals intact, while removing all prior positions
+eliminates refusal. The support is therefore redundant, conjunctive, or
+distributed across bands at this resolution. Interaction tests among grouped
+bands, not exhaustive single-position masks, are the next localization step.
 
 ## Backtracking calibration
 
