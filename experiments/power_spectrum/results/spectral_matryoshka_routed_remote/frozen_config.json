@@ -1,0 +1,361 @@
+{
+  "budget": {
+    "assumed_usd_per_gpu_hour": 4.0,
+    "cost_overhead_multiplier": 1.25,
+    "max_session_hours": 0.9,
+    "max_total_usd": 4.8,
+    "reserve_usd": 0.4
+  },
+  "fairness": {
+    "attribution": "DCT versus Fourier tests phase/translation compatibility; Fourier global versus adaptive isolates learned loss weights; adaptive versus routed isolates using those detached weights in support competition. No low-to-high ordering is imposed.",
+    "capacity_regime": "The sparse narrowband tasks contain 24 ground-truth causes but only four are active per episode. TXC has 64 unconstrained atoms; parameter-matched spectral arms have 255 band-limited atoms. The balanced versus high-crowded tasks test whether learned routing follows frequency-specific dictionary demand.",
+    "data": "All models receive identical seeded training episodes and episode-disjoint probe/eval episodes with one shared orthonormal observation dictionary.",
+    "noise": "The adaptive arms apply a synthetic-task noise-floor heuristic: the expected white-noise contribution sigma^2/T is subtracted and clamped from per-band power and residual estimates. Because reconstruction depends on the noisy input, this is not an unbiased residual correction. Main reconstruction loss still uses the original noisy observations.",
+    "parameters": "TXC uses 64 atoms and every spectral arm uses the same 255-atom dictionary. Total trainable parameters match to within 0.6% at d=16 and 0.2% at d=48; exact counts are recorded.",
+    "primary_metric": "Direct latent reconstruction R2 projects reconstructed observations onto known orthonormal emission directions, avoiding a wider-dictionary probe advantage.",
+    "support": "Every window model has nominal L0=W: TXC-post uses k_pos=W; spectral models use k_pos=1 and k_win=W with global BatchTopK."
+  },
+  "models": [
+    {
+      "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
+      "consumes": "window",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      },
+      "implementation_version": "1.0.0",
+      "label": "TXC-post",
+      "name": "txc",
+      "sparsity_rule": "window_length"
+    },
+    {
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "consumes": "window",
+      "hparams": {
+        "auxk_alpha": 0.03125,
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "dominance_alpha": 0.0,
+        "frequency_matryoshka_alpha": 0.0,
+        "selection_mode": "global",
+        "temporal_basis": "dct"
+      },
+      "implementation_version": "2.2.0-experimental",
+      "label": "Spectral DCT global",
+      "name": "spectral_dct_global",
+      "sparsity_rule": "one_per_token"
+    },
+    {
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "consumes": "window",
+      "hparams": {
+        "auxk_alpha": 0.03125,
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "dominance_alpha": 0.0,
+        "frequency_matryoshka_alpha": 0.0,
+        "selection_mode": "global",
+        "temporal_basis": "fourier"
+      },
+      "implementation_version": "2.2.0-experimental",
+      "label": "Spectral Fourier global",
+      "name": "spectral_fourier_global",
+      "sparsity_rule": "one_per_token"
+    },
+    {
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "consumes": "window",
+      "hparams": {
+        "adaptive_frequency_adversary_alpha": 0.1,
+        "adaptive_frequency_alpha": 0.1,
+        "adaptive_frequency_ema_beta": 0.99,
+        "adaptive_frequency_entropy": 0.2,
+        "adaptive_frequency_floor": 0.2,
+        "adaptive_frequency_power_floor": 0.05,
+        "adaptive_frequency_warmup_steps": 500,
+        "auxk_alpha": 0.03125,
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "dominance_alpha": 0.0,
+        "frequency_matryoshka_alpha": 0.0,
+        "selection_mode": "global",
+        "temporal_basis": "fourier"
+      },
+      "implementation_version": "2.2.0-experimental",
+      "label": "Spectral Fourier learned loss",
+      "name": "spectral_fourier_adaptive",
+      "sparsity_rule": "one_per_token"
+    },
+    {
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "consumes": "window",
+      "hparams": {
+        "adaptive_frequency_adversary_alpha": 0.1,
+        "adaptive_frequency_alpha": 0.1,
+        "adaptive_frequency_ema_beta": 0.99,
+        "adaptive_frequency_entropy": 0.2,
+        "adaptive_frequency_floor": 0.2,
+        "adaptive_frequency_power_floor": 0.05,
+        "adaptive_frequency_routing_max": 2.0,
+        "adaptive_frequency_routing_min": 0.5,
+        "adaptive_frequency_routing_strength": 1.0,
+        "adaptive_frequency_warmup_steps": 500,
+        "auxk_alpha": 0.03125,
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "dominance_alpha": 0.0,
+        "frequency_matryoshka_alpha": 0.0,
+        "selection_mode": "global",
+        "temporal_basis": "fourier"
+      },
+      "implementation_version": "2.2.0-experimental",
+      "label": "Spectral Matryoshka learned routing",
+      "name": "spectral_fourier_routed",
+      "sparsity_rule": "one_per_token"
+    }
+  ],
+  "overall_spend": {
+    "cap_usd": 50.0,
+    "estimated_prior_usd": 44.529297,
+    "note": "Conservative prior plus measured spectral-advantage smoke/full ledgers. The session hard cap leaves more than $0.67 for its short smoke test."
+  },
+  "planning": {
+    "estimated_eval_seconds_per_cell": 15.0,
+    "estimated_steps_per_second": 35.0,
+    "setup_seconds": 120.0
+  },
+  "run_name": "spectral-matryoshka-routed-screen-20260730",
+  "schema_version": 1,
+  "seeds": [
+    1
+  ],
+  "smoke": {
+    "models": [
+      "txc",
+      "spectral_dct_global",
+      "spectral_fourier_global",
+      "spectral_fourier_adaptive",
+      "spectral_fourier_routed"
+    ],
+    "n_steps": 2,
+    "seed": 1,
+    "tasks": [
+      "hmm_slow_t8_routed_screen",
+      "hmm_alternating_t8_routed_screen",
+      "narrowband_sparse_balanced_t8",
+      "narrowband_sparse_high_crowded_t8"
+    ]
+  },
+  "split_seeds": {
+    "eval": 533,
+    "probe": 522,
+    "train": 511
+  },
+  "split_sizes": {
+    "eval": 2048,
+    "probe": 2048,
+    "train": 4096
+  },
+  "tasks": [
+    {
+      "d_in": 16,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "spectral_fourier_adaptive": 255,
+        "spectral_fourier_global": 255,
+        "spectral_fourier_routed": 255
+      },
+      "family": "factorial_hmm",
+      "group": "hmm_slow_t8_routed_screen",
+      "hparams_by_model": {
+        "spectral_fourier_adaptive": {
+          "adaptive_frequency_noise_variance": 0.25
+        },
+        "spectral_fourier_routed": {
+          "adaptive_frequency_noise_variance": 0.25
+        }
+      },
+      "lambdas": [
+        0.9,
+        0.9,
+        0.9,
+        0.9
+      ],
+      "models": [
+        "txc",
+        "spectral_fourier_global",
+        "spectral_fourier_adaptive",
+        "spectral_fourier_routed"
+      ],
+      "n_steps": 3500,
+      "name": "hmm_slow_t8_routed_screen",
+      "primary_metric": "direct_latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.5,
+      "window": 8
+    },
+    {
+      "d_in": 16,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "spectral_fourier_adaptive": 255,
+        "spectral_fourier_global": 255,
+        "spectral_fourier_routed": 255
+      },
+      "family": "factorial_hmm",
+      "group": "hmm_alternating_t8_routed_screen",
+      "hparams_by_model": {
+        "spectral_fourier_adaptive": {
+          "adaptive_frequency_noise_variance": 0.25
+        },
+        "spectral_fourier_routed": {
+          "adaptive_frequency_noise_variance": 0.25
+        }
+      },
+      "lambdas": [
+        -0.9,
+        -0.9,
+        -0.9,
+        -0.9
+      ],
+      "models": [
+        "txc",
+        "spectral_fourier_global",
+        "spectral_fourier_adaptive",
+        "spectral_fourier_routed"
+      ],
+      "n_steps": 3500,
+      "name": "hmm_alternating_t8_routed_screen",
+      "primary_metric": "direct_latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.5,
+      "window": 8
+    },
+    {
+      "active_sources_per_episode": 4,
+      "allow_repeated_frequencies": true,
+      "amplitude_range": [
+        0.8,
+        1.2
+      ],
+      "d_in": 48,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "spectral_dct_global": 255,
+        "spectral_fourier_adaptive": 255,
+        "spectral_fourier_global": 255,
+        "spectral_fourier_routed": 255
+      },
+      "family": "narrowband_sources",
+      "frequencies": [
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.125,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375
+      ],
+      "group": "narrowband_sparse_balanced_t8",
+      "hparams_by_model": {
+        "spectral_fourier_adaptive": {
+          "adaptive_frequency_noise_variance": 0.0625
+        },
+        "spectral_fourier_routed": {
+          "adaptive_frequency_noise_variance": 0.0625
+        }
+      },
+      "min_frequency_separation": 0.0625,
+      "n_steps": 5000,
+      "name": "narrowband_sparse_balanced_t8",
+      "primary_metric": "direct_latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.25,
+      "window": 8
+    },
+    {
+      "active_sources_per_episode": 4,
+      "allow_repeated_frequencies": true,
+      "amplitude_range": [
+        0.8,
+        1.2
+      ],
+      "d_in": 48,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "spectral_dct_global": 255,
+        "spectral_fourier_adaptive": 255,
+        "spectral_fourier_global": 255,
+        "spectral_fourier_routed": 255
+      },
+      "family": "narrowband_sources",
+      "frequencies": [
+        0.125,
+        0.125,
+        0.125,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.25,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375,
+        0.375
+      ],
+      "group": "narrowband_sparse_high_crowded_t8",
+      "hparams_by_model": {
+        "spectral_fourier_adaptive": {
+          "adaptive_frequency_noise_variance": 0.0625
+        },
+        "spectral_fourier_routed": {
+          "adaptive_frequency_noise_variance": 0.0625
+        }
+      },
+      "min_frequency_separation": 0.0625,
+      "n_steps": 5000,
+      "name": "narrowband_sparse_high_crowded_t8",
+      "primary_metric": "direct_latent_r2",
+      "sequence_length": 64,
+      "sigma": 0.25,
+      "window": 8
+    }
+  ],
+  "training": {
+    "batch_tokens": 1024,
+    "budget_check_every_steps": 100,
+    "gradient_clip_norm": 1.0,
+    "learning_rate": 0.0003,
+    "log_every_steps": 500,
+    "precision": "bf16",
+    "warmup_steps": 500
+  }
+}

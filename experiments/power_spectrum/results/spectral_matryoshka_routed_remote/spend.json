@@ -1,0 +1,29 @@
+{
+  "assumed_usd_per_gpu_hour": 4.0,
+  "config_hash": "1bea921f74e6b67bc5d444aa69e692d326188a57c00ac94a3827b47e433b7ab9",
+  "cost_overhead_multiplier": 1.25,
+  "estimated_total_usd": 1.323126,
+  "max_total_usd": 4.8,
+  "remaining_usable_usd": 3.076874,
+  "reserve_usd": 0.4,
+  "schema_version": 1,
+  "sessions": [
+    {
+      "elapsed_seconds": 11.556,
+      "estimated_cost_usd": 0.01605,
+      "last_seen_at": "2026-07-30T05:14:05Z",
+      "session_id": "b07bfcad8f1a",
+      "started_at": "2026-07-30T05:13:54Z",
+      "status": "complete"
+    },
+    {
+      "elapsed_seconds": 941.095,
+      "estimated_cost_usd": 1.307076,
+      "last_seen_at": "2026-07-30T05:31:38Z",
+      "session_id": "00c22d70de6f",
+      "started_at": "2026-07-30T05:15:57Z",
+      "status": "complete"
+    }
+  ],
+  "usable_budget_usd": 4.3999999999999995
+}

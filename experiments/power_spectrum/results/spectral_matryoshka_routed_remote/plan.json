@@ -1,0 +1,23 @@
+{
+  "effective_assumed_usd_per_hour": 5.0,
+  "estimated_cost_usd": 3.64,
+  "estimated_gpu_hours": 0.727,
+  "estimated_prior_usd": 44.529297,
+  "evaluation_cells": 18,
+  "max_session_hours": 0.9,
+  "overall_cap_usd": 50.0,
+  "run_name": "spectral-matryoshka-routed-screen-20260730",
+  "smoke": false,
+  "task_cell_counts": {
+    "hmm_alternating_t8_routed_screen": 4,
+    "hmm_slow_t8_routed_screen": 4,
+    "narrowband_sparse_balanced_t8": 5,
+    "narrowband_sparse_high_crowded_t8": 5
+  },
+  "total_optimizer_steps": 78000,
+  "unique_training_runs": 18,
+  "usable_budget_usd": 4.4,
+  "within_cost_plan": true,
+  "within_time_plan": true,
+  "worst_case_overall_usd": 49.329297
+}
