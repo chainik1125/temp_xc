@@ -7,12 +7,15 @@ import pytest
 import torch
 
 from experiments.power_spectrum.code.controlled_tasks import (
+    DEFAULT_NARROWBAND_FREQUENCIES,
     dct_basis,
     evaluate_polynomial,
     expected_dct_band_energy,
     expected_dct_energy,
     generate_factorial_hmm,
     generate_factorial_hmm_splits,
+    generate_narrowband_source_splits,
+    generate_narrowband_sources,
     generate_shamir_clock,
     generate_shamir_splits,
     is_prime,
@@ -255,5 +258,106 @@ def test_factorial_hmm_rejects_invalid_lambda(bad_lambda: float) -> None:
             sigma=0.0,
             n_seq=2,
             seq_len=3,
+            seed=0,
+        )
+
+
+def test_default_narrowband_carriers_are_exact_separated_bins_at_t16_and_t32() -> None:
+    frequencies = torch.tensor(DEFAULT_NARROWBAND_FREQUENCIES, dtype=torch.float64)
+    assert torch.allclose(
+        frequencies * 16,
+        torch.tensor([1.0, 3.0, 5.0, 7.0], dtype=torch.float64),
+    )
+    assert torch.allclose(
+        frequencies * 32,
+        torch.tensor([2.0, 6.0, 10.0, 14.0], dtype=torch.float64),
+    )
+    assert torch.all(torch.diff(frequencies) >= 1.0 / 16)
+
+
+def test_narrowband_sources_are_deterministic_simultaneous_and_recoverable() -> None:
+    kwargs = {
+        "d": 12,
+        "sigma": 0.0,
+        "n_seq": 24,
+        "seq_len": 32,
+        "seed": 14,
+    }
+    first = generate_narrowband_sources(**kwargs)
+    second = generate_narrowband_sources(**kwargs)
+    assert torch.equal(first.x, second.x)
+    assert torch.equal(first.states, second.states)
+    assert torch.equal(first.phases, second.phases)
+    assert torch.equal(first.amplitudes, second.amplitudes)
+    assert first.states.shape == (24, 32, 4, 2)
+    assert first.emissions.shape == (4, 2, 12)
+
+    flat_emissions = first.emissions.reshape(8, 12)
+    assert torch.allclose(
+        flat_emissions @ flat_emissions.T,
+        torch.eye(8, dtype=torch.float64),
+        atol=1e-10,
+    )
+    projected = torch.einsum("ntd,jcd->ntjc", first.x, first.emissions)
+    assert torch.allclose(projected, first.states, atol=1e-10)
+    # Every source is active at every time: quadrature norm equals its
+    # independently sampled strictly positive episode amplitude.
+    assert torch.allclose(
+        first.states.norm(dim=-1),
+        first.amplitudes[:, None, :].expand(-1, 32, -1),
+        atol=1e-10,
+    )
+
+
+def test_each_narrowband_cause_has_one_distinct_fourier_peak() -> None:
+    batch = generate_narrowband_sources(
+        d=10,
+        sigma=0.0,
+        n_seq=32,
+        seq_len=64,
+        seed=7,
+    )
+    spectrum = torch.fft.rfft(batch.states, dim=1)
+    power = spectrum.abs().square().sum(dim=(0, 3)).T
+    expected_bins = (batch.frequencies * 64).round().to(torch.long)
+    assert torch.equal(power.argmax(dim=1), expected_bins)
+    peak_fraction = power.gather(1, expected_bins[:, None]).squeeze(1) / power.sum(dim=1)
+    assert torch.all(peak_fraction > 1.0 - 1e-12)
+    assert torch.unique(expected_bins).numel() == batch.frequencies.numel()
+
+
+def test_narrowband_splits_share_dictionary_not_episode_phase() -> None:
+    splits = generate_narrowband_source_splits(
+        d=10,
+        sigma=0.05,
+        seq_len=32,
+        split_sizes={"train": 11, "probe": 7, "eval": 5},
+        split_seeds={"train": 101, "probe": 202, "eval": 303},
+        emission_seed=44,
+    )
+    assert torch.equal(splits["train"].emissions, splits["probe"].emissions)
+    assert torch.equal(splits["train"].emissions, splits["eval"].emissions)
+    assert not torch.equal(splits["train"].phases[:5], splits["eval"].phases)
+
+
+@pytest.mark.parametrize(
+    ("frequencies", "match"),
+    [
+        ((0.1,), "at least two"),
+        ((0.0, 0.2), "DC and Nyquist"),
+        ((0.1, 0.15), "sufficiently separated"),
+    ],
+)
+def test_narrowband_generator_rejects_non_advantage_frequency_grids(
+    frequencies: tuple[float, ...],
+    match: str,
+) -> None:
+    with pytest.raises(ValueError, match=match):
+        generate_narrowband_sources(
+            frequencies=frequencies,
+            d=8,
+            sigma=0.0,
+            n_seq=2,
+            seq_len=16,
             seed=0,
         )

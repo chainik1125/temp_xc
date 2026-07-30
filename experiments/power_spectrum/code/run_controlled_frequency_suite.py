@@ -37,10 +37,12 @@ import torch
 
 from experiments.power_spectrum.code.controlled_tasks import (
     FactorialHMMBatch,
+    NarrowbandSourceBatch,
     ShamirClockBatch,
     dct_basis,
     expected_dct_energy,
     generate_factorial_hmm_splits,
+    generate_narrowband_source_splits,
     generate_shamir_splits,
     recover_leading_coefficient,
 )
@@ -80,7 +82,7 @@ def load_config(path: Path) -> dict[str, Any]:
                 raise ValueError(
                     f"{task['name']}: window must be smaller than q so times are distinct"
                 )
-        elif task["family"] != "factorial_hmm":
+        elif task["family"] not in {"factorial_hmm", "narrowband_sources"}:
             raise ValueError(f"{task['name']}: unknown family {task['family']!r}")
     prior = float(config["overall_spend"]["estimated_prior_usd"])
     incremental = float(config["budget"]["max_total_usd"])
@@ -97,6 +99,11 @@ def _model_k(model: dict[str, Any], window: int) -> int:
     if rule == "window_length":
         return window
     raise ValueError(f"unknown sparsity rule {rule!r}")
+
+
+def _model_d_sae(task: dict[str, Any], model: dict[str, Any]) -> int:
+    overrides = task.get("d_sae_by_model", {})
+    return int(overrides.get(model["name"], task["d_sae"]))
 
 
 def _training_identity(
@@ -122,7 +129,7 @@ def _training_identity(
         "hparams": model.get("hparams", {}),
         "seed": int(seed),
         "d_in": int(task["d_in"]),
-        "d_sae": int(task["d_sae"]),
+        "d_sae": _model_d_sae(task, model),
         "training_window": training_window,
         "k_pos": _model_k(model, int(task["window"])),
         "n_steps": int(n_steps),
@@ -155,11 +162,7 @@ def enumerate_cells(
                 continue
             seeds = [int(smoke_config["seed"])] if smoke else config["seeds"]
             for seed in seeds:
-                n_steps = (
-                    int(smoke_config["n_steps"])
-                    if smoke
-                    else int(task["n_steps"])
-                )
+                n_steps = int(smoke_config["n_steps"]) if smoke else int(task["n_steps"])
                 identity = _training_identity(
                     config,
                     task,
@@ -176,7 +179,7 @@ def enumerate_cells(
                     "seed": int(seed),
                     "window": int(task["window"]),
                     "d_in": int(task["d_in"]),
-                    "d_sae": int(task["d_sae"]),
+                    "d_sae": _model_d_sae(task, model),
                     "k_pos": _model_k(model, int(task["window"])),
                     "n_steps": n_steps,
                     "primary_metric": task["primary_metric"],
@@ -210,8 +213,7 @@ def build_plan(
     planning = config["planning"]
     seconds = (
         float(planning["setup_seconds"])
-        + sum(unique_training.values())
-        / float(planning["estimated_steps_per_second"])
+        + sum(unique_training.values()) / float(planning["estimated_steps_per_second"])
         + len(cells) * float(planning["estimated_eval_seconds_per_cell"])
     )
     budget = config["budget"]
@@ -239,12 +241,8 @@ def build_plan(
         "within_cost_plan": estimated_cost <= usable,
         "within_time_plan": seconds / 3600.0 <= float(budget["max_session_hours"]),
         "overall_cap_usd": float(config["overall_spend"]["cap_usd"]),
-        "estimated_prior_usd": float(
-            config["overall_spend"]["estimated_prior_usd"]
-        ),
-        "worst_case_overall_usd": float(
-            config["overall_spend"]["estimated_prior_usd"]
-        )
+        "estimated_prior_usd": float(config["overall_spend"]["estimated_prior_usd"]),
+        "worst_case_overall_usd": float(config["overall_spend"]["estimated_prior_usd"])
         + float(budget["max_total_usd"]),
     }
 
@@ -283,7 +281,7 @@ def _atomic_torch_save(path: Path, payload: dict[str, Any]) -> None:
 def _materialize_group(
     config: dict[str, Any],
     task: dict[str, Any],
-) -> dict[str, ShamirClockBatch | FactorialHMMBatch]:
+) -> dict[str, ShamirClockBatch | FactorialHMMBatch | NarrowbandSourceBatch]:
     sizes = {key: int(value) for key, value in config["split_sizes"].items()}
     seeds = {key: int(value) for key, value in config["split_seeds"].items()}
     if task["family"] == "shamir":
@@ -297,19 +295,31 @@ def _materialize_group(
             split_seeds=seeds,
             alphabet_seed=0,
         )
-    return generate_factorial_hmm_splits(
-        lambdas=task["lambdas"],
+    if task["family"] == "factorial_hmm":
+        return generate_factorial_hmm_splits(
+            lambdas=task["lambdas"],
+            d=int(task["d_in"]),
+            sigma=float(task["sigma"]),
+            seq_len=int(task["sequence_length"]),
+            split_sizes=sizes,
+            split_seeds=seeds,
+            emission_seed=0,
+        )
+    return generate_narrowband_source_splits(
+        frequencies=task["frequencies"],
         d=int(task["d_in"]),
         sigma=float(task["sigma"]),
         seq_len=int(task["sequence_length"]),
         split_sizes=sizes,
         split_seeds=seeds,
         emission_seed=0,
+        amplitude_range=tuple(task.get("amplitude_range", (0.75, 1.25))),
+        min_frequency_separation=float(task.get("min_frequency_separation", 1.0 / 16)),
     )
 
 
 def _sample_training_batch(
-    data: ShamirClockBatch | FactorialHMMBatch,
+    data: ShamirClockBatch | FactorialHMMBatch | NarrowbandSourceBatch,
     *,
     consumes: str,
     window: int,
@@ -349,7 +359,7 @@ def _sample_training_batch(
 def train_or_load(
     config: dict[str, Any],
     cell: dict[str, Any],
-    train_data: ShamirClockBatch | FactorialHMMBatch,
+    train_data: ShamirClockBatch | FactorialHMMBatch | NarrowbandSourceBatch,
     results_dir: Path,
     budget: BudgetGuard,
 ):
@@ -448,9 +458,7 @@ def train_or_load(
             "training_id": cell["training_id"],
             "step": n_steps,
             "model_kwargs": _model_kwargs(cell),
-            "model": {
-                key: value.detach().cpu() for key, value in model.state_dict().items()
-            },
+            "model": {key: value.detach().cpu() for key, value in model.state_dict().items()},
             "completed_at": _utc_now(),
         },
     )
@@ -499,6 +507,28 @@ def encode_windows(
     native = torch.cat(native_batches).numpy()
     features = native.reshape(native.shape[0], -1)
     return features, native
+
+
+@torch.no_grad()
+def reconstruct_windows(
+    model,
+    x: torch.Tensor,
+    *,
+    window: int,
+    batch_size: int = 256,
+) -> np.ndarray:
+    """Reconstruct the first analysis window of each independent episode."""
+
+    device = next(model.parameters()).device
+    outputs = []
+    windows = x[:, :window]
+    for start in range(0, windows.shape[0], batch_size):
+        batch = windows[start : start + batch_size].to(
+            device=device,
+            dtype=torch.float32,
+        )
+        outputs.append(model.decode(model.encode(batch)).detach().float().cpu())
+    return torch.cat(outputs).numpy()
 
 
 def _row_shuffle(x: torch.Tensor, window: int, seed: int) -> torch.Tensor:
@@ -595,18 +625,16 @@ def _secret_selectivity(
     probe_score = (probe_precision - 1.0 / q) / (1.0 - 1.0 / q)
     eval_eligible_mass = eval_mass[:, eligible]
     columns = np.arange(eval_eligible_mass.shape[1])
-    eval_precision = eval_eligible_mass[preferred, columns] / eval_eligible_mass.sum(
-        axis=0
-    ).clip(1e-12)
+    eval_precision = eval_eligible_mass[preferred, columns] / eval_eligible_mass.sum(axis=0).clip(
+        1e-12
+    )
     eval_score = (eval_precision - 1.0 / q) / (1.0 - 1.0 / q)
     count = min(q, probe_score.shape[0])
     order = np.argsort(probe_score)[-count:]
     return {
         "selective_feature_count": int(eligible.sum()),
         "top_q_selectivity": float(eval_score[order].mean()),
-        "top_q_secret_coverage": float(
-            len(set(preferred[order].tolist())) / q
-        ),
+        "top_q_secret_coverage": float(len(set(preferred[order].tolist())) / q),
         "minimum_fires_per_split": minimum_fires,
     }
 
@@ -642,25 +670,18 @@ def _spectral_usage(model, native_code: np.ndarray) -> dict[str, Any]:
     )
     bias = model.b_dec.detach().float()
     bias_coefficients = torch.einsum("wt,td->wd", basis, bias)
-    bias_frequency_energy = (
-        bias_coefficients.square().sum(dim=1).cpu().numpy().astype(np.float64)
-    )
+    bias_frequency_energy = bias_coefficients.square().sum(dim=1).cpu().numpy().astype(np.float64)
 
     def shares(values: np.ndarray) -> list[float]:
         total = float(values.sum())
-        return (
-            (values / total).tolist()
-            if total > 0
-            else [0.0 for _ in values]
-        )
+        return (values / total).tolist() if total > 0 else [0.0 for _ in values]
 
-    return {
+    usage = {
         "bands": [list(map(int, band)) for band in model.bands],
         "band_slices": [[int(start), int(stop)] for start, stop in slices],
         "allocated_atoms": [int(value) for value in model.h_per_band],
         "nominal_k_per_band": [
-            int(value)
-            for value in getattr(model, "selection_k_per_band", model.k_per_band)
+            int(value) for value in getattr(model, "selection_k_per_band", model.k_per_band)
         ],
         "activation_energy_share": shares(activation_energy),
         "activation_mass_share": shares(activation_mass),
@@ -668,6 +689,20 @@ def _spectral_usage(model, native_code: np.ndarray) -> dict[str, Any]:
         "decoded_frequency_energy_share": shares(decoded_frequency_energy),
         "bias_frequency_energy_share": shares(bias_frequency_energy),
     }
+    if hasattr(model, "learned_frequency_weights"):
+        learned = model.learned_frequency_weights().detach().float().cpu().numpy()
+        prior = model.frequency_weight_prior.detach().float().cpu().numpy()
+        full_prior = np.zeros(len(slices), dtype=np.float64)
+        full_prior[list(model.active_bands)] = prior
+        usage["learned_frequency_weight"] = learned.tolist()
+        usage["frequency_weight_prior"] = full_prior.tolist()
+        usage["frequency_weight_lift"] = np.divide(
+            learned,
+            full_prior,
+            out=np.zeros_like(learned, dtype=np.float64),
+            where=full_prior > 0,
+        ).tolist()
+    return usage
 
 
 @torch.no_grad()
@@ -719,9 +754,7 @@ def evaluate_shamir(
     )
     chance = 1.0 / q
     recovery = (balanced_accuracy - chance) / (1.0 - chance)
-    permutation = np.random.default_rng(seed + 1000).permutation(
-        probe_data.secret.numpy()
-    )
+    permutation = np.random.default_rng(seed + 1000).permutation(probe_data.secret.numpy())
     _, shuffled_label_accuracy = _fit_classifier(
         probe_code,
         permutation,
@@ -754,9 +787,7 @@ def evaluate_shamir(
         )
         observed_symbols = symbol_scores.argmax(dim=-1)
         oracle_prediction = recover_leading_coefficient(observed_symbols, q)
-        oracle_accuracy = float(
-            (oracle_prediction == eval_data.secret).double().mean().item()
-        )
+        oracle_accuracy = float((oracle_prediction == eval_data.secret).double().mean().item())
     else:
         oracle_accuracy = chance
     metrics: dict[str, Any] = {
@@ -867,6 +898,37 @@ def evaluate_hmm(
         eval_states,
         consumes=consumes,
     )
+    reconstructed = torch.from_numpy(reconstruct_windows(model, eval_data.x, window=window)).to(
+        dtype=eval_data.emissions.dtype
+    )
+    direct_prediction = torch.einsum(
+        "ntd,jd->ntj",
+        reconstructed,
+        eval_data.emissions,
+    ).numpy()
+    direct_per_source = [
+        float(
+            r2_score(
+                eval_states[:, :, source].reshape(-1),
+                direct_prediction[:, :, source].reshape(-1),
+            )
+        )
+        for source in range(eval_states.shape[-1])
+    ]
+    raw_projection = torch.einsum(
+        "ntd,jd->ntj",
+        eval_data.x[:, :window],
+        eval_data.emissions,
+    ).numpy()
+    raw_projection_per_source = [
+        float(
+            r2_score(
+                eval_states[:, :, source].reshape(-1),
+                raw_projection[:, :, source].reshape(-1),
+            )
+        )
+        for source in range(eval_states.shape[-1])
+    ]
     shuffled_x = _row_shuffle(eval_data.x, window, seed + 3000)
     _, shuffled_native = encode_windows(model, shuffled_x, window=window)
     shuffled_prediction = _predict_hmm_probe(
@@ -892,10 +954,14 @@ def evaluate_hmm(
         for source in range(raw_eval_y.shape[-1])
     ]
     metrics: dict[str, Any] = {
+        "direct_latent_r2": statistics.fmean(direct_per_source),
+        "direct_latent_r2_per_source": direct_per_source,
         "latent_r2": statistics.fmean(per_source),
         "latent_r2_per_source": per_source,
         "raw_token_r2": statistics.fmean(raw_per_source),
         "raw_token_r2_per_source": raw_per_source,
+        "raw_projection_r2": statistics.fmean(raw_projection_per_source),
+        "raw_projection_r2_per_source": raw_projection_per_source,
         "time_shuffled_latent_r2": shuffled_r2,
         "lambdas": [float(value) for value in eval_data.lambdas],
         **_reconstruction_metrics(model, eval_data.x, window=window),
@@ -919,10 +985,7 @@ def evaluate_hmm(
             window,
         ).numpy()
         expected_band = np.stack(
-            [
-                expected_frequency[:, list(map(int, band))].sum(axis=1)
-                for band in model.bands
-            ],
+            [expected_frequency[:, list(map(int, band))].sum(axis=1) for band in model.bands],
             axis=1,
         )
         expected_band /= expected_band.sum(axis=1, keepdims=True)
@@ -932,16 +995,170 @@ def evaluate_hmm(
         metrics["expected_dct_band_energy_per_source"] = expected_band.tolist()
         metrics["expected_band_per_source"] = expected_winner.astype(int).tolist()
         metrics["recovered_band_per_source"] = recovered_winner.astype(int).tolist()
-        metrics["band_localization_accuracy"] = float(
-            (expected_winner == recovered_winner).mean()
+        metrics["band_localization_accuracy"] = float((expected_winner == recovered_winner).mean())
+    return metrics
+
+
+def evaluate_narrowband(
+    model,
+    task: dict[str, Any],
+    probe_data: NarrowbandSourceBatch,
+    eval_data: NarrowbandSourceBatch,
+    *,
+    seed: int,
+) -> dict[str, Any]:
+    """Evaluate phase-varying independent narrowband causes."""
+
+    from sklearn.linear_model import Ridge
+    from sklearn.metrics import r2_score
+
+    window = int(task["window"])
+    consumes = str(model.consumes)
+    _, probe_native = encode_windows(model, probe_data.x, window=window)
+    _, eval_native = encode_windows(model, eval_data.x, window=window)
+    n_sources = int(eval_data.states.shape[2])
+    probe_states = (
+        probe_data.states[:, :window]
+        .reshape(probe_data.states.shape[0], window, 2 * n_sources)
+        .numpy()
+    )
+    eval_states = (
+        eval_data.states[:, :window]
+        .reshape(eval_data.states.shape[0], window, 2 * n_sources)
+        .numpy()
+    )
+    ridge, _, per_quadrature = _fit_hmm_probe(
+        probe_native,
+        probe_states,
+        eval_native,
+        eval_states,
+        consumes=consumes,
+    )
+    per_source = np.asarray(per_quadrature, dtype=np.float64).reshape(n_sources, 2).mean(axis=1)
+
+    reconstructed = torch.from_numpy(reconstruct_windows(model, eval_data.x, window=window)).to(
+        dtype=eval_data.emissions.dtype
+    )
+    direct_prediction = torch.einsum(
+        "ntd,jcd->ntjc",
+        reconstructed,
+        eval_data.emissions,
+    ).numpy()
+    direct_target = eval_data.states[:, :window].numpy()
+    direct_per_quadrature = np.asarray(
+        [
+            r2_score(
+                direct_target[:, :, source, component].reshape(-1),
+                direct_prediction[:, :, source, component].reshape(-1),
+            )
+            for source in range(n_sources)
+            for component in range(2)
+        ],
+        dtype=np.float64,
+    )
+    direct_per_source = direct_per_quadrature.reshape(n_sources, 2).mean(axis=1)
+    raw_projection = torch.einsum(
+        "ntd,jcd->ntjc",
+        eval_data.x[:, :window],
+        eval_data.emissions,
+    ).numpy()
+    raw_projection_per_quadrature = np.asarray(
+        [
+            r2_score(
+                direct_target[:, :, source, component].reshape(-1),
+                raw_projection[:, :, source, component].reshape(-1),
+            )
+            for source in range(n_sources)
+            for component in range(2)
+        ],
+        dtype=np.float64,
+    )
+    raw_projection_per_source = raw_projection_per_quadrature.reshape(n_sources, 2).mean(axis=1)
+
+    shuffled_x = _row_shuffle(eval_data.x, window, seed + 4000)
+    _, shuffled_native = encode_windows(model, shuffled_x, window=window)
+    shuffled_prediction = _predict_hmm_probe(
+        ridge,
+        shuffled_native,
+        consumes=consumes,
+        output_shape=eval_states.shape,
+    )
+    shuffled_r2 = float(r2_score(eval_states.reshape(-1), shuffled_prediction.reshape(-1)))
+
+    raw_probe_x = probe_data.x[:, :window].reshape(-1, int(task["d_in"])).numpy()
+    raw_probe_y = probe_states.reshape(-1, 2 * n_sources)
+    raw_eval_x = eval_data.x[:, :window].reshape(-1, int(task["d_in"])).numpy()
+    raw_eval_y = eval_states.reshape(-1, 2 * n_sources)
+    raw_ridge = Ridge(alpha=1.0).fit(raw_probe_x, raw_probe_y)
+    raw_prediction = raw_ridge.predict(raw_eval_x)
+    raw_per_quadrature = np.asarray(
+        [
+            r2_score(raw_eval_y[:, component], raw_prediction[:, component])
+            for component in range(2 * n_sources)
+        ],
+        dtype=np.float64,
+    )
+    raw_per_source = raw_per_quadrature.reshape(n_sources, 2).mean(axis=1)
+
+    metrics: dict[str, Any] = {
+        "direct_latent_r2": float(direct_per_source.mean()),
+        "direct_latent_r2_per_source": direct_per_source.tolist(),
+        "direct_latent_r2_per_quadrature": direct_per_quadrature.tolist(),
+        "latent_r2": float(per_source.mean()),
+        "latent_r2_per_source": per_source.tolist(),
+        "latent_r2_per_quadrature": list(map(float, per_quadrature)),
+        "raw_token_r2": float(raw_per_source.mean()),
+        "raw_token_r2_per_source": raw_per_source.tolist(),
+        "raw_projection_r2": float(raw_projection_per_source.mean()),
+        "raw_projection_r2_per_source": raw_projection_per_source.tolist(),
+        "time_shuffled_latent_r2": shuffled_r2,
+        "frequencies": [float(value) for value in eval_data.frequencies],
+        **_reconstruction_metrics(model, eval_data.x, window=window),
+    }
+    usage = _spectral_usage(model, eval_native)
+    if usage:
+        metrics["spectral_usage"] = usage
+        band_source_r2 = []
+        for start, stop in model.band_of_features():
+            _, _, values = _fit_hmm_probe(
+                probe_native[:, start:stop],
+                probe_states,
+                eval_native[:, start:stop],
+                eval_states,
+                consumes="window",
+            )
+            band_source_r2.append(
+                np.asarray(values, dtype=np.float64).reshape(n_sources, 2).mean(axis=1)
+            )
+        recovered = np.stack(band_source_r2, axis=1)
+
+        states = eval_data.states[:, :window]
+        basis = dct_basis(window).to(dtype=states.dtype)
+        coefficients = torch.einsum("wt,ntjc->nwjc", basis, states)
+        expected_frequency = coefficients.square().sum(dim=(0, 3)).T.numpy()
+        expected_frequency /= expected_frequency.sum(axis=1, keepdims=True)
+        expected_band = np.stack(
+            [expected_frequency[:, list(map(int, band))].sum(axis=1) for band in model.bands],
+            axis=1,
         )
+        expected_band /= expected_band.sum(axis=1, keepdims=True)
+        expected_winner = expected_band.argmax(axis=1)
+        recovered_winner = recovered.argmax(axis=1)
+        metrics["band_latent_r2_per_source"] = recovered.tolist()
+        metrics["expected_dct_band_energy_per_source"] = expected_band.tolist()
+        metrics["expected_band_per_source"] = expected_winner.astype(int).tolist()
+        metrics["recovered_band_per_source"] = recovered_winner.astype(int).tolist()
+        metrics["band_localization_accuracy"] = float((expected_winner == recovered_winner).mean())
     return metrics
 
 
 def evaluate_cell(
     model,
     cell: dict[str, Any],
-    splits: dict[str, ShamirClockBatch | FactorialHMMBatch],
+    splits: dict[
+        str,
+        ShamirClockBatch | FactorialHMMBatch | NarrowbandSourceBatch,
+    ],
 ) -> dict[str, Any]:
     if cell["family"] == "shamir":
         return evaluate_shamir(
@@ -951,7 +1168,15 @@ def evaluate_cell(
             splits["eval"],
             seed=int(cell["seed"]),
         )
-    return evaluate_hmm(
+    if cell["family"] == "factorial_hmm":
+        return evaluate_hmm(
+            model,
+            cell["task_spec"],
+            splits["probe"],
+            splits["eval"],
+            seed=int(cell["seed"]),
+        )
+    return evaluate_narrowband(
         model,
         cell["task_spec"],
         splits["probe"],
@@ -970,26 +1195,17 @@ def write_summary(
     expected = enumerate_cells(config, smoke=smoke)
     expected_ids = {cell["cell_id"] for cell in expected}
     latest = latest_results(results_dir / "results.jsonl")
-    observed = {
-        cell_id: row
-        for cell_id, row in latest.items()
-        if bool(row.get("smoke")) == smoke
-    }
+    observed = {cell_id: row for cell_id, row in latest.items() if bool(row.get("smoke")) == smoke}
     ok = [row for row in observed.values() if row.get("status") == "ok"]
     aggregates = []
     for task in config["tasks"]:
         for model in config["models"]:
             selected = [
-                row
-                for row in ok
-                if row["task"] == task["name"] and row["model"] == model["name"]
+                row for row in ok if row["task"] == task["name"] and row["model"] == model["name"]
             ]
             if not selected:
                 continue
-            values = [
-                float(row["metrics"][task["primary_metric"]])
-                for row in selected
-            ]
+            values = [float(row["metrics"][task["primary_metric"]]) for row in selected]
             aggregates.append(
                 {
                     "task": task["name"],
@@ -1002,14 +1218,11 @@ def write_summary(
                     "min": min(values),
                     "max": max(values),
                     "seed_values": {
-                        str(row["seed"]): float(
-                            row["metrics"][task["primary_metric"]]
-                        )
+                        str(row["seed"]): float(row["metrics"][task["primary_metric"]])
                         for row in selected
                     },
                     "mean_l0_per_window": statistics.fmean(
-                        float(row["metrics"]["l0_per_window"])
-                        for row in selected
+                        float(row["metrics"]["l0_per_window"]) for row in selected
                     ),
                     "mean_nmse": statistics.fmean(
                         float(row["metrics"]["nmse"]) for row in selected
@@ -1062,9 +1275,7 @@ def seed_compatible_results(
     source_path = source_dir / "results.jsonl"
     if not source_path.exists():
         return 0
-    expected_ids = {
-        cell["cell_id"] for cell in enumerate_cells(config, smoke=smoke)
-    }
+    expected_ids = {cell["cell_id"] for cell in enumerate_cells(config, smoke=smoke)}
     existing = latest_results(destination_dir / "results.jsonl")
     copied = 0
     for cell_id, row in latest_results(source_path).items():
@@ -1103,7 +1314,13 @@ def run(
     config_hash = hashlib.sha256(_canonical_json(config).encode()).hexdigest()
     budget = BudgetGuard(config, results_dir, config_hash)
     status = "complete"
-    data_cache: dict[str, dict[str, ShamirClockBatch | FactorialHMMBatch]] = {}
+    data_cache: dict[
+        str,
+        dict[
+            str,
+            ShamirClockBatch | FactorialHMMBatch | NarrowbandSourceBatch,
+        ],
+    ] = {}
     try:
         completed = latest_results(results_dir / "results.jsonl")
         for cell in enumerate_cells(config, smoke=smoke):
@@ -1187,14 +1404,11 @@ def run(
             _append_jsonl(results_dir / "results.jsonl", row)
             completed[cell["cell_id"]] = row
             print(
-                f"  -> {row['status']} "
-                f"{row.get('primary_value', row.get('error', ''))}",
+                f"  -> {row['status']} {row.get('primary_value', row.get('error', ''))}",
                 flush=True,
             )
             if row["status"] != "ok":
-                raise RuntimeError(
-                    f"cell {cell['cell_id']} failed: {row.get('error')}"
-                )
+                raise RuntimeError(f"cell {cell['cell_id']} failed: {row.get('error')}")
         write_summary(config, results_dir, plan=plan, smoke=smoke)
         return 0
     except StopRequested as exc:

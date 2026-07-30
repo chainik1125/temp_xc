@@ -7,6 +7,7 @@ import numpy as np
 from experiments.power_spectrum.code import run_controlled_frequency_suite as suite
 from experiments.power_spectrum.code.controlled_tasks import (
     generate_factorial_hmm_splits,
+    generate_narrowband_source_splits,
     generate_shamir_splits,
 )
 from temp_bench.archs.batchtopk_sae import BatchTopKSAE
@@ -14,9 +15,7 @@ from temp_bench.archs.spectral_txc import SpectralTXCBatchTopK
 
 
 def test_frozen_plan_is_paired_and_below_incremental_and_overall_caps() -> None:
-    config = suite.load_config(
-        suite.POWER_ROOT / "configs" / "controlled_frequency_suite.json"
-    )
+    config = suite.load_config(suite.POWER_ROOT / "configs" / "controlled_frequency_suite.json")
     plan = suite.build_plan(config)
     assert plan["evaluation_cells"] == 58
     assert plan["unique_training_runs"] == 54
@@ -27,25 +26,19 @@ def test_frozen_plan_is_paired_and_below_incremental_and_overall_caps() -> None:
 
 
 def test_token_sae_training_is_reused_across_windows_and_support_is_matched() -> None:
-    config = suite.load_config(
-        suite.POWER_ROOT / "configs" / "controlled_frequency_suite.json"
-    )
+    config = suite.load_config(suite.POWER_ROOT / "configs" / "controlled_frequency_suite.json")
     cells = suite.enumerate_cells(config)
     sae_h1_seed1 = [
         cell
         for cell in cells
-        if cell["model"] == "sae"
-        and cell["group"] == "shamir_h1"
-        and cell["seed"] == 1
+        if cell["model"] == "sae" and cell["group"] == "shamir_h1" and cell["seed"] == 1
     ]
     assert len(sae_h1_seed1) == 3
     assert len({cell["training_id"] for cell in sae_h1_seed1}) == 1
     assert {cell["k_pos"] for cell in sae_h1_seed1} == {1}
 
     spectral_h2 = next(
-        cell
-        for cell in cells
-        if cell["model"] == "spectral_v1" and cell["task"] == "shamir_h2_w6"
+        cell for cell in cells if cell["model"] == "spectral_v1" and cell["task"] == "shamir_h2_w6"
     )
     assert spectral_h2["k_pos"] == 1
     assert not any(
@@ -123,6 +116,88 @@ def test_hmm_evaluator_reports_band_localization_and_usage() -> None:
         1.0,
         rel_tol=1e-6,
     )
+    assert math.isfinite(metrics["direct_latent_r2"])
+
+
+def test_advantage_plan_matches_support_parameters_and_overall_budget() -> None:
+    config = suite.load_config(suite.POWER_ROOT / "configs" / "spectral_advantage.json")
+    cells = suite.enumerate_cells(config)
+    assert len(cells) == 18
+    assert suite.build_plan(config)["within_cost_plan"]
+    assert suite.build_plan(config)["within_time_plan"]
+    assert suite.build_plan(config)["worst_case_overall_usd"] < config["overall_spend"]["cap_usd"]
+
+    for task in config["tasks"]:
+        task_cells = [cell for cell in cells if cell["task"] == task["name"] and cell["seed"] == 1]
+        counts = {}
+        for cell in task_cells:
+            cls = suite._import_model(cell["model_spec"])
+            model = cls(**suite._model_kwargs(cell))
+            counts[cell["model"]] = sum(parameter.numel() for parameter in model.parameters())
+            if cell["model"] == "txc":
+                assert cell["k_pos"] == cell["window"]
+            else:
+                assert cell["k_pos"] == 1
+        reference = counts["txc"]
+        assert abs(counts["spectral_global"] - reference) / reference < 0.002
+        assert abs(counts["spectral_adaptive"] - reference) / reference < 0.002
+
+    t16 = next(
+        cell
+        for cell in cells
+        if cell["task"] == "narrowband_offgrid_t16_matched_params"
+        and cell["model"] == "spectral_adaptive"
+    )
+    assert t16["d_sae"] == 255
+    assert t16["k_pos"] == 1
+    txc_t16 = next(
+        cell
+        for cell in cells
+        if cell["task"] == "narrowband_offgrid_t16_matched_params" and cell["model"] == "txc"
+    )
+    assert txc_t16["d_sae"] == 64
+    assert txc_t16["k_pos"] == 16
+
+
+def test_narrowband_evaluator_reports_direct_recovery_and_learned_weights() -> None:
+    from experiments.power_spectrum.code.spectral_txc_v2 import SpectralTXCV2
+
+    splits = generate_narrowband_source_splits(
+        frequencies=(0.08, 0.21, 0.34, 0.46),
+        d=10,
+        sigma=0.2,
+        seq_len=16,
+        split_sizes={"train": 128, "probe": 128, "eval": 128},
+        split_seeds={"train": 51, "probe": 52, "eval": 53},
+        emission_seed=0,
+        min_frequency_separation=0.06,
+    )
+    model = SpectralTXCV2(
+        d_in=10,
+        d_sae=32,
+        T=8,
+        k_pos=1,
+        bands="multiband",
+        selection_mode="global",
+        adaptive_frequency_alpha=0.1,
+        adaptive_frequency_adversary_alpha=0.1,
+    )
+    model.eval()
+    metrics = suite.evaluate_narrowband(
+        model,
+        {"window": 8, "d_in": 10},
+        splits["probe"],
+        splits["eval"],
+        seed=1,
+    )
+    assert len(metrics["direct_latent_r2_per_source"]) == 4
+    assert len(metrics["band_latent_r2_per_source"]) == 4
+    assert math.isfinite(metrics["direct_latent_r2"])
+    assert math.isclose(
+        sum(metrics["spectral_usage"]["learned_frequency_weight"]),
+        1.0,
+        rel_tol=1e-6,
+    )
 
 
 def test_secret_selectivity_is_cross_split_and_rejects_one_off_fires() -> None:
@@ -149,9 +224,7 @@ def test_secret_selectivity_is_cross_split_and_rejects_one_off_fires() -> None:
 
 
 def test_seed_compatible_results_copies_only_current_successes(tmp_path) -> None:
-    config = suite.load_config(
-        suite.POWER_ROOT / "configs" / "controlled_frequency_suite.json"
-    )
+    config = suite.load_config(suite.POWER_ROOT / "configs" / "controlled_frequency_suite.json")
     expected = suite.enumerate_cells(config)
     source = tmp_path / "source"
     destination = tmp_path / "destination"
@@ -167,11 +240,14 @@ def test_seed_compatible_results_copies_only_current_successes(tmp_path) -> None
     for row in (keep, skip_failed, skip_unexpected):
         suite._append_jsonl(source / "results.jsonl", row)
 
-    assert suite.seed_compatible_results(
-        config,
-        source,
-        destination,
-        smoke=False,
-    ) == 1
+    assert (
+        suite.seed_compatible_results(
+            config,
+            source,
+            destination,
+            smoke=False,
+        )
+        == 1
+    )
     copied = suite.latest_results(destination / "results.jsonl")
     assert set(copied) == {keep["cell_id"]}

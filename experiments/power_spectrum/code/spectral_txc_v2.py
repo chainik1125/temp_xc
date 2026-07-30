@@ -26,12 +26,19 @@ Two opt-in objectives implement the proposed spectral penalties:
     a three-bin band and a singleton band as equally large by definition.
 
 ``frequency_matryoshka_alpha``
-    Adds nested low-to-high reconstruction terms at DCT-band boundaries.  Each
-    prefix is compared with the matching projection of the target, rather than
-    asking low-frequency atoms to reproduce impossible high-frequency detail.
-    Under strictly disjoint per-band support this is mathematically a
-    low-frequency reweighting; with global support selection it also changes
-    competition for the shared active-atom budget.
+    Retains the original nested low-to-high ablation for provenance.  Because
+    earlier bands occur in more prefixes, this is a *fixed low-frequency
+    weighting*, not the learned-frequency objective.
+
+``adaptive_frequency_alpha``
+    Adds order-free, independently projected band losses.  Their positive
+    relative weights are learned on the simplex.  The model minimizes the
+    weighted reconstruction loss while the weight logits adversarially
+    emphasize bands with high power-normalized residual.  A bandwidth prior,
+    entropy regularization, and a positive prior floor prevent collapse.  The
+    two gradient directions are separated with stop-gradient operations, so a
+    single ordinary optimizer performs the min-max update without allowing the
+    weights to hide a difficult band.
 """
 
 from __future__ import annotations
@@ -46,7 +53,7 @@ from temp_bench.archs.spectral_txc import SpectralTXCBatchTopK, _dct_basis
 class SpectralTXCV2(SpectralTXCBatchTopK):
     """Spectral TXC with controlled DC, support-allocation, and loss ablations."""
 
-    arch_version = "2.0.0-experimental"
+    arch_version = "2.1.0-experimental"
     _registry_name = "spectral_txc_v2"
 
     def __init__(
@@ -69,6 +76,13 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
         dominance_target: str = "bandwidth",
         frequency_matryoshka_alpha: float = 0.0,
         frequency_matryoshka_decay: float = 1.0,
+        adaptive_frequency_alpha: float = 0.0,
+        adaptive_frequency_adversary_alpha: float = 0.0,
+        adaptive_frequency_entropy: float = 0.1,
+        adaptive_frequency_floor: float = 0.2,
+        adaptive_frequency_ema_beta: float = 0.99,
+        adaptive_frequency_power_floor: float = 0.05,
+        adaptive_frequency_warmup_steps: int = 0,
     ):
         if dc_mode not in {"keep", "remove"}:
             raise ValueError("dc_mode must be 'keep' or 'remove'")
@@ -84,6 +98,25 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
             raise ValueError("frequency_matryoshka_alpha must be non-negative")
         if frequency_matryoshka_decay <= 0:
             raise ValueError("frequency_matryoshka_decay must be positive")
+        if adaptive_frequency_alpha < 0:
+            raise ValueError("adaptive_frequency_alpha must be non-negative")
+        if adaptive_frequency_adversary_alpha < 0:
+            raise ValueError("adaptive_frequency_adversary_alpha must be non-negative")
+        if (adaptive_frequency_alpha > 0) != (adaptive_frequency_adversary_alpha > 0):
+            raise ValueError(
+                "adaptive frequency model and adversary alphas must either both "
+                "be positive or both be zero"
+            )
+        if adaptive_frequency_entropy <= 0:
+            raise ValueError("adaptive_frequency_entropy must be positive")
+        if not 0 <= adaptive_frequency_floor < 1:
+            raise ValueError("adaptive_frequency_floor must lie in [0, 1)")
+        if not 0 <= adaptive_frequency_ema_beta < 1:
+            raise ValueError("adaptive_frequency_ema_beta must lie in [0, 1)")
+        if not 0 < adaptive_frequency_power_floor <= 1:
+            raise ValueError("adaptive_frequency_power_floor must lie in (0, 1]")
+        if adaptive_frequency_warmup_steps < 0:
+            raise ValueError("adaptive_frequency_warmup_steps must be non-negative")
         if dc_mode == "remove" and T < 2:
             raise ValueError("dc_mode='remove' needs T >= 2 (at least one AC bin)")
 
@@ -106,6 +139,13 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
         self.dominance_target = dominance_target
         self.frequency_matryoshka_alpha = float(frequency_matryoshka_alpha)
         self.frequency_matryoshka_decay = float(frequency_matryoshka_decay)
+        self.adaptive_frequency_alpha = float(adaptive_frequency_alpha)
+        self.adaptive_frequency_adversary_alpha = float(adaptive_frequency_adversary_alpha)
+        self.adaptive_frequency_entropy = float(adaptive_frequency_entropy)
+        self.adaptive_frequency_floor = float(adaptive_frequency_floor)
+        self.adaptive_frequency_ema_beta = float(adaptive_frequency_ema_beta)
+        self.adaptive_frequency_power_floor = float(adaptive_frequency_power_floor)
+        self.adaptive_frequency_warmup_steps = int(adaptive_frequency_warmup_steps)
         self.k_win = self.k_pos * self._T
         self.register_buffer("dct_basis_v2", _dct_basis(T), persistent=False)
 
@@ -127,6 +167,34 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
             active_features[s:e] = True
         self.register_buffer("active_features", active_features, persistent=False)
         self.register_buffer("global_threshold", torch.tensor(-1.0))
+
+        widths = torch.tensor(
+            [self._frequency_count(b) for b in self.active_bands],
+            dtype=torch.float32,
+        )
+        self.register_buffer(
+            "frequency_weight_prior",
+            widths / widths.sum(),
+            persistent=False,
+        )
+        self.register_buffer(
+            "frequency_error_ema",
+            torch.ones(len(self.active_bands), dtype=torch.float32),
+        )
+        self.register_buffer(
+            "frequency_power_ema",
+            torch.ones(len(self.active_bands), dtype=torch.float32),
+        )
+        self.register_buffer(
+            "frequency_ema_initialized",
+            torch.tensor(False),
+        )
+        if self.adaptive_frequency_alpha > 0:
+            self.frequency_weight_logits = torch.nn.Parameter(
+                torch.zeros(len(self.active_bands), dtype=torch.float32)
+            )
+        else:
+            self.register_parameter("frequency_weight_logits", None)
 
         # DC-only branches receive no reserved support.  Reassign their legacy
         # share over the active branches while preserving the total k_win.
@@ -199,9 +267,7 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
             if use_threshold:
                 z[:, s:e] = pre_b * (pre_b > self.threshold[b])
             else:
-                z[:, s:e] = self._batchtopk_band(
-                    pre_b, self.selection_k_per_band[b]
-                )
+                z[:, s:e] = self._batchtopk_band(pre_b, self.selection_k_per_band[b])
         return z
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
@@ -266,9 +332,7 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
         loss = (excess.square() / target.clamp_min(1e-12)).sum()
         return loss, shares
 
-    def _project_frequencies(
-        self, x: torch.Tensor, frequencies: Sequence[int]
-    ) -> torch.Tensor:
+    def _project_frequencies(self, x: torch.Tensor, frequencies: Sequence[int]) -> torch.Tensor:
         if not frequencies:
             return torch.zeros_like(x)
         basis = self.dct_basis_v2.to(dtype=x.dtype)
@@ -298,12 +362,145 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
         weight_tensor = x.new_tensor(weights)
         return (torch.stack(terms) * weight_tensor).sum() / weight_tensor.sum()
 
+    def learned_frequency_weights(self) -> torch.Tensor:
+        """Return positive normalized weights in full band order.
+
+        The trainable logits only cover active bands.  Inactive bands (the DC
+        branch under ``dc_mode="remove"``) receive zero weight.
+        """
+
+        prior = self.frequency_weight_prior
+        if self.frequency_weight_logits is None:
+            active_weights = prior
+        else:
+            learned = torch.softmax(
+                torch.log(prior) + self.frequency_weight_logits,
+                dim=0,
+            )
+            active_weights = (
+                self.adaptive_frequency_floor * prior
+                + (1.0 - self.adaptive_frequency_floor) * learned
+            )
+        full = active_weights.new_zeros(self.n_bands)
+        full[list(self.active_bands)] = active_weights
+        return full
+
+    def _active_frequency_weights(self) -> torch.Tensor:
+        return self.learned_frequency_weights()[list(self.active_bands)]
+
+    def _frequency_band_errors_and_power(
+        self,
+        x: torch.Tensor,
+        band_recons: Sequence[torch.Tensor],
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Per-frequency residual and target power for every active band."""
+
+        errors: list[torch.Tensor] = []
+        powers: list[torch.Tensor] = []
+        for b in self.active_bands:
+            kept = [
+                frequency
+                for frequency, keep in zip(
+                    self.bands[b],
+                    self._frequency_mask(b).tolist(),
+                )
+                if keep
+            ]
+            width = float(len(kept))
+            target = self._project_frequencies(x, kept)
+            bias = self._project_frequencies(self.b_dec.unsqueeze(0), kept)
+            residual = target - band_recons[b] - bias
+            errors.append(residual.float().square().mean() / width)
+            powers.append(target.float().square().mean() / width)
+        return torch.stack(errors), torch.stack(powers)
+
+    @torch.no_grad()
+    def _update_frequency_emas(
+        self,
+        errors: torch.Tensor,
+        powers: torch.Tensor,
+    ) -> None:
+        errors = errors.detach().to(self.frequency_error_ema)
+        powers = powers.detach().to(self.frequency_power_ema)
+        if not bool(self.frequency_ema_initialized):
+            self.frequency_error_ema.copy_(errors)
+            self.frequency_power_ema.copy_(powers)
+            self.frequency_ema_initialized.fill_(True)
+            return
+        beta = self.adaptive_frequency_ema_beta
+        self.frequency_error_ema.lerp_(errors, 1.0 - beta)
+        self.frequency_power_ema.lerp_(powers, 1.0 - beta)
+
+    def _normalized_frequency_errors(
+        self,
+        errors: torch.Tensor,
+    ) -> torch.Tensor:
+        prior = self.frequency_weight_prior
+        global_power = (prior * self.frequency_power_ema).sum()
+        denominator = torch.maximum(
+            self.frequency_power_ema,
+            self.adaptive_frequency_power_floor * global_power,
+        ).clamp_min(1e-12)
+        return errors / denominator.detach().to(errors)
+
+    def _frequency_weight_reward(
+        self,
+        normalized_errors: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        """Adversary reward and KL; gradients flow only to weight logits."""
+
+        weights = self._active_frequency_weights()
+        prior = self.frequency_weight_prior.to(weights)
+        learned = (
+            torch.softmax(
+                torch.log(prior) + self.frequency_weight_logits,
+                dim=0,
+            )
+            if self.frequency_weight_logits is not None
+            else prior
+        )
+        kl = (
+            learned * (torch.log(learned.clamp_min(1e-12)) - torch.log(prior.clamp_min(1e-12)))
+        ).sum()
+        reward = (
+            weights * normalized_errors.detach().to(weights)
+        ).sum() - self.adaptive_frequency_entropy * kl
+        return reward, kl
+
+    def _adaptive_frequency_loss(
+        self,
+        x: torch.Tensor,
+        band_recons: Sequence[torch.Tensor],
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Return model loss, zero-value adversary surrogate, reward, and KL."""
+
+        if self.frequency_weight_logits is None:
+            zero = x.new_zeros(())
+            return zero, zero, zero, zero
+        errors, powers = self._frequency_band_errors_and_power(x, band_recons)
+        self._update_frequency_emas(errors, powers)
+        normalized = self._normalized_frequency_errors(errors)
+        weights = self._active_frequency_weights().detach().to(normalized)
+        model_loss = (weights * normalized).sum()
+        reward, kl = self._frequency_weight_reward(
+            self._normalized_frequency_errors(self.frequency_error_ema)
+        )
+        if int(self.global_step.item()) < self.adaptive_frequency_warmup_steps:
+            adversary = reward.new_zeros(())
+        else:
+            # Forward value is exactly zero.  Its gradient makes an ordinary
+            # minimizing optimizer ascend the detached adversary reward.
+            adversary = -self.adaptive_frequency_adversary_alpha * (reward - reward.detach())
+        return model_loss, adversary, reward, kl
+
     def _uses_parent_objective(self) -> bool:
         return (
             self.dc_mode == "keep"
             and self.selection_mode == "per_band"
             and self.dominance_alpha == 0
             and self.frequency_matryoshka_alpha == 0
+            and self.adaptive_frequency_alpha == 0
+            and self.adaptive_frequency_adversary_alpha == 0
         )
 
     def train_step(self, x: torch.Tensor) -> dict[str, torch.Tensor]:
@@ -350,11 +547,16 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
 
         dominance, shares = self._dominance_loss(band_recons)
         matryoshka = self._frequency_matryoshka_loss(x, band_recons)
+        adaptive, adversary, weight_reward, weight_kl = self._adaptive_frequency_loss(
+            x, band_recons
+        )
         loss = (
             reconstruction
             + self.auxk_alpha * aux_loss
             + self.dominance_alpha * dominance
             + self.frequency_matryoshka_alpha * matryoshka
+            + self.adaptive_frequency_alpha * adaptive
+            + adversary
         )
 
         with torch.no_grad():
@@ -367,7 +569,7 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
                 else self.threshold[list(self.active_bands)].mean()
             )
 
-        return {
+        metrics = {
             "loss": loss,
             "mse": reconstruction.detach(),
             "l0": l0.detach(),
@@ -377,7 +579,13 @@ class SpectralTXCV2(SpectralTXCBatchTopK):
             "dominance": dominance.detach(),
             "frequency_matryoshka": matryoshka.detach(),
             "max_band_power_share": max_share.detach(),
+            "adaptive_frequency": adaptive.detach(),
+            "frequency_weight_reward": weight_reward.detach(),
+            "frequency_weight_kl": weight_kl.detach(),
         }
+        for b, weight in enumerate(self.learned_frequency_weights()):
+            metrics[f"frequency_weight_{b}"] = weight.detach()
+        return metrics
 
     def post_step(self) -> None:
         if self.dc_mode == "remove":

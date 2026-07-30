@@ -16,7 +16,12 @@ structure:
     and is high-pass.  Each chain is observed along its own orthonormal
     direction, making latent-to-frequency attribution unambiguous.
 
-Both generators accept a fixed externally supplied observation dictionary.
+``generate_narrowband_sources``
+    Simultaneously active independent sources at separated carrier
+    frequencies.  Every source owns a two-dimensional quadrature emission
+    plane, so random phase does not turn one cause into a mixture of bands.
+
+All three generators accept a fixed externally supplied observation dictionary.
 The split helpers use that facility to share only the observation coordinate
 system across train/probe/eval while sampling every split as new episodes.
 """
@@ -50,6 +55,28 @@ class FactorialHMMBatch:
     states: torch.Tensor
     emissions: torch.Tensor
     lambdas: torch.Tensor
+
+
+@dataclass(frozen=True)
+class NarrowbandSourceBatch:
+    """Independent single-frequency causes mixed in orthogonal quadrature planes.
+
+    ``states[n, t, j]`` contains the two amplitude-scaled quadratures for
+    source ``j``.  In a noiseless batch it is recovered exactly by projecting
+    ``x[n, t]`` onto ``emissions[j]``.
+    """
+
+    x: torch.Tensor
+    states: torch.Tensor
+    phases: torch.Tensor
+    amplitudes: torch.Tensor
+    emissions: torch.Tensor
+    frequencies: torch.Tensor
+
+
+# Integer Fourier bins 1, 3, 5, and 7 at T=16 (and 2, 6, 10, 14 at T=32).
+# They span the AC range without putting multiple frequencies in any cause.
+DEFAULT_NARROWBAND_FREQUENCIES = (1.0 / 16, 3.0 / 16, 5.0 / 16, 7.0 / 16)
 
 
 def is_prime(value: int) -> bool:
@@ -359,6 +386,163 @@ def generate_factorial_hmm_splits(
             seq_len=seq_len,
             seed=split_seeds[name],
             emissions=emissions,
+        )
+        for name, size in split_sizes.items()
+    }
+
+
+def generate_narrowband_sources(
+    *,
+    frequencies: Sequence[float] | torch.Tensor = DEFAULT_NARROWBAND_FREQUENCIES,
+    d: int,
+    sigma: float,
+    n_seq: int,
+    seq_len: int,
+    seed: int,
+    emissions: torch.Tensor | None = None,
+    amplitude_range: tuple[float, float] = (0.75, 1.25),
+    min_frequency_separation: float = 1.0 / 16,
+) -> NarrowbandSourceBatch:
+    """Generate a simultaneous mixture of independent narrowband causes.
+
+    Each source ``j`` has its own carrier ``f_j`` in cycles/sample, random
+    episode phase ``phi_j``, positive random amplitude ``a_j``, and orthogonal
+    quadrature emission plane ``(u_j, v_j)``:
+
+    ``x_t = sum_j a_j [cos(2 pi f_j (t+1/2) + phi_j) u_j
+                       + sin(2 pi f_j (t+1/2) + phi_j) v_j] + noise``.
+
+    The two quadratures are one *cause* at one carrier frequency.  They make
+    its representation phase-invariant; they do not combine distinct
+    frequencies.  The default carriers occupy separated exact Fourier bins
+    for both ``T=16`` and ``T=32``.
+    """
+
+    frequency_tensor = torch.as_tensor(frequencies, dtype=torch.float64).flatten()
+    if frequency_tensor.numel() < 2:
+        raise ValueError("frequencies must contain at least two simultaneous sources")
+    if not torch.isfinite(frequency_tensor).all():
+        raise ValueError("frequencies must be finite")
+    if ((frequency_tensor <= 0) | (frequency_tensor >= 0.5)).any():
+        raise ValueError("frequencies must lie strictly between DC and Nyquist")
+    if min_frequency_separation <= 0:
+        raise ValueError("min_frequency_separation must be positive")
+    sorted_frequencies = frequency_tensor.sort().values
+    separations = sorted_frequencies[1:] - sorted_frequencies[:-1]
+    if (separations + 1e-12 < min_frequency_separation).any():
+        raise ValueError(
+            "frequencies are not sufficiently separated: "
+            f"minimum required gap is {min_frequency_separation}"
+        )
+    n_sources = frequency_tensor.numel()
+    if 2 * n_sources > d:
+        raise ValueError(
+            f"need two orthonormal emission directions per source; got 2 * {n_sources} > d={d}"
+        )
+    if sigma < 0:
+        raise ValueError(f"sigma must be non-negative; got {sigma}")
+    if n_seq < 1:
+        raise ValueError(f"n_seq must be positive; got {n_seq}")
+    if seq_len < 2:
+        raise ValueError(f"seq_len must be at least 2; got {seq_len}")
+    amplitude_low, amplitude_high = map(float, amplitude_range)
+    if not 0 < amplitude_low <= amplitude_high:
+        raise ValueError(
+            f"amplitude_range must be finite, positive, and ordered; got {amplitude_range}"
+        )
+    if not math.isfinite(amplitude_low) or not math.isfinite(amplitude_high):
+        raise ValueError(
+            f"amplitude_range must be finite, positive, and ordered; got {amplitude_range}"
+        )
+
+    generator = torch.Generator(device="cpu").manual_seed(seed)
+    if emissions is None:
+        fixed_emissions = orthonormal_rows(
+            2 * n_sources,
+            d,
+            generator=generator,
+        ).reshape(n_sources, 2, d)
+    else:
+        if emissions.shape != (n_sources, 2, d):
+            raise ValueError(
+                f"emissions must have shape ({n_sources}, 2, {d}); got {tuple(emissions.shape)}"
+            )
+        fixed_emissions = _validated_dictionary(
+            emissions.reshape(2 * n_sources, d),
+            n_rows=2 * n_sources,
+            d=d,
+            name="emissions",
+        ).reshape(n_sources, 2, d)
+
+    phases = (
+        2.0
+        * math.pi
+        * torch.rand(
+            n_seq,
+            n_sources,
+            generator=generator,
+            dtype=torch.float64,
+        )
+    )
+    amplitude_uniform = torch.rand(
+        n_seq,
+        n_sources,
+        generator=generator,
+        dtype=torch.float64,
+    )
+    amplitudes = amplitude_low + (amplitude_high - amplitude_low) * amplitude_uniform
+    time = torch.arange(seq_len, dtype=torch.float64) + 0.5
+    angles = (
+        2.0 * math.pi * time[None, :, None] * frequency_tensor[None, None, :] + phases[:, None, :]
+    )
+    unit_quadratures = torch.stack([torch.cos(angles), torch.sin(angles)], dim=-1)
+    states = amplitudes[:, None, :, None] * unit_quadratures
+    clean = torch.einsum("ntjc,jcd->ntd", states, fixed_emissions)
+    noise = torch.randn(n_seq, seq_len, d, generator=generator, dtype=torch.float64)
+    x = clean + float(sigma) * noise
+    return NarrowbandSourceBatch(
+        x=x,
+        states=states,
+        phases=phases,
+        amplitudes=amplitudes,
+        emissions=fixed_emissions,
+        frequencies=frequency_tensor.clone(),
+    )
+
+
+def generate_narrowband_source_splits(
+    *,
+    frequencies: Sequence[float] | torch.Tensor = DEFAULT_NARROWBAND_FREQUENCIES,
+    d: int,
+    sigma: float,
+    seq_len: int,
+    split_sizes: Mapping[str, int],
+    split_seeds: Mapping[str, int],
+    emission_seed: int,
+    amplitude_range: tuple[float, float] = (0.75, 1.25),
+    min_frequency_separation: float = 1.0 / 16,
+) -> dict[str, NarrowbandSourceBatch]:
+    """Generate independent narrowband episodes with one shared dictionary."""
+
+    _validate_split_spec(split_sizes, split_seeds)
+    frequency_tensor = torch.as_tensor(frequencies, dtype=torch.float64).flatten()
+    emission_generator = torch.Generator(device="cpu").manual_seed(emission_seed)
+    emissions = orthonormal_rows(
+        2 * frequency_tensor.numel(),
+        d,
+        generator=emission_generator,
+    ).reshape(frequency_tensor.numel(), 2, d)
+    return {
+        name: generate_narrowband_sources(
+            frequencies=frequency_tensor,
+            d=d,
+            sigma=sigma,
+            n_seq=size,
+            seq_len=seq_len,
+            seed=split_seeds[name],
+            emissions=emissions,
+            amplitude_range=amplitude_range,
+            min_frequency_separation=min_frequency_separation,
         )
         for name, size in split_sizes.items()
     }

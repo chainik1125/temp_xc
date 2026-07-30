@@ -116,6 +116,70 @@ def test_frequency_matryoshka_matches_bandwise_dct_projections() -> None:
     assert model._frequency_matryoshka_loss(x, zero_bands) > 0
 
 
+def test_adaptive_frequency_weights_start_at_bandwidth_prior() -> None:
+    model = SpectralTXCV2(
+        d_in=3,
+        d_sae=32,
+        T=8,
+        bands="multiband",
+        adaptive_frequency_alpha=0.1,
+        adaptive_frequency_adversary_alpha=0.1,
+    )
+    expected = torch.tensor([1.0, 2.0, 2.0, 3.0]) / 8.0
+    assert torch.allclose(model.learned_frequency_weights(), expected)
+    assert torch.allclose(model.learned_frequency_weights().sum(), torch.tensor(1.0))
+
+
+def test_adaptive_frequency_loss_is_order_free_and_exact_at_projection() -> None:
+    model = SpectralTXCV2(
+        d_in=3,
+        d_sae=32,
+        T=8,
+        bands="multiband",
+        adaptive_frequency_alpha=0.1,
+        adaptive_frequency_adversary_alpha=0.1,
+    )
+    x = torch.randn(7, 8, 3)
+    exact = [model._project_frequencies(x, band) for band in model.bands]
+    errors, _ = model._frequency_band_errors_and_power(x, exact)
+    assert torch.all(errors < 1e-10)
+
+    permutation = torch.tensor([3, 1, 0, 2])
+    values = torch.tensor([0.2, 0.4, 0.8, 1.6])
+    weights = model._active_frequency_weights().detach()
+    assert torch.allclose(
+        (weights * values).sum(),
+        (weights[permutation] * values[permutation]).sum(),
+    )
+
+
+def test_adaptive_frequency_adversary_upweights_hard_band() -> None:
+    model = SpectralTXCV2(
+        d_in=3,
+        d_sae=32,
+        T=8,
+        bands="multiband",
+        adaptive_frequency_alpha=0.1,
+        adaptive_frequency_adversary_alpha=1.0,
+        adaptive_frequency_entropy=0.2,
+        adaptive_frequency_floor=0.1,
+    )
+    optimizer = torch.optim.SGD([model.frequency_weight_logits], lr=0.5)
+    before = model.learned_frequency_weights().detach().clone()
+    normalized_errors = torch.tensor([0.1, 0.2, 0.4, 2.0])
+    reward, _ = model._frequency_weight_reward(normalized_errors)
+    surrogate = -(reward - reward.detach())
+    optimizer.zero_grad()
+    surrogate.backward()
+    optimizer.step()
+    after = model.learned_frequency_weights().detach()
+    assert after[-1] > before[-1]
+    assert after[0] < before[0]
+    floor = model.adaptive_frequency_floor * model.frequency_weight_prior
+    assert torch.all(after >= floor - 1e-7)
+    assert torch.allclose(after.sum(), torch.tensor(1.0), atol=1e-6)
+
+
 def test_augmented_objective_is_additive_and_differentiable() -> None:
     model = SpectralTXCV2(
         d_in=5,
@@ -146,3 +210,10 @@ def test_invalid_experimental_modes_fail_loudly() -> None:
         SpectralTXCV2(d_in=4, d_sae=8, T=1, dc_mode="remove")
     with pytest.raises(ValueError, match="selection_mode"):
         SpectralTXCV2(d_in=4, d_sae=8, T=2, selection_mode="adaptive")
+    with pytest.raises(ValueError, match="both be positive"):
+        SpectralTXCV2(
+            d_in=4,
+            d_sae=8,
+            T=2,
+            adaptive_frequency_alpha=0.1,
+        )

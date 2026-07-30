@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "run_name": "spectral-advantage-learned-frequency-20260730",
+  "overall_spend": {
+    "cap_usd": 50.0,
+    "estimated_prior_usd": 43.229452,
+    "note": "Conservative prior from controlled_frequency_provenance.json. The independent session ledger below leaves the combined worst case below the user's cap."
+  },
+  "budget": {
+    "max_total_usd": 6.5,
+    "reserve_usd": 0.5,
+    "assumed_usd_per_gpu_hour": 4.0,
+    "cost_overhead_multiplier": 1.25,
+    "max_session_hours": 1.2
+  },
+  "planning": {
+    "estimated_steps_per_second": 35.0,
+    "estimated_eval_seconds_per_cell": 15.0,
+    "setup_seconds": 120.0
+  },
+  "training": {
+    "batch_tokens": 1024,
+    "learning_rate": 0.0003,
+    "warmup_steps": 500,
+    "gradient_clip_norm": 1.0,
+    "budget_check_every_steps": 100,
+    "log_every_steps": 1000,
+    "precision": "bf16"
+  },
+  "split_sizes": {
+    "train": 4096,
+    "probe": 2048,
+    "eval": 2048
+  },
+  "split_seeds": {
+    "train": 411,
+    "probe": 422,
+    "eval": 433
+  },
+  "models": [
+    {
+      "name": "txc",
+      "label": "TXC-post",
+      "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
+      "implementation_version": "1.0.0",
+      "consumes": "window",
+      "sparsity_rule": "window_length",
+      "hparams": {
+        "auxk_alpha": 0.03125
+      }
+    },
+    {
+      "name": "spectral_global",
+      "label": "Spectral global",
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "implementation_version": "2.1.0-experimental",
+      "consumes": "window",
+      "sparsity_rule": "one_per_token",
+      "hparams": {
+        "auxk_alpha": 0.03125,
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "selection_mode": "global",
+        "dominance_alpha": 0.0,
+        "frequency_matryoshka_alpha": 0.0
+      }
+    },
+    {
+      "name": "spectral_adaptive",
+      "label": "Spectral learned-frequency",
+      "class_path": "experiments.power_spectrum.code.spectral_txc_v2:SpectralTXCV2",
+      "implementation_version": "2.1.0-experimental",
+      "consumes": "window",
+      "sparsity_rule": "one_per_token",
+      "hparams": {
+        "auxk_alpha": 0.03125,
+        "bands": "multiband",
+        "dc_mode": "keep",
+        "selection_mode": "global",
+        "dominance_alpha": 0.0,
+        "frequency_matryoshka_alpha": 0.0,
+        "adaptive_frequency_alpha": 0.1,
+        "adaptive_frequency_adversary_alpha": 0.1,
+        "adaptive_frequency_entropy": 0.2,
+        "adaptive_frequency_floor": 0.2,
+        "adaptive_frequency_ema_beta": 0.99,
+        "adaptive_frequency_power_floor": 0.05,
+        "adaptive_frequency_warmup_steps": 500
+      }
+    }
+  ],
+  "seeds": [
+    1,
+    2
+  ],
+  "tasks": [
+    {
+      "name": "hmm_mixed_t8_matched_params",
+      "family": "factorial_hmm",
+      "group": "hmm_mixed_t8_matched_params",
+      "lambdas": [
+        0.9,
+        0.5,
+        -0.5,
+        -0.9
+      ],
+      "d_in": 16,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "spectral_global": 254,
+        "spectral_adaptive": 253
+      },
+      "sigma": 0.5,
+      "sequence_length": 64,
+      "window": 8,
+      "n_steps": 4000,
+      "primary_metric": "direct_latent_r2"
+    },
+    {
+      "name": "narrowband_offgrid_t8_matched_params",
+      "family": "narrowband_sources",
+      "group": "narrowband_offgrid_t8_matched_params",
+      "frequencies": [
+        0.078125,
+        0.203125,
+        0.328125,
+        0.453125
+      ],
+      "amplitude_range": [
+        0.75,
+        1.25
+      ],
+      "min_frequency_separation": 0.0625,
+      "d_in": 16,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "spectral_global": 254,
+        "spectral_adaptive": 253
+      },
+      "sigma": 0.75,
+      "sequence_length": 64,
+      "window": 8,
+      "n_steps": 6000,
+      "primary_metric": "direct_latent_r2"
+    },
+    {
+      "name": "narrowband_offgrid_t16_matched_params",
+      "family": "narrowband_sources",
+      "group": "narrowband_offgrid_t16_matched_params",
+      "frequencies": [
+        0.078125,
+        0.203125,
+        0.328125,
+        0.453125
+      ],
+      "amplitude_range": [
+        0.75,
+        1.25
+      ],
+      "min_frequency_separation": 0.0625,
+      "d_in": 16,
+      "d_sae": 64,
+      "d_sae_by_model": {
+        "spectral_global": 255,
+        "spectral_adaptive": 255
+      },
+      "sigma": 0.75,
+      "sequence_length": 64,
+      "window": 16,
+      "n_steps": 6000,
+      "primary_metric": "direct_latent_r2"
+    }
+  ],
+  "smoke": {
+    "tasks": [
+      "hmm_mixed_t8_matched_params",
+      "narrowband_offgrid_t8_matched_params",
+      "narrowband_offgrid_t16_matched_params"
+    ],
+    "models": [
+      "txc",
+      "spectral_global",
+      "spectral_adaptive"
+    ],
+    "seed": 1,
+    "n_steps": 2
+  },
+  "fairness": {
+    "support": "Every window model has nominal L0=W: TXC-post uses k_pos=W; spectral models use k_pos=1 and k_win=W with global BatchTopK.",
+    "parameters": "Task-specific dictionary widths match total trainable parameters between TXC and both spectral arms to within 0.2%; exact counts are recorded per cell.",
+    "data": "All models receive identical seeded representation-training episodes and episode-disjoint probe/eval episodes with one shared observation dictionary.",
+    "attribution": "Spectral global and learned-frequency differ only by the adaptive order-free band objective and four learned band logits; the historical fixed low-prefix Matryoshka loss is disabled.",
+    "primary_metric": "Direct latent reconstruction R2 projects reconstructed observations onto the known emission directions, avoiding a wider-dictionary probe advantage."
+  }
+}
