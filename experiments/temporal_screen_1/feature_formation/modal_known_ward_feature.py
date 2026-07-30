@@ -400,7 +400,40 @@ def run() -> dict:
 
 @app.local_entrypoint()
 def main():
+    import copy
+
     payload = run.remote()
+    compact = copy.deepcopy(payload)
+    compact["pairing"]["n_records_omitted"] = len(
+        compact["pairing"].pop("records")
+    )
+    compact["known_directions"]["curves"] = {
+        name: curve
+        for name, curve in compact["known_directions"]["curves"].items()
+        if name in {"base_union", "reasoning_union"}
+    }
+    primary_feature = compact["conventional_sae"][
+        "best_positive_feature"
+    ]
+    primary_name = f"f{primary_feature}"
+    compact["conventional_sae"]["curves"] = {
+        primary_name: compact["conventional_sae"]["curves"][primary_name]
+    }
+    compact["conventional_sae"]["summaries"] = {
+        primary_name: compact["conventional_sae"]["summaries"][
+            primary_name
+        ]
+    }
+    compact["compact_artifact"] = {
+        "omitted": (
+            "pair records, non-union full direction curves, and auxiliary "
+            "aligned-SAE feature curves"
+        ),
+        "full_modal_volume_path": (
+            "temporal-screen-ward-weak-label-cache:"
+            "ward_known_feature_formation_v1.json"
+        ),
+    }
     RESULT.parent.mkdir(parents=True, exist_ok=True)
-    RESULT.write_text(json.dumps(payload, indent=2, sort_keys=True))
+    RESULT.write_text(json.dumps(compact, indent=2, sort_keys=True))
     print(f"[saved] {RESULT}")

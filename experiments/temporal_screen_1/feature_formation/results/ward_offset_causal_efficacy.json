@@ -1,0 +1,2377 @@
+{
+  "aggregates": {
+    "base_derived_off+0_normmatched": {
+      "any_keyword_fraction": 1.0,
+      "mean_keyword_count": 33.2,
+      "mean_keyword_rate": 0.03239578024347818,
+      "mean_words": 1051.25,
+      "n_prompts": 20
+    },
+    "base_derived_off+0_raw": {
+      "any_keyword_fraction": 1.0,
+      "mean_keyword_count": 265.9,
+      "mean_keyword_rate": 0.803912387209442,
+      "mean_words": 292.65,
+      "n_prompts": 20
+    },
+    "base_derived_off-10_raw": {
+      "any_keyword_fraction": 0.95,
+      "mean_keyword_count": 25.35,
+      "mean_keyword_rate": 0.024823067535598563,
+      "mean_words": 1015.95,
+      "n_prompts": 20
+    },
+    "base_derived_off-11_raw": {
+      "any_keyword_fraction": 0.9,
+      "mean_keyword_count": 32.8,
+      "mean_keyword_rate": 0.031105432485709145,
+      "mean_words": 997.65,
+      "n_prompts": 20
+    },
+    "base_derived_off-12_raw": {
+      "any_keyword_fraction": 0.95,
+      "mean_keyword_count": 29.65,
+      "mean_keyword_rate": 0.02778491736036263,
+      "mean_words": 1051.8,
+      "n_prompts": 20
+    },
+    "base_derived_off-13_raw": {
+      "any_keyword_fraction": 0.95,
+      "mean_keyword_count": 26.05,
+      "mean_keyword_rate": 0.025745476276129654,
+      "mean_words": 1006.35,
+      "n_prompts": 20
+    },
+    "base_derived_off-8_raw": {
+      "any_keyword_fraction": 0.95,
+      "mean_keyword_count": 39.85,
+      "mean_keyword_rate": 0.03733282482856628,
+      "mean_words": 1085.85,
+      "n_prompts": 20
+    },
+    "base_derived_off-9_raw": {
+      "any_keyword_fraction": 1.0,
+      "mean_keyword_count": 33.55,
+      "mean_keyword_rate": 0.031989215359448556,
+      "mean_words": 1075.3,
+      "n_prompts": 20
+    },
+    "base_derived_union_raw": {
+      "any_keyword_fraction": 0.95,
+      "mean_keyword_count": 30.85,
+      "mean_keyword_rate": 0.029081798119949605,
+      "mean_words": 1034.4,
+      "n_prompts": 20
+    },
+    "sae_f3998_positive_aligned_normmatched": {
+      "any_keyword_fraction": 0.9,
+      "mean_keyword_count": 30.5,
+      "mean_keyword_rate": 0.028469317758467394,
+      "mean_words": 977.15,
+      "n_prompts": 20
+    },
+    "stage_a_magnitude_zero_baseline": {
+      "any_keyword_fraction": 0.8,
+      "mean_keyword_count": 6.65,
+      "mean_keyword_rate": 0.0069839738625378425,
+      "mean_words": 861.45,
+      "n_prompts": 20
+    }
+  },
+  "guardrails": [
+    "This is a single-magnitude efficacy slice, not a full dose-response curve.",
+    "Raw band-vector norms are similar; offset zero is also reported after norm matching because its raw norm is larger.",
+    "The keyword metric is the Ward screen metric but is noisier than a semantic judge of genuine backtracking."
+  ],
+  "layer": 10,
+  "magnitude": 12.0,
+  "max_new_tokens": 1500,
+  "method": "held-out causal generation with repository Ward reference implementation",
+  "n_eval_prompts": 20,
+  "rows": [
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.008350730688935281,
+      "magnitude": 12.0,
+      "n_words": 958,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 8
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.017406440382941687,
+      "magnitude": 12.0,
+      "n_words": 1149,
+      "prompt_id": "probability_019",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 20
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.04243008678881389,
+      "magnitude": 12.0,
+      "n_words": 1037,
+      "prompt_id": "sequences_000",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 44
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.0036496350364963502,
+      "magnitude": 12.0,
+      "n_words": 1370,
+      "prompt_id": "probability_007",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 5
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.03268551236749117,
+      "magnitude": 12.0,
+      "n_words": 1132,
+      "prompt_id": "counting_028",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 37
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.0226890756302521,
+      "magnitude": 12.0,
+      "n_words": 1190,
+      "prompt_id": "set_theory_013",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 27
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.07692307692307693,
+      "magnitude": 12.0,
+      "n_words": 832,
+      "prompt_id": "sequences_022",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 64
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.005479452054794521,
+      "magnitude": 12.0,
+      "n_words": 1095,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 6
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 12.0,
+      "n_words": 213,
+      "prompt_id": "arithmetic_014",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.02619047619047619,
+      "magnitude": 12.0,
+      "n_words": 840,
+      "prompt_id": "set_theory_008",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.03379224030037547,
+      "magnitude": 12.0,
+      "n_words": 799,
+      "prompt_id": "inequalities_019",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 27
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.03145853193517636,
+      "magnitude": 12.0,
+      "n_words": 1049,
+      "prompt_id": "number_theory_020",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 33
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.026387625113739762,
+      "magnitude": 12.0,
+      "n_words": 1099,
+      "prompt_id": "basic_logic_014",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 29
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.02118270079435128,
+      "magnitude": 12.0,
+      "n_words": 1133,
+      "prompt_id": "number_theory_022",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 24
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.024734982332155476,
+      "magnitude": 12.0,
+      "n_words": 1132,
+      "prompt_id": "geometry_019",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 28
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.03379224030037547,
+      "magnitude": 12.0,
+      "n_words": 799,
+      "prompt_id": "inequalities_018",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 27
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.010428736964078795,
+      "magnitude": 12.0,
+      "n_words": 863,
+      "prompt_id": "arithmetic_023",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 9
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.03076923076923077,
+      "magnitude": 12.0,
+      "n_words": 1235,
+      "prompt_id": "counting_026",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 38
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.0215633423180593,
+      "magnitude": 12.0,
+      "n_words": 1113,
+      "prompt_id": "basic_logic_013",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 24
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.04499540863177227,
+      "magnitude": 12.0,
+      "n_words": 1089,
+      "prompt_id": "geometry_025",
+      "source": "base_derived_off-13_raw",
+      "target": "reasoning",
+      "wait_count": 49
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.02551521099116781,
+      "magnitude": 12.0,
+      "n_words": 1019,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 26
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.012345679012345678,
+      "magnitude": 12.0,
+      "n_words": 1215,
+      "prompt_id": "probability_019",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 15
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.025052192066805846,
+      "magnitude": 12.0,
+      "n_words": 958,
+      "prompt_id": "sequences_000",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 24
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.03122497998398719,
+      "magnitude": 12.0,
+      "n_words": 1249,
+      "prompt_id": "probability_007",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 39
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.012254901960784314,
+      "magnitude": 12.0,
+      "n_words": 1224,
+      "prompt_id": "counting_028",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 15
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.029197080291970802,
+      "magnitude": 12.0,
+      "n_words": 1233,
+      "prompt_id": "set_theory_013",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 36
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.041666666666666664,
+      "magnitude": 12.0,
+      "n_words": 672,
+      "prompt_id": "sequences_022",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 28
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.040336134453781515,
+      "magnitude": 12.0,
+      "n_words": 1190,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 48
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 12.0,
+      "n_words": 168,
+      "prompt_id": "arithmetic_014",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.013050570962479609,
+      "magnitude": 12.0,
+      "n_words": 1226,
+      "prompt_id": "set_theory_008",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 16
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.05778648383937316,
+      "magnitude": 12.0,
+      "n_words": 1021,
+      "prompt_id": "inequalities_019",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 59
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.02022058823529412,
+      "magnitude": 12.0,
+      "n_words": 1088,
+      "prompt_id": "number_theory_020",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.006837606837606838,
+      "magnitude": 12.0,
+      "n_words": 1170,
+      "prompt_id": "basic_logic_014",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 8
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.004078303425774877,
+      "magnitude": 12.0,
+      "n_words": 1226,
+      "prompt_id": "number_theory_022",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 5
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.04722452361226181,
+      "magnitude": 12.0,
+      "n_words": 1207,
+      "prompt_id": "geometry_019",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 57
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.05778648383937316,
+      "magnitude": 12.0,
+      "n_words": 1021,
+      "prompt_id": "inequalities_018",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 59
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.023835319609967497,
+      "magnitude": 12.0,
+      "n_words": 923,
+      "prompt_id": "arithmetic_023",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.04410354745925216,
+      "magnitude": 12.0,
+      "n_words": 1043,
+      "prompt_id": "counting_026",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 46
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.013416815742397137,
+      "magnitude": 12.0,
+      "n_words": 1118,
+      "prompt_id": "basic_logic_013",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 15
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.04976525821596244,
+      "magnitude": 12.0,
+      "n_words": 1065,
+      "prompt_id": "geometry_025",
+      "source": "base_derived_off-12_raw",
+      "target": "reasoning",
+      "wait_count": 53
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.007911392405063292,
+      "magnitude": 12.0,
+      "n_words": 632,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 5
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.04317111459968603,
+      "magnitude": 12.0,
+      "n_words": 1274,
+      "prompt_id": "probability_019",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 55
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.032397408207343416,
+      "magnitude": 12.0,
+      "n_words": 926,
+      "prompt_id": "sequences_000",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 30
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.026004728132387706,
+      "magnitude": 12.0,
+      "n_words": 1269,
+      "prompt_id": "probability_007",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 33
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.017973856209150325,
+      "magnitude": 12.0,
+      "n_words": 1224,
+      "prompt_id": "counting_028",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.02861952861952862,
+      "magnitude": 12.0,
+      "n_words": 1188,
+      "prompt_id": "set_theory_013",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 34
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.09707602339181287,
+      "magnitude": 12.0,
+      "n_words": 855,
+      "prompt_id": "sequences_022",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 83
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.06912878787878787,
+      "magnitude": 12.0,
+      "n_words": 1056,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 73
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 12.0,
+      "n_words": 722,
+      "prompt_id": "arithmetic_014",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.0016,
+      "magnitude": 12.0,
+      "n_words": 1250,
+      "prompt_id": "set_theory_008",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 2
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.042708333333333334,
+      "magnitude": 12.0,
+      "n_words": 960,
+      "prompt_id": "inequalities_019",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 41
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.02071563088512241,
+      "magnitude": 12.0,
+      "n_words": 1062,
+      "prompt_id": "number_theory_020",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.04101221640488656,
+      "magnitude": 12.0,
+      "n_words": 1146,
+      "prompt_id": "basic_logic_014",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 47
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.0048828125,
+      "magnitude": 12.0,
+      "n_words": 1024,
+      "prompt_id": "number_theory_022",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 5
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.06340288924558588,
+      "magnitude": 12.0,
+      "n_words": 1246,
+      "prompt_id": "geometry_019",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 79
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.042708333333333334,
+      "magnitude": 12.0,
+      "n_words": 960,
+      "prompt_id": "inequalities_018",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 41
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 12.0,
+      "n_words": 107,
+      "prompt_id": "arithmetic_023",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.02913453299057412,
+      "magnitude": 12.0,
+      "n_words": 1167,
+      "prompt_id": "counting_026",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 34
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.02483900643974241,
+      "magnitude": 12.0,
+      "n_words": 1087,
+      "prompt_id": "basic_logic_013",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 27
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.02882205513784461,
+      "magnitude": 12.0,
+      "n_words": 798,
+      "prompt_id": "geometry_025",
+      "source": "base_derived_off-11_raw",
+      "target": "reasoning",
+      "wait_count": 23
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.013940520446096654,
+      "magnitude": 12.0,
+      "n_words": 1076,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 15
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.03265940902021773,
+      "magnitude": 12.0,
+      "n_words": 1286,
+      "prompt_id": "probability_019",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 42
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.02998965873836608,
+      "magnitude": 12.0,
+      "n_words": 967,
+      "prompt_id": "sequences_000",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 29
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.05492730210016155,
+      "magnitude": 12.0,
+      "n_words": 1238,
+      "prompt_id": "probability_007",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 68
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.03800904977375565,
+      "magnitude": 12.0,
+      "n_words": 1105,
+      "prompt_id": "counting_028",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 42
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.018837018837018837,
+      "magnitude": 12.0,
+      "n_words": 1221,
+      "prompt_id": "set_theory_013",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 23
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.06435643564356436,
+      "magnitude": 12.0,
+      "n_words": 606,
+      "prompt_id": "sequences_022",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 39
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.02262443438914027,
+      "magnitude": 12.0,
+      "n_words": 1105,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 25
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 12.0,
+      "n_words": 214,
+      "prompt_id": "arithmetic_014",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.023008849557522124,
+      "magnitude": 12.0,
+      "n_words": 1130,
+      "prompt_id": "set_theory_008",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 26
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.03244495944380069,
+      "magnitude": 12.0,
+      "n_words": 863,
+      "prompt_id": "inequalities_019",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 28
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.023645320197044337,
+      "magnitude": 12.0,
+      "n_words": 1015,
+      "prompt_id": "number_theory_020",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 24
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.01192504258943782,
+      "magnitude": 12.0,
+      "n_words": 1174,
+      "prompt_id": "basic_logic_014",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 14
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.005199306759098787,
+      "magnitude": 12.0,
+      "n_words": 1154,
+      "prompt_id": "number_theory_022",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 6
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.009513742071881607,
+      "magnitude": 12.0,
+      "n_words": 946,
+      "prompt_id": "geometry_019",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 9
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.03244495944380069,
+      "magnitude": 12.0,
+      "n_words": 863,
+      "prompt_id": "inequalities_018",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 28
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.027263875365141188,
+      "magnitude": 12.0,
+      "n_words": 1027,
+      "prompt_id": "arithmetic_023",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 28
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.018502943650126155,
+      "magnitude": 12.0,
+      "n_words": 1189,
+      "prompt_id": "counting_026",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.010723860589812333,
+      "magnitude": 12.0,
+      "n_words": 1119,
+      "prompt_id": "basic_logic_013",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 12
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.02644466209598433,
+      "magnitude": 12.0,
+      "n_words": 1021,
+      "prompt_id": "geometry_025",
+      "source": "base_derived_off-10_raw",
+      "target": "reasoning",
+      "wait_count": 27
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.0416243654822335,
+      "magnitude": 12.0,
+      "n_words": 985,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 41
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.04159592529711375,
+      "magnitude": 12.0,
+      "n_words": 1178,
+      "prompt_id": "probability_019",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 49
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.07952069716775599,
+      "magnitude": 12.0,
+      "n_words": 918,
+      "prompt_id": "sequences_000",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 73
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.022277227722772276,
+      "magnitude": 12.0,
+      "n_words": 1212,
+      "prompt_id": "probability_007",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 27
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.03439153439153439,
+      "magnitude": 12.0,
+      "n_words": 1134,
+      "prompt_id": "counting_028",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 39
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.04285714285714286,
+      "magnitude": 12.0,
+      "n_words": 1120,
+      "prompt_id": "set_theory_013",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 48
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.08036739380022963,
+      "magnitude": 12.0,
+      "n_words": 871,
+      "prompt_id": "sequences_022",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 70
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.021447721179624665,
+      "magnitude": 12.0,
+      "n_words": 1119,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 24
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.02012072434607646,
+      "magnitude": 12.0,
+      "n_words": 994,
+      "prompt_id": "arithmetic_014",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 20
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.029812606473594547,
+      "magnitude": 12.0,
+      "n_words": 1174,
+      "prompt_id": "set_theory_008",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 35
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.0255863539445629,
+      "magnitude": 12.0,
+      "n_words": 938,
+      "prompt_id": "inequalities_019",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 24
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.028440366972477066,
+      "magnitude": 12.0,
+      "n_words": 1090,
+      "prompt_id": "number_theory_020",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 31
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.013215859030837005,
+      "magnitude": 12.0,
+      "n_words": 1135,
+      "prompt_id": "basic_logic_014",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 15
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.004789272030651341,
+      "magnitude": 12.0,
+      "n_words": 1044,
+      "prompt_id": "number_theory_022",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 5
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.031144781144781145,
+      "magnitude": 12.0,
+      "n_words": 1188,
+      "prompt_id": "geometry_019",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 37
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.0255863539445629,
+      "magnitude": 12.0,
+      "n_words": 938,
+      "prompt_id": "inequalities_018",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 24
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.01608325449385052,
+      "magnitude": 12.0,
+      "n_words": 1057,
+      "prompt_id": "arithmetic_023",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 17
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.025483304042179262,
+      "magnitude": 12.0,
+      "n_words": 1138,
+      "prompt_id": "counting_026",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 29
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.0291005291005291,
+      "magnitude": 12.0,
+      "n_words": 1134,
+      "prompt_id": "basic_logic_013",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 33
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.02633889376646181,
+      "magnitude": 12.0,
+      "n_words": 1139,
+      "prompt_id": "geometry_025",
+      "source": "base_derived_off-9_raw",
+      "target": "reasoning",
+      "wait_count": 30
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.02330097087378641,
+      "magnitude": 12.0,
+      "n_words": 1030,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 24
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.07234726688102894,
+      "magnitude": 12.0,
+      "n_words": 1244,
+      "prompt_id": "probability_019",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 90
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.029693486590038315,
+      "magnitude": 12.0,
+      "n_words": 1044,
+      "prompt_id": "sequences_000",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 31
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.02048857368006304,
+      "magnitude": 12.0,
+      "n_words": 1269,
+      "prompt_id": "probability_007",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 26
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.057676685621445976,
+      "magnitude": 12.0,
+      "n_words": 1231,
+      "prompt_id": "counting_028",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 71
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.022632020117351215,
+      "magnitude": 12.0,
+      "n_words": 1193,
+      "prompt_id": "set_theory_013",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 27
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.046419098143236075,
+      "magnitude": 12.0,
+      "n_words": 754,
+      "prompt_id": "sequences_022",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 35
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.017210144927536232,
+      "magnitude": 12.0,
+      "n_words": 1104,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 19
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 12.0,
+      "n_words": 1004,
+      "prompt_id": "arithmetic_014",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.08056042031523643,
+      "magnitude": 12.0,
+      "n_words": 1142,
+      "prompt_id": "set_theory_008",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 92
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.0814081408140814,
+      "magnitude": 12.0,
+      "n_words": 909,
+      "prompt_id": "inequalities_019",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 74
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.024738344433872503,
+      "magnitude": 12.0,
+      "n_words": 1051,
+      "prompt_id": "number_theory_020",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 26
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.013781223083548665,
+      "magnitude": 12.0,
+      "n_words": 1161,
+      "prompt_id": "basic_logic_014",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 16
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.038033395176252316,
+      "magnitude": 12.0,
+      "n_words": 1078,
+      "prompt_id": "number_theory_022",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 41
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.01643598615916955,
+      "magnitude": 12.0,
+      "n_words": 1156,
+      "prompt_id": "geometry_019",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 19
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.0814081408140814,
+      "magnitude": 12.0,
+      "n_words": 909,
+      "prompt_id": "inequalities_018",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 74
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.027410207939508508,
+      "magnitude": 12.0,
+      "n_words": 1058,
+      "prompt_id": "arithmetic_023",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 29
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.026785714285714284,
+      "magnitude": 12.0,
+      "n_words": 1232,
+      "prompt_id": "counting_026",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 33
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.014453477868112014,
+      "magnitude": 12.0,
+      "n_words": 1107,
+      "prompt_id": "basic_logic_013",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 16
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.05187319884726225,
+      "magnitude": 12.0,
+      "n_words": 1041,
+      "prompt_id": "geometry_025",
+      "source": "base_derived_off-8_raw",
+      "target": "reasoning",
+      "wait_count": 54
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.9529411764705882,
+      "magnitude": 12.0,
+      "n_words": 255,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 243
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.9844097995545658,
+      "magnitude": 12.0,
+      "n_words": 449,
+      "prompt_id": "probability_019",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 442
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.9771986970684039,
+      "magnitude": 12.0,
+      "n_words": 307,
+      "prompt_id": "sequences_000",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 300
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.9887892376681614,
+      "magnitude": 12.0,
+      "n_words": 446,
+      "prompt_id": "probability_007",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 441
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.986046511627907,
+      "magnitude": 12.0,
+      "n_words": 430,
+      "prompt_id": "counting_028",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 424
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.18181818181818182,
+      "magnitude": 12.0,
+      "n_words": 77,
+      "prompt_id": "set_theory_013",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 14
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.9886363636363636,
+      "magnitude": 12.0,
+      "n_words": 440,
+      "prompt_id": "sequences_022",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 435
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.9636363636363636,
+      "magnitude": 12.0,
+      "n_words": 275,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 265
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.23684210526315788,
+      "magnitude": 12.0,
+      "n_words": 114,
+      "prompt_id": "arithmetic_014",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 27
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.3508771929824561,
+      "magnitude": 12.0,
+      "n_words": 57,
+      "prompt_id": "set_theory_008",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 20
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.96,
+      "magnitude": 12.0,
+      "n_words": 300,
+      "prompt_id": "inequalities_019",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 288
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.9816933638443935,
+      "magnitude": 12.0,
+      "n_words": 437,
+      "prompt_id": "number_theory_020",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 429
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.9545454545454546,
+      "magnitude": 12.0,
+      "n_words": 242,
+      "prompt_id": "basic_logic_014",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 231
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.511864406779661,
+      "magnitude": 12.0,
+      "n_words": 295,
+      "prompt_id": "number_theory_022",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 151
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.9682539682539683,
+      "magnitude": 12.0,
+      "n_words": 315,
+      "prompt_id": "geometry_019",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 305
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.96,
+      "magnitude": 12.0,
+      "n_words": 300,
+      "prompt_id": "inequalities_018",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 288
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.9977827050997783,
+      "magnitude": 12.0,
+      "n_words": 451,
+      "prompt_id": "arithmetic_023",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 450
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.9977477477477478,
+      "magnitude": 12.0,
+      "n_words": 444,
+      "prompt_id": "counting_026",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 443
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.8962264150943396,
+      "magnitude": 12.0,
+      "n_words": 106,
+      "prompt_id": "basic_logic_013",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 95
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.23893805309734514,
+      "magnitude": 12.0,
+      "n_words": 113,
+      "prompt_id": "geometry_025",
+      "source": "base_derived_off+0_raw",
+      "target": "reasoning",
+      "wait_count": 27
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.01953488372093023,
+      "magnitude": 12.0,
+      "n_words": 1075,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 21
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.050283860502838604,
+      "magnitude": 12.0,
+      "n_words": 1233,
+      "prompt_id": "probability_019",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 62
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.04656084656084656,
+      "magnitude": 12.0,
+      "n_words": 945,
+      "prompt_id": "sequences_000",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 44
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.022852639873916468,
+      "magnitude": 12.0,
+      "n_words": 1269,
+      "prompt_id": "probability_007",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 29
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.019150707743547043,
+      "magnitude": 12.0,
+      "n_words": 1201,
+      "prompt_id": "counting_028",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 23
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.030726256983240222,
+      "magnitude": 12.0,
+      "n_words": 1074,
+      "prompt_id": "set_theory_013",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 33
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.06815642458100558,
+      "magnitude": 12.0,
+      "n_words": 895,
+      "prompt_id": "sequences_022",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 61
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.03344768439108062,
+      "magnitude": 12.0,
+      "n_words": 1166,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 39
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 12.0,
+      "n_words": 219,
+      "prompt_id": "arithmetic_014",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.0211864406779661,
+      "magnitude": 12.0,
+      "n_words": 1180,
+      "prompt_id": "set_theory_008",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 25
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.02732919254658385,
+      "magnitude": 12.0,
+      "n_words": 805,
+      "prompt_id": "inequalities_019",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.042682926829268296,
+      "magnitude": 12.0,
+      "n_words": 984,
+      "prompt_id": "number_theory_020",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 42
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.014492753623188406,
+      "magnitude": 12.0,
+      "n_words": 1104,
+      "prompt_id": "basic_logic_014",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 16
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.005957446808510639,
+      "magnitude": 12.0,
+      "n_words": 1175,
+      "prompt_id": "number_theory_022",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 7
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.04227642276422764,
+      "magnitude": 12.0,
+      "n_words": 1230,
+      "prompt_id": "geometry_019",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 52
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.02732919254658385,
+      "magnitude": 12.0,
+      "n_words": 805,
+      "prompt_id": "inequalities_018",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.01701701701701702,
+      "magnitude": 12.0,
+      "n_words": 999,
+      "prompt_id": "arithmetic_023",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 17
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.028789161727349702,
+      "magnitude": 12.0,
+      "n_words": 1181,
+      "prompt_id": "counting_026",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 34
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.028472821397756688,
+      "magnitude": 12.0,
+      "n_words": 1159,
+      "prompt_id": "basic_logic_013",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 33
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.03538928210313448,
+      "magnitude": 12.0,
+      "n_words": 989,
+      "prompt_id": "geometry_025",
+      "source": "base_derived_union_raw",
+      "target": "reasoning",
+      "wait_count": 35
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.04315960912052117,
+      "magnitude": 12.0,
+      "n_words": 1228,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 53
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.021636876763875823,
+      "magnitude": 12.0,
+      "n_words": 1063,
+      "prompt_id": "probability_019",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 23
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.026709401709401708,
+      "magnitude": 12.0,
+      "n_words": 936,
+      "prompt_id": "sequences_000",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 25
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.01993704092339979,
+      "magnitude": 12.0,
+      "n_words": 953,
+      "prompt_id": "probability_007",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 19
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.03102836879432624,
+      "magnitude": 12.0,
+      "n_words": 1128,
+      "prompt_id": "counting_028",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 35
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.03656307129798903,
+      "magnitude": 12.0,
+      "n_words": 1094,
+      "prompt_id": "set_theory_013",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 40
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.03979591836734694,
+      "magnitude": 12.0,
+      "n_words": 980,
+      "prompt_id": "sequences_022",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 39
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.03396851698425849,
+      "magnitude": 12.0,
+      "n_words": 1207,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 41
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.023084994753410283,
+      "magnitude": 12.0,
+      "n_words": 953,
+      "prompt_id": "arithmetic_014",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.022350993377483443,
+      "magnitude": 12.0,
+      "n_words": 1208,
+      "prompt_id": "set_theory_008",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 27
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.05056179775280899,
+      "magnitude": 12.0,
+      "n_words": 890,
+      "prompt_id": "inequalities_019",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 45
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.019247594050743656,
+      "magnitude": 12.0,
+      "n_words": 1143,
+      "prompt_id": "number_theory_020",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.016289592760180997,
+      "magnitude": 12.0,
+      "n_words": 1105,
+      "prompt_id": "basic_logic_014",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 18
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.013157894736842105,
+      "magnitude": 12.0,
+      "n_words": 1140,
+      "prompt_id": "number_theory_022",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 15
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.03248730964467005,
+      "magnitude": 12.0,
+      "n_words": 985,
+      "prompt_id": "geometry_019",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 32
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.05056179775280899,
+      "magnitude": 12.0,
+      "n_words": 890,
+      "prompt_id": "inequalities_018",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 45
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.07828282828282829,
+      "magnitude": 12.0,
+      "n_words": 792,
+      "prompt_id": "arithmetic_023",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 62
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.022900763358778626,
+      "magnitude": 12.0,
+      "n_words": 1310,
+      "prompt_id": "counting_026",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 30
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.04442581726739313,
+      "magnitude": 12.0,
+      "n_words": 1193,
+      "prompt_id": "basic_logic_013",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 53
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.02176541717049577,
+      "magnitude": 12.0,
+      "n_words": 827,
+      "prompt_id": "geometry_025",
+      "source": "base_derived_off+0_normmatched",
+      "target": "reasoning",
+      "wait_count": 18
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.023741690408357077,
+      "magnitude": 12.0,
+      "n_words": 1053,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 25
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.05688073394495413,
+      "magnitude": 12.0,
+      "n_words": 1090,
+      "prompt_id": "probability_019",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 62
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.08301158301158301,
+      "magnitude": 12.0,
+      "n_words": 1036,
+      "prompt_id": "sequences_000",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 86
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.015625,
+      "magnitude": 12.0,
+      "n_words": 1216,
+      "prompt_id": "probability_007",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 19
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.0361952861952862,
+      "magnitude": 12.0,
+      "n_words": 1188,
+      "prompt_id": "counting_028",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 43
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.03548680618744313,
+      "magnitude": 12.0,
+      "n_words": 1099,
+      "prompt_id": "set_theory_013",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 39
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.021105527638190954,
+      "magnitude": 12.0,
+      "n_words": 995,
+      "prompt_id": "sequences_022",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 21
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.02697841726618705,
+      "magnitude": 12.0,
+      "n_words": 1112,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 30
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 12.0,
+      "n_words": 163,
+      "prompt_id": "arithmetic_014",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.02135561745589601,
+      "magnitude": 12.0,
+      "n_words": 1077,
+      "prompt_id": "set_theory_008",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 23
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.036303630363036306,
+      "magnitude": 12.0,
+      "n_words": 909,
+      "prompt_id": "inequalities_019",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 33
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.01095290251916758,
+      "magnitude": 12.0,
+      "n_words": 913,
+      "prompt_id": "number_theory_020",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 10
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.007662835249042145,
+      "magnitude": 12.0,
+      "n_words": 1044,
+      "prompt_id": "basic_logic_014",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 8
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.03451407811080836,
+      "magnitude": 12.0,
+      "n_words": 1101,
+      "prompt_id": "number_theory_022",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 38
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.04003481288076589,
+      "magnitude": 12.0,
+      "n_words": 1149,
+      "prompt_id": "geometry_019",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 46
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.036303630363036306,
+      "magnitude": 12.0,
+      "n_words": 909,
+      "prompt_id": "inequalities_018",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 33
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 12.0,
+      "n_words": 158,
+      "prompt_id": "arithmetic_023",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.01987353206865402,
+      "magnitude": 12.0,
+      "n_words": 1107,
+      "prompt_id": "counting_026",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 22
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.019029495718363463,
+      "magnitude": 12.0,
+      "n_words": 1051,
+      "prompt_id": "basic_logic_013",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 20
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.0443307757885763,
+      "magnitude": 12.0,
+      "n_words": 1173,
+      "prompt_id": "geometry_025",
+      "source": "sae_f3998_positive_aligned_normmatched",
+      "target": "reasoning",
+      "wait_count": 52
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.014155712841253791,
+      "magnitude": 0.0,
+      "n_words": 989,
+      "prompt_id": "algebra_word_problems_019",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 14
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.01607142857142857,
+      "magnitude": 0.0,
+      "n_words": 1120,
+      "prompt_id": "probability_019",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 18
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.004511278195488722,
+      "magnitude": 0.0,
+      "n_words": 665,
+      "prompt_id": "sequences_000",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 3
+    },
+    {
+      "category": "probability",
+      "keyword_rate": 0.006122448979591836,
+      "magnitude": 0.0,
+      "n_words": 980,
+      "prompt_id": "probability_007",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 6
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.011333914559721011,
+      "magnitude": 0.0,
+      "n_words": 1147,
+      "prompt_id": "counting_028",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 13
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.0,
+      "magnitude": 0.0,
+      "n_words": 817,
+      "prompt_id": "set_theory_013",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "sequences",
+      "keyword_rate": 0.008298755186721992,
+      "magnitude": 0.0,
+      "n_words": 723,
+      "prompt_id": "sequences_022",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 6
+    },
+    {
+      "category": "algebra_word_problems",
+      "keyword_rate": 0.0048216007714561235,
+      "magnitude": 0.0,
+      "n_words": 1037,
+      "prompt_id": "algebra_word_problems_014",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 5
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 0.0,
+      "n_words": 285,
+      "prompt_id": "arithmetic_014",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "set_theory",
+      "keyword_rate": 0.0,
+      "magnitude": 0.0,
+      "n_words": 620,
+      "prompt_id": "set_theory_008",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.00922266139657444,
+      "magnitude": 0.0,
+      "n_words": 759,
+      "prompt_id": "inequalities_019",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 7
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.01221001221001221,
+      "magnitude": 0.0,
+      "n_words": 819,
+      "prompt_id": "number_theory_020",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 10
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.004549590536851683,
+      "magnitude": 0.0,
+      "n_words": 1099,
+      "prompt_id": "basic_logic_014",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 5
+    },
+    {
+      "category": "number_theory",
+      "keyword_rate": 0.0078125,
+      "magnitude": 0.0,
+      "n_words": 896,
+      "prompt_id": "number_theory_022",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 7
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.012141280353200883,
+      "magnitude": 0.0,
+      "n_words": 906,
+      "prompt_id": "geometry_019",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 11
+    },
+    {
+      "category": "inequalities",
+      "keyword_rate": 0.00922266139657444,
+      "magnitude": 0.0,
+      "n_words": 759,
+      "prompt_id": "inequalities_018",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 7
+    },
+    {
+      "category": "arithmetic",
+      "keyword_rate": 0.0,
+      "magnitude": 0.0,
+      "n_words": 456,
+      "prompt_id": "arithmetic_023",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 0
+    },
+    {
+      "category": "counting",
+      "keyword_rate": 0.009482758620689655,
+      "magnitude": 0.0,
+      "n_words": 1160,
+      "prompt_id": "counting_026",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 11
+    },
+    {
+      "category": "basic_logic",
+      "keyword_rate": 0.006352087114337568,
+      "magnitude": 0.0,
+      "n_words": 1102,
+      "prompt_id": "basic_logic_013",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 7
+    },
+    {
+      "category": "geometry",
+      "keyword_rate": 0.0033707865168539327,
+      "magnitude": 0.0,
+      "n_words": 890,
+      "prompt_id": "geometry_025",
+      "source": "stage_a_magnitude_zero_baseline",
+      "target": "reasoning",
+      "wait_count": 3
+    }
+  ],
+  "runtime": {
+    "gpu": "NVIDIA A100-SXM4-40GB",
+    "wall_seconds": 8917.48910665512
+  },
+  "sources": {
+    "base_derived_off+0_normmatched": {
+      "derivation_offset": 0,
+      "kind": "Ward DoM norm-matched control",
+      "norm": 0.413976788520813,
+      "original_norm": 1.118591547012329,
+      "scale": "matched to base union norm"
+    },
+    "base_derived_off+0_raw": {
+      "derivation_offset": 0,
+      "kind": "Ward DoM",
+      "norm": 1.118591547012329,
+      "scale": "raw Stage-A vector"
+    },
+    "base_derived_off-10_raw": {
+      "derivation_offset": -10,
+      "kind": "Ward DoM",
+      "norm": 0.4206719994544983,
+      "scale": "raw Stage-A vector"
+    },
+    "base_derived_off-11_raw": {
+      "derivation_offset": -11,
+      "kind": "Ward DoM",
+      "norm": 0.4327050745487213,
+      "scale": "raw Stage-A vector"
+    },
+    "base_derived_off-12_raw": {
+      "derivation_offset": -12,
+      "kind": "Ward DoM",
+      "norm": 0.4495849907398224,
+      "scale": "raw Stage-A vector"
+    },
+    "base_derived_off-13_raw": {
+      "derivation_offset": -13,
+      "kind": "Ward DoM",
+      "norm": 0.43406808376312256,
+      "scale": "raw Stage-A vector"
+    },
+    "base_derived_off-8_raw": {
+      "derivation_offset": -8,
+      "kind": "Ward DoM",
+      "norm": 0.44750192761421204,
+      "scale": "raw Stage-A vector"
+    },
+    "base_derived_off-9_raw": {
+      "derivation_offset": -9,
+      "kind": "Ward DoM",
+      "norm": 0.4468766748905182,
+      "scale": "raw Stage-A vector"
+    },
+    "base_derived_union_raw": {
+      "derivation_offsets": [
+        -13,
+        -12,
+        -11,
+        -10,
+        -9,
+        -8
+      ],
+      "kind": "Ward DoM union",
+      "norm": 0.413976788520813,
+      "scale": "raw Stage-A vector"
+    },
+    "sae_f3998_positive_aligned_normmatched": {
+      "decoder_cosine_to_base_union": 0.2680041193962097,
+      "feature": 3998,
+      "kind": "single conventional TopK SAE decoder direction",
+      "norm": 0.4139764904975891,
+      "scale": "matched to base union norm"
+    },
+    "stage_a_magnitude_zero_baseline": {
+      "kind": "exact reused Stage-A baseline",
+      "magnitude": 0.0
+    }
+  },
+  "target": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+  "compact_artifact": {
+    "omitted": "generated rollout text; per-prompt metrics retained",
+    "full_modal_volume_path": "temporal-screen-ward-weak-label-cache:ward_offset_causal_efficacy_v1.json"
+  }
+}

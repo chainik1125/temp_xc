@@ -277,6 +277,18 @@ def run() -> dict:
 @app.local_entrypoint()
 def main():
     payload = run.remote()
+    compact = dict(payload)
+    compact["rows"] = [
+        {key: value for key, value in row.items() if key != "text"}
+        for row in payload["rows"]
+    ]
+    compact["compact_artifact"] = {
+        "omitted": "generated rollout text; per-prompt metrics retained",
+        "full_modal_volume_path": (
+            "temporal-screen-ward-weak-label-cache:"
+            "ward_offset_causal_efficacy_v1.json"
+        ),
+    }
     RESULT.parent.mkdir(parents=True, exist_ok=True)
-    RESULT.write_text(json.dumps(payload, indent=2, sort_keys=True))
+    RESULT.write_text(json.dumps(compact, indent=2, sort_keys=True))
     print(f"[saved] {RESULT}")

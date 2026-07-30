@@ -1,0 +1,391 @@
+{
+  "causal": {
+    "band_offsets": [
+      {
+        "any_keyword_fraction": 0.95,
+        "mean_keyword_count": 26.05,
+        "mean_keyword_rate": 0.025745476276129654,
+        "mean_words": 1006.35,
+        "n_prompts": 20,
+        "offset": -13,
+        "source": "base_derived_off-13_raw"
+      },
+      {
+        "any_keyword_fraction": 0.95,
+        "mean_keyword_count": 29.65,
+        "mean_keyword_rate": 0.02778491736036263,
+        "mean_words": 1051.8,
+        "n_prompts": 20,
+        "offset": -12,
+        "source": "base_derived_off-12_raw"
+      },
+      {
+        "any_keyword_fraction": 0.9,
+        "mean_keyword_count": 32.8,
+        "mean_keyword_rate": 0.031105432485709145,
+        "mean_words": 997.65,
+        "n_prompts": 20,
+        "offset": -11,
+        "source": "base_derived_off-11_raw"
+      },
+      {
+        "any_keyword_fraction": 0.95,
+        "mean_keyword_count": 25.35,
+        "mean_keyword_rate": 0.024823067535598563,
+        "mean_words": 1015.95,
+        "n_prompts": 20,
+        "offset": -10,
+        "source": "base_derived_off-10_raw"
+      },
+      {
+        "any_keyword_fraction": 1.0,
+        "mean_keyword_count": 33.55,
+        "mean_keyword_rate": 0.031989215359448556,
+        "mean_words": 1075.3,
+        "n_prompts": 20,
+        "offset": -9,
+        "source": "base_derived_off-9_raw"
+      },
+      {
+        "any_keyword_fraction": 0.95,
+        "mean_keyword_count": 39.85,
+        "mean_keyword_rate": 0.03733282482856628,
+        "mean_words": 1085.85,
+        "n_prompts": 20,
+        "offset": -8,
+        "source": "base_derived_off-8_raw"
+      }
+    ],
+    "baseline": {
+      "any_keyword_fraction": 0.8,
+      "mean_keyword_count": 6.65,
+      "mean_keyword_rate": 0.0069839738625378425,
+      "mean_words": 861.45,
+      "n_prompts": 20
+    },
+    "best_band_mean_keyword_rate": 0.03733282482856628,
+    "best_band_offset": -8,
+    "bootstrap_95": {
+      "method": "10,000 prompt-paired nonparametric bootstrap replicates",
+      "seed": 20260729,
+      "sources": {
+        "base_derived_off+0_normmatched": {
+          "mean_keyword_rate": 0.03239578024347818,
+          "mean_keyword_rate_ci95": [
+            0.026295443969572518,
+            0.03928569703535051
+          ],
+          "paired_lift_ci95": [
+            0.018799986629976118,
+            0.032885572190112254
+          ],
+          "paired_lift_over_baseline": 0.025411806380940333
+        },
+        "base_derived_off+0_raw": {
+          "mean_keyword_rate": 0.8039123872094418,
+          "mean_keyword_rate_ci95": [
+            0.6669123610678451,
+            0.923761639203743
+          ],
+          "paired_lift_ci95": [
+            0.6614211446863818,
+            0.9155350908686168
+          ],
+          "paired_lift_over_baseline": 0.7969284133469041
+        },
+        "base_derived_off-10_raw": {
+          "mean_keyword_rate": 0.02482306753559856,
+          "mean_keyword_rate_ci95": [
+            0.018584564640664047,
+            0.03176848274207711
+          ],
+          "paired_lift_ci95": [
+            0.01147412272635251,
+            0.024817704339814436
+          ],
+          "paired_lift_over_baseline": 0.01783909367306072
+        },
+        "base_derived_off-11_raw": {
+          "mean_keyword_rate": 0.031105432485709145,
+          "mean_keyword_rate_ci95": [
+            0.020879177694596955,
+            0.042347048022584106
+          ],
+          "paired_lift_ci95": [
+            0.014282940075252232,
+            0.03479255556280742
+          ],
+          "paired_lift_over_baseline": 0.024121458623171294
+        },
+        "base_derived_off-12_raw": {
+          "mean_keyword_rate": 0.027784917360362628,
+          "mean_keyword_rate_ci95": [
+            0.020360529828164605,
+            0.03541339083303446
+          ],
+          "paired_lift_ci95": [
+            0.013296580394945691,
+            0.028156706892220034
+          ],
+          "paired_lift_over_baseline": 0.02080094349782479
+        },
+        "base_derived_off-13_raw": {
+          "mean_keyword_rate": 0.025745476276129654,
+          "mean_keyword_rate_ci95": [
+            0.018789637751029747,
+            0.03345076633409174
+          ],
+          "paired_lift_ci95": [
+            0.01177501248727817,
+            0.026440462544556155
+          ],
+          "paired_lift_over_baseline": 0.01876150241359181
+        },
+        "base_derived_off-8_raw": {
+          "mean_keyword_rate": 0.03733282482856628,
+          "mean_keyword_rate_ci95": [
+            0.02702769475226886,
+            0.04856870656950706
+          ],
+          "paired_lift_ci95": [
+            0.020443675459374325,
+            0.04133770646928891
+          ],
+          "paired_lift_over_baseline": 0.030348850966028434
+        },
+        "base_derived_off-9_raw": {
+          "mean_keyword_rate": 0.031989215359448556,
+          "mean_keyword_rate_ci95": [
+            0.024622942212219164,
+            0.04056919083135583
+          ],
+          "paired_lift_ci95": [
+            0.017846701604544973,
+            0.03359986829487864
+          ],
+          "paired_lift_over_baseline": 0.02500524149691071
+        },
+        "base_derived_union_raw": {
+          "mean_keyword_rate": 0.029081798119949608,
+          "mean_keyword_rate_ci95": [
+            0.022648359429876405,
+            0.035963419051596474
+          ],
+          "paired_lift_ci95": [
+            0.015952126100078744,
+            0.02839895549403008
+          ],
+          "paired_lift_over_baseline": 0.022097824257411757
+        },
+        "sae_f3998_positive_aligned_normmatched": {
+          "mean_keyword_rate": 0.028469317758467394,
+          "mean_keyword_rate_ci95": [
+            0.020437599965616178,
+            0.03720605938397379
+          ],
+          "paired_lift_ci95": [
+            0.014072752289177762,
+            0.02986332895386263
+          ],
+          "paired_lift_over_baseline": 0.021485343895929553
+        },
+        "stage_a_magnitude_zero_baseline": {
+          "mean_keyword_rate": 0.0069839738625378425,
+          "mean_keyword_rate_ci95": [
+            0.004870908624839894,
+            0.009071051808177393
+          ],
+          "paired_lift_ci95": [
+            0.0,
+            0.0
+          ],
+          "paired_lift_over_baseline": 0.0
+        }
+      }
+    },
+    "magnitude": 12.0,
+    "matched_observational_auc_vs_causal_rate": {
+      "n_offsets": 6,
+      "pearson_r": 0.31792882978049825,
+      "warning": "Exploratory correlation across only six highly cosine-similar directions; not an independent validation set."
+    },
+    "offset_zero_normmatched": {
+      "any_keyword_fraction": 1.0,
+      "mean_keyword_count": 33.2,
+      "mean_keyword_rate": 0.03239578024347818,
+      "mean_words": 1051.25,
+      "n_prompts": 20
+    },
+    "offset_zero_raw": {
+      "any_keyword_fraction": 1.0,
+      "mean_keyword_count": 265.9,
+      "mean_keyword_rate": 0.803912387209442,
+      "mean_words": 292.65,
+      "n_prompts": 20
+    },
+    "sae_single_normmatched": {
+      "any_keyword_fraction": 0.9,
+      "mean_keyword_count": 30.5,
+      "mean_keyword_rate": 0.028469317758467394,
+      "mean_words": 977.15,
+      "n_prompts": 20
+    },
+    "union": {
+      "any_keyword_fraction": 0.95,
+      "mean_keyword_count": 30.85,
+      "mean_keyword_rate": 0.029081798119949605,
+      "mean_words": 1034.4,
+      "n_prompts": 20
+    }
+  },
+  "n_pairs": 268,
+  "natural": {
+    "base_union": {
+      "bands": {
+        "far": {
+          "max_auc": 0.5310898863889508,
+          "mean_auc": 0.5002175456671865,
+          "mean_paired_difference": 0.07942982371651985,
+          "mean_paired_effect_dz": 0.009371300162905893,
+          "n_offsets": 8
+        },
+        "immediate": {
+          "max_auc": 0.6519269325016707,
+          "mean_auc": 0.6072813404989975,
+          "mean_paired_difference": 0.17354671263263854,
+          "mean_paired_effect_dz": 0.2857088379099564,
+          "n_offsets": 8
+        },
+        "post": {
+          "max_auc": 0.6775729561149477,
+          "mean_auc": 0.6479049482067276,
+          "mean_paired_difference": 0.24839811547348067,
+          "mean_paired_effect_dz": 0.3692215299561381,
+          "n_offsets": 16
+        },
+        "pre": {
+          "max_auc": 0.5876865671641791,
+          "mean_auc": 0.5258577985953969,
+          "mean_paired_difference": 0.034450653419865626,
+          "mean_paired_effect_dz": 0.05853834516033964,
+          "n_offsets": 19
+        },
+        "ward": {
+          "max_auc": 0.5915989084428603,
+          "mean_auc": 0.580061446498849,
+          "mean_paired_difference": 0.12019359786416056,
+          "mean_paired_effect_dz": 0.19671381422267664,
+          "n_offsets": 6
+        }
+      },
+      "half_peak_auc_onset_offset": -9,
+      "peak_auc": 0.6775729561149477,
+      "peak_auc_offset": 8,
+      "peak_effect_offset": 8,
+      "peak_paired_effect_dz": 0.4640730873574474
+    },
+    "post_band_mean_auc": {
+      "residual_base_union": 0.6479049482067276,
+      "sae_best_single": 0.5327937040543551,
+      "sae_distributed": 0.6439395257852529
+    },
+    "primary_direction": "base_union",
+    "sae_best_single_feature": {
+      "decoder_cosine": 0.26800456643104553,
+      "feature": 3998,
+      "summary": {
+        "bands": {
+          "far": {
+            "max_auc": 0.5249429160169303,
+            "mean_auc": 0.4993691175651592,
+            "mean_paired_difference": -0.0012192210571757003,
+            "mean_paired_effect_dz": -0.01794410377644205,
+            "n_offsets": 8
+          },
+          "immediate": {
+            "max_auc": 0.5430496769881934,
+            "mean_auc": 0.5156598073067498,
+            "mean_paired_difference": 0.027530587229655307,
+            "mean_paired_effect_dz": 0.10663105180715815,
+            "n_offsets": 8
+          },
+          "post": {
+            "max_auc": 0.5609545555803075,
+            "mean_auc": 0.5327937040543551,
+            "mean_paired_difference": 0.048272843420533326,
+            "mean_paired_effect_dz": 0.16200635212459652,
+            "n_offsets": 16
+          },
+          "pre": {
+            "max_auc": 0.5166100467810204,
+            "mean_auc": 0.5017575857945152,
+            "mean_paired_difference": 0.005732891532443962,
+            "mean_paired_effect_dz": 0.027668401767947007,
+            "n_offsets": 19
+          },
+          "ward": {
+            "max_auc": 0.511033916239697,
+            "mean_auc": 0.506233988638895,
+            "mean_paired_difference": 0.006271625419531889,
+            "mean_paired_effect_dz": 0.038750834652642424,
+            "n_offsets": 6
+          }
+        },
+        "half_peak_auc_onset_offset": -1,
+        "peak_auc": 0.5609545555803075,
+        "peak_auc_offset": 16,
+        "peak_effect_offset": 1,
+        "peak_paired_effect_dz": 0.24832810520285925
+      }
+    },
+    "sae_distributed_projection": {
+      "bands": {
+        "far": {
+          "max_auc": 0.5398613276899087,
+          "mean_auc": 0.5074766094898641,
+          "mean_paired_difference": 0.05130552441236188,
+          "mean_paired_effect_dz": 0.026067851381254746,
+          "n_offsets": 8
+        },
+        "immediate": {
+          "max_auc": 0.6636082646469146,
+          "mean_auc": 0.6027964190242815,
+          "mean_paired_difference": 0.1621576664320353,
+          "mean_paired_effect_dz": 0.28197219672892493,
+          "n_offsets": 8
+        },
+        "post": {
+          "max_auc": 0.676027511695255,
+          "mean_auc": 0.6439395257852529,
+          "mean_paired_difference": 0.23268925526514717,
+          "mean_paired_effect_dz": 0.35707033529736565,
+          "n_offsets": 16
+        },
+        "pre": {
+          "max_auc": 0.5844842949431945,
+          "mean_auc": 0.5216047121032701,
+          "mean_paired_difference": 0.030763970298775988,
+          "mean_paired_effect_dz": 0.05382920025726596,
+          "n_offsets": 19
+        },
+        "ward": {
+          "max_auc": 0.5947315660503454,
+          "mean_auc": 0.5700810314101137,
+          "mean_paired_difference": 0.10575049864220899,
+          "mean_paired_effect_dz": 0.18195519846877872,
+          "n_offsets": 6
+        }
+      },
+      "half_peak_auc_onset_offset": -9,
+      "peak_auc": 0.676027511695255,
+      "peak_auc_offset": 16,
+      "peak_effect_offset": 1,
+      "peak_paired_effect_dz": 0.4672850415371157
+    },
+    "ward_band_mean_auc": {
+      "residual_base_union": 0.580061446498849,
+      "sae_best_single": 0.506233988638895,
+      "sae_distributed": 0.5700810314101137
+    }
+  }
+}
