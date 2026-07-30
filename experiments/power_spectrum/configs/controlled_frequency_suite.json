@@ -6,6 +6,17 @@
     "estimated_prior_usd": 37.6,
     "note": "Prior estimate includes the completed overnight, matched-control, paper-synthetic, smoke, and calibration calls. This run has an independent stricter ledger below."
   },
+  "reviewer_response_reference": {
+    "source": "dmitry-txcwins-10h:docs/dmitry/reviewer_responses/reviewer_responses_1.md",
+    "protocol": "h=2, q=11, episode-disjoint representation/probe/validation pools, one evaluation window per episode; non-TXC baselines select best k independently at each W.",
+    "windows": [1, 2, 3, 4, 5, 10],
+    "chance": [0.091, 0.091, 0.091, 0.091, 0.091, 0.091],
+    "sae_best_k": [0.099, 0.095, 0.10, 0.092, 0.094, 0.095],
+    "txc_k1": [0.10, 0.091, 0.13, 0.19, 0.29, 0.63],
+    "txc_k2": [0.098, 0.087, 0.15, 0.32, 0.56, 0.91],
+    "txc_k5": [0.092, 0.088, 0.097, 0.097, 0.16, 0.96],
+    "note": "These corrected reviewer-response curves replace redundant fresh SAE/TXC h=2 cells. New compute is reserved for Spectral v1 and Spectral Matryoshka."
+  },
   "budget": {
     "max_total_usd": 9.0,
     "reserve_usd": 0.5,
@@ -152,7 +163,11 @@
       "sequence_length": 16,
       "window": 2,
       "n_steps": 6000,
-      "primary_metric": "secret_recovery"
+      "primary_metric": "secret_recovery",
+      "models": [
+        "spectral_v1",
+        "spectral_mat_global"
+      ]
     },
     {
       "name": "shamir_h2_w3",
@@ -166,7 +181,11 @@
       "sequence_length": 16,
       "window": 3,
       "n_steps": 6000,
-      "primary_metric": "secret_recovery"
+      "primary_metric": "secret_recovery",
+      "models": [
+        "spectral_v1",
+        "spectral_mat_global"
+      ]
     },
     {
       "name": "shamir_h2_w6",
@@ -180,7 +199,11 @@
       "sequence_length": 16,
       "window": 6,
       "n_steps": 6000,
-      "primary_metric": "secret_recovery"
+      "primary_metric": "secret_recovery",
+      "models": [
+        "spectral_v1",
+        "spectral_mat_global"
+      ]
     },
     {
       "name": "hmm_slow",

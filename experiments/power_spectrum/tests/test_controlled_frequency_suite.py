@@ -18,9 +18,9 @@ def test_frozen_plan_is_paired_and_below_incremental_and_overall_caps() -> None:
         suite.POWER_ROOT / "configs" / "controlled_frequency_suite.json"
     )
     plan = suite.build_plan(config)
-    assert plan["evaluation_cells"] == 70
-    assert plan["unique_training_runs"] == 62
-    assert plan["total_optimizer_steps"] == 324_000
+    assert plan["evaluation_cells"] == 58
+    assert plan["unique_training_runs"] == 54
+    assert plan["total_optimizer_steps"] == 276_000
     assert plan["within_cost_plan"]
     assert plan["within_time_plan"]
     assert plan["worst_case_overall_usd"] < plan["overall_cap_usd"]
@@ -42,18 +42,18 @@ def test_token_sae_training_is_reused_across_windows_and_support_is_matched() ->
     assert len({cell["training_id"] for cell in sae_h1_seed1}) == 1
     assert {cell["k_pos"] for cell in sae_h1_seed1} == {1}
 
-    txc_h2 = next(
-        cell
-        for cell in cells
-        if cell["model"] == "txc" and cell["task"] == "shamir_h2_w6"
-    )
     spectral_h2 = next(
         cell
         for cell in cells
         if cell["model"] == "spectral_v1" and cell["task"] == "shamir_h2_w6"
     )
-    assert txc_h2["k_pos"] == 6
     assert spectral_h2["k_pos"] == 1
+    assert not any(
+        cell["family"] == "shamir"
+        and cell["group"] == "shamir_h2"
+        and cell["model"] in {"sae", "txc"}
+        for cell in cells
+    )
 
 
 def test_shamir_evaluator_has_exact_symbolic_oracle_on_fresh_episodes() -> None:

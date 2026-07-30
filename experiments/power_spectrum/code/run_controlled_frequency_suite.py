@@ -141,7 +141,12 @@ def enumerate_cells(
     for task in config["tasks"]:
         if smoke and task["name"] not in smoke_config["tasks"]:
             continue
+        task_models = {
+            str(name) for name in task.get("models", [m["name"] for m in config["models"]])
+        }
         for model in config["models"]:
+            if model["name"] not in task_models:
+                continue
             if smoke and model["name"] not in smoke_config["models"]:
                 continue
             if int(task["window"]) in {
