@@ -1,0 +1,16 @@
+{
+  "status": "verified",
+  "artifact": "sentence_acts_L10.npz",
+  "sha256": "1656f6be2cd85fb85c8b246b9b27933f73ef40cfaac84078169dfd3bbbe27810",
+  "size_bytes": 1137333114,
+  "shape": [
+    25204,
+    6,
+    4096
+  ],
+  "n_sentences": 25204,
+  "n_positive": 3169,
+  "positive_fraction": 0.12573401047452784,
+  "n_questions": 300,
+  "verification_note": "SHA-256, byte size, shape, label count, and question count verified on the A40 evaluation pod before compact result harvesting."
+}

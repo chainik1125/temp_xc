@@ -30,3 +30,23 @@ writes one compact, provenance-stamped JSON result. Steering is intentionally
 kept separate: the historical full evaluator loses generated panels if the
 Anthropic judge is unavailable, so it must not be launched until generation
 persistence and the judge credential have both been verified.
+
+Once the three corrected TXC detection JSONs and the T-SAE-16K sensitivity
+JSON are present, `plot_detection.py` builds the reviewer package:
+
+```bash
+python purified/experiments/backtracking_300k_seeded/plot_detection.py \
+  --root purified/results/neurips_rebuttal/backtracking_300k_seeded \
+  --tsae16-json purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/tsae_paper_d16384_seed42/detection.json \
+  --output-dir purified/results/neurips_rebuttal/backtracking_300k_seeded/publication
+```
+
+The script fails closed on the training and detection protocols, historical
+source commit, source-activation artifact hash, cohort counts, train keys,
+widths, seeds, step count, and complete \(S\)-grid. It reports the corrected
+TXC-base seeds as mean \( \pm \) sample SD, with the submitted \(S=8\) probe
+budget as the headline comparison. Submitted seed-42 SAE, T-SAE-32K, and
+TXC-base values are rounded table-transcribed contextual references and are
+never pooled with the new replication. This package is a TXC-base detection
+replication; it neither reruns the submitted TXC-pro detection winner nor
+supplies the still-missing multi-seed steering evaluation.

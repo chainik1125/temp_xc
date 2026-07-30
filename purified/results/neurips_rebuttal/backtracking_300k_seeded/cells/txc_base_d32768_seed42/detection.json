@@ -1,0 +1,41 @@
+{
+  "S_grid": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32
+  ],
+  "arch": "txc_base",
+  "arch_window": 5,
+  "d_sae": 32768,
+  "detection_protocol": "c7-detection-seeded-v1",
+  "elapsed_seconds": 1937.1543054580688,
+  "historical_commit": "284a8bf5e3e5a7cc094dd68c6fa5a92a9fd4eec3",
+  "n_positive": 3169,
+  "n_sentences": 25204,
+  "positive_fraction": 0.12573401047452784,
+  "pr_auc": {
+    "1": 0.14123597224016313,
+    "16": 0.2249874067827001,
+    "2": 0.14551588007960586,
+    "32": 0.2523250792283652,
+    "4": 0.1734919568055095,
+    "8": 0.1880718727091344
+  },
+  "probe_random_state": 42,
+  "roc_auc": {
+    "1": 0.558828857665449,
+    "16": 0.6561038053792816,
+    "2": 0.5657743096275943,
+    "32": 0.6816208806431623,
+    "4": 0.6070875279079309,
+    "8": 0.6286361977946813
+  },
+  "seed": 42,
+  "sentence_window": 6,
+  "status": "complete",
+  "train_key": "8787f8fe527218ad",
+  "training_protocol": "c7-300k-seeded-v1"
+}

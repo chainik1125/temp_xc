@@ -1,0 +1,33 @@
+{
+  "S_grid": [
+    1,
+    2,
+    4,
+    8,
+    16,
+    32
+  ],
+  "caveat": "Submitted values are rounded, table-transcribed seed-42 references and are not pooled with the corrected-seed TXC-base replication. This package does not replicate TXC-pro or steering.",
+  "detection_protocol": "c7-detection-seeded-v1",
+  "headline_S": 8,
+  "positive_fraction": 0.12573401047452784,
+  "sentence_artifact_sha256": "1656f6be2cd85fb85c8b246b9b27933f73ef40cfaac84078169dfd3bbbe27810",
+  "status": "complete",
+  "submitted_sae32_headline_pr_auc_seed42": 0.175,
+  "submitted_tsae32_headline_pr_auc_seed42": 0.196,
+  "submitted_txc_base_headline_pr_auc_seed42": 0.201,
+  "training_protocol": "c7-300k-seeded-v1",
+  "tsae16_headline_pr_auc_seed42": 0.20425840725398592,
+  "txc_headline_pr_auc_by_seed": {
+    "1": 0.1950309704662098,
+    "2": 0.17913119600269342,
+    "42": 0.1880718727091344
+  },
+  "txc_headline_pr_auc_mean": 0.1874113463926792,
+  "txc_headline_pr_auc_sd": 0.007970440907422827,
+  "txc_seeds": [
+    1,
+    2,
+    42
+  ]
+}

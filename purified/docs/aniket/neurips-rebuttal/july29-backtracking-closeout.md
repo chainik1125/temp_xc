@@ -1,13 +1,39 @@
 # July 29 Backtracking closeout
 
-**Status:** Reviewer comments have been submitted. This checklist records the
-remaining evidence needed to replace pending or one-seed Backtracking claims
-without mixing incompatible 20K and 300K protocols.
+**Status:** The corrected 300K TXC-base training and detection replication is
+complete for seeds 1, 2, and 42, and the new 16K T-SAE seed-42 width
+sensitivity is complete. Multi-seed steering and a corrected TXC-pro detection
+replication remain unrun.
 
-## Minimum missing experiment
+## Completed 300K detection result
 
-Run the two missing **300K TXC-base dictionary seeds, 1 and 2**, reproducing
-the submitted seed-42 C7 cell with seed as the only intended change:
+All four dictionaries were evaluated on the exact submitted sentence artifact
+using five GroupKFold splits and
+\(S\in\{1,2,4,8,16,32\}\). The source artifact, training checkpoints, detector
+outputs, and compact transfer passed their locked hash and provenance checks.
+
+| Probe budget | TXC-base 32K, seeds 1/2/42 | T-SAE 16K, seed 42 | Submitted T-SAE 32K, seed 42 |
+|--:|--:|--:|--:|
+| \(S=8\) | \(0.1874 \pm 0.0080\) | \(0.2043\) | \(0.196\) |
+| \(S=16\) | \(0.2314 \pm 0.0072\) | \(0.2130\) | \(0.213\) |
+| \(S=32\) | \(0.2568 \pm 0.0048\) | \(0.2285\) | \(0.245\) |
+
+At the submitted \(S=8\) budget, corrected TXC-base remains above the
+submitted SAE reference \(0.175\), but it is below both T-SAE references. The
+ranking reverses at \(S\geq16\), where TXC-base is strongest. Detection claims
+must therefore name the sparse-probe budget rather than presenting one
+budget-independent architecture ranking.
+
+The submitted detection winner was TXC-pro, whereas this corrected replication
+is TXC-base, the submitted steering winner. These results close the requested
+TXC-base dictionary and detection reruns but do not supply new TXC-pro or
+multi-seed steering evidence. The compact results and reviewer figures live in
+`purified/results/neurips_rebuttal/backtracking_300k_seeded/`.
+
+## Completed training specification
+
+The replication trained **300K TXC-base dictionary seeds 1, 2, and 42**,
+matching the submitted C7 cell except for the documented RNG correction:
 
 - historical source: `origin/extended-300k`
 - architecture: paper-faithful `txc_base`
@@ -59,12 +85,11 @@ checkpoint would restart that cell from step zero; adding an unverified
 partial-resume format during the closeout would create a larger reproducibility
 risk than the bounded preemption risk.
 
-## Evaluations required for each TXC seed
+## Evaluation status for each TXC seed
 
-1. **Detection:** run the paper's grouped Backtracking detector at
-   \(S\in\{1,2,4,8,16,32\}\). The seed-42 reference is approximately 0.250
-   PR-AUC at \(S=32\).
-2. **Steering:** run the paper-faithful C7 steering evaluation with
+1. **Detection — complete:** the paper's grouped Backtracking detector was run
+   at \(S\in\{1,2,4,8,16,32\}\) for all three corrected seeds.
+2. **Steering — pending:** run the paper-faithful C7 steering evaluation with
    `cut_fraction=0.25` and magnitudes
    \[
    -16,-12,-10,-8,-7,-6,-5,-4,-3,-2,-1,-0.5,0,0.5,1,2,3,4,5,6,7,8,10,12,16.
