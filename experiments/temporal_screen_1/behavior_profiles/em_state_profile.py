@@ -179,6 +179,74 @@ def crossfit_terminal_direction_scores(
     return scores, folds
 
 
+def crossfit_positionwise_direction_scores(
+    activations: np.ndarray,
+    labels: np.ndarray,
+    groups: np.ndarray,
+) -> tuple[np.ndarray, dict[int, dict]]:
+    """Fit a separate leave-one-group-out direction at every progress point.
+
+    This is the trajectory-changing complement to the transported terminal
+    direction.  It asks whether *some* shared linear readout exists at each
+    point, even if the readout rotates as the response unfolds.
+    """
+
+    values = np.asarray(activations, dtype=float)
+    labels = np.asarray(labels, dtype=np.int8)
+    groups = np.asarray(groups)
+    if values.ndim != 3:
+        raise ValueError("activations must have shape (rollout, progress, d_model)")
+    if len(labels) != len(values) or len(groups) != len(values):
+        raise ValueError("rollout, label, and group dimensions differ")
+    if not np.isin(labels, [0, 1]).all():
+        raise ValueError("labels must be binary")
+    if not np.isfinite(values).all():
+        raise ValueError("activations contain non-finite values")
+
+    scores = np.full(values.shape[:2], np.nan, dtype=float)
+    folds: dict[int, dict] = {}
+    for held_out in np.unique(groups):
+        test = groups == held_out
+        train = ~test
+        progress_details = []
+        for progress_index in range(values.shape[1]):
+            try:
+                direction, contrast_groups = _fit_group_balanced_direction(
+                    values[train, progress_index, :],
+                    labels[train],
+                    groups[train],
+                )
+            except ValueError:
+                # Progress zero is the shared final prompt token.  Endpoint
+                # labels cannot define a within-prompt direction there, so
+                # record the structurally correct chance score.
+                scores[test, progress_index] = 0.0
+                progress_details.append(
+                    {
+                        "progress_index": progress_index,
+                        "training_contrast_groups": [],
+                        "direction_norm": 0.0,
+                        "null_readout": True,
+                    }
+                )
+                continue
+            scores[test, progress_index] = values[test, progress_index, :] @ direction
+            progress_details.append(
+                {
+                    "progress_index": progress_index,
+                    "training_contrast_groups": contrast_groups,
+                    "direction_norm": float(np.linalg.norm(direction)),
+                    "null_readout": False,
+                }
+            )
+        folds[int(held_out)] = {
+            "n_train": int(train.sum()),
+            "n_test": int(test.sum()),
+            "progress": progress_details,
+        }
+    return scores, folds
+
+
 def within_group_auc_curve(
     labels: np.ndarray,
     groups: np.ndarray,
@@ -310,13 +378,27 @@ def estimate_state_profile(
     *,
     n_bootstrap: int = 4_000,
     seed: int = 42,
+    fit_mode: str = "terminal",
 ) -> dict:
     """Run cross-fitting, within-prompt evaluation, and group bootstrap."""
 
     progress_list = [float(value) for value in progress]
     if len(progress_list) != np.asarray(activations).shape[1]:
         raise ValueError("progress grid does not match activation progress dimension")
-    scores, folds = crossfit_terminal_direction_scores(activations, labels, groups)
+    if fit_mode == "terminal":
+        scores, folds = crossfit_terminal_direction_scores(
+            activations,
+            labels,
+            groups,
+        )
+    elif fit_mode == "positionwise":
+        scores, folds = crossfit_positionwise_direction_scores(
+            activations,
+            labels,
+            groups,
+        )
+    else:
+        raise ValueError(f"unknown fit_mode {fit_mode!r}")
     auc = within_group_auc_curve(labels, groups, scores)
     bootstrap = group_bootstrap_curve(
         auc["per_group_auc"],
@@ -324,6 +406,7 @@ def estimate_state_profile(
         seed=seed,
     )
     return {
+        "fit_mode": fit_mode,
         "progress": progress_list,
         "folds": folds,
         "auc": auc,

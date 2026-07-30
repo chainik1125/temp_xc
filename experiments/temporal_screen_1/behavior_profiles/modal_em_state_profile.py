@@ -217,6 +217,7 @@ def run_profile(
     instant_array = np.stack(instant)
     prefix_mean_array = np.stack(prefix_mean)
     profiles = {}
+    positionwise_profiles = {}
     for representation, values in {
         "instantaneous_residual": instant_array,
         "prefix_mean_residual": prefix_mean_array,
@@ -237,6 +238,26 @@ def run_profile(
                 progress,
                 n_bootstrap=n_bootstrap,
                 seed=seed + 1,
+            ),
+        }
+        positionwise_profiles[representation] = {
+            "raw_projection": estimate_state_profile(
+                values,
+                selection.labels,
+                selection.groups,
+                progress,
+                n_bootstrap=n_bootstrap,
+                seed=seed,
+                fit_mode="positionwise",
+            ),
+            "cosine_projection": estimate_state_profile(
+                normalize_activation_rows(values),
+                selection.labels,
+                selection.groups,
+                progress,
+                n_bootstrap=n_bootstrap,
+                seed=seed + 1,
+                fit_mode="positionwise",
             ),
         }
 
@@ -286,6 +307,7 @@ def run_profile(
         },
         "token_audit": token_audit,
         "profiles": profiles,
+        "positionwise_profiles": positionwise_profiles,
         "limitations": [
             (
                 "EM has no labeled within-rollout event; the curve is "
@@ -322,11 +344,14 @@ def main(
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(result, indent=2) + "\n")
     compact = {
-        representation: {
-            projection: profile["summary"]
-            for projection, profile in variants.items()
+        family: {
+            representation: {
+                projection: profile["summary"]
+                for projection, profile in variants.items()
+            }
+            for representation, variants in result[family].items()
         }
-        for representation, variants in result["profiles"].items()
+        for family in ("profiles", "positionwise_profiles")
     }
     print(json.dumps(compact, indent=2))
     print(f"[saved] {output}")

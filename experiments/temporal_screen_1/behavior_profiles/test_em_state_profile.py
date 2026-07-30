@@ -60,6 +60,36 @@ def test_crossfit_profile_detects_terminal_signal_without_prompt_leakage():
     assert all(fold["n_test"] == 4 for fold in result["folds"].values())
 
 
+def test_positionwise_profile_detects_a_rotating_readout():
+    groups = np.repeat(np.arange(4), 4)
+    labels = np.tile(np.asarray([1, 1, 0, 0]), 4)
+    signs = np.where(labels == 1, 1.0, -1.0)
+    values = np.zeros((16, 3, 4), dtype=float)
+    for index, group in enumerate(groups):
+        values[index, 0] = [0.0, 0.0, float(group), 1.0]
+        values[index, 1] = [signs[index], 0.0, float(group), 1.0]
+        values[index, 2] = [0.0, signs[index], float(group), 1.0]
+
+    transported = estimate_state_profile(
+        values,
+        labels,
+        groups,
+        [0.0, 0.5, 1.0],
+        n_bootstrap=100,
+    )
+    positionwise = estimate_state_profile(
+        values,
+        labels,
+        groups,
+        [0.0, 0.5, 1.0],
+        n_bootstrap=100,
+        fit_mode="positionwise",
+    )
+    assert transported["auc"]["macro_auc"] == [0.5, 0.5, 1.0]
+    assert positionwise["auc"]["macro_auc"] == [0.5, 1.0, 1.0]
+    assert positionwise["fit_mode"] == "positionwise"
+
+
 def test_row_normalization_is_unit_length():
     values = np.asarray([[[3.0, 4.0], [5.0, 12.0]]])
     normalized = normalize_activation_rows(values)
