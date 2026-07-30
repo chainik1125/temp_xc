@@ -77,7 +77,8 @@ def build_comparison(
             "selection": (
                 "Each bar is the best seed-mean hyperparameter cell. "
                 "Published bars retain the historical renderer's duplicate rows; "
-                "Spectral v1 requires all three configured seeds."
+                "Spectral v1 requires all three configured seeds and is selected "
+                "from the frozen focused grid."
             ),
             "coupling": spectral["coupling_metric_note"],
             "backbone": (

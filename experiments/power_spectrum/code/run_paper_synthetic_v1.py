@@ -10,6 +10,11 @@ inside the isolated power-spectrum experiment:
 - Adam, 1k linear warmup, gradient clipping, and paper step counts;
 - exact Denoising sliding-window Ridge probe and Coupling cosine-AUC.
 
+The frozen grid is focused rather than exhaustive: it contains the published
+best TXC cell and dense-code alternatives for Denoising, and the published
+best T/k neighborhood for Coupling. Every selected cell is run at all three
+paper seeds.
+
 Only Spectral v1 is trained. Published SAE, T-SAE, and TXC values are extracted
 separately by :mod:`extract_paper_baselines`.
 """

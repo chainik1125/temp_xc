@@ -9,14 +9,20 @@ from experiments.power_spectrum.code import analyze_paper_synthetic_v1
 from experiments.power_spectrum.code import run_paper_synthetic_v1 as runner
 
 
-def test_paper_grid_matches_expected_size_and_budget() -> None:
+def test_focused_paper_grid_matches_expected_size_and_budget() -> None:
     config = runner.load_config(
         runner.POWER_ROOT / "configs" / "paper_synthetic_v1.json"
     )
     cells = runner.enumerate_cells(config)
-    assert len(cells) == 213
-    assert sum(cell["task"] == "denoising" for cell in cells) == 135
-    assert sum(cell["task"] == "coupling" for cell in cells) == 78
+    assert len(cells) == 30
+    assert sum(cell["task"] == "denoising" for cell in cells) == 24
+    assert sum(cell["task"] == "coupling" for cell in cells) == 6
+    assert any(
+        cell["task"] == "denoising"
+        and cell["T"] == 2
+        and cell["k_pos"] == 17
+        for cell in cells
+    )
     assert runner.build_plan(config)["within_cost_plan"]
 
 

@@ -9,7 +9,7 @@
   },
   "budget": {
     "max_total_usd": 14.0,
-    "reserve_usd": 1.0,
+    "reserve_usd": 0.5,
     "assumed_usd_per_gpu_hour": 4.0,
     "cost_overhead_multiplier": 1.25,
     "max_session_hours": 2.75
@@ -17,12 +17,12 @@
   "planning": {
     "setup_seconds": 180.0,
     "eval_seconds_per_cell": {
-      "denoising": 12.0,
+      "denoising": 8.0,
       "coupling": 2.0
     },
     "estimated_steps_per_second": {
-      "denoising": 1800.0,
-      "coupling": 700.0
+      "denoising": 105.0,
+      "coupling": 150.0
     }
   },
   "training": {
@@ -57,13 +57,10 @@
       "eval_data_seed": 42,
       "eval_n_sequences": 2000,
       "grid": {
-        "2": [1, 2, 3, 4, 5, 6, 8, 10, 12, 15, 17, 20],
-        "4": [1, 2, 3, 4, 5, 6, 8, 10],
-        "5": [1, 2, 3, 4, 5, 6, 8],
-        "6": [1, 2, 3, 4, 5, 6],
-        "8": [1, 2, 3, 4, 5],
-        "10": [1, 2, 3, 4],
-        "12": [1, 2, 3]
+        "2": [12, 17, 20],
+        "4": [8, 10],
+        "5": [6, 8],
+        "8": [5]
       }
     },
     "coupling": {
@@ -73,18 +70,12 @@
       "paper_generator": "origin/final:purified/src/temp_bench/data/toy/coupled_noisy.py",
       "train_data_seed": 0,
       "grid": {
-        "2": [1, 2, 3],
-        "4": [1, 2, 3],
-        "5": [1, 2, 3, 4, 5, 6, 7, 8],
-        "6": [1, 2, 3],
-        "8": [1, 2, 3],
-        "10": [1, 2, 3],
-        "12": [1, 2, 3]
+        "5": [1, 2]
       }
     }
   },
   "reporting": {
-    "selection": "Best seed-mean (T, k_pos) cell with all three seeds, matching the published renderer's best-cell convention.",
+    "selection": "Best seed-mean (T, k_pos) cell with all three seeds. Denoising uses a focused 8-cell grid containing the paper-best TXC cell (T=2,k=17) and matched dense-code alternatives; Coupling uses T=5,k in {1,2}, containing the published best cell.",
     "comparison": "Published SAE/T-SAE/TXC values are read byte-for-byte from the pinned Figure 2 snapshot; only Spectral v1 is newly trained.",
     "compatibility_caveat": "Spectral v1 uses the current BatchTopK plus AuxK backbone, while the published TopK SAE and TXC-base use the legacy TopK-to-ReLU backbone."
   }

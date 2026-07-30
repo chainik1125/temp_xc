@@ -31,8 +31,8 @@ REMOTE_CONFIG = (
     / "configs"
     / "paper_synthetic_v1.json"
 )
-FULL_RUN_DIR = Path("/vol/paper-synthetic-v1-20260729")
-SMOKE_RUN_DIR = Path("/vol/paper-synthetic-v1-smoke-20260729")
+FULL_RUN_DIR = Path("/vol/paper-synthetic-v1-focused-20260729")
+SMOKE_RUN_DIR = Path("/vol/paper-synthetic-v1-focused-smoke-20260729")
 LOCAL_RESULTS = (
     LOCAL_ROOT
     / "experiments"

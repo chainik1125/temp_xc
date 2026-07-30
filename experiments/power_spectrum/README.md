@@ -26,11 +26,12 @@ two synthetic tasks used in Figure 2 of the paper:
 - Coupling: best static decoder `gAUC` on the maximum-overlap
   `toy_coupled_noisy_K10_M20_d256_pB05_np10` regime.
 
-The runner ports the historical generators, data seeds, training recipe,
-hyperparameter grids, and evaluation definitions into this isolated
-experiment. Published TopK SAE, T-SAE, and TXC-base numbers are extracted
-byte-for-byte from the pinned Figure 2 data rather than re-trained under the
-newer repository protocol:
+The runner ports the historical generators, data seeds, training recipe, and
+evaluation definitions into this isolated experiment. Its focused grid
+contains the paper-best TXC cell plus dense-code alternatives on Denoising and
+the paper-best neighborhood on Coupling. Published TopK SAE, T-SAE, and
+TXC-base numbers are extracted byte-for-byte from the pinned Figure 2 data
+rather than re-trained under the newer repository protocol:
 
 ```bash
 uv run python -m experiments.power_spectrum.code.extract_paper_baselines
@@ -51,14 +52,15 @@ uv run python -m experiments.power_spectrum.code.analyze_paper_synthetic_v1
 uv run python -m experiments.power_spectrum.code.plot_paper_synthetic_v1
 ```
 
-The plan contains 213 three-seed cells and 4,674,000 optimizer steps. Its
-conservative estimate is 1.42 A10G hours and $7.08, with a $14 hard ledger
-cap and 2.75-hour inner deadline. The Coupling evaluator filters near-zero
-time-mean decoder atoms before cosine normalization: non-DC DCT atoms have
-mathematically zero time mean, and normalizing float32 cancellation residue
-would create arbitrary directions. The raw historical calculation is retained
-as `gauc_paper_raw` for sensitivity. This maximum-overlap Coupling target is
-rank one, so Denoising is the more discriminating result.
+The plan contains 30 three-seed cells and 768,000 optimizer steps. Its
+conservative estimate uses the measured paid-smoke throughput and stays below
+the $14 hard ledger cap and 2.75-hour inner deadline. The Coupling evaluator
+filters near-zero time-mean decoder atoms before cosine normalization: non-DC
+DCT atoms have mathematically zero time mean, and normalizing float32
+cancellation residue would create arbitrary directions. The raw historical
+calculation is retained as `gauc_paper_raw` for sensitivity. This
+maximum-overlap Coupling target is rank one, so Denoising is the more
+discriminating result.
 
 Read-only source material:
 

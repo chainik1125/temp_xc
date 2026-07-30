@@ -1,0 +1,7 @@
+{
+  "app_id": "ap-crPhPWBoEwbQkOK69Gq0JD",
+  "disposition": "stopped_after_throughput_calibration",
+  "function_call_id": "fc-01KYR9D077EMGYA19STFVP5Q8S",
+  "reason": "Measured approximately 150 optimizer steps/second on the first Denoising cell, invalidating the exhaustive-grid wall-clock estimate. No cell completed; the frozen plan was replaced by a focused paper-aligned grid before the scientific run.",
+  "status": "spawned"
+}
