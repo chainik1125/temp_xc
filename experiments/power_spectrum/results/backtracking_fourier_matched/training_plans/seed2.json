@@ -1,0 +1,166 @@
+{
+  "activation_cache": "/workspace/fourier_data/act_cache/fb2a74be884e512a/resid_post_L10.npy",
+  "artifact": "/workspace/txc-neurips-aniket/purified/artifacts/c7/sentence_acts_L10_T16.npz",
+  "cells": [
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 32768,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 1
+      },
+      "parameter_match": {
+        "difference": 0,
+        "fourier_d_sae": 32768,
+        "fourier_parameters": 268472320,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 268472320,
+        "relative_difference": 0.0
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131067,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 10
+      },
+      "parameter_match": {
+        "difference": -8197,
+        "fourier_d_sae": 131067,
+        "fourier_parameters": 2684420091,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 2684428288,
+        "relative_difference": -3.053536589761939e-06
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 65532,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 2
+      },
+      "parameter_match": {
+        "difference": -4,
+        "fourier_d_sae": 65532,
+        "fourier_parameters": 536911868,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 536911872,
+        "relative_difference": -7.450012206099998e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 98298,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 4
+      },
+      "parameter_match": {
+        "difference": -6,
+        "fourier_d_sae": 98298,
+        "fourier_parameters": 1073790970,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1073790976,
+        "relative_difference": -5.587679664016845e-09
+      }
+    },
+    {
+      "config": {
+        "amp": true,
+        "bands": "multiband",
+        "batch_size": 1024,
+        "checkpoint_every": 1000,
+        "d_in": 4096,
+        "d_sae": 131064,
+        "k_pos": 20,
+        "learning_rate": 0.0003,
+        "reference_txc_d_sae": 32768,
+        "schedule_max_window": 16,
+        "schedule_seed": 907200,
+        "seed": 2,
+        "steps": 20000,
+        "warmup_steps": 1000,
+        "window": 6
+      },
+      "parameter_match": {
+        "difference": -8,
+        "fourier_d_sae": 131064,
+        "fourier_parameters": 1610670072,
+        "reference_txc_d_sae": 32768,
+        "reference_txc_parameters": 1610670080,
+        "relative_difference": -4.96687689138672e-09
+      }
+    }
+  ],
+  "checkpoint_root": "/workspace/txc-neurips-aniket/checkpoints/backtracking_fourier_matched/reviewer-five-point-v1",
+  "device": "cuda:0",
+  "implementation_sha256": {
+    "backtracking_fourier_xc.py": "c986b6215623705ff7e8e4ba0a64723e4c7e9cfdc9f16715c6b538c6e1d42aad",
+    "run_backtracking_fourier.py": "d02a2dc07127694906d669429aab56fab9350fa88f79b4eb9faa318bd3289643"
+  },
+  "inventory": {
+    "activation_cache": "/workspace/fourier_data/act_cache/fb2a74be884e512a/resid_post_L10.npy",
+    "activation_cache_dtype": "float16",
+    "activation_cache_dtype_ok": true,
+    "activation_cache_sha256": "dc34dfb117f77abddef4b4396d0d00afc707c39876d0ee36015de1e7b8406914",
+    "activation_cache_sha256_ok": true,
+    "activation_cache_shape": [
+      4044,
+      128,
+      4096
+    ],
+    "activation_cache_shape_ok": true
+  },
+  "output_root": "/workspace/txc-neurips-aniket/purified/results/neurips_rebuttal/backtracking_fourier_matched/reviewer-five-point-v1",
+  "phase": "train",
+  "protocol_version": "power-spectrum.backtracking-fourier.v1",
+  "reference_commit": "d9c7fc7b2",
+  "reference_protocol_version": "2026-07-26.t16.1",
+  "run_fingerprint": "4fa0cbe112729bba2d1693cca50ce127ea42362fda725f5a4c105c4a999d8ec8"
+}
