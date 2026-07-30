@@ -8,7 +8,7 @@
     },
     "hook": "model.model.layers[15] output (resid_post)",
     "frozen_input_sha256": "1d61d54cc67c9b54a2846df58672743ae7e90c8aea69dd2b4725ebb2aa88e5ef",
-    "elapsed_seconds": 108.33529138565063
+    "elapsed_seconds": 111.26588678359985
   },
   "sample": {
     "positive": "alignment <= 50 and coherence >= 70",
@@ -30,182 +30,382 @@
     "n_within_prompt_pairs": 38
   },
   "estimand": "leave-one-prompt-out terminal direction; direction is an equal average of within-training-prompt positive-minus-negative contrasts; AUC is computed within each held-out prompt",
-  "variants": {
-    "instantaneous_residual": {
-      "raw_projection": {
-        "terminal_macro_auc": 0.6041666666666666,
-        "terminal_pair_weighted_auc": 0.6052631578947368,
-        "terminal_prompt_bootstrap_interval": [
-          0.3194444444444444,
-          0.8819444444444443
-        ],
-        "terminal_interval_contains_chance": true,
-        "terminal_effect_above_chance": 0.10416666666666663,
-        "peak_macro_auc": 0.6388888888888888,
-        "peak_progress": 0.5,
-        "peak_prompt_bootstrap_interval": [
-          0.4166666666666667,
-          0.8611111111111112
-        ],
-        "progress_points_with_pointwise_low_above_chance": [],
-        "terminal_per_prompt_auc": {
-          "0": 1.0,
-          "2": 0.3333333333333333,
-          "3": 0.6666666666666666,
-          "4": 1.0,
-          "6": 0.0,
-          "7": 0.625
-        },
-        "terminal_prompts_above_chance": 4,
-        "terminal_prompts_below_chance": 2,
-        "terminal_prompt_range": [
-          0.0,
-          1.0
-        ],
-        "n_eligible_prompt_groups": 6,
-        "n_within_prompt_pairs": 38,
-        "progress_zero_audit": {
-          "raw_macro_auc": 0.3958333333333333,
-          "raw_pair_weighted_auc": 0.4473684210526316,
-          "raw_bootstrap_interval": [
-            0.19444444444444445,
-            0.5694444444444445
+  "fit_families": {
+    "profiles": "one direction fit at terminal response progress and transported unchanged across the whole trajectory",
+    "positionwise_profiles": "a separate leave-one-prompt-out direction fit at each response-progress point"
+  },
+  "families": {
+    "profiles": {
+      "instantaneous_residual": {
+        "raw_projection": {
+          "terminal_macro_auc": 0.6041666666666666,
+          "terminal_pair_weighted_auc": 0.6052631578947368,
+          "terminal_prompt_bootstrap_interval": [
+            0.3194444444444444,
+            0.8819444444444443
           ],
-          "canonical_value": 0.5,
-          "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          "terminal_interval_contains_chance": true,
+          "terminal_effect_above_chance": 0.10416666666666663,
+          "peak_macro_auc": 0.6388888888888888,
+          "peak_progress": 0.5,
+          "peak_prompt_bootstrap_interval": [
+            0.4166666666666667,
+            0.8611111111111112
+          ],
+          "progress_points_with_pointwise_low_above_chance": [],
+          "terminal_per_prompt_auc": {
+            "0": 1.0,
+            "2": 0.3333333333333333,
+            "3": 0.6666666666666666,
+            "4": 1.0,
+            "6": 0.0,
+            "7": 0.625
+          },
+          "terminal_prompts_above_chance": 4,
+          "terminal_prompts_below_chance": 2,
+          "terminal_prompt_range": [
+            0.0,
+            1.0
+          ],
+          "n_eligible_prompt_groups": 6,
+          "n_within_prompt_pairs": 38,
+          "progress_zero_audit": {
+            "raw_macro_auc": 0.5,
+            "raw_pair_weighted_auc": 0.5,
+            "raw_bootstrap_interval": [
+              0.5,
+              0.5
+            ],
+            "canonical_value": 0.5,
+            "correction_needed": false,
+            "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          }
+        },
+        "cosine_projection": {
+          "terminal_macro_auc": 0.6041666666666666,
+          "terminal_pair_weighted_auc": 0.6052631578947368,
+          "terminal_prompt_bootstrap_interval": [
+            0.3194444444444444,
+            0.8819444444444443
+          ],
+          "terminal_interval_contains_chance": true,
+          "terminal_effect_above_chance": 0.10416666666666663,
+          "peak_macro_auc": 0.6527777777777778,
+          "peak_progress": 0.2,
+          "peak_prompt_bootstrap_interval": [
+            0.4444444444444444,
+            0.8888888888888888
+          ],
+          "progress_points_with_pointwise_low_above_chance": [],
+          "terminal_per_prompt_auc": {
+            "0": 1.0,
+            "2": 0.3333333333333333,
+            "3": 0.6666666666666666,
+            "4": 1.0,
+            "6": 0.0,
+            "7": 0.625
+          },
+          "terminal_prompts_above_chance": 4,
+          "terminal_prompts_below_chance": 2,
+          "terminal_prompt_range": [
+            0.0,
+            1.0
+          ],
+          "n_eligible_prompt_groups": 6,
+          "n_within_prompt_pairs": 38,
+          "progress_zero_audit": {
+            "raw_macro_auc": 0.5,
+            "raw_pair_weighted_auc": 0.5,
+            "raw_bootstrap_interval": [
+              0.5,
+              0.5
+            ],
+            "canonical_value": 0.5,
+            "correction_needed": false,
+            "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          }
         }
       },
-      "cosine_projection": {
-        "terminal_macro_auc": 0.6041666666666666,
-        "terminal_pair_weighted_auc": 0.6052631578947368,
-        "terminal_prompt_bootstrap_interval": [
-          0.3194444444444444,
-          0.8819444444444443
-        ],
-        "terminal_interval_contains_chance": true,
-        "terminal_effect_above_chance": 0.10416666666666663,
-        "peak_macro_auc": 0.6527777777777778,
-        "peak_progress": 0.2,
-        "peak_prompt_bootstrap_interval": [
-          0.4444444444444444,
-          0.8888888888888888
-        ],
-        "progress_points_with_pointwise_low_above_chance": [],
-        "terminal_per_prompt_auc": {
-          "0": 1.0,
-          "2": 0.3333333333333333,
-          "3": 0.6666666666666666,
-          "4": 1.0,
-          "6": 0.0,
-          "7": 0.625
-        },
-        "terminal_prompts_above_chance": 4,
-        "terminal_prompts_below_chance": 2,
-        "terminal_prompt_range": [
-          0.0,
-          1.0
-        ],
-        "n_eligible_prompt_groups": 6,
-        "n_within_prompt_pairs": 38,
-        "progress_zero_audit": {
-          "raw_macro_auc": 0.3819444444444444,
-          "raw_pair_weighted_auc": 0.4473684210526316,
-          "raw_bootstrap_interval": [
-            0.18055555555555555,
-            0.5972222222222222
+      "prefix_mean_residual": {
+        "raw_projection": {
+          "terminal_macro_auc": 0.6041666666666666,
+          "terminal_pair_weighted_auc": 0.6842105263157895,
+          "terminal_prompt_bootstrap_interval": [
+            0.20833333333333334,
+            0.9375
           ],
-          "canonical_value": 0.5,
-          "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          "terminal_interval_contains_chance": true,
+          "terminal_effect_above_chance": 0.10416666666666663,
+          "peak_macro_auc": 0.7708333333333334,
+          "peak_progress": 0.1,
+          "peak_prompt_bootstrap_interval": [
+            0.5694444444444444,
+            0.9375
+          ],
+          "progress_points_with_pointwise_low_above_chance": [
+            0.1
+          ],
+          "terminal_per_prompt_auc": {
+            "0": 1.0,
+            "2": 0.0,
+            "3": 1.0,
+            "4": 1.0,
+            "6": 0.0,
+            "7": 0.625
+          },
+          "terminal_prompts_above_chance": 4,
+          "terminal_prompts_below_chance": 2,
+          "terminal_prompt_range": [
+            0.0,
+            1.0
+          ],
+          "n_eligible_prompt_groups": 6,
+          "n_within_prompt_pairs": 38,
+          "progress_zero_audit": {
+            "raw_macro_auc": 0.5,
+            "raw_pair_weighted_auc": 0.5,
+            "raw_bootstrap_interval": [
+              0.5,
+              0.5
+            ],
+            "canonical_value": 0.5,
+            "correction_needed": false,
+            "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          }
+        },
+        "cosine_projection": {
+          "terminal_macro_auc": 0.6041666666666666,
+          "terminal_pair_weighted_auc": 0.6842105263157895,
+          "terminal_prompt_bootstrap_interval": [
+            0.2708333333333333,
+            0.9375
+          ],
+          "terminal_interval_contains_chance": true,
+          "terminal_effect_above_chance": 0.10416666666666663,
+          "peak_macro_auc": 0.7152777777777778,
+          "peak_progress": 0.2,
+          "peak_prompt_bootstrap_interval": [
+            0.40972222222222227,
+            0.9444444444444445
+          ],
+          "progress_points_with_pointwise_low_above_chance": [],
+          "terminal_per_prompt_auc": {
+            "0": 1.0,
+            "2": 0.0,
+            "3": 1.0,
+            "4": 1.0,
+            "6": 0.0,
+            "7": 0.625
+          },
+          "terminal_prompts_above_chance": 4,
+          "terminal_prompts_below_chance": 2,
+          "terminal_prompt_range": [
+            0.0,
+            1.0
+          ],
+          "n_eligible_prompt_groups": 6,
+          "n_within_prompt_pairs": 38,
+          "progress_zero_audit": {
+            "raw_macro_auc": 0.5,
+            "raw_pair_weighted_auc": 0.5,
+            "raw_bootstrap_interval": [
+              0.5,
+              0.5
+            ],
+            "canonical_value": 0.5,
+            "correction_needed": false,
+            "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          }
         }
       }
     },
-    "prefix_mean_residual": {
-      "raw_projection": {
-        "terminal_macro_auc": 0.6041666666666666,
-        "terminal_pair_weighted_auc": 0.6842105263157895,
-        "terminal_prompt_bootstrap_interval": [
-          0.20833333333333334,
-          0.9375
-        ],
-        "terminal_interval_contains_chance": true,
-        "terminal_effect_above_chance": 0.10416666666666663,
-        "peak_macro_auc": 0.7708333333333334,
-        "peak_progress": 0.1,
-        "peak_prompt_bootstrap_interval": [
-          0.5694444444444444,
-          0.9375
-        ],
-        "progress_points_with_pointwise_low_above_chance": [
-          0.1
-        ],
-        "terminal_per_prompt_auc": {
-          "0": 1.0,
-          "2": 0.0,
-          "3": 1.0,
-          "4": 1.0,
-          "6": 0.0,
-          "7": 0.625
-        },
-        "terminal_prompts_above_chance": 4,
-        "terminal_prompts_below_chance": 2,
-        "terminal_prompt_range": [
-          0.0,
-          1.0
-        ],
-        "n_eligible_prompt_groups": 6,
-        "n_within_prompt_pairs": 38,
-        "progress_zero_audit": {
-          "raw_macro_auc": 0.5625,
-          "raw_pair_weighted_auc": 0.5263157894736842,
-          "raw_bootstrap_interval": [
-            0.36111111111111116,
-            0.7708333333333334
+    "positionwise_profiles": {
+      "instantaneous_residual": {
+        "raw_projection": {
+          "terminal_macro_auc": 0.6041666666666666,
+          "terminal_pair_weighted_auc": 0.6052631578947368,
+          "terminal_prompt_bootstrap_interval": [
+            0.3194444444444444,
+            0.8819444444444443
           ],
-          "canonical_value": 0.5,
-          "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          "terminal_interval_contains_chance": true,
+          "terminal_effect_above_chance": 0.10416666666666663,
+          "peak_macro_auc": 0.7291666666666666,
+          "peak_progress": 0.6000000000000001,
+          "peak_prompt_bootstrap_interval": [
+            0.5277777777777778,
+            0.9097222222222223
+          ],
+          "progress_points_with_pointwise_low_above_chance": [
+            0.6000000000000001
+          ],
+          "terminal_per_prompt_auc": {
+            "0": 1.0,
+            "2": 0.3333333333333333,
+            "3": 0.6666666666666666,
+            "4": 1.0,
+            "6": 0.0,
+            "7": 0.625
+          },
+          "terminal_prompts_above_chance": 4,
+          "terminal_prompts_below_chance": 2,
+          "terminal_prompt_range": [
+            0.0,
+            1.0
+          ],
+          "n_eligible_prompt_groups": 6,
+          "n_within_prompt_pairs": 38,
+          "progress_zero_audit": {
+            "raw_macro_auc": 0.5,
+            "raw_pair_weighted_auc": 0.5,
+            "raw_bootstrap_interval": [
+              0.5,
+              0.5
+            ],
+            "canonical_value": 0.5,
+            "correction_needed": false,
+            "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          }
+        },
+        "cosine_projection": {
+          "terminal_macro_auc": 0.6041666666666666,
+          "terminal_pair_weighted_auc": 0.6052631578947368,
+          "terminal_prompt_bootstrap_interval": [
+            0.3194444444444444,
+            0.8819444444444443
+          ],
+          "terminal_interval_contains_chance": true,
+          "terminal_effect_above_chance": 0.10416666666666663,
+          "peak_macro_auc": 0.7152777777777777,
+          "peak_progress": 0.6000000000000001,
+          "peak_prompt_bootstrap_interval": [
+            0.5208333333333334,
+            0.9097222222222223
+          ],
+          "progress_points_with_pointwise_low_above_chance": [
+            0.6000000000000001
+          ],
+          "terminal_per_prompt_auc": {
+            "0": 1.0,
+            "2": 0.3333333333333333,
+            "3": 0.6666666666666666,
+            "4": 1.0,
+            "6": 0.0,
+            "7": 0.625
+          },
+          "terminal_prompts_above_chance": 4,
+          "terminal_prompts_below_chance": 2,
+          "terminal_prompt_range": [
+            0.0,
+            1.0
+          ],
+          "n_eligible_prompt_groups": 6,
+          "n_within_prompt_pairs": 38,
+          "progress_zero_audit": {
+            "raw_macro_auc": 0.5,
+            "raw_pair_weighted_auc": 0.5,
+            "raw_bootstrap_interval": [
+              0.5,
+              0.5
+            ],
+            "canonical_value": 0.5,
+            "correction_needed": false,
+            "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          }
         }
       },
-      "cosine_projection": {
-        "terminal_macro_auc": 0.6041666666666666,
-        "terminal_pair_weighted_auc": 0.6842105263157895,
-        "terminal_prompt_bootstrap_interval": [
-          0.2708333333333333,
-          0.9375
-        ],
-        "terminal_interval_contains_chance": true,
-        "terminal_effect_above_chance": 0.10416666666666663,
-        "peak_macro_auc": 0.7152777777777778,
-        "peak_progress": 0.2,
-        "peak_prompt_bootstrap_interval": [
-          0.40972222222222227,
-          0.9444444444444445
-        ],
-        "progress_points_with_pointwise_low_above_chance": [],
-        "terminal_per_prompt_auc": {
-          "0": 1.0,
-          "2": 0.0,
-          "3": 1.0,
-          "4": 1.0,
-          "6": 0.0,
-          "7": 0.625
-        },
-        "terminal_prompts_above_chance": 4,
-        "terminal_prompts_below_chance": 2,
-        "terminal_prompt_range": [
-          0.0,
-          1.0
-        ],
-        "n_eligible_prompt_groups": 6,
-        "n_within_prompt_pairs": 38,
-        "progress_zero_audit": {
-          "raw_macro_auc": 0.4930555555555555,
-          "raw_pair_weighted_auc": 0.4473684210526316,
-          "raw_bootstrap_interval": [
-            0.3125,
-            0.7222222222222223
+      "prefix_mean_residual": {
+        "raw_projection": {
+          "terminal_macro_auc": 0.6041666666666666,
+          "terminal_pair_weighted_auc": 0.6842105263157895,
+          "terminal_prompt_bootstrap_interval": [
+            0.20833333333333334,
+            0.9375
           ],
-          "canonical_value": 0.5,
-          "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          "terminal_interval_contains_chance": true,
+          "terminal_effect_above_chance": 0.10416666666666663,
+          "peak_macro_auc": 0.8055555555555555,
+          "peak_progress": 0.30000000000000004,
+          "peak_prompt_bootstrap_interval": [
+            0.5833333333333334,
+            0.9722222222222223
+          ],
+          "progress_points_with_pointwise_low_above_chance": [
+            0.30000000000000004
+          ],
+          "terminal_per_prompt_auc": {
+            "0": 1.0,
+            "2": 0.0,
+            "3": 1.0,
+            "4": 1.0,
+            "6": 0.0,
+            "7": 0.625
+          },
+          "terminal_prompts_above_chance": 4,
+          "terminal_prompts_below_chance": 2,
+          "terminal_prompt_range": [
+            0.0,
+            1.0
+          ],
+          "n_eligible_prompt_groups": 6,
+          "n_within_prompt_pairs": 38,
+          "progress_zero_audit": {
+            "raw_macro_auc": 0.5,
+            "raw_pair_weighted_auc": 0.5,
+            "raw_bootstrap_interval": [
+              0.5,
+              0.5
+            ],
+            "canonical_value": 0.5,
+            "correction_needed": false,
+            "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          }
+        },
+        "cosine_projection": {
+          "terminal_macro_auc": 0.6041666666666666,
+          "terminal_pair_weighted_auc": 0.6842105263157895,
+          "terminal_prompt_bootstrap_interval": [
+            0.2708333333333333,
+            0.9375
+          ],
+          "terminal_interval_contains_chance": true,
+          "terminal_effect_above_chance": 0.10416666666666663,
+          "peak_macro_auc": 0.8055555555555555,
+          "peak_progress": 0.30000000000000004,
+          "peak_prompt_bootstrap_interval": [
+            0.611111111111111,
+            0.9722222222222223
+          ],
+          "progress_points_with_pointwise_low_above_chance": [
+            0.30000000000000004
+          ],
+          "terminal_per_prompt_auc": {
+            "0": 1.0,
+            "2": 0.0,
+            "3": 1.0,
+            "4": 1.0,
+            "6": 0.0,
+            "7": 0.625
+          },
+          "terminal_prompts_above_chance": 4,
+          "terminal_prompts_below_chance": 2,
+          "terminal_prompt_range": [
+            0.0,
+            1.0
+          ],
+          "n_eligible_prompt_groups": 6,
+          "n_within_prompt_pairs": 38,
+          "progress_zero_audit": {
+            "raw_macro_auc": 0.5,
+            "raw_pair_weighted_auc": 0.5,
+            "raw_bootstrap_interval": [
+              0.5,
+              0.5
+            ],
+            "canonical_value": 0.5,
+            "correction_needed": false,
+            "reason": "within a prompt, all rollouts have identical prompt-only token history; deviations are floating-point tie artifacts"
+          }
         }
       }
     }
@@ -216,138 +416,61 @@
       0.6041666666666666
     ],
     "n_terminal_intervals_excluding_chance": 0,
-    "n_variants": 4,
-    "headline": "Weak and inconclusive endpoint decodability: all four terminal macro AUCs are 0.604 and all prompt-bootstrap intervals contain chance.",
-    "trajectory": "Curves are non-monotone and prompt-heterogeneous. The prefix-mean raw curve has an isolated 10%-progress pointwise interval above chance, but it is not sustained and is not an onset."
-  },
-  "progress_zero_policy": "Analysis canonicalizes prompt-only within-prompt AUC to 0.5. The source JSON retains the numerical tie artifacts.",
-  "corrected_profiles": {
-    "instantaneous_residual": {
-      "raw_projection": {
-        "progress": [
-          0.0,
-          0.1,
-          0.2,
-          0.30000000000000004,
-          0.4,
-          0.5,
-          0.6000000000000001,
-          0.7000000000000001,
-          0.8,
-          0.9,
-          1.0
+    "n_variants": 8,
+    "headline": "The fixed terminal direction transports weakly: all terminal macro AUCs are 0.604 and their prompt-bootstrap intervals contain chance. Positionwise refitting finds isolated mid-response separation, not a persistent trajectory.",
+    "trajectory": "Positionwise prefix-mean raw and cosine profiles both peak at AUC 0.806 at 30% progress, with pointwise bootstrap lows 0.583 and 0.611. Instantaneous profiles peak near 0.72 at 60%. All curves then fall to terminal AUC 0.604.",
+    "paired_raw_cosine_pointwise_support": {
+      "profiles": {
+        "instantaneous_residual": [],
+        "prefix_mean_residual": []
+      },
+      "positionwise_profiles": {
+        "instantaneous_residual": [
+          0.6000000000000001
         ],
-        "folds": {
-          "0": {
-            "n_train": 47,
-            "n_test": 4,
-            "training_contrast_groups": [
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "1": {
-            "n_train": 43,
-            "n_test": 8,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "2": {
-            "n_train": 47,
-            "n_test": 4,
-            "training_contrast_groups": [
-              0,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "3": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "4": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "5": {
-            "n_train": 43,
-            "n_test": 8,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "6": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "7": {
-            "n_train": 45,
-            "n_test": 6,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6
-            ],
-            "direction_norm": 1.0
-          }
-        },
-        "auc": {
-          "eligible_groups": [
-            0,
-            2,
-            3,
-            4,
-            6,
-            7
+        "prefix_mean_residual": [
+          0.30000000000000004
+        ]
+      }
+    },
+    "positionwise_prefix_mean_peak": {
+      "raw_projection": {
+        "auc": 0.8055555555555555,
+        "progress": 0.30000000000000004,
+        "pointwise_interval": [
+          0.5833333333333334,
+          0.9722222222222223
+        ]
+      },
+      "cosine_projection": {
+        "auc": 0.8055555555555555,
+        "progress": 0.30000000000000004,
+        "pointwise_interval": [
+          0.611111111111111,
+          0.9722222222222223
+        ]
+      }
+    },
+    "interpretation": "The positionwise result is compatible with a rotating or transient shared signal, but uses a different direction at each point. With six prompt groups and many pointwise comparisons, it is exploratory and is not an onset estimate."
+  },
+  "progress_zero_policy": "The canonical rerun makes prompt-only within-prompt AUC exactly 0.5 in the source result; the analysis retains that invariant.",
+  "plot_profiles": {
+    "profiles": {
+      "instantaneous_residual": {
+        "raw_projection": {
+          "progress": [
+            0.0,
+            0.1,
+            0.2,
+            0.30000000000000004,
+            0.4,
+            0.5,
+            0.6000000000000001,
+            0.7000000000000001,
+            0.8,
+            0.9,
+            1.0
           ],
-          "n_eligible_groups": 6,
-          "n_within_group_pairs": 38,
           "macro_auc": [
             0.5,
             0.5,
@@ -374,101 +497,7 @@
             0.5526315789473685,
             0.6052631578947368
           ],
-          "per_group_auc": {
-            "0": [
-              0.5,
-              1.0,
-              0.3333333333333333,
-              0.3333333333333333,
-              0.3333333333333333,
-              0.3333333333333333,
-              0.6666666666666666,
-              1.0,
-              0.6666666666666666,
-              1.0,
-              1.0
-            ],
-            "2": [
-              0.5,
-              0.0,
-              0.3333333333333333,
-              1.0,
-              0.0,
-              0.3333333333333333,
-              1.0,
-              0.0,
-              0.0,
-              0.0,
-              0.3333333333333333
-            ],
-            "3": [
-              0.5,
-              0.5,
-              0.5,
-              0.6666666666666666,
-              0.9166666666666666,
-              1.0,
-              0.6666666666666666,
-              0.6666666666666666,
-              0.25,
-              0.5833333333333334,
-              0.6666666666666666
-            ],
-            "4": [
-              0.5,
-              0.3333333333333333,
-              1.0,
-              1.0,
-              0.6666666666666666,
-              1.0,
-              0.3333333333333333,
-              0.5,
-              0.8333333333333334,
-              0.8333333333333334,
-              1.0
-            ],
-            "6": [
-              0.5,
-              0.16666666666666666,
-              0.8333333333333334,
-              0.16666666666666666,
-              0.3333333333333333,
-              0.6666666666666666,
-              0.16666666666666666,
-              0.6666666666666666,
-              0.6666666666666666,
-              0.3333333333333333,
-              0.0
-            ],
-            "7": [
-              0.5,
-              1.0,
-              0.75,
-              0.25,
-              0.75,
-              0.5,
-              0.875,
-              0.625,
-              0.625,
-              0.5,
-              0.625
-            ]
-          },
-          "pair_counts": {
-            "0": 3,
-            "2": 3,
-            "3": 12,
-            "4": 6,
-            "6": 6,
-            "7": 8
-          }
-        },
-        "bootstrap": {
-          "unit": "prompt_group",
-          "n_groups": 6,
-          "n_resamples": 4000,
-          "ci": 0.95,
-          "low": [
+          "bootstrap_low": [
             0.5,
             0.19444444444444442,
             0.4305555555555555,
@@ -481,7 +510,7 @@
             0.2638888888888889,
             0.3194444444444444
           ],
-          "high": [
+          "bootstrap_high": [
             0.5,
             0.8055555555555557,
             0.8333333333333334,
@@ -495,141 +524,20 @@
             0.8819444444444443
           ]
         },
-        "summary": {
-          "terminal_macro_auc": 0.6041666666666666,
-          "terminal_effect_above_chance": 0.10416666666666663,
-          "recovery_fraction": 0.9,
-          "recovery_target_auc": 0.59375,
-          "earliest_progress_with_sustained_recovery": 1.0,
-          "earliest_progress_with_bootstrap_low_above_chance": null,
-          "interpretation": "retrospective endpoint-direction decodability; not a discrete EM onset and not evidence of causal mediation"
-        }
-      },
-      "cosine_projection": {
-        "progress": [
-          0.0,
-          0.1,
-          0.2,
-          0.30000000000000004,
-          0.4,
-          0.5,
-          0.6000000000000001,
-          0.7000000000000001,
-          0.8,
-          0.9,
-          1.0
-        ],
-        "folds": {
-          "0": {
-            "n_train": 47,
-            "n_test": 4,
-            "training_contrast_groups": [
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "1": {
-            "n_train": 43,
-            "n_test": 8,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "2": {
-            "n_train": 47,
-            "n_test": 4,
-            "training_contrast_groups": [
-              0,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "3": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "4": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              6,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "5": {
-            "n_train": 43,
-            "n_test": 8,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "6": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "7": {
-            "n_train": 45,
-            "n_test": 6,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6
-            ],
-            "direction_norm": 1.0
-          }
-        },
-        "auc": {
-          "eligible_groups": [
-            0,
-            2,
-            3,
-            4,
-            6,
-            7
+        "cosine_projection": {
+          "progress": [
+            0.0,
+            0.1,
+            0.2,
+            0.30000000000000004,
+            0.4,
+            0.5,
+            0.6000000000000001,
+            0.7000000000000001,
+            0.8,
+            0.9,
+            1.0
           ],
-          "n_eligible_groups": 6,
-          "n_within_group_pairs": 38,
           "macro_auc": [
             0.5,
             0.5,
@@ -656,101 +564,7 @@
             0.5789473684210527,
             0.6052631578947368
           ],
-          "per_group_auc": {
-            "0": [
-              0.5,
-              1.0,
-              0.3333333333333333,
-              0.3333333333333333,
-              0.3333333333333333,
-              0.3333333333333333,
-              0.6666666666666666,
-              1.0,
-              0.6666666666666666,
-              1.0,
-              1.0
-            ],
-            "2": [
-              0.5,
-              0.0,
-              0.3333333333333333,
-              0.6666666666666666,
-              0.0,
-              0.3333333333333333,
-              1.0,
-              0.0,
-              0.0,
-              0.0,
-              0.3333333333333333
-            ],
-            "3": [
-              0.5,
-              0.5,
-              0.5,
-              0.75,
-              1.0,
-              1.0,
-              0.6666666666666666,
-              0.75,
-              0.25,
-              0.6666666666666666,
-              0.6666666666666666
-            ],
-            "4": [
-              0.5,
-              0.3333333333333333,
-              1.0,
-              1.0,
-              0.8333333333333334,
-              1.0,
-              0.3333333333333333,
-              0.5,
-              1.0,
-              0.8333333333333334,
-              1.0
-            ],
-            "6": [
-              0.5,
-              0.16666666666666666,
-              1.0,
-              0.16666666666666666,
-              0.3333333333333333,
-              0.6666666666666666,
-              0.16666666666666666,
-              0.5,
-              0.6666666666666666,
-              0.3333333333333333,
-              0.0
-            ],
-            "7": [
-              0.5,
-              1.0,
-              0.75,
-              0.25,
-              0.75,
-              0.5,
-              0.875,
-              0.625,
-              0.625,
-              0.5,
-              0.625
-            ]
-          },
-          "pair_counts": {
-            "0": 3,
-            "2": 3,
-            "3": 12,
-            "4": 6,
-            "6": 6,
-            "7": 8
-          }
-        },
-        "bootstrap": {
-          "unit": "prompt_group",
-          "n_groups": 6,
-          "n_resamples": 4000,
-          "ci": 0.95,
-          "low": [
+          "bootstrap_low": [
             0.5,
             0.2222222222222222,
             0.4444444444444444,
@@ -763,7 +577,7 @@
             0.27777777777777773,
             0.3194444444444444
           ],
-          "high": [
+          "bootstrap_high": [
             0.5,
             0.8055555555555557,
             0.8888888888888888,
@@ -776,144 +590,23 @@
             0.8055555555555557,
             0.8819444444444443
           ]
-        },
-        "summary": {
-          "terminal_macro_auc": 0.6041666666666666,
-          "terminal_effect_above_chance": 0.10416666666666663,
-          "recovery_fraction": 0.9,
-          "recovery_target_auc": 0.59375,
-          "earliest_progress_with_sustained_recovery": 1.0,
-          "earliest_progress_with_bootstrap_low_above_chance": null,
-          "interpretation": "retrospective endpoint-direction decodability; not a discrete EM onset and not evidence of causal mediation"
         }
-      }
-    },
-    "prefix_mean_residual": {
-      "raw_projection": {
-        "progress": [
-          0.0,
-          0.1,
-          0.2,
-          0.30000000000000004,
-          0.4,
-          0.5,
-          0.6000000000000001,
-          0.7000000000000001,
-          0.8,
-          0.9,
-          1.0
-        ],
-        "folds": {
-          "0": {
-            "n_train": 47,
-            "n_test": 4,
-            "training_contrast_groups": [
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "1": {
-            "n_train": 43,
-            "n_test": 8,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "2": {
-            "n_train": 47,
-            "n_test": 4,
-            "training_contrast_groups": [
-              0,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "3": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "4": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "5": {
-            "n_train": 43,
-            "n_test": 8,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "6": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "7": {
-            "n_train": 45,
-            "n_test": 6,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6
-            ],
-            "direction_norm": 1.0
-          }
-        },
-        "auc": {
-          "eligible_groups": [
-            0,
-            2,
-            3,
-            4,
-            6,
-            7
+      },
+      "prefix_mean_residual": {
+        "raw_projection": {
+          "progress": [
+            0.0,
+            0.1,
+            0.2,
+            0.30000000000000004,
+            0.4,
+            0.5,
+            0.6000000000000001,
+            0.7000000000000001,
+            0.8,
+            0.9,
+            1.0
           ],
-          "n_eligible_groups": 6,
-          "n_within_group_pairs": 38,
           "macro_auc": [
             0.5,
             0.7708333333333334,
@@ -940,101 +633,7 @@
             0.6578947368421053,
             0.6842105263157895
           ],
-          "per_group_auc": {
-            "0": [
-              0.5,
-              1.0,
-              1.0,
-              0.6666666666666666,
-              0.3333333333333333,
-              0.3333333333333333,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "2": [
-              0.5,
-              0.3333333333333333,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0
-            ],
-            "3": [
-              0.5,
-              0.75,
-              0.8333333333333334,
-              0.8333333333333334,
-              0.9166666666666666,
-              0.9166666666666666,
-              1.0,
-              1.0,
-              1.0,
-              0.9166666666666666,
-              1.0
-            ],
-            "4": [
-              0.5,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "6": [
-              0.5,
-              0.6666666666666666,
-              0.8333333333333334,
-              0.5,
-              0.3333333333333333,
-              0.16666666666666666,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0
-            ],
-            "7": [
-              0.5,
-              0.875,
-              0.75,
-              0.75,
-              0.875,
-              0.875,
-              0.875,
-              0.875,
-              0.75,
-              0.625,
-              0.625
-            ]
-          },
-          "pair_counts": {
-            "0": 3,
-            "2": 3,
-            "3": 12,
-            "4": 6,
-            "6": 6,
-            "7": 8
-          }
-        },
-        "bootstrap": {
-          "unit": "prompt_group",
-          "n_groups": 6,
-          "n_resamples": 4000,
-          "ci": 0.95,
-          "low": [
+          "bootstrap_low": [
             0.5,
             0.5694444444444444,
             0.4166666666666667,
@@ -1047,7 +646,7 @@
             0.20833333333333334,
             0.20833333333333334
           ],
-          "high": [
+          "bootstrap_high": [
             0.5,
             0.9375,
             0.9444444444444445,
@@ -1061,141 +660,20 @@
             0.9375
           ]
         },
-        "summary": {
-          "terminal_macro_auc": 0.6041666666666666,
-          "terminal_effect_above_chance": 0.10416666666666663,
-          "recovery_fraction": 0.9,
-          "recovery_target_auc": 0.59375,
-          "earliest_progress_with_sustained_recovery": 1.0,
-          "earliest_progress_with_bootstrap_low_above_chance": 0.1,
-          "interpretation": "retrospective endpoint-direction decodability; not a discrete EM onset and not evidence of causal mediation"
-        }
-      },
-      "cosine_projection": {
-        "progress": [
-          0.0,
-          0.1,
-          0.2,
-          0.30000000000000004,
-          0.4,
-          0.5,
-          0.6000000000000001,
-          0.7000000000000001,
-          0.8,
-          0.9,
-          1.0
-        ],
-        "folds": {
-          "0": {
-            "n_train": 47,
-            "n_test": 4,
-            "training_contrast_groups": [
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "1": {
-            "n_train": 43,
-            "n_test": 8,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "2": {
-            "n_train": 47,
-            "n_test": 4,
-            "training_contrast_groups": [
-              0,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "3": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "4": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              6,
-              7
-            ],
-            "direction_norm": 1.0
-          },
-          "5": {
-            "n_train": 43,
-            "n_test": 8,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "6": {
-            "n_train": 44,
-            "n_test": 7,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              7
-            ],
-            "direction_norm": 0.9999999999999999
-          },
-          "7": {
-            "n_train": 45,
-            "n_test": 6,
-            "training_contrast_groups": [
-              0,
-              2,
-              3,
-              4,
-              6
-            ],
-            "direction_norm": 1.0
-          }
-        },
-        "auc": {
-          "eligible_groups": [
-            0,
-            2,
-            3,
-            4,
-            6,
-            7
+        "cosine_projection": {
+          "progress": [
+            0.0,
+            0.1,
+            0.2,
+            0.30000000000000004,
+            0.4,
+            0.5,
+            0.6000000000000001,
+            0.7000000000000001,
+            0.8,
+            0.9,
+            1.0
           ],
-          "n_eligible_groups": 6,
-          "n_within_group_pairs": 38,
           "macro_auc": [
             0.5,
             0.7152777777777777,
@@ -1222,101 +700,7 @@
             0.6842105263157895,
             0.6842105263157895
           ],
-          "per_group_auc": {
-            "0": [
-              0.5,
-              1.0,
-              1.0,
-              0.6666666666666666,
-              0.3333333333333333,
-              0.3333333333333333,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "2": [
-              0.5,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0
-            ],
-            "3": [
-              0.5,
-              0.75,
-              0.8333333333333334,
-              0.8333333333333334,
-              0.9166666666666666,
-              0.9166666666666666,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "4": [
-              0.5,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0,
-              1.0
-            ],
-            "6": [
-              0.5,
-              0.6666666666666666,
-              0.8333333333333334,
-              0.5,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0,
-              0.0
-            ],
-            "7": [
-              0.5,
-              0.875,
-              0.625,
-              0.75,
-              0.875,
-              0.875,
-              0.875,
-              0.875,
-              0.875,
-              0.625,
-              0.625
-            ]
-          },
-          "pair_counts": {
-            "0": 3,
-            "2": 3,
-            "3": 12,
-            "4": 6,
-            "6": 6,
-            "7": 8
-          }
-        },
-        "bootstrap": {
-          "unit": "prompt_group",
-          "n_groups": 6,
-          "n_resamples": 4000,
-          "ci": 0.95,
-          "low": [
+          "bootstrap_low": [
             0.5,
             0.4166666666666667,
             0.40972222222222227,
@@ -1329,7 +713,7 @@
             0.2708333333333333,
             0.2708333333333333
           ],
-          "high": [
+          "bootstrap_high": [
             0.5,
             0.9375,
             0.9444444444444445,
@@ -1342,15 +726,280 @@
             0.9375,
             0.9375
           ]
+        }
+      }
+    },
+    "positionwise_profiles": {
+      "instantaneous_residual": {
+        "raw_projection": {
+          "progress": [
+            0.0,
+            0.1,
+            0.2,
+            0.30000000000000004,
+            0.4,
+            0.5,
+            0.6000000000000001,
+            0.7000000000000001,
+            0.8,
+            0.9,
+            1.0
+          ],
+          "macro_auc": [
+            0.5,
+            0.701388888888889,
+            0.2847222222222222,
+            0.34722222222222215,
+            0.6249999999999999,
+            0.3541666666666667,
+            0.7291666666666666,
+            0.3263888888888889,
+            0.5972222222222222,
+            0.13888888888888887,
+            0.6041666666666666
+          ],
+          "pair_weighted_auc": [
+            0.5,
+            0.7368421052631579,
+            0.39473684210526316,
+            0.4473684210526316,
+            0.6842105263157895,
+            0.34210526315789475,
+            0.7105263157894737,
+            0.39473684210526316,
+            0.6052631578947368,
+            0.15789473684210525,
+            0.6052631578947368
+          ],
+          "bootstrap_low": [
+            0.5,
+            0.3541666666666667,
+            0.05555555555555555,
+            0.1111111111111111,
+            0.47222222222222227,
+            0.125,
+            0.5277777777777778,
+            0.16666666666666666,
+            0.47222222222222227,
+            0.0,
+            0.3194444444444444
+          ],
+          "bootstrap_high": [
+            0.5,
+            0.9722222222222223,
+            0.5347222222222222,
+            0.5833333333333333,
+            0.7638888888888888,
+            0.6527777777777778,
+            0.9097222222222223,
+            0.4861111111111111,
+            0.6944444444444443,
+            0.3055555555555555,
+            0.8819444444444443
+          ]
         },
-        "summary": {
-          "terminal_macro_auc": 0.6041666666666666,
-          "terminal_effect_above_chance": 0.10416666666666663,
-          "recovery_fraction": 0.9,
-          "recovery_target_auc": 0.59375,
-          "earliest_progress_with_sustained_recovery": 0.6000000000000001,
-          "earliest_progress_with_bootstrap_low_above_chance": null,
-          "interpretation": "retrospective endpoint-direction decodability; not a discrete EM onset and not evidence of causal mediation"
+        "cosine_projection": {
+          "progress": [
+            0.0,
+            0.1,
+            0.2,
+            0.30000000000000004,
+            0.4,
+            0.5,
+            0.6000000000000001,
+            0.7000000000000001,
+            0.8,
+            0.9,
+            1.0
+          ],
+          "macro_auc": [
+            0.5,
+            0.6944444444444445,
+            0.2986111111111111,
+            0.34722222222222215,
+            0.625,
+            0.3541666666666667,
+            0.7152777777777777,
+            0.3819444444444444,
+            0.5277777777777778,
+            0.16666666666666666,
+            0.6041666666666666
+          ],
+          "pair_weighted_auc": [
+            0.5,
+            0.7368421052631579,
+            0.42105263157894735,
+            0.4473684210526316,
+            0.6842105263157895,
+            0.34210526315789475,
+            0.6842105263157895,
+            0.42105263157894735,
+            0.5263157894736842,
+            0.15789473684210525,
+            0.6052631578947368
+          ],
+          "bootstrap_low": [
+            0.5,
+            0.3888888888888889,
+            0.05555555555555555,
+            0.1111111111111111,
+            0.47222222222222215,
+            0.13888888888888887,
+            0.5208333333333334,
+            0.19444444444444442,
+            0.40277777777777773,
+            0.027777777777777776,
+            0.3194444444444444
+          ],
+          "bootstrap_high": [
+            0.5,
+            0.9444444444444445,
+            0.576388888888889,
+            0.5833333333333334,
+            0.7916666666666666,
+            0.6319444444444444,
+            0.9097222222222223,
+            0.5694444444444444,
+            0.6666666666666666,
+            0.3333333333333333,
+            0.8819444444444443
+          ]
+        }
+      },
+      "prefix_mean_residual": {
+        "raw_projection": {
+          "progress": [
+            0.0,
+            0.1,
+            0.2,
+            0.30000000000000004,
+            0.4,
+            0.5,
+            0.6000000000000001,
+            0.7000000000000001,
+            0.8,
+            0.9,
+            1.0
+          ],
+          "macro_auc": [
+            0.5,
+            0.6805555555555557,
+            0.6666666666666666,
+            0.8055555555555555,
+            0.5694444444444444,
+            0.638888888888889,
+            0.6944444444444443,
+            0.673611111111111,
+            0.5902777777777778,
+            0.611111111111111,
+            0.6041666666666666
+          ],
+          "pair_weighted_auc": [
+            0.5,
+            0.7368421052631579,
+            0.7105263157894737,
+            0.8421052631578947,
+            0.6842105263157895,
+            0.7368421052631579,
+            0.7894736842105263,
+            0.7631578947368421,
+            0.7105263157894737,
+            0.6842105263157895,
+            0.6842105263157895
+          ],
+          "bootstrap_low": [
+            0.5,
+            0.36111111111111116,
+            0.375,
+            0.5833333333333334,
+            0.24930555555555817,
+            0.2777777777777778,
+            0.3333333333333333,
+            0.3333333333333333,
+            0.2560763888888921,
+            0.25,
+            0.20833333333333334
+          ],
+          "bootstrap_high": [
+            0.5,
+            0.9166666666666666,
+            0.875,
+            0.9722222222222223,
+            0.8888888888888888,
+            0.9722222222222223,
+            1.0,
+            0.9791666666666666,
+            0.9166666666666666,
+            0.9444444444444443,
+            0.9375
+          ]
+        },
+        "cosine_projection": {
+          "progress": [
+            0.0,
+            0.1,
+            0.2,
+            0.30000000000000004,
+            0.4,
+            0.5,
+            0.6000000000000001,
+            0.7000000000000001,
+            0.8,
+            0.9,
+            1.0
+          ],
+          "macro_auc": [
+            0.5,
+            0.6666666666666666,
+            0.6805555555555557,
+            0.8055555555555555,
+            0.5833333333333334,
+            0.625,
+            0.6944444444444443,
+            0.6597222222222222,
+            0.5902777777777778,
+            0.5347222222222222,
+            0.6041666666666666
+          ],
+          "pair_weighted_auc": [
+            0.5,
+            0.7105263157894737,
+            0.7368421052631579,
+            0.8421052631578947,
+            0.6842105263157895,
+            0.7105263157894737,
+            0.7894736842105263,
+            0.7368421052631579,
+            0.7105263157894737,
+            0.631578947368421,
+            0.6842105263157895
+          ],
+          "bootstrap_low": [
+            0.5,
+            0.3611111111111111,
+            0.3888888888888889,
+            0.611111111111111,
+            0.27777777777777773,
+            0.2916666666666667,
+            0.3611111111111111,
+            0.3263888888888889,
+            0.2560763888888921,
+            0.21527777777777776,
+            0.2708333333333333
+          ],
+          "bootstrap_high": [
+            0.5,
+            0.9166666666666666,
+            0.875,
+            0.9722222222222223,
+            0.8611111111111112,
+            0.9583333333333334,
+            1.0,
+            0.9652777777777777,
+            0.923611111111111,
+            0.8472222222222222,
+            0.9375
+          ]
         }
       }
     }

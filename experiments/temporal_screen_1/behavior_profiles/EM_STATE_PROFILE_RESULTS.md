@@ -1,10 +1,16 @@
 ## Medical EM state-profile pilot
 
-The SAE-free pilot does **not** recover a robust temporal formation curve for
-Medical emergent misalignment. The leave-one-prompt-out endpoint direction has
-terminal macro AUC **0.604** in all four readouts, and every 95% prompt-bootstrap
-interval includes chance. With only six evaluable prompt groups, the honest
-conclusion is weak, inconclusive decodability rather than a feature onset.
+The SAE-free pilot does **not** recover a robust persistent temporal formation
+curve for Medical emergent misalignment. A fixed direction learned at the end
+of the response transports weakly: terminal macro AUC is **0.604** in all four
+readouts, and every 95% prompt-bootstrap interval includes chance.
+
+A separate positionwise estimator does find isolated shared separation in the
+middle of the response. Its prefix-mean raw and cosine profiles both peak at
+**0.806 AUC at 30% progress**, with pointwise bootstrap intervals
+**[0.583, 0.972]** and **[0.611, 0.972]**. The signal then declines to 0.604 at
+the endpoint. This is compatible with a transient or rotating readout, but it
+is exploratory evidence from six prompt groups—not a feature onset.
 
 ![Medical EM state profile](em_state_profile_analysis.png)
 
@@ -22,16 +28,22 @@ conclusion is weak, inconclusive decodability rather than a feature onset.
   model, prompts, domain, and essentially the same length distribution.
 - Representation: layer-15 `resid_post`, teacher-forced at 11 normalized
   response-progress points.
-- Estimator: terminal positive-minus-negative directions trained
-  leave-one-prompt-out from equal-weighted within-training-prompt contrasts.
+- Estimator: positive-minus-negative directions trained leave-one-prompt-out
+  from equal-weighted within-training-prompt contrasts. Directions are fit
+  either at the terminal point or independently at each progress point.
   Evaluation AUC is calculated within each held-out prompt and then averaged
   over prompts.
 
 The two temporal readouts are the residual at the selected token and the mean
 residual over the observed response prefix. Each is reported with raw dot
-products and cosine-normalized projections.
+products and cosine-normalized projections under two fitting modes:
 
-## Results
+- **terminal-transported:** learn one direction at 100% progress, then apply
+  that unchanged direction at every earlier point;
+- **positionwise:** learn a separate leave-one-prompt-out direction at each
+  progress point.
+
+## Terminal-transported results
 
 | Readout | Projection | Terminal macro AUC | 95% prompt-bootstrap interval | Peak AUC (progress) |
 |---|---:|---:|---:|---:|
@@ -46,13 +58,33 @@ is not sustained and is absent from the cosine sensitivity check. It should
 not be reported as an onset. Terminal results are also heterogeneous: four
 prompt groups score above chance and two below, spanning AUC 0 to 1.
 
-The source result's progress-zero AUCs range from 0.382 to 0.562. These are
-floating-point tie artifacts: before the first response token, rollouts of the
-same prompt have mathematically identical causal histories, but differing
-total sequence lengths can select slightly different attention kernels. The
-analysis plot canonically sets within-prompt progress-zero AUC to 0.5. The raw
-JSON is unchanged, and future runs canonicalize the prompt-only residual before
-scoring.
+## Positionwise results
+
+| Readout | Projection | Terminal macro AUC | Peak AUC (progress) | 95% pointwise interval at peak |
+|---|---:|---:|---:|---:|
+| Instantaneous | Raw | 0.604 | 0.729 (0.6) | [0.528, 0.910] |
+| Instantaneous | Cosine | 0.604 | 0.715 (0.6) | [0.521, 0.910] |
+| Prefix mean | Raw | 0.604 | 0.806 (0.3) | [0.583, 0.972] |
+| Prefix mean | Cosine | 0.604 | 0.806 (0.3) | [0.611, 0.972] |
+
+Raw and cosine controls agree on the location of two isolated pointwise peaks:
+30% for the prefix mean and 60% for the instantaneous residual. This makes a
+pure residual-norm artifact less likely. However, the estimator deliberately
+uses a different direction at every progress point. It therefore shows that a
+prompt-general discriminating direction can be found *at that point*, not that
+one feature is forming and persisting. The curves are sharply non-monotone;
+for example, the instantaneous positionwise macro AUC falls below chance at
+several later points before returning to 0.604 at the endpoint.
+
+The bands are pointwise and are not corrected for searching across 11 progress
+points, two representations, and two normalizations. With only six eligible
+prompt groups, the peaks should be treated as a replication target. A
+preregistered rerun on more prompts is needed before calling them evidence for
+a rotating or transient shared EM state.
+
+Progress zero is exactly 0.5 in the canonical raw result. The runner copies one
+prompt-only residual within each prompt before scoring, preventing negligible
+sequence-length-kernel differences from breaking mathematical ties.
 
 ## Interpretation
 
@@ -68,10 +100,13 @@ supports using two protocol families:
   as evidence accumulation over normalized progress and without an onset
   claim.
 
-This negative pilot does not show that EM has no temporal structure. It says
-that this small, single-layer, terminal-direction estimator cannot establish
-one. Stronger evidence would require more prompt groups, held-out endpoint
-labels, a layer sweep, and causal validation of any stable direction.
+This pilot does not show that EM has no temporal structure. It says that a
+small, single-layer, fixed terminal-direction estimator cannot establish a
+persistent state, while a more flexible positionwise estimator finds
+interesting but isolated mid-response separation. Stronger evidence would
+require more prompt groups, a preregistered progress region, held-out endpoint
+labels, a layer sweep, cross-time direction-similarity measurements, and causal
+validation of any stable direction.
 
 ## Reproduce
 
