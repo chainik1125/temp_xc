@@ -543,35 +543,66 @@ def _predict_classifier(classifier, values: np.ndarray) -> np.ndarray:
 
 
 def _secret_selectivity(
-    code: np.ndarray,
-    secret: np.ndarray,
+    probe_code: np.ndarray,
+    probe_secret: np.ndarray,
+    eval_code: np.ndarray,
+    eval_secret: np.ndarray,
     q: int,
 ) -> dict[str, float]:
-    native = code.reshape(code.shape[0], -1)
-    masses = np.stack(
-        [native[secret == value].sum(axis=0) for value in range(q)],
+    """Cross-split single-feature secret selectivity.
+
+    Preferred classes and the top-q feature set are chosen only on the probe
+    split.  Their activation-mass precision is then measured on the independent
+    eval split.  A minimum fire count prevents one-off activations from looking
+    perfectly selective in a wide sparse dictionary.
+    """
+
+    probe = probe_code.reshape(probe_code.shape[0], -1)
+    evaluation = eval_code.reshape(eval_code.shape[0], -1)
+    probe_mass = np.stack(
+        [probe[probe_secret == value].sum(axis=0) for value in range(q)],
         axis=0,
     )
-    totals = masses.sum(axis=0)
-    valid = totals > 1e-12
-    if not valid.any():
+    eval_mass = np.stack(
+        [evaluation[eval_secret == value].sum(axis=0) for value in range(q)],
+        axis=0,
+    )
+    minimum_fires = max(10, int(math.ceil(0.005 * probe.shape[0])))
+    probe_fires = (probe > 0).sum(axis=0)
+    eval_fires = (evaluation > 0).sum(axis=0)
+    eligible = (
+        (probe_fires >= minimum_fires)
+        & (eval_fires >= minimum_fires)
+        & (probe_mass.sum(axis=0) > 1e-12)
+        & (eval_mass.sum(axis=0) > 1e-12)
+    )
+    if not eligible.any():
         return {
             "selective_feature_count": 0,
             "top_q_selectivity": 0.0,
             "top_q_secret_coverage": 0.0,
+            "minimum_fires_per_split": minimum_fires,
         }
-    probabilities = masses[:, valid] / totals[valid][None, :]
-    entropy = -(probabilities * np.log(probabilities + 1e-12)).sum(axis=0)
-    selectivity = 1.0 - entropy / math.log(q)
-    preferred = probabilities.argmax(axis=0)
-    count = min(q, selectivity.shape[0])
-    order = np.argsort(selectivity)[-count:]
+    probe_class_counts = np.bincount(probe_secret, minlength=q).astype(np.float64)
+    probe_means = probe_mass[:, eligible] / probe_class_counts[:, None]
+    preferred = probe_means.argmax(axis=0)
+    probe_precision = probe_means.max(axis=0) / probe_means.sum(axis=0).clip(1e-12)
+    probe_score = (probe_precision - 1.0 / q) / (1.0 - 1.0 / q)
+    eval_eligible_mass = eval_mass[:, eligible]
+    columns = np.arange(eval_eligible_mass.shape[1])
+    eval_precision = eval_eligible_mass[preferred, columns] / eval_eligible_mass.sum(
+        axis=0
+    ).clip(1e-12)
+    eval_score = (eval_precision - 1.0 / q) / (1.0 - 1.0 / q)
+    count = min(q, probe_score.shape[0])
+    order = np.argsort(probe_score)[-count:]
     return {
-        "selective_feature_count": int(valid.sum()),
-        "top_q_selectivity": float(selectivity[order].mean()),
+        "selective_feature_count": int(eligible.sum()),
+        "top_q_selectivity": float(eval_score[order].mean()),
         "top_q_secret_coverage": float(
             len(set(preferred[order].tolist())) / q
         ),
+        "minimum_fires_per_split": minimum_fires,
     }
 
 
@@ -732,7 +763,13 @@ def evaluate_shamir(
         "raw_window_balanced_accuracy": raw_accuracy,
         "symbolic_interpolation_oracle": oracle_accuracy,
         "identifiable": bool(window >= h + 1),
-        **_secret_selectivity(eval_native, eval_data.secret.numpy(), q),
+        **_secret_selectivity(
+            probe_native,
+            probe_data.secret.numpy(),
+            eval_native,
+            eval_data.secret.numpy(),
+            q,
+        ),
         **_reconstruction_metrics(model, eval_data.x, window=window),
     }
     usage = _spectral_usage(model, eval_native)

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import math
 
+import numpy as np
+
 from experiments.power_spectrum.code import run_controlled_frequency_suite as suite
 from experiments.power_spectrum.code.controlled_tasks import (
     generate_factorial_hmm_splits,
@@ -121,3 +123,26 @@ def test_hmm_evaluator_reports_band_localization_and_usage() -> None:
         1.0,
         rel_tol=1e-6,
     )
+
+
+def test_secret_selectivity_is_cross_split_and_rejects_one_off_fires() -> None:
+    probe_secret = np.repeat(np.arange(4), 40)
+    eval_secret = np.repeat(np.arange(4), 40)
+    probe = np.zeros((160, 5), dtype=np.float32)
+    evaluation = np.zeros((160, 5), dtype=np.float32)
+    probe[probe_secret == 2, 0] = 1.0
+    evaluation[eval_secret == 2, 0] = 1.0
+    # This feature would look perfectly selective without a minimum-fire gate.
+    probe[0, 1] = 100.0
+    evaluation[0, 1] = 100.0
+
+    result = suite._secret_selectivity(
+        probe,
+        probe_secret,
+        evaluation,
+        eval_secret,
+        q=4,
+    )
+    assert result["selective_feature_count"] == 1
+    assert result["top_q_selectivity"] == 1.0
+    assert result["top_q_secret_coverage"] == 0.25
