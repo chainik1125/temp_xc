@@ -64,5 +64,8 @@ fi
 if [[ "${BACKTRACKING_FOURIER_ALLOW_RECOVERED_ARTIFACT:-0}" == "1" ]]; then
   args+=(--allow-recovered-artifact)
 fi
+if [[ "${BACKTRACKING_FOURIER_BAND_PROBES:-0}" == "1" ]]; then
+  args+=(--band-probes)
+fi
 
 "$PYTHON" -m experiments.power_spectrum.code.run_backtracking_fourier "${args[@]}"

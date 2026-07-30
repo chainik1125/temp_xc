@@ -500,6 +500,7 @@ def evaluate_dictionary(
     window: int,
     seed: int,
     encode_batch_size: int,
+    run_band_probes: bool,
     device: str,
 ) -> dict:
     """Evaluate using Aniket's artifact, controls, grouped folds, and probe."""
@@ -520,6 +521,10 @@ def evaluate_dictionary(
             "cohort": completed.get("cohort_sha256") == cohort_sha256,
             "provenance": completed.get("artifact_provenance")
             == artifact_provenance,
+            "band_probes": completed.get("architecture", {}).get(
+                "band_probes"
+            )
+            is run_band_probes,
             "checkpoint": cached_fingerprint.get("fourier_checkpoint_sha256")
             == reference["sha256"](model_path),
             "implementation": cached_fingerprint.get(
@@ -548,6 +553,7 @@ def evaluate_dictionary(
         "artifact_sha256": artifact_sha256,
         "cohort_sha256": cohort_sha256,
         "artifact_provenance": artifact_provenance,
+        "band_probes": run_band_probes,
         "window": window,
         "window_offsets": list(ARTIFACT_OFFSETS[-window:]),
         "seed": seed,
@@ -585,11 +591,12 @@ def evaluate_dictionary(
         matrices[name] = matrix
 
     representations = {"fourier": matrices}
-    for band, (start, stop) in enumerate(model.band_slices):
-        representations[f"fourier_band_{band}"] = {
-            name: matrix[:, start:stop]
-            for name, matrix in matrices.items()
-        }
+    if run_band_probes:
+        for band, (start, stop) in enumerate(model.band_slices):
+            representations[f"fourier_band_{band}"] = {
+                name: matrix[:, start:stop]
+                for name, matrix in matrices.items()
+            }
 
     probes = {}
     for name, variants in representations.items():
@@ -622,6 +629,7 @@ def evaluate_dictionary(
             "atoms_per_band": list(model.h_per_band),
             "matryoshka": False,
             "adaptive_frequency_objective": False,
+            "band_probes": run_band_probes,
             "support_rule": "per-example TopK then ReLU, matching TXCBase",
         },
         "artifact": str(artifact.resolve()),
@@ -853,6 +861,7 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--checkpoint-every", type=int, default=1_000)
     parser.add_argument("--memory-smoke-steps", type=int, default=1)
     parser.add_argument("--encode-batch-size", type=int, default=32)
+    parser.add_argument("--band-probes", action="store_true")
     parser.add_argument("--device", default="cuda:0")
     parser.add_argument("--max-cells", type=int)
     parser.add_argument("--cleanup-optimizer-state", action="store_true")
@@ -944,6 +953,7 @@ def main() -> None:
         "output_root": str(args.output_root),
         "checkpoint_root": str(args.checkpoint_root),
         "allow_recovered_artifact": args.allow_recovered_artifact,
+        "band_probes": args.band_probes,
         "cells": [
             {
                 "config": asdict(config),
@@ -1027,6 +1037,7 @@ def main() -> None:
                 window=config.window,
                 seed=config.seed,
                 encode_batch_size=args.encode_batch_size,
+                run_band_probes=args.band_probes,
                 device=args.device,
             )
         if (
