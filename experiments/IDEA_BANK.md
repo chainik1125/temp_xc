@@ -1,4 +1,4 @@
-## TXC experiment idea bank
+## Experiment idea bank
 
 **Purpose:** collect plausible TXC use cases without quietly promoting them to
 positive evidence. Each entry should state the mechanism, the strongest cheap
@@ -140,3 +140,159 @@ also directly exposes the two questions our graveyard says must be separated:
 That makes many-shot jailbreaks a good *falsifiable screen* for the remaining
 TXC niche, even though the skeptical prior should be that current-state or
 simple evidence pooling will win.
+
+## A T=2 concatenated T-SAE as the minimal TXC
+
+**Status:** high-priority architecture search; intended as a bridge experiment,
+not another large TXC bundle.
+
+### Core question
+
+Can we construct a two-position model that is as close as possible to the
+paper T-SAE, but improves synthetic latent recovery because it is allowed to
+form sparse atoms jointly over two adjacent positions?
+
+For a pair $(h_{t-1},h_t)$, concatenate the inputs and apply a T-SAE-like
+sparse autoencoder:
+
+```text
+u = concat(h[t-1], h[t])
+z = sparse_gate(W_enc u + b_enc)
+u_hat = W_dec z + b_dec
+```
+
+Reshape each decoder atom back to `(2, d_in)`. This is a TXC at `T=2`, but it
+removes almost every complication that currently separates TXC from T-SAE.
+The first implementation should retain the T-SAE stack—BatchTopK during
+training, thresholded inference, AuxK, decoder normalization, and optionally
+the same Matryoshka and temporal-contrastive terms—while changing only the
+object being encoded and reconstructed from one position to a concatenated
+pair.
+
+The representational hope is simple. A motion atom can have decoder profile
+`[-v, +v]`, so one firing represents a change across positions. A per-token
+T-SAE needs separate firings at the two positions and a downstream operation
+to combine them. If this sparse-efficiency argument is real, `T=2` is the
+smallest place it should be visible.
+
+### Make it a true extension of T-SAE
+
+Use two complementary initializations:
+
+- **Scratch joint:** initialize the concatenated dictionary normally and let
+  every atom become local or joint.
+- **T-SAE warm start:** start from a trained T-SAE and embed its decoder atoms
+  as position-local atoms, `[d_f, 0]` and `[0, d_f]`, with the corresponding
+  block encoder. At the initial checkpoint this reproduces two independent
+  applications of the same T-SAE dictionary. Then release the off-position
+  weights and fine-tune on pairs.
+
+The warm-start path is especially useful: the model begins with a known
+T-SAE solution and asks whether optimization chooses to turn any local atoms
+into genuinely joint two-position atoms. Keep a frozen-block arm so any gain
+from merely continuing T-SAE training is visible.
+
+### Fairness frontiers
+
+A two-position model can appear better simply because it gets more active
+features, parameters, or tokens per optimizer step. Report all three
+frontiers rather than choosing the convenient one:
+
+- **Matched online code:** `k_window = k_TSAE`; one T=2 code has the same
+  active bandwidth as one current-token T-SAE code.
+- **Matched per-token code:** `k_window = 2 * k_TSAE`; compare against the
+  concatenation of both per-token T-SAE codes, which also spends two token
+  budgets.
+- **Matched parameters:** reduce the joint dictionary width so the total
+  encoder-plus-decoder parameter count matches T-SAE. Also report equal
+  dictionary width as a separate, explicitly higher-parameter frontier.
+
+Normalize training exposure in tokens, not batches. The T=2 arm must not see
+twice as many activation vectors per step by accident.
+
+### Baselines
+
+- Current-position T-SAE.
+- The same T-SAE applied independently at both positions, with its two latent
+  vectors concatenated. Evaluate last, mean, max, and learned linear pooling.
+- The frozen block-diagonal T-SAE warm start.
+- Stacked/positional SAE at `T=2`.
+- Canonical TXC-pre and TXC-post at `T=2`.
+- Supervised raw-pair and raw-current ceilings for each synthetic target.
+
+The independent two-position T-SAE is load-bearing. Beating only the
+current-position T-SAE shows that a second position contains information;
+beating the concatenated two-code baseline shows that a *shared joint sparse
+code* adds something.
+
+### Staged search
+
+Start on the existing synthetic benchmarks at `T=2`; do not create a new task
+while selecting the architecture. The most diagnostic initial subset is:
+
+- signed motion and phase-pair, where a pair can expose a directed or
+  relational variable;
+- frequency velocity and multilane, where window models already have a clear
+  non-ambient signal;
+- backtracking intensity, where additive pooling is a strong alternative;
+- one ambient negative control such as changepoint mode.
+
+Run a small successive-halving search rather than a combinatorial sweep:
+
+1. **Gate family:** BatchTopK versus ReLU plus L1/JumpReLU-style sparsity.
+2. **Sparsity:** matched-code and matched-per-token budgets, with one lower and
+   one higher neighboring value.
+3. **Loss:** reconstruction-only first; then independently add AuxK,
+   Matryoshka, and shifted-window contrastive penalties. Search a log-spaced
+   coefficient grid around zero and the T-SAE defaults.
+4. **Dictionary allocation:** all-joint atoms versus a local-plus-joint split,
+   with the split fraction selected on validation data.
+5. **Initialization:** scratch, block warm start frozen, and block warm start
+   released.
+
+Use seeds 1 and 2 plus a validation stream to select at most two recipes.
+Confirm those recipes on seed 42, fresh data, and the synthetic tasks not used
+for selection. This prevents a broad hyperparameter search from manufacturing
+a fragile TXC win.
+
+### Measurements
+
+- Primary latent-recovery metric already defined for each benchmark.
+- Reconstruction NMSE, realized L0 per window and per token, dead-feature
+  fraction, and firing-rate distribution.
+- Pair-shuffle and position-swap ablations. A genuinely directed atom should
+  change predictably under swapping, while an order-free pooling solution
+  should not.
+- Decoder temporal profiles and the fraction of selected atoms with material
+  norm at both positions.
+- Improvement over both current-position T-SAE and concatenated two-code
+  T-SAE, with paired seed differences.
+
+### Success and kill criteria
+
+**Initial success:** one preselected T=2 recipe improves held-out recovery on
+at least two non-ambient benchmarks relative to both T-SAE baselines, at a
+matched code or parameter frontier, without a degenerate NMSE or dead-feature
+failure.
+
+**Strong result:** the gain survives position swapping/shuffling in the
+predicted way and is carried by atoms with genuinely two-position decoder
+support. This would show that the benefit comes from joint sparse atoms rather
+than extra capacity or post-hoc pooling.
+
+**Kill:** gains disappear when active bandwidth, parameter count, or training
+tokens are matched; concatenated independent T-SAE codes match the joint code;
+or the selected recipe fails on seed 42/held-out tasks. In that case, adding a
+second position is useful only as extra input to an ordinary pooled baseline,
+not as evidence for the TXC architecture.
+
+### Why this experiment matters
+
+This is the cleanest way to ask whether there is any beneficial architectural
+step between T-SAE and TXC. Instead of comparing two mature systems that differ
+in gating, losses, inference thresholds, sparsity semantics, parameter count,
+and temporal extent, it constructs a nested `T=1 -> T=2` family. If even this
+minimal pair model cannot beat a concatenated T-SAE on tasks designed to
+contain pair-only information, the case for more elaborate TXCs becomes much
+weaker. If it can, the winning sparsity and loss recipe gives us a principled
+base on which to build.
