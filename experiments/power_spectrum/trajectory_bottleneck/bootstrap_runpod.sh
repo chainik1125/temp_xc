@@ -42,7 +42,7 @@ python -m pip install --quiet \
   "huggingface-hub>=0.26" "hf-xet>=1.1"
 
 export PYTHONPATH="${SOURCE_ROOT}/src:${SOURCE_ROOT}"
-export HF_HUB_ENABLE_HF_TRANSFER=1
+export HF_XET_HIGH_PERFORMANCE=1
 python -m experiments.backtracking_assets \
   --destination "${SOURCE_ROOT}/artifacts/hf_temp_bench_data" \
   --revision "${REVISION}" \
@@ -58,10 +58,16 @@ ln -sfn \
   "${SOURCE_ROOT}/artifacts/hf_temp_bench_data/c7_backtracking/stage_a/sentence_acts_L10.npz" \
   "${SOURCE_ROOT}/artifacts/c7/sentence_acts_L10.npz"
 
+LOCAL_CACHE="/dev/shm/trajectory_resid_post_L10.npy"
+cp \
+  "${SOURCE_ROOT}/artifacts/hf_temp_bench_data/act_cache/fb2a74be884e512a/resid_post_L10.npy" \
+  "${LOCAL_CACHE}"
+echo "dc34dfb117f77abddef4b4396d0d00afc707c39876d0ee36015de1e7b8406914  ${LOCAL_CACHE}" \
+  | sha256sum --check
+
 python -m experiments.power_spectrum.trajectory_bottleneck.smoke
 python -m experiments.power_spectrum.trajectory_bottleneck.run \
-  --activation-cache \
-  "${SOURCE_ROOT}/artifacts/hf_temp_bench_data/act_cache/fb2a74be884e512a/resid_post_L10.npy" \
+  --activation-cache "${LOCAL_CACHE}" \
   --artifact "${SOURCE_ROOT}/artifacts/c7/sentence_acts_L10.npz" \
   --checkpoint-root "${RUN_ROOT}/checkpoints" \
   --output-root "${RUN_ROOT}/results" \
@@ -72,6 +78,7 @@ trap - EXIT
 setsid nohup env \
   TRAJECTORY_RUN_ROOT="${RUN_ROOT}" \
   TRAJECTORY_SOURCE_ROOT="${SOURCE_ROOT}" \
+  TRAJECTORY_ACTIVATION_CACHE="${LOCAL_CACHE}" \
   TRAJECTORY_MAX_SECONDS=28800 \
   "${SOURCE_ROOT}/experiments/power_spectrum/trajectory_bottleneck/supervisor.sh" \
   > "${RUN_ROOT}/logs/supervisor_launcher.log" 2>&1 < /dev/null &

@@ -29,3 +29,8 @@ volume. Training checkpoints are atomic and resumable. The supervisor restarts
 ordinary process failures, applies a hard wall-clock deadline, and invokes a
 pod-stop helper after flushing state. An SSH or client connection drop does not
 affect the worker.
+
+The bootstrap verifies both public artifacts by SHA-256 and copies the 4.24 GB
+training cache to `/dev/shm` before launching. Checkpoints and results remain on
+the persistent `/workspace` volume; only the immutable read cache is local
+scratch.
