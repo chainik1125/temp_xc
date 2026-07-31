@@ -347,6 +347,9 @@ def train_one(
     config = load_config()
     training = config["representation_training"]
     spec = _architecture_spec(config, architecture)
+    d_sae = int(d_sae_override or training["d_sae"])
+    steps = int(steps_override or training["steps"])
+    positions_per_step = int(positions_per_step_override or training["positions_per_step"])
     architecture_root = output_root / architecture
     final_checkpoint = architecture_root / "model.safetensors"
     final_health = architecture_root / "health.json"
@@ -358,6 +361,9 @@ def train_one(
             "config_sha256": config_digest(config),
             "activation_sha256": file_sha256(activation_path),
             "metadata_sha256": file_sha256(metadata_path),
+            "d_sae": d_sae,
+            "steps": steps,
+            "positions_per_step": positions_per_step,
         }
         actual_identity = {key: existing_health.get(key) for key in expected_identity}
         if actual_identity != expected_identity:
@@ -384,7 +390,6 @@ def train_one(
     torch.manual_seed(seed)
     torch.set_float32_matmul_precision("high")
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    d_sae = int(d_sae_override or training["d_sae"])
     model = _instantiate(
         spec=spec,
         d_in=activations.shape[-1],
@@ -394,11 +399,9 @@ def train_one(
     ).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=float(training["learning_rate"]))
     generator = torch.Generator(device="cpu").manual_seed(seed + 991)
-    steps = int(steps_override or training["steps"])
     warmup = int(training["warmup_steps"])
     log_every = int(training["log_every"])
     checkpoint_every = int(training["checkpoint_every"])
-    positions_per_step = int(positions_per_step_override or training["positions_per_step"])
     rows: list[dict[str, float]] = []
     resume_checkpoint = architecture_root / "resume_checkpoint.pt"
     start_step = 0
@@ -568,6 +571,7 @@ def train_one(
         "k_pos": int(training["k_pos"]),
         "parameter_count": sum(parameter.numel() for parameter in model.parameters()),
         "training_seed": seed,
+        "positions_per_step": positions_per_step,
         "dead_feature_threshold_tokens": int(training["dead_feature_threshold_tokens"]),
         "realized_l0_unit": "token" if window == 1 else "shared_window_code",
         "normalization_scalar_rms": normalization.scalar_rms,
