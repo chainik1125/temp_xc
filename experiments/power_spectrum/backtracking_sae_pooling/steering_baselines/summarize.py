@@ -1,4 +1,4 @@
-"""Summarize and plot the fresh two-arm steering calibration."""
+"""Summarize and plot the fresh steering calibration controls."""
 
 from __future__ import annotations
 
@@ -10,8 +10,18 @@ from typing import Any
 import matplotlib.pyplot as plt
 
 
-ARM_LABELS = {"topk_sae": "Final-token SAE", "txc_base": "TXC-base"}
-ARM_COLORS = {"topk_sae": "#3569b7", "txc_base": "#d1495b"}
+ARM_LABELS = {
+    "topk_sae": "Final-token SAE",
+    "pooled_sae_mean": "Mean-pooled SAE",
+    "pooled_sae_max": "Max-pooled SAE",
+    "txc_base": "TXC-base",
+}
+ARM_COLORS = {
+    "topk_sae": "#3569b7",
+    "pooled_sae_mean": "#2a9d8f",
+    "pooled_sae_max": "#e9a03b",
+    "txc_base": "#d1495b",
+}
 NEGATIVE_LOBE_MAGNITUDES = [-12.0, -10.0, -8.0, -7.0, -6.0, -5.0]
 
 
@@ -35,15 +45,8 @@ def summarize(workspace: Path, historical_path: Path, output_dir: Path) -> dict[
     for arm, result in fresh.items():
         metrics = result["metrics"]
         curve = metric_curve(metrics, magnitudes)
-        reference = historical["arms"][arm]
         fresh_by_magnitude = dict(zip(magnitudes, curve, strict=True))
-        historical_by_magnitude = dict(
-            zip(magnitudes, reference["delta_gc"], strict=True)
-        )
         negative_lobe = [fresh_by_magnitude[value] for value in NEGATIVE_LOBE_MAGNITUDES]
-        historical_negative_lobe = [
-            historical_by_magnitude[value] for value in NEGATIVE_LOBE_MAGNITUDES
-        ]
         decoder_norm = float(result["feature"]["decoder_norm"])
         summary["arms"][arm] = {
             "train_key": result["train_key"],
@@ -54,15 +57,27 @@ def summarize(workspace: Path, historical_path: Path, output_dir: Path) -> dict[
             "delta_gc": curve,
             "delta_gc_peak": float(metrics["delta_gc_peak"]),
             "delta_gc_peak_magnitude": float(metrics["delta_gc_peak_magnitude"]),
-            "peak_residual_l2": abs(float(metrics["delta_gc_peak_magnitude"]))
-            * decoder_norm,
             "negative_lobe_mean": sum(negative_lobe) / len(negative_lobe),
-            "historical_negative_lobe_mean": sum(historical_negative_lobe)
-            / len(historical_negative_lobe),
-            "historical_delta_gc_peak": float(reference["delta_gc_peak"]),
-            "peak_change": float(metrics["delta_gc_peak"] - reference["delta_gc_peak"]),
             "successful_judge_keys": int(result["successful_judge_keys"]),
         }
+        reference = historical["arms"].get(arm)
+        if reference is not None:
+            historical_by_magnitude = dict(
+                zip(magnitudes, reference["delta_gc"], strict=True)
+            )
+            historical_negative_lobe = [
+                historical_by_magnitude[value] for value in NEGATIVE_LOBE_MAGNITUDES
+            ]
+            summary["arms"][arm].update(
+                {
+                    "historical_negative_lobe_mean": sum(historical_negative_lobe)
+                    / len(historical_negative_lobe),
+                    "historical_delta_gc_peak": float(reference["delta_gc_peak"]),
+                    "peak_change": float(
+                        metrics["delta_gc_peak"] - reference["delta_gc_peak"]
+                    ),
+                }
+            )
 
     output_dir.mkdir(parents=True, exist_ok=True)
     (output_dir / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n")
@@ -70,15 +85,16 @@ def summarize(workspace: Path, historical_path: Path, output_dir: Path) -> dict[
     fig, ax = plt.subplots(figsize=(8.0, 4.8))
     for arm, label in ARM_LABELS.items():
         color = ARM_COLORS[arm]
-        ax.plot(
-            magnitudes,
-            historical["arms"][arm]["delta_gc"],
-            linestyle="--",
-            linewidth=1.5,
-            alpha=0.5,
-            color=color,
-            label=f"{label} (May reference)",
-        )
+        if arm in historical["arms"]:
+            ax.plot(
+                magnitudes,
+                historical["arms"][arm]["delta_gc"],
+                linestyle="--",
+                linewidth=1.5,
+                alpha=0.5,
+                color=color,
+                label=f"{label} (May reference)",
+            )
         ax.plot(
             magnitudes,
             summary["arms"][arm]["delta_gc"],

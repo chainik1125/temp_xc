@@ -6,6 +6,7 @@ from dataclasses import dataclass
 import torch
 
 from experiments.power_spectrum.backtracking_sae_pooling.steering_baselines import (
+    paired_audit,
     run_baselines,
     summarize,
 )
@@ -72,3 +73,12 @@ def test_pooled_sae_adapter_returns_one_aligned_window_code() -> None:
     assert torch.equal(mean.encode(x), torch.tensor([[[2.0, 3.0]]]))
     assert torch.equal(maximum.encode(x), torch.tensor([[[3.0, 4.0]]]))
     assert torch.equal(maximum.decoder_directions(), torch.eye(2))
+
+
+def test_successful_labels_keep_last_valid_retry() -> None:
+    rows = [
+        {"transcript_id": "q", "magnitude": 0, "arch": "txc_base", "seed": 42, "label": 0},
+        {"transcript_id": "q", "magnitude": 0, "arch": "txc_base", "seed": 42, "label": -1},
+        {"transcript_id": "q", "magnitude": 0, "arch": "txc_base", "seed": 42, "label": 2},
+    ]
+    assert paired_audit.successful_labels(rows) == {("q", 0.0, "txc_base"): 2}
