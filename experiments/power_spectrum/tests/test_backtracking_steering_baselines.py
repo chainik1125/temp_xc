@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+from dataclasses import dataclass
+
+import torch
 
 from experiments.power_spectrum.backtracking_sae_pooling.steering_baselines import (
     run_baselines,
@@ -34,3 +37,38 @@ def test_metric_curve_uses_signed_canonical_keys() -> None:
         "delta_gc_mag_+1.0": -0.5,
     }
     assert summarize.metric_curve(metrics, [-1, 0, 1]) == [0.25, 0.0, -0.5]
+
+
+@dataclass
+class _DummyConfig:
+    name: str = "topk_sae"
+    T: int = 1
+    d_sae: int = 2
+
+
+class _DummySAE(torch.nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.anchor = torch.nn.Parameter(torch.zeros(()))
+        self.config = _DummyConfig()
+
+    def encode(self, x: torch.Tensor) -> torch.Tensor:
+        return x
+
+    def decode(self, z: torch.Tensor) -> torch.Tensor:
+        return z
+
+    def decoder_directions(self) -> torch.Tensor:
+        return torch.eye(2)
+
+
+def test_pooled_sae_adapter_returns_one_aligned_window_code() -> None:
+    x = torch.tensor([[[1.0, 4.0], [3.0, 2.0]]])
+    mean = run_baselines.PooledSAEAdapter(_DummySAE(), pool="mean", window=2)
+    maximum = run_baselines.PooledSAEAdapter(_DummySAE(), pool="max", window=2)
+
+    assert mean.config.T == 2
+    assert mean.config.name == "pooled_sae_mean"
+    assert torch.equal(mean.encode(x), torch.tensor([[[2.0, 3.0]]]))
+    assert torch.equal(maximum.encode(x), torch.tensor([[[3.0, 4.0]]]))
+    assert torch.equal(maximum.decoder_directions(), torch.eye(2))

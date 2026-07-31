@@ -1,4 +1,4 @@
-"""Run fresh final-token SAE and TXC-base C7 steering baselines.
+"""Run fresh SAE and TXC-base C7 steering baselines.
 
 This is deliberately a thin adapter around the frozen C7 implementation on
 ``origin/temp-bench``. In particular, generation, prompt construction,
@@ -19,7 +19,7 @@ import platform
 import subprocess
 import sys
 import time
-from dataclasses import asdict
+from dataclasses import asdict, replace
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -32,10 +32,54 @@ D_IN = 4096
 EXPECTED_WRONG = 31
 EXPECTED_CORRECT = 30
 ARM_TO_TRAIN_KEY = {
+    "pooled_sae_max": "f437e623fabc37ec",
+    "pooled_sae_mean": "f437e623fabc37ec",
     "topk_sae": "f437e623fabc37ec",
     "txc_base": "08fe3af07682fab4",
 }
+ARM_TO_CHECKPOINT_ARCH = {
+    "pooled_sae_max": "topk_sae",
+    "pooled_sae_mean": "topk_sae",
+    "topk_sae": "topk_sae",
+    "txc_base": "txc_base",
+}
 EXPECTED_CANONICAL_REVISION = "1c213513fe0c89220e8a00e53a9b258081ffe749"
+
+
+class PooledSAEAdapter(torch.nn.Module):
+    """Expose one shared SAE code pooled over a fixed activation window.
+
+    The wrapped SAE encodes every position with the same dictionary, so a
+    feature ID has one decoder direction at all positions.  Pooling produces
+    a single window-level code which the canonical C7 feature miner can rank
+    exactly like a TXC code.  No parameters are trained or changed here.
+    """
+
+    def __init__(self, base: torch.nn.Module, *, pool: str, window: int = 5):
+        super().__init__()
+        if pool not in {"mean", "max"}:
+            raise ValueError(f"unknown pool: {pool}")
+        self.base = base
+        self.pool = pool
+        self.config = replace(base.config, name=f"pooled_sae_{pool}", T=window)
+
+    @property
+    def d_sae(self) -> int:
+        return int(self.config.d_sae)
+
+    def encode(self, x: torch.Tensor) -> torch.Tensor:
+        z = self.base.encode(x)
+        if z.dim() != 3:
+            raise ValueError(f"expected windowed SAE code, got {tuple(z.shape)}")
+        if self.pool == "mean":
+            return z.mean(dim=1, keepdim=True)
+        return z.amax(dim=1, keepdim=True)
+
+    def decode(self, z: torch.Tensor) -> torch.Tensor:
+        return self.base.decode(z)
+
+    def decoder_directions(self) -> torch.Tensor:
+        return self.base.decoder_directions()
 
 
 def sha256_file(path: Path, chunk_size: int = 8 * 1024 * 1024) -> str:
@@ -135,13 +179,16 @@ def load_architecture(arm: str, checkpoint: Path):
     parameter_dtypes = [tensor.dtype for tensor in state.values() if tensor.is_floating_point()]
     checkpoint_dtype = parameter_dtypes[0] if parameter_dtypes else torch.float32
 
-    spec = load_arch(arm, component="c7")
+    checkpoint_arch = ARM_TO_CHECKPOINT_ARCH[arm]
+    spec = load_arch(checkpoint_arch, component="c7")
     model = instantiate_arch(spec, d_in=D_IN)
     model = model.to(dtype=checkpoint_dtype)
     incompatible = model.load_state_dict(state, strict=True)
     if incompatible.missing_keys or incompatible.unexpected_keys:
         raise RuntimeError(f"checkpoint mismatch: {incompatible}")
     model = model.cuda().eval()
+    if arm.startswith("pooled_sae_"):
+        model = PooledSAEAdapter(model, pool=arm.removeprefix("pooled_sae_"))
     del state
     gc.collect()
     return model, state_dtypes
@@ -190,7 +237,7 @@ def validate_checkpoint_config(config_path: Path, arm: str) -> dict[str, Any]:
     config = json.loads(config_path.read_text())
     expected_key = ARM_TO_TRAIN_KEY[arm]
     required = {
-        "arch": arm,
+        "arch": ARM_TO_CHECKPOINT_ARCH[arm],
         "seed": SEED,
         "train_key": expected_key,
     }
@@ -245,6 +292,7 @@ def run_arm(args: argparse.Namespace) -> dict[str, Any]:
     pos_neg, feature = mine_feature(model, args.sentence_acts)
     preflight = {
         "arm": args.arm,
+        "checkpoint_arch": ARM_TO_CHECKPOINT_ARCH[args.arm],
         "train_key": ARM_TO_TRAIN_KEY[args.arm],
         "checkpoint_sha256": sha256_file(checkpoint),
         "checkpoint_state_dtypes": state_dtypes,
