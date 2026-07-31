@@ -1,0 +1,59 @@
+{
+  "adapter_decoder_rank": {
+    "0": 0,
+    "256": 256
+  },
+  "adapter_ranks": [
+    0,
+    256
+  ],
+  "adapter_steps": 8000,
+  "base_steps": 8000,
+  "batch_positions": 1024,
+  "buffer_tokens": 524288,
+  "checkpoint_every": 1000,
+  "d_in": 768,
+  "d_sae": 2048,
+  "datasource": "dial_real_ttrend_gpt2_l7",
+  "eval_alphas": [
+    0.01,
+    0.03162277660168379,
+    0.1,
+    0.31622776601683794,
+    1.0,
+    3.1622776601683795,
+    10.0,
+    31.622776601683793,
+    100.0,
+    316.22776601683796,
+    1000.0,
+    3162.2776601683795,
+    10000.0
+  ],
+  "eval_n_windows": 8192,
+  "eval_window": 32,
+  "historical_txc_grouped_r_n6": 0.2496,
+  "historical_txc_v1_r_n6": 0.282,
+  "k_pos": 8,
+  "k_window": 8,
+  "learning_rate": 0.0003,
+  "max_realized_l0_gap": 1.5,
+  "noninferiority_margin_r": 0.03,
+  "order_drop_margin_r": 0.03,
+  "primary_adapter_rank": 256,
+  "protocol": "dailydialog-learned-sae-trajectory-control.v1",
+  "runpod_hard_hours": 8.0,
+  "runpod_hourly_usd": 2.99,
+  "seeds": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "sign_of_life_margin_r": 0.05,
+  "txc_steps": 8000,
+  "warmup_steps": 1000,
+  "window": 32
+}

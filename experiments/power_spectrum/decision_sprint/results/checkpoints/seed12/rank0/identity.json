@@ -1,0 +1,15 @@
+{
+  "adapter_steps": 8000,
+  "base_identity": {
+    "checkpoint_sha256": "197e82db76f60ad0043556b8c2dec25a56834fd210fb813b5097c81067046a96",
+    "train_key": "d2b567fa8ec37106"
+  },
+  "decoder_rank": 0,
+  "k_pos": 8,
+  "k_window": 8,
+  "protocol": "dailydialog-learned-sae-trajectory-control.v1",
+  "rank": 0,
+  "rms_scale": 10.217911720275879,
+  "seed": 12,
+  "window": 32
+}

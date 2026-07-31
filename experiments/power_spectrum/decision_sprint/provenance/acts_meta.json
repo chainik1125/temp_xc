@@ -1,0 +1,16 @@
+{
+  "model_id": "openai-community/gpt2",
+  "hs_capture": [
+    7,
+    4,
+    10
+  ],
+  "screen_hs": 7,
+  "n_seqs": 4111,
+  "seq_len": 128,
+  "d_model": 768,
+  "dtype": "float16",
+  "n_prefix": 0,
+  "mapping_verified_rows": 4111,
+  "wall_seconds": 18.8
+}

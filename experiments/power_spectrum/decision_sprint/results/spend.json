@@ -1,0 +1,29 @@
+{
+  "provider": "RunPod",
+  "pod_id": "k804r98a0a6w6b",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "hourly_usd": 2.99,
+  "training_dispatch": {
+    "start_unix": 1785512031.0,
+    "start_utc": "2026-07-31T15:33:51Z",
+    "end_unix": 1785523840.9598165,
+    "end_utc": "2026-07-31T18:50:40Z",
+    "billable_hours_estimated": 3.280544,
+    "compute_usd_estimated": 9.808828,
+    "auto_stop_verified_utc": "2026-07-31T18:50:41Z"
+  },
+  "artifact_export_restart": {
+    "start_utc": "2026-07-31T18:50:54Z",
+    "end_utc": "2026-07-31T18:54:44Z",
+    "billable_hours_estimated": 0.063889,
+    "compute_usd_estimated": 0.191028,
+    "stop_verified_utc": "2026-07-31T18:54:44Z"
+  },
+  "sprint_compute_usd_estimated": 9.999856,
+  "prior_mistaken_dispatch_usd_estimated": 2.13,
+  "combined_compute_usd_estimated": 12.129856,
+  "cap_usd": 50.0,
+  "remaining_under_cap_usd_estimated": 37.870144,
+  "under_cap": true,
+  "persistent_storage_charges_included": false
+}

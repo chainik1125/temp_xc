@@ -1,0 +1,27 @@
+{
+  "arch": "txc_batchtopk_post",
+  "eval_cached": false,
+  "eval_key": "b282031acf365937",
+  "metrics": {
+    "e_frac_recovered_80": 0.25,
+    "e_frac_recovered_90": 0.125,
+    "e_mean_max_cos": 0.6200581789016724,
+    "eauc": 0.625,
+    "l0_per_token": 0.244537353515625,
+    "l0_per_window": 7.8251953125,
+    "lambda_alpha_v2": 1000.0,
+    "lambda_chance": 0.017331361656948728,
+    "lambda_chance_v2": 0.034860379009377766,
+    "lambda_r2": -142.7152862548828,
+    "lambda_r2_v2": 0.06214606761932373,
+    "lambda_recovery": -0.0027725232847130286,
+    "lambda_recovery_v2": 0.24963716485007223,
+    "lambda_v2_n_eval_rows": 4365.0,
+    "lambda_v2_n_train_rows": 4534.0,
+    "nmse": 0.30013055390143545
+  },
+  "seed": 10,
+  "steps": 8000,
+  "train_cached": false,
+  "train_key": "b6ece2b8558614ef"
+}

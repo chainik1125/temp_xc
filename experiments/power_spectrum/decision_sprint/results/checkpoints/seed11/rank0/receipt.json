@@ -1,0 +1,29 @@
+{
+  "checkpoint": "/workspace/txc_decision_sprint/results/checkpoints/seed11/rank0",
+  "identity": {
+    "adapter_steps": 8000,
+    "base_identity": {
+      "checkpoint_sha256": "69cafbac70e12bf7fe93085b753cc31e6c25e1944df0f496bf652fda0cadfdd4",
+      "train_key": "02572759bde29c53"
+    },
+    "decoder_rank": 0,
+    "k_pos": 8,
+    "k_window": 8,
+    "protocol": "dailydialog-learned-sae-trajectory-control.v1",
+    "rank": 0,
+    "rms_scale": 10.213369369506836,
+    "seed": 11,
+    "window": 32
+  },
+  "last_metrics": {
+    "auxk": 0.0,
+    "dead": 0.0,
+    "l0": 8.0,
+    "loss": 36.63323974609375,
+    "mse": 36.63323974609375
+  },
+  "rank": 0,
+  "seed": 11,
+  "steps": 8000,
+  "trainable_parameters": 133120
+}

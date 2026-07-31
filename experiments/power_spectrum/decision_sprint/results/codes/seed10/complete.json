@@ -1,0 +1,16 @@
+{
+  "base_identity": {
+    "checkpoint_sha256": "602f7c6f08ccf6e5be213f7ce36cff6509a6590cfe701a97363e94a4f592cf20",
+    "train_key": "0e0cbf265b1ae48f"
+  },
+  "k_pos": 8,
+  "protocol": "dailydialog-learned-sae-trajectory-control.v1",
+  "rms_scale": 10.202801704406738,
+  "seed": 10,
+  "shape": [
+    4111,
+    128,
+    8
+  ],
+  "value_dtype": "float32"
+}

@@ -1,0 +1,31 @@
+{
+  "protocol": "dailydialog-learned-sae-trajectory-control.v1",
+  "source_commit": "5ba43728a15b4e4c166798f9587cac97c979e998",
+  "source_clean_at_dispatch": true,
+  "invocation": "python -m experiments.power_spectrum.decision_sprint.run --output /workspace/txc_decision_sprint/results",
+  "analyze_invocation": "python -m experiments.power_spectrum.decision_sprint.analyze --raw /workspace/txc_decision_sprint/results/raw_results.json --output /workspace/txc_decision_sprint/results",
+  "expected_seeds": [9, 10, 11, 12, 13, 14],
+  "completed_seeds": [9, 10, 11, 12, 13, 14],
+  "all_complete": true,
+  "datasource": "dial_real_ttrend_gpt2_l7",
+  "data_key": "dailydialog/gpt2/hidden_state_7/T32",
+  "hardware": "NVIDIA H100 80GB HBM3",
+  "cuda_determinism_forced": false,
+  "verdict": "STOP_GENERAL_TXC",
+  "hashes": {
+    "CARD.md": "a581485fdef50e332fa1ad98675bdab4589e7333987dfb978d72ad98f6e06ec2",
+    "config.json": "1f3da54ce118abc13157111502d6b48f32d8ddfb01c0476edc9da7c759f7a911",
+    "results/frozen_config.json": "6e9183218dff721f097c72a4d45badca6da6a0e27b231a866faa8b156a5433c2",
+    "results/raw_results.json": "be16877e3817ffb157210b2f87aba82faa54dd2ce301d64fd23b63dea7029e7c",
+    "results/summary.json": "58dfec4fb1dc5beb78201d28523b7d5e1577e593751e2fe898e3a1f5b9ae3c1d",
+    "results/comparison.png": "3986a2a34ed2d2da99778c8e6f8d46d980e33fd95c28e5820645b936bf07995e",
+    "transport_archive": "bde0557358d6e86ded89fc3d73bb986017b2b4005fc8b67e0570f48c218436b4"
+  },
+  "remote_start_utc": "2026-07-31T15:33:51Z",
+  "remote_finish_utc": "2026-07-31T18:50:40Z",
+  "notes": [
+    "Checkpoint tensors, optimizer states, sparse-code arrays, and the 771 MB activation cache were excluded from the repository export.",
+    "Their hashes and TempBench manifest/leaderboard rows are preserved under provenance/.",
+    "The transport archive hash was verified locally before extraction; the temporary archive was then removed."
+  ]
+}

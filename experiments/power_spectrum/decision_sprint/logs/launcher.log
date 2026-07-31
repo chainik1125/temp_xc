@@ -1,0 +1,569 @@
+[dialevel cache] hit: /workspace/dialevel_caches/gpt2
+/workspace/txc-decision-repo/src/explorations/task_hunt/real_dialogue.py:113: UserWarning: The given NumPy array is not writable, and PyTorch does not support non-writable tensors. This means writing to this tensor will result in undefined behavior. You may want to copy the array to protect its data or make it writable before converting it to a tensor. This type of warning will be suppressed for the rest of this program. (Triggered internally at /pytorch/torch/csrc/utils/tensor_numpy.cpp:203.)
+  x = torch.from_numpy(np.ascontiguousarray(arr[:N])).float()
+  [train] step=     0 loss=572.1228
+  [train] step=   400 loss=71.5863
+  [train] step=   800 loss=29.3282
+  [train] step=  1200 loss=23.1167
+  [train] step=  1600 loss=21.5161
+  [train] step=  2000 loss=20.0236
+  [train] step=  2400 loss=21.0789
+  [train] step=  2800 loss=15.2331
+  [train] step=  3200 loss=16.1890
+  [train] step=  3600 loss=15.3095
+  [train] step=  4000 loss=14.4207
+  [train] step=  4400 loss=13.5480
+  [train] step=  4800 loss=13.4072
+  [train] step=  5200 loss=19.7377
+  [train] step=  5600 loss=12.6865
+  [train] step=  6000 loss=13.6530
+  [train] step=  6400 loss=12.6417
+  [train] step=  6800 loss=12.9508
+  [train] step=  7200 loss=12.6769
+  [train] step=  7600 loss=11.9735
+  [train] step=  7999 loss=13.2293
+  [train] step=     0 loss=71.9093
+  [train] step=   400 loss=38.1196
+  [train] step=   800 loss=115.0685
+  [train] step=  1200 loss=38.7601
+  [train] step=  1600 loss=37.2267
+  [train] step=  2000 loss=36.7160
+  [train] step=  2400 loss=33.9873
+  [train] step=  2800 loss=33.2727
+  [train] step=  3200 loss=39.3073
+  [train] step=  3600 loss=33.6814
+  [train] step=  4000 loss=33.1602
+  [train] step=  4400 loss=33.5554
+  [train] step=  4800 loss=34.6387
+  [train] step=  5200 loss=33.9857
+  [train] step=  5600 loss=33.0442
+  [train] step=  6000 loss=33.4920
+  [train] step=  6400 loss=32.3239
+  [train] step=  6800 loss=33.1093
+  [train] step=  7200 loss=31.7511
+  [train] step=  7600 loss=32.9761
+  [train] step=  7999 loss=32.2434
+[adapter] seed=9 rank=0 step=1000/8000 loss=37.69179 l0=8.000
+[adapter] seed=9 rank=0 step=2000/8000 loss=37.86877 l0=8.000
+[adapter] seed=9 rank=0 step=3000/8000 loss=36.57471 l0=8.000
+[adapter] seed=9 rank=0 step=4000/8000 loss=36.98226 l0=8.000
+[adapter] seed=9 rank=0 step=5000/8000 loss=37.45222 l0=8.000
+[adapter] seed=9 rank=0 step=6000/8000 loss=36.75912 l0=8.000
+[adapter] seed=9 rank=0 step=7000/8000 loss=37.57404 l0=8.000
+[adapter] seed=9 rank=0 step=8000/8000 loss=37.78570 l0=8.000
+[adapter] seed=9 rank=256 step=1000/8000 loss=35.99321 l0=8.000
+[adapter] seed=9 rank=256 step=2000/8000 loss=35.41113 l0=8.000
+[adapter] seed=9 rank=256 step=3000/8000 loss=34.99429 l0=8.000
+[adapter] seed=9 rank=256 step=4000/8000 loss=35.14510 l0=8.000
+[adapter] seed=9 rank=256 step=5000/8000 loss=33.07063 l0=8.000
+[adapter] seed=9 rank=256 step=6000/8000 loss=32.87079 l0=8.000
+[adapter] seed=9 rank=256 step=7000/8000 loss=33.53596 l0=8.000
+[adapter] seed=9 rank=256 step=8000/8000 loss=32.38735 l0=8.000
+[eval] seed=9 sae_last: r=0.0134
+[eval] seed=9 sae_mean_top8: r=0.3115
+[eval] seed=9 sae_max_top8: r=0.1127
+[eval] seed=9 adapter_rank0_untrained: r=0.3091
+[eval] seed=9 adapter_rank0: r=0.3136
+[eval] seed=9 adapter_rank0_reverse: r=0.3143
+[eval] seed=9 adapter_rank256_untrained: r=0.3091
+[eval] seed=9 adapter_rank256: r=0.2665
+[eval] seed=9 adapter_rank256_reverse: r=0.1157
+  [train] step=     0 loss=1452.8064
+  [train] step=   400 loss=68.3688
+  [train] step=   800 loss=29.4147
+  [train] step=  1200 loss=29.2002
+  [train] step=  1600 loss=17.8948
+  [train] step=  2000 loss=16.1967
+  [train] step=  2400 loss=15.5026
+  [train] step=  2800 loss=14.7675
+  [train] step=  3200 loss=14.3188
+  [train] step=  3600 loss=14.7514
+  [train] step=  4000 loss=14.2462
+  [train] step=  4400 loss=13.6106
+  [train] step=  4800 loss=17.0721
+  [train] step=  5200 loss=12.7816
+  [train] step=  5600 loss=13.3312
+  [train] step=  6000 loss=13.4146
+  [train] step=  6400 loss=14.2891
+  [train] step=  6800 loss=12.6960
+  [train] step=  7200 loss=13.4067
+  [train] step=  7600 loss=12.4694
+  [train] step=  7999 loss=12.9519
+  [train] step=     0 loss=71.7325
+  [train] step=   400 loss=204.4638
+  [train] step=   800 loss=37.6982
+  [train] step=  1200 loss=39.2135
+  [train] step=  1600 loss=36.1946
+  [train] step=  2000 loss=35.0135
+  [train] step=  2400 loss=33.2939
+  [train] step=  2800 loss=33.5866
+  [train] step=  3200 loss=32.8100
+  [train] step=  3600 loss=33.1337
+  [train] step=  4000 loss=32.3487
+  [train] step=  4400 loss=32.4570
+  [train] step=  4800 loss=32.0211
+  [train] step=  5200 loss=31.7824
+  [train] step=  5600 loss=33.3053
+  [train] step=  6000 loss=32.1293
+  [train] step=  6400 loss=32.6934
+  [train] step=  6800 loss=31.9544
+  [train] step=  7200 loss=32.6774
+  [train] step=  7600 loss=31.6627
+  [train] step=  7999 loss=32.1919
+[adapter] seed=10 rank=0 step=1000/8000 loss=36.68200 l0=8.000
+[adapter] seed=10 rank=0 step=2000/8000 loss=36.76263 l0=8.000
+[adapter] seed=10 rank=0 step=3000/8000 loss=116.42893 l0=8.000
+[adapter] seed=10 rank=0 step=4000/8000 loss=116.58256 l0=8.000
+[adapter] seed=10 rank=0 step=5000/8000 loss=36.43148 l0=8.000
+[adapter] seed=10 rank=0 step=6000/8000 loss=117.72359 l0=8.000
+[adapter] seed=10 rank=0 step=7000/8000 loss=117.65089 l0=8.000
+[adapter] seed=10 rank=0 step=8000/8000 loss=36.79152 l0=8.000
+[adapter] seed=10 rank=256 step=1000/8000 loss=35.71576 l0=8.000
+[adapter] seed=10 rank=256 step=2000/8000 loss=34.42942 l0=8.000
+[adapter] seed=10 rank=256 step=3000/8000 loss=37.95829 l0=8.000
+[adapter] seed=10 rank=256 step=4000/8000 loss=33.34924 l0=8.000
+[adapter] seed=10 rank=256 step=5000/8000 loss=33.30956 l0=8.000
+[adapter] seed=10 rank=256 step=6000/8000 loss=33.67044 l0=8.000
+[adapter] seed=10 rank=256 step=7000/8000 loss=31.43135 l0=8.000
+[adapter] seed=10 rank=256 step=8000/8000 loss=33.26311 l0=8.000
+[eval] seed=10 sae_last: r=0.0088
+[eval] seed=10 sae_mean_top8: r=0.2930
+[eval] seed=10 sae_max_top8: r=0.1449
+[eval] seed=10 adapter_rank0_untrained: r=0.2928
+[eval] seed=10 adapter_rank0: r=0.3319
+[eval] seed=10 adapter_rank0_reverse: r=0.3108
+[eval] seed=10 adapter_rank256_untrained: r=0.2928
+[eval] seed=10 adapter_rank256: r=0.2559
+[eval] seed=10 adapter_rank256_reverse: r=0.1523
+  [train] step=     0 loss=944.6015
+  [train] step=   400 loss=74.3288
+  [train] step=   800 loss=31.1624
+  [train] step=  1200 loss=21.9616
+  [train] step=  1600 loss=19.6812
+  [train] step=  2000 loss=15.8443
+  [train] step=  2400 loss=15.6281
+  [train] step=  2800 loss=15.2246
+  [train] step=  3200 loss=14.3143
+  [train] step=  3600 loss=13.4353
+  [train] step=  4000 loss=13.3019
+  [train] step=  4400 loss=13.3887
+  [train] step=  4800 loss=29.4265
+  [train] step=  5200 loss=13.0706
+  [train] step=  5600 loss=12.8172
+  [train] step=  6000 loss=13.5411
+  [train] step=  6400 loss=14.4469
+  [train] step=  6800 loss=13.3148
+  [train] step=  7200 loss=13.1590
+  [train] step=  7600 loss=14.0850
+  [train] step=  7999 loss=13.3450
+  [train] step=     0 loss=72.6476
+  [train] step=   400 loss=123.4624
+  [train] step=   800 loss=38.5032
+  [train] step=  1200 loss=39.9931
+  [train] step=  1600 loss=35.4485
+  [train] step=  2000 loss=37.1316
+  [train] step=  2400 loss=33.7451
+  [train] step=  2800 loss=35.7436
+  [train] step=  3200 loss=33.7058
+  [train] step=  3600 loss=33.9298
+  [train] step=  4000 loss=32.9518
+  [train] step=  4400 loss=33.1925
+  [train] step=  4800 loss=32.4367
+  [train] step=  5200 loss=31.5793
+  [train] step=  5600 loss=31.2661
+  [train] step=  6000 loss=32.0236
+  [train] step=  6400 loss=32.7909
+  [train] step=  6800 loss=32.2011
+  [train] step=  7200 loss=31.8246
+  [train] step=  7600 loss=33.1629
+  [train] step=  7999 loss=32.3368
+[adapter] seed=11 rank=0 step=1000/8000 loss=36.60865 l0=8.000
+[adapter] seed=11 rank=0 step=2000/8000 loss=36.10266 l0=8.000
+[adapter] seed=11 rank=0 step=3000/8000 loss=117.99747 l0=8.000
+[adapter] seed=11 rank=0 step=4000/8000 loss=36.57977 l0=8.000
+[adapter] seed=11 rank=0 step=5000/8000 loss=35.95818 l0=8.000
+[adapter] seed=11 rank=0 step=6000/8000 loss=36.23284 l0=8.000
+[adapter] seed=11 rank=0 step=7000/8000 loss=115.40766 l0=8.000
+[adapter] seed=11 rank=0 step=8000/8000 loss=36.63324 l0=8.000
+[adapter] seed=11 rank=256 step=1000/8000 loss=58.31081 l0=8.000
+[adapter] seed=11 rank=256 step=2000/8000 loss=34.69646 l0=8.000
+[adapter] seed=11 rank=256 step=3000/8000 loss=34.15287 l0=8.000
+[adapter] seed=11 rank=256 step=4000/8000 loss=34.78150 l0=8.000
+[adapter] seed=11 rank=256 step=5000/8000 loss=32.28370 l0=8.000
+[adapter] seed=11 rank=256 step=6000/8000 loss=34.27112 l0=8.000
+[adapter] seed=11 rank=256 step=7000/8000 loss=32.08966 l0=8.000
+[adapter] seed=11 rank=256 step=8000/8000 loss=32.17191 l0=8.000
+[eval] seed=11 sae_last: r=0.0173
+[eval] seed=11 sae_mean_top8: r=0.2912
+[eval] seed=11 sae_max_top8: r=0.1896
+[eval] seed=11 adapter_rank0_untrained: r=0.2907
+[eval] seed=11 adapter_rank0: r=0.3114
+[eval] seed=11 adapter_rank0_reverse: r=0.2952
+[eval] seed=11 adapter_rank256_untrained: r=0.2907
+[eval] seed=11 adapter_rank256: r=0.2640
+[eval] seed=11 adapter_rank256_reverse: r=0.1193
+  [train] step=     0 loss=878.0562
+  [train] step=   400 loss=62.7814
+  [train] step=   800 loss=29.8426
+  [train] step=  1200 loss=22.6406
+  [train] step=  1600 loss=18.9882
+  [train] step=  2000 loss=16.4365
+  [train] step=  2400 loss=15.6139
+  [train] step=  2800 loss=14.6607
+  [train] step=  3200 loss=17.7385
+  [train] step=  3600 loss=13.9657
+  [train] step=  4000 loss=14.2033
+  [train] step=  4400 loss=14.3514
+  [train] step=  4800 loss=12.9973
+  [train] step=  5200 loss=16.9551
+  [train] step=  5600 loss=13.6851
+  [train] step=  6000 loss=14.3392
+  [train] step=  6400 loss=12.6435
+  [train] step=  6800 loss=12.1918
+  [train] step=  7200 loss=13.1665
+  [train] step=  7600 loss=13.2614
+  [train] step=  7999 loss=17.0407
+  [train] step=     0 loss=71.5198
+  [train] step=   400 loss=38.1597
+  [train] step=   800 loss=37.6628
+  [train] step=  1200 loss=37.3650
+  [train] step=  1600 loss=36.3874
+  [train] step=  2000 loss=34.8758
+  [train] step=  2400 loss=35.1975
+  [train] step=  2800 loss=32.8809
+  [train] step=  3200 loss=33.0936
+  [train] step=  3600 loss=33.3825
+  [train] step=  4000 loss=33.2463
+  [train] step=  4400 loss=32.6134
+  [train] step=  4800 loss=33.8787
+  [train] step=  5200 loss=32.6894
+  [train] step=  5600 loss=33.0169
+  [train] step=  6000 loss=32.9960
+  [train] step=  6400 loss=33.7060
+  [train] step=  6800 loss=32.2181
+  [train] step=  7200 loss=32.0033
+  [train] step=  7600 loss=33.0691
+  [train] step=  7999 loss=32.5426
+[adapter] seed=12 rank=0 step=1000/8000 loss=36.54372 l0=8.000
+[adapter] seed=12 rank=0 step=2000/8000 loss=118.23363 l0=8.000
+[adapter] seed=12 rank=0 step=3000/8000 loss=36.72610 l0=8.000
+[adapter] seed=12 rank=0 step=4000/8000 loss=37.14002 l0=8.000
+[adapter] seed=12 rank=0 step=5000/8000 loss=36.94862 l0=8.000
+[adapter] seed=12 rank=0 step=6000/8000 loss=37.05893 l0=8.000
+[adapter] seed=12 rank=0 step=7000/8000 loss=194.66452 l0=8.000
+[adapter] seed=12 rank=0 step=8000/8000 loss=37.11903 l0=8.000
+[adapter] seed=12 rank=256 step=1000/8000 loss=40.92483 l0=8.000
+[adapter] seed=12 rank=256 step=2000/8000 loss=34.93612 l0=8.000
+[adapter] seed=12 rank=256 step=3000/8000 loss=34.01910 l0=8.000
+[adapter] seed=12 rank=256 step=4000/8000 loss=32.96196 l0=8.000
+[adapter] seed=12 rank=256 step=5000/8000 loss=32.61912 l0=8.000
+[adapter] seed=12 rank=256 step=6000/8000 loss=33.45073 l0=8.000
+[adapter] seed=12 rank=256 step=7000/8000 loss=32.11919 l0=8.000
+[adapter] seed=12 rank=256 step=8000/8000 loss=32.12956 l0=8.000
+[eval] seed=12 sae_last: r=0.0197
+[eval] seed=12 sae_mean_top8: r=0.3298
+[eval] seed=12 sae_max_top8: r=0.2377
+[eval] seed=12 adapter_rank0_untrained: r=0.3292
+[eval] seed=12 adapter_rank0: r=0.3351
+[eval] seed=12 adapter_rank0_reverse: r=0.3152
+[eval] seed=12 adapter_rank256_untrained: r=0.3292
+[eval] seed=12 adapter_rank256: r=0.2710
+[eval] seed=12 adapter_rank256_reverse: r=0.1535
+  [train] step=     0 loss=450.9674
+  [train] step=   400 loss=75.0465
+  [train] step=   800 loss=31.3553
+  [train] step=  1200 loss=27.4978
+  [train] step=  1600 loss=20.3698
+  [train] step=  2000 loss=16.0299
+  [train] step=  2400 loss=15.0760
+  [train] step=  2800 loss=15.1987
+  [train] step=  3200 loss=19.7241
+  [train] step=  3600 loss=13.7726
+  [train] step=  4000 loss=16.7452
+  [train] step=  4400 loss=13.5786
+  [train] step=  4800 loss=13.8190
+  [train] step=  5200 loss=14.7567
+  [train] step=  5600 loss=13.3222
+  [train] step=  6000 loss=12.5160
+  [train] step=  6400 loss=12.3297
+  [train] step=  6800 loss=13.6606
+  [train] step=  7200 loss=20.5819
+  [train] step=  7600 loss=11.6892
+  [train] step=  7999 loss=13.5083
+  [train] step=     0 loss=72.9017
+  [train] step=   400 loss=110.2552
+  [train] step=   800 loss=41.7551
+  [train] step=  1200 loss=35.3042
+  [train] step=  1600 loss=35.5151
+  [train] step=  2000 loss=35.8282
+  [train] step=  2400 loss=34.4409
+  [train] step=  2800 loss=34.3918
+  [train] step=  3200 loss=34.4878
+  [train] step=  3600 loss=33.4771
+  [train] step=  4000 loss=34.6762
+  [train] step=  4400 loss=34.1724
+  [train] step=  4800 loss=33.2249
+  [train] step=  5200 loss=33.8807
+  [train] step=  5600 loss=33.5125
+  [train] step=  6000 loss=33.6651
+  [train] step=  6400 loss=32.5880
+  [train] step=  6800 loss=33.2817
+  [train] step=  7200 loss=32.5849
+  [train] step=  7600 loss=32.5969
+  [train] step=  7999 loss=32.3190
+[adapter] seed=13 rank=0 step=1000/8000 loss=36.11303 l0=8.000
+[adapter] seed=13 rank=0 step=2000/8000 loss=36.88972 l0=8.000
+[adapter] seed=13 rank=0 step=3000/8000 loss=36.99889 l0=8.000
+[adapter] seed=13 rank=0 step=4000/8000 loss=117.66784 l0=8.000
+[adapter] seed=13 rank=0 step=5000/8000 loss=36.41976 l0=8.000
+[adapter] seed=13 rank=0 step=6000/8000 loss=37.00752 l0=8.000
+[adapter] seed=13 rank=0 step=7000/8000 loss=36.65516 l0=8.000
+[adapter] seed=13 rank=0 step=8000/8000 loss=37.39049 l0=8.000
+[adapter] seed=13 rank=256 step=1000/8000 loss=35.47813 l0=8.000
+[adapter] seed=13 rank=256 step=2000/8000 loss=68.54519 l0=8.000
+[adapter] seed=13 rank=256 step=3000/8000 loss=33.10844 l0=8.000
+[adapter] seed=13 rank=256 step=4000/8000 loss=34.93333 l0=8.000
+[adapter] seed=13 rank=256 step=5000/8000 loss=32.04816 l0=8.000
+[adapter] seed=13 rank=256 step=6000/8000 loss=33.28967 l0=8.000
+[adapter] seed=13 rank=256 step=7000/8000 loss=32.84488 l0=8.000
+[adapter] seed=13 rank=256 step=8000/8000 loss=34.50585 l0=8.000
+[eval] seed=13 sae_last: r=0.0161
+[eval] seed=13 sae_mean_top8: r=0.2946
+[eval] seed=13 sae_max_top8: r=0.2106
+[eval] seed=13 adapter_rank0_untrained: r=0.2928
+[eval] seed=13 adapter_rank0: r=0.3133
+[eval] seed=13 adapter_rank0_reverse: r=0.3023
+[eval] seed=13 adapter_rank256_untrained: r=0.2928
+[eval] seed=13 adapter_rank256: r=0.2829
+[eval] seed=13 adapter_rank256_reverse: r=0.1555
+  [train] step=     0 loss=1239.2633
+  [train] step=   400 loss=55.1695
+  [train] step=   800 loss=29.2519
+  [train] step=  1200 loss=24.0616
+  [train] step=  1600 loss=20.7048
+  [train] step=  2000 loss=16.3698
+  [train] step=  2400 loss=16.1564
+  [train] step=  2800 loss=15.9490
+  [train] step=  3200 loss=16.8674
+  [train] step=  3600 loss=15.5665
+  [train] step=  4000 loss=15.5816
+  [train] step=  4400 loss=15.6589
+  [train] step=  4800 loss=13.2185
+  [train] step=  5200 loss=12.5736
+  [train] step=  5600 loss=13.5198
+  [train] step=  6000 loss=13.2153
+  [train] step=  6400 loss=13.8978
+  [train] step=  6800 loss=12.7476
+  [train] step=  7200 loss=12.4154
+  [train] step=  7600 loss=12.3213
+  [train] step=  7999 loss=11.8845
+  [train] step=     0 loss=72.2363
+  [train] step=   400 loss=122.2092
+  [train] step=   800 loss=38.9144
+  [train] step=  1200 loss=38.6052
+  [train] step=  1600 loss=35.1991
+  [train] step=  2000 loss=34.2380
+  [train] step=  2400 loss=35.6285
+  [train] step=  2800 loss=34.8118
+  [train] step=  3200 loss=33.5928
+  [train] step=  3600 loss=33.1905
+  [train] step=  4000 loss=33.7014
+  [train] step=  4400 loss=33.4741
+  [train] step=  4800 loss=32.3491
+  [train] step=  5200 loss=32.3341
+  [train] step=  5600 loss=32.8703
+  [train] step=  6000 loss=32.3154
+  [train] step=  6400 loss=33.1242
+  [train] step=  6800 loss=32.7724
+  [train] step=  7200 loss=32.3703
+  [train] step=  7600 loss=32.5283
+  [train] step=  7999 loss=32.2853
+[adapter] seed=14 rank=0 step=1000/8000 loss=120.40288 l0=8.000
+[adapter] seed=14 rank=0 step=2000/8000 loss=122.50092 l0=8.000
+[adapter] seed=14 rank=0 step=3000/8000 loss=37.93450 l0=8.000
+[adapter] seed=14 rank=0 step=4000/8000 loss=196.08995 l0=8.000
+[adapter] seed=14 rank=0 step=5000/8000 loss=36.85174 l0=8.000
+[adapter] seed=14 rank=0 step=6000/8000 loss=195.86301 l0=8.000
+[adapter] seed=14 rank=0 step=7000/8000 loss=37.70458 l0=8.000
+[adapter] seed=14 rank=0 step=8000/8000 loss=36.95541 l0=8.000
+[adapter] seed=14 rank=256 step=1000/8000 loss=49.85242 l0=8.000
+[adapter] seed=14 rank=256 step=2000/8000 loss=36.14397 l0=8.000
+[adapter] seed=14 rank=256 step=3000/8000 loss=34.49859 l0=8.000
+[adapter] seed=14 rank=256 step=4000/8000 loss=33.41777 l0=8.000
+[adapter] seed=14 rank=256 step=5000/8000 loss=32.69991 l0=8.000
+[adapter] seed=14 rank=256 step=6000/8000 loss=32.57887 l0=8.000
+[adapter] seed=14 rank=256 step=7000/8000 loss=32.69237 l0=8.000
+[adapter] seed=14 rank=256 step=8000/8000 loss=32.73150 l0=8.000
+[eval] seed=14 sae_last: r=0.0217
+[eval] seed=14 sae_mean_top8: r=0.2934
+[eval] seed=14 sae_max_top8: r=0.1278
+[eval] seed=14 adapter_rank0_untrained: r=0.2946
+[eval] seed=14 adapter_rank0: r=0.3273
+[eval] seed=14 adapter_rank0_reverse: r=0.2917
+[eval] seed=14 adapter_rank256_untrained: r=0.2946
+[eval] seed=14 adapter_rank256: r=0.2792
+[eval] seed=14 adapter_rank256_reverse: r=0.1691
+{
+  "best_adapter": "adapter_rank256",
+  "best_adapter_order_drop": {
+    "mean": 0.12566260635720938,
+    "seed_values": [
+      0.15072855541737207,
+      0.10361004710960972,
+      0.14465546104035387,
+      0.11749154074685861,
+      0.1273613157052583,
+      0.11012871812380359
+    ]
+  },
+  "best_adapter_untrained": {
+    "mean": 0.3015312399501121,
+    "seed_values": [
+      0.3090817861836418,
+      0.2928127496099713,
+      0.29070036216409817,
+      0.32923474389724827,
+      0.2927812000546917,
+      0.29457659779102147
+    ]
+  },
+  "gates": {
+    "adapter_noninferior_ci_upper_within_0.03": true,
+    "realized_l0_gap_within_tolerance": true,
+    "txc_order_receipt_available": true,
+    "txc_real_task_sign_of_life": false
+  },
+  "models": {
+    "SAE last": {
+      "mean": 0.016153204175038554,
+      "seed_values": [
+        0.013376897981861986,
+        0.008775325159181743,
+        0.01725885202167455,
+        0.01970264403124934,
+        0.01614290905022084,
+        0.021662596806042853
+      ],
+      "std_sample": 0.0046111922201677695
+    },
+    "SAE max top-8": {
+      "mean": 0.17055566857340534,
+      "seed_values": [
+        0.11273155470399225,
+        0.1448888253956955,
+        0.18959995896038973,
+        0.23769213279925425,
+        0.21064767868158213,
+        0.12777386089951825
+      ],
+      "std_sample": 0.0496186601007002
+    },
+    "SAE mean top-8": {
+      "mean": 0.30225203787511545,
+      "seed_values": [
+        0.3114616175995592,
+        0.2930246013026597,
+        0.29123830737626744,
+        0.32981721889619514,
+        0.29457538997454746,
+        0.2933950921014636
+      ],
+      "std_sample": 0.015417391608520752
+    },
+    "TXC": {
+      "mean": 0.25920322327234274,
+      "seed_values": [
+        0.2654400644378302,
+        0.24963716485007223,
+        0.2766716905457025,
+        0.26236598153676977,
+        0.2484258231634734,
+        0.2526786151002086
+      ],
+      "std_sample": 0.010993460920820073
+    },
+    "adapter_rank0": {
+      "mean": 0.3221093876982803,
+      "seed_values": [
+        0.3136406209260469,
+        0.3319341398146724,
+        0.311394673576677,
+        0.335077379563118,
+        0.3133298995117924,
+        0.32727961279737505
+      ],
+      "std_sample": 0.010535941504177098
+    },
+    "adapter_rank256": {
+      "mean": 0.2699062078578642,
+      "seed_values": [
+        0.26646374808489304,
+        0.2558837317323191,
+        0.2639682728828456,
+        0.2710369029618497,
+        0.282850490798219,
+        0.2792341006870587
+      ],
+      "std_sample": 0.009995818672211209
+    }
+  },
+  "paired_txc_minus_best": {
+    "bootstrap_ci95": [
+      -0.023254015593871608,
+      0.0014069966207102315
+    ],
+    "mean": -0.010702984585521394,
+    "seed_values": [
+      -0.0010236836470628452,
+      -0.006246566882246868,
+      0.01270341766285693,
+      -0.008670921425079914,
+      -0.03442466763474561,
+      -0.02655548558685006
+    ]
+  },
+  "realized_l0": {
+    "adapter_mean": 8.0,
+    "adapter_seed_values": [
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0,
+      8.0
+    ],
+    "mean_gap": 0.08544921875,
+    "txc_mean": 7.91455078125,
+    "txc_seed_values": [
+      7.7998046875,
+      7.8251953125,
+      7.9150390625,
+      7.9755859375,
+      7.9443359375,
+      8.02734375
+    ]
+  },
+  "txc_order_drop": {
+    "mean": 0.035066289113641846,
+    "seed_values": [
+      0.02750890366047959,
+      0.04838123422157961,
+      0.026487392239818164,
+      0.047537824026618186,
+      0.011428331448263052,
+      0.04905404908509248
+    ]
+  },
+  "txc_untrained": {
+    "mean": 0.007582939265847304,
+    "seed_values": [
+      -0.015298218361102003,
+      -0.013681622154449876,
+      0.010060532550413859,
+      0.015919195873439432,
+      0.009364721279986101,
+      0.03913302640679631
+    ]
+  },
+  "verdict": "STOP_GENERAL_TXC"
+}

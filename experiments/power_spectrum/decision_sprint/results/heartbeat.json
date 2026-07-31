@@ -1,0 +1,22 @@
+{
+  "completed_seeds": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "protocol": "dailydialog-learned-sae-trajectory-control.v1",
+  "seeds": [
+    9,
+    10,
+    11,
+    12,
+    13,
+    14
+  ],
+  "stage": "complete",
+  "unix_time": 1785523838.8311174,
+  "utc": "2026-07-31T18:50:38Z"
+}
