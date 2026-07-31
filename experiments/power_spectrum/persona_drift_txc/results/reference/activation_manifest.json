@@ -1,0 +1,23 @@
+{
+  "activation_file_sha256": "b21ac289248674b38f771563f7237dc3dd8bc305473dd10aa70171ec85e8ac74",
+  "activation_shape": [
+    400,
+    15,
+    5120
+  ],
+  "actual_token_length_max": 2008,
+  "actual_token_length_min": 1742,
+  "assistant_axis_code_commit": "a98961956072224eaf244eb289d6c01700b63795",
+  "assistant_axis_file": "qwen-3-32b/assistant_axis.pt",
+  "assistant_axis_repo": "lu-christina/assistant-axis-vectors",
+  "config_sha256": "17f4f17ce2a9f53622ba0fbd3f93188d55a55847295531cfeb030400afadb270",
+  "conversation_file_sha256": "c4656ee1e5fd8afb18a045957c7e060b18f131798c4220e7aa865993b96a8668",
+  "metadata_file_sha256": "dbf48cd5c2d26e29da7d68906cc427021bab566570cd4cdf5ca60ce1d6ff39a3",
+  "monitor_layer": 32,
+  "n_conversations": 400,
+  "n_truncated_conversations": 0,
+  "protocol_version": "0.1.0",
+  "reference_projection_max_abs_diff": 6.67572021484375e-05,
+  "subject_model": "Qwen/Qwen3-32B",
+  "turns_per_conversation": 15
+}

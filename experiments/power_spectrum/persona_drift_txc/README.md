@@ -10,6 +10,27 @@ about *future* movement along the released Assistant Axis beyond:
 It deliberately stops after the predictive Step 7 gate. No steering result is
 claimed until the temporal prediction gate has been evaluated.
 
+## Outcome of the initial 10k-step run
+
+The predeclared Step-7 gate **did not pass**. In the primary \(W=8\),
+four-turn-horizon cell:
+
+- raw history minus raw current activation had
+  \(\Delta R^2=+0.0018\), with 95% CI \([-0.0131,+0.0167]\);
+- SAE plus TXC minus SAE had
+  \(\Delta R^2=-0.0773\), with 95% CI \([-0.1320,-0.0360]\).
+
+All four representation models reached their best fixed-validation loss before
+4,000 steps and regressed by 10,000 steps. The 10k checkpoints were retained
+for the frozen comparison requested by the protocol. Shorter exploratory
+horizons contain a small raw-history signal, but the final TXC latents do not
+capture it beyond an SAE.
+
+See [RESULTS.md](RESULTS.md) for the full interpretation,
+[training diagnostics](results/training/training_diagnostics.png) for the
+loss/dead-latent plot, and the
+[Step-7 comparison](results/future_drift_probe.png) for the predictive result.
+
 ## Primary hypothesis
 
 For Assistant Axis projection \(a_t\), the temporal hypothesis is:

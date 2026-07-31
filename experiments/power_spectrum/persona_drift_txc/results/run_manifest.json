@@ -1,0 +1,77 @@
+{
+  "experiment": "persona_drift_txc_step7_initial_10k",
+  "protocol_version": "0.1.0",
+  "status": "complete_gate_failed",
+  "code": {
+    "repository_commit_before_results": "375f6904fc0e8acfa2c402314ceb88a9433041b4",
+    "config_file_sha256": "033438e7b0eb5aae7e6acf1639ceee21731dacde3034da07b9c29843a8c45b5b",
+    "config_canonical_sha256": "17f4f17ce2a9f53622ba0fbd3f93188d55a55847295531cfeb030400afadb270"
+  },
+  "runpod": {
+    "pod_id": "47c46ldqo6hl00",
+    "pod_name": "persona-drift-step7-a100",
+    "gpu": "NVIDIA A100 80GB PCIe",
+    "hourly_price_usd": 1.39,
+    "created_at_utc": "2026-07-31T00:03:47.957Z",
+    "stopped_at_utc_approx": "2026-07-31T02:10:13Z",
+    "estimated_elapsed_hours": 2.107,
+    "estimated_cost_usd": 2.93,
+    "final_status": "EXITED"
+  },
+  "reference": {
+    "assistant_axis_repository": "https://github.com/safety-research/assistant-axis.git",
+    "assistant_axis_commit": "a98961956072224eaf244eb289d6c01700b63795",
+    "assistant_axis_uv_lock_sha256": "438b7d11359eb3a2dae997101da56737dc52d9197d79dc95ce91a8e39a66748a",
+    "transformers": "4.57.5",
+    "torch": "2.9.0+cu128",
+    "vllm": "0.13.0"
+  },
+  "models": {
+    "subject": {
+      "name": "Qwen/Qwen3-32B",
+      "revision": "9216db5781bf21249d130ec9da846c4624c16137"
+    },
+    "embedding": {
+      "name": "Qwen/Qwen3-Embedding-0.6B",
+      "revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3"
+    },
+    "assistant_axis_vectors": {
+      "name": "lu-christina/assistant-axis-vectors",
+      "revision": "3b3b788432ad33e3a28d9ff08e88a530c0740814"
+    }
+  },
+  "data": {
+    "conversations": 400,
+    "turns_per_conversation": 15,
+    "activation_shape": [
+      400,
+      15,
+      5120
+    ],
+    "user_scripts_sha256": "72488ebcb8bedb2ee6484339036471b7255e86db82d52e45dea1de5aaff58cda",
+    "qwen_conversations_sha256": "c4656ee1e5fd8afb18a045957c7e060b18f131798c4220e7aa865993b96a8668",
+    "qwen_conversations_archive": "corpus/qwen_conversations.jsonl.xz",
+    "qwen_conversations_archive_sha256": "7be29400a5e9a0137538db8bb2db0f6920130fd69ab1af5d6a8511f37e029879",
+    "metadata_sha256": "dbf48cd5c2d26e29da7d68906cc427021bab566570cd4cdf5ca60ce1d6ff39a3",
+    "activations_sha256": "b21ac289248674b38f771563f7237dc3dd8bc305473dd10aa70171ec85e8ac74",
+    "truncated_conversations": 0
+  },
+  "outputs": {
+    "training_exit_code": 0,
+    "probe_exit_code": 0,
+    "health_summary_sha256": "1706fd5ac3e52ab6c63a8d1143978c730f78709fde4694300315bc56969f92de",
+    "probe_summary_sha256": "d5da186ce9695b6cd77f924547620ea076d44b5acb1b541357db7f3c4c3b6333",
+    "probe_bootstrap_deltas_sha256": "973ea662abf29cf52486894477af80517bbcd1e327d6cdc7c39b1d78b0e0c25e",
+    "probe_predictions_archive": "probe_predictions.csv.xz",
+    "probe_predictions_sha256": "0d33bfae4447fa2bca3babbc00e238710d47208999facc78912b10aeec8d88b4",
+    "probe_predictions_archive_sha256": "17b98fdbb7606620e3f496a94456f7e8c43f9561c051e561ca83fc6088ba65d0",
+    "step7_gate_sha256": "d0dd3cee9ed94e1aaf7c5bba6d9e7f4dba5b3f501ff6163a6fc41f3e020f51db",
+    "initial_decision_passed": false
+  },
+  "limitations": [
+    "One generation seed and one representation seed.",
+    "One held-out persona style per domain.",
+    "Published breach threshold yields 100% test prevalence in this corpus.",
+    "The retained 10k checkpoints are later than every model's best validation step."
+  ]
+}
