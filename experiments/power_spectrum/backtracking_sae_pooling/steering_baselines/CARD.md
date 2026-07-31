@@ -27,3 +27,7 @@ The final-token SAE is intentionally measured before any pooled-latent steering.
 The pooled experiment can then change only feature aggregation while retaining
 this evaluation protocol.
 
+`run_runpod.sh` executes the two arms in that order under a four-hour hard
+timeout. Its heartbeat, logs, partial judge rows, and completed arm results are
+all on the persistent volume. Its exit trap flushes the volume and requests pod
+shutdown, including after an error or timeout.
