@@ -4,6 +4,7 @@ import json
 
 from experiments.power_spectrum.backtracking_sae_pooling.steering_baselines import (
     run_baselines,
+    summarize,
 )
 
 
@@ -25,3 +26,11 @@ def test_atomic_write_json_replaces_complete_file(tmp_path) -> None:
     assert json.loads(target.read_text()) == {"complete": True, "value": 3}
     assert not target.with_suffix(".json.tmp").exists()
 
+
+def test_metric_curve_uses_signed_canonical_keys() -> None:
+    metrics = {
+        "delta_gc_mag_-1.0": 0.25,
+        "delta_gc_mag_+0.0": 0.0,
+        "delta_gc_mag_+1.0": -0.5,
+    }
+    assert summarize.metric_curve(metrics, [-1, 0, 1]) == [0.25, 0.0, -0.5]
