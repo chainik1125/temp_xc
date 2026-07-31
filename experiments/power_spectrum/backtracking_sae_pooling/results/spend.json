@@ -1,0 +1,16 @@
+{
+  "provider": "RunPod",
+  "pod_id": "k804r98a0a6w6b",
+  "pod_name": "trajectory-bottleneck-c7-300k",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "hourly_rate_usd": 2.99,
+  "resumed_utc": "2026-07-31T19:48:58Z",
+  "stopped_utc": "2026-07-31T20:04:17Z",
+  "billable_wall_seconds_estimate": 919,
+  "experiment_seconds": 426.14460587501526,
+  "estimated_cost_usd": 0.7631,
+  "judge_cost_usd": 0.0,
+  "budget_cap_usd": 50.0,
+  "pod_stopped": true
+}
+

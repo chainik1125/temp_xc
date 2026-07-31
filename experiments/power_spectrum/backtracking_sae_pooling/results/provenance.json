@@ -1,0 +1,13 @@
+{
+  "source_commit": "064441bfd",
+  "source_branch": "codex/spectral-screen-overnight-20260729",
+  "checkpoint_train_key": "f437e623fabc37ec",
+  "checkpoint_sha256": "2efc15ad39603bcb554730c900e0c4b69035ac5be07d925aa489adbd15533d40",
+  "sentence_acts_sha256": "1656f6be2cd85fb85c8b246b9b27933f73ef40cfaac84078169dfd3bbbe27810",
+  "raw_results_sha256": "0efd92f0b2eec10240bd3066c1e67112184fc86b5df8d73ed3e1333a7181289a",
+  "remote_plot_sha256": "c751eee1c2c7eb38e43001a95f8f041e47ccad8e47ce3ad1514ec26f5dd21cc4",
+  "local_regenerated_plot_sha256": "488c41d5c4460b808b2cf4ab461c537637840a62e556297ecf0d135223ca63b9",
+  "remote_output": "/workspace/sae_pooling_c7/results/run_064441bfd",
+  "checkpoint_source": "han1823123123/temp-bench-models/f437e623fabc37ec",
+  "data_source": "canonical C7 sentence_acts_L10.npz"
+}
