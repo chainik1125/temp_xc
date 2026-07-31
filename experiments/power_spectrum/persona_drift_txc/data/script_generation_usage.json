@@ -1,0 +1,6 @@
+{
+  "calls": 80,
+  "input_tokens": 27418,
+  "model": "gpt-4.1-mini",
+  "output_tokens": 128360
+}

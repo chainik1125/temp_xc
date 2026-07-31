@@ -1,0 +1,95 @@
+{
+  "protocol_version": "0.1.0",
+  "subject_model": "Qwen/Qwen3-32B",
+  "subject_model_revision": "9216db5781bf21249d130ec9da846c4624c16137",
+  "embedding_model": "Qwen/Qwen3-Embedding-0.6B",
+  "embedding_model_revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+  "assistant_axis_repo": "lu-christina/assistant-axis-vectors",
+  "assistant_axis_revision": "3b3b788432ad33e3a28d9ff08e88a530c0740814",
+  "assistant_axis_file": "qwen-3-32b/assistant_axis.pt",
+  "capping_config_file": "qwen-3-32b/capping_config.pt",
+  "assistant_axis_code_repo": "https://github.com/safety-research/assistant-axis.git",
+  "assistant_axis_code_commit": "a98961956072224eaf244eb289d6c01700b63795",
+  "assistant_axis_uv_lock_sha256": "438b7d11359eb3a2dae997101da56737dc52d9197d79dc95ce91a8e39a66748a",
+  "monitor_layer": 32,
+  "safe_threshold": 5.28125,
+  "domains": [
+    "coding",
+    "writing",
+    "therapy",
+    "philosophy"
+  ],
+  "conversations_per_domain": 100,
+  "turns_per_conversation": 15,
+  "generation": {
+    "max_new_tokens": 96,
+    "temperature": 0.7,
+    "top_p": 0.9,
+    "do_sample": true,
+    "enable_thinking": false,
+    "base_seed": 730000
+  },
+  "script_generation": {
+    "model": "gpt-4.1-mini",
+    "topics_per_call": 5,
+    "temperature": 0.8,
+    "base_seed": 41000
+  },
+  "representation_training": {
+    "steps": 10000,
+    "learning_rate": 0.0003,
+    "warmup_steps": 1000,
+    "d_sae": 8192,
+    "k_pos": 20,
+    "positions_per_step": 512,
+    "log_every": 50,
+    "checkpoint_every": 2000,
+    "dead_feature_threshold_tokens": 1000000,
+    "seed": 42,
+    "architectures": [
+      {
+        "name": "sae",
+        "class_path": "temp_bench.archs.batchtopk_sae:BatchTopKSAE",
+        "window": 1
+      },
+      {
+        "name": "tsae",
+        "class_path": "temp_bench.archs.tsae:TSAEPaper",
+        "window": 1,
+        "contrastive_alpha": 0.1
+      },
+      {
+        "name": "txc_w4",
+        "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
+        "window": 4
+      },
+      {
+        "name": "txc_w8",
+        "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
+        "window": 8
+      }
+    ]
+  },
+  "probe": {
+    "primary_window": 8,
+    "primary_horizon": 4,
+    "horizons": [
+      1,
+      2,
+      4
+    ],
+    "ridge_alphas": [
+      0.0001,
+      0.001,
+      0.01,
+      0.1,
+      1.0,
+      10.0,
+      100.0,
+      1000.0,
+      10000.0
+    ],
+    "bootstrap_repetitions": 1000,
+    "seed": 8128
+  }
+}
