@@ -9,7 +9,7 @@ RUN_ROOT="${TRAJECTORY_RUN_ROOT:-/workspace/trajectory_bottleneck_c7}"
 SOURCE_ROOT="${TRAJECTORY_SOURCE_ROOT:-/workspace/txc-neurips-aniket/purified}"
 ACTIVATION_CACHE="${TRAJECTORY_ACTIVATION_CACHE:-${SOURCE_ROOT}/artifacts/hf_temp_bench_data/act_cache/fb2a74be884e512a/resid_post_L10.npy}"
 ARTIFACT="${TRAJECTORY_ARTIFACT:-${SOURCE_ROOT}/artifacts/c7/sentence_acts_L10.npz}"
-MAX_SECONDS="${TRAJECTORY_MAX_SECONDS:-28200}"
+MAX_SECONDS="${TRAJECTORY_MAX_SECONDS:-28800}"
 MAX_RESTARTS="${TRAJECTORY_MAX_RESTARTS:-12}"
 
 mkdir -p "${RUN_ROOT}/logs" "${RUN_ROOT}/checkpoints" "${RUN_ROOT}/results"
@@ -19,7 +19,11 @@ if ! flock -n 9; then
   exit 0
 fi
 
-started_epoch="$(date +%s)"
+if [[ -s "${RUN_ROOT}/billing_started_epoch" ]]; then
+  started_epoch="$(<"${RUN_ROOT}/billing_started_epoch")"
+else
+  started_epoch="$(date +%s)"
+fi
 deadline_epoch="$((started_epoch + MAX_SECONDS))"
 printf '%s\n' "${started_epoch}" > "${RUN_ROOT}/started_epoch"
 printf '%s\n' "${deadline_epoch}" > "${RUN_ROOT}/deadline_epoch"
