@@ -407,6 +407,15 @@ def validate_reference_transcripts(
             )
             mapped = mapper.map_spans(batch_activations, spans, batch_metadata)[0]
             assistant_turns = mapped[1::2, 0, :].detach().cpu()
+            expected_assistant_turns = sum(
+                message["role"] == "assistant" for message in conversation
+            )
+            if len(assistant_turns) != expected_assistant_turns:
+                raise RuntimeError(
+                    f"{scenario}/{condition}: reference transcript was "
+                    f"truncated ({len(assistant_turns)}/"
+                    f"{expected_assistant_turns} assistant turns)"
+                )
             scores = project_axis(assistant_turns, axis, layer=layer)
             for turn, score in zip(assistant_turns, scores, strict=True):
                 reference_score = reference["project"](turn, axis, layer=layer, normalize=True)

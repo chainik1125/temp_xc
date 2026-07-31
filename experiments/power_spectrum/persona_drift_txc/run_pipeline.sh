@@ -47,7 +47,8 @@ run_reference() {
     -m experiments.power_spectrum.persona_drift_txc.collect_activations \
     reference \
     --reference-root "$REFERENCE_ROOT" \
-    --output-root "$ARTIFACT_ROOT/activations"
+    --output-root "$ARTIFACT_ROOT/activations" \
+    --max-length "${PERSONA_DRIFT_REFERENCE_MAX_LENGTH:-32768}"
 }
 
 run_collect() {
