@@ -48,6 +48,11 @@
     "seed": 42,
     "architectures": [
       {
+        "name": "txc_w8",
+        "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
+        "window": 8
+      },
+      {
         "name": "sae",
         "class_path": "temp_bench.archs.batchtopk_sae:BatchTopKSAE",
         "window": 1
@@ -62,11 +67,6 @@
         "name": "txc_w4",
         "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
         "window": 4
-      },
-      {
-        "name": "txc_w8",
-        "class_path": "temp_bench.archs.txc_batchtopk:TXCBatchTopKPost",
-        "window": 8
       }
     ]
   },
