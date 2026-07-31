@@ -1,0 +1,346 @@
+{
+  "arm": "topk_sae",
+  "canonical_git_revision": "1c213513fe0c89220e8a00e53a9b258081ffe749",
+  "checkpoint_config": {
+    "act_cache_key": "fb2a74be884e512a",
+    "agent": "agent_back",
+    "arch": "topk_sae",
+    "arch_version": "1.0.0",
+    "datasource": "llama_3_1_8b_base_l10_ward_nousmirror",
+    "saved_ts": "2026-05-05T16:03:33Z",
+    "seed": 42,
+    "train_key": "f437e623fabc37ec",
+    "training_cfg": {
+      "batch_size": 1024,
+      "bricken_enabled": false,
+      "bricken_max_resample_fraction": 0.5,
+      "bricken_min_fires": 1,
+      "bricken_n_check": 2048,
+      "bricken_resample_every": 500,
+      "dead_threshold_tokens": 10000000,
+      "ema_auxk_alpha": 0.03125,
+      "learning_rate": 0.0003,
+      "n_steps": 20000,
+      "optimizer": "adam",
+      "plateau_early_stop": false,
+      "plateau_min_delta": 0.0001,
+      "plateau_patience": 5000,
+      "precision": "bf16",
+      "warmup_steps": 1000
+    }
+  },
+  "checkpoint_sha256": "2efc15ad39603bcb554730c900e0c4b69035ac5be07d925aa489adbd15533d40",
+  "checkpoint_state_dtypes": [
+    "torch.float32"
+  ],
+  "cohort": {
+    "correct": 30,
+    "qids": [
+      "test/algebra/1072.json",
+      "test/algebra/1184.json",
+      "test/algebra/1275.json",
+      "test/algebra/2193.json",
+      "test/algebra/305.json",
+      "test/counting_and_probability/430.json",
+      "test/counting_and_probability/737.json",
+      "test/counting_and_probability/765.json",
+      "test/geometry/477.json",
+      "test/intermediate_algebra/1102.json",
+      "test/intermediate_algebra/1217.json",
+      "test/number_theory/203.json",
+      "test/number_theory/368.json",
+      "test/number_theory/46.json",
+      "test/number_theory/516.json",
+      "test/number_theory/598.json",
+      "test/number_theory/737.json",
+      "test/number_theory/911.json",
+      "test/prealgebra/1044.json",
+      "test/prealgebra/1114.json",
+      "test/prealgebra/1353.json",
+      "test/prealgebra/1512.json",
+      "test/prealgebra/153.json",
+      "test/prealgebra/1733.json",
+      "test/prealgebra/1865.json",
+      "test/prealgebra/465.json",
+      "test/prealgebra/930.json",
+      "test/prealgebra/954.json",
+      "test/prealgebra/993.json",
+      "test/precalculus/452.json",
+      "test/precalculus/881.json",
+      "test/algebra/1035.json",
+      "test/algebra/114.json",
+      "test/algebra/1199.json",
+      "test/algebra/1255.json",
+      "test/algebra/1425.json",
+      "test/algebra/1837.json",
+      "test/algebra/2064.json",
+      "test/algebra/2251.json",
+      "test/algebra/2743.json",
+      "test/algebra/694.json",
+      "test/counting_and_probability/23957.json",
+      "test/geometry/1097.json",
+      "test/geometry/73.json",
+      "test/intermediate_algebra/1422.json",
+      "test/number_theory/1090.json",
+      "test/number_theory/1185.json",
+      "test/number_theory/255.json",
+      "test/number_theory/410.json",
+      "test/number_theory/483.json",
+      "test/number_theory/627.json",
+      "test/number_theory/686.json",
+      "test/number_theory/914.json",
+      "test/number_theory/978.json",
+      "test/prealgebra/1297.json",
+      "test/prealgebra/1558.json",
+      "test/prealgebra/192.json",
+      "test/prealgebra/1924.json",
+      "test/prealgebra/1973.json",
+      "test/prealgebra/951.json",
+      "test/precalculus/323.json"
+    ],
+    "wrong": 31
+  },
+  "cuda_device": "NVIDIA H100 80GB HBM3",
+  "cut_fraction": 0.25,
+  "feature": {
+    "decoder_norm": 1.0,
+    "feature_id": 10668,
+    "n_negative_windows": 22035,
+    "n_positive_windows": 3169,
+    "neg_act_mean": 0.02098248526453972,
+    "pos_act_mean": 0.07626742124557495,
+    "selectivity": 0.05528493598103523,
+    "top_32": [
+      {
+        "feature_id": 10668,
+        "neg_act_mean": 0.02098248526453972,
+        "pos_act_mean": 0.07626742124557495,
+        "selectivity": 0.05528493598103523
+      },
+      {
+        "feature_id": 31559,
+        "neg_act_mean": 0.0025715529918670654,
+        "pos_act_mean": 0.05148163065314293,
+        "selectivity": 0.048910077661275864
+      },
+      {
+        "feature_id": 23259,
+        "neg_act_mean": 0.03873448818922043,
+        "pos_act_mean": 0.07986155152320862,
+        "selectivity": 0.04112706333398819
+      },
+      {
+        "feature_id": 6599,
+        "neg_act_mean": 0.03158968687057495,
+        "pos_act_mean": 0.06895788013935089,
+        "selectivity": 0.03736819326877594
+      },
+      {
+        "feature_id": 24530,
+        "neg_act_mean": 0.015652447938919067,
+        "pos_act_mean": 0.05243651941418648,
+        "selectivity": 0.03678407147526741
+      },
+      {
+        "feature_id": 7013,
+        "neg_act_mean": 0.0007461719214916229,
+        "pos_act_mean": 0.035869915038347244,
+        "selectivity": 0.03512374311685562
+      },
+      {
+        "feature_id": 16696,
+        "neg_act_mean": 0.028718000277876854,
+        "pos_act_mean": 0.05963340774178505,
+        "selectivity": 0.030915407463908195
+      },
+      {
+        "feature_id": 19056,
+        "neg_act_mean": 0.01593071222305298,
+        "pos_act_mean": 0.045203499495983124,
+        "selectivity": 0.029272787272930145
+      },
+      {
+        "feature_id": 22278,
+        "neg_act_mean": 0.016141759231686592,
+        "pos_act_mean": 0.04396011680364609,
+        "selectivity": 0.027818357571959496
+      },
+      {
+        "feature_id": 30345,
+        "neg_act_mean": 0.003434040118008852,
+        "pos_act_mean": 0.03100898116827011,
+        "selectivity": 0.027574941515922546
+      },
+      {
+        "feature_id": 7785,
+        "neg_act_mean": 0.02540523372590542,
+        "pos_act_mean": 0.05072373151779175,
+        "selectivity": 0.02531849779188633
+      },
+      {
+        "feature_id": 6594,
+        "neg_act_mean": 0.009629009291529655,
+        "pos_act_mean": 0.034483518451452255,
+        "selectivity": 0.0248545091599226
+      },
+      {
+        "feature_id": 21200,
+        "neg_act_mean": 0.006041340529918671,
+        "pos_act_mean": 0.030522767454385757,
+        "selectivity": 0.024481426924467087
+      },
+      {
+        "feature_id": 4754,
+        "neg_act_mean": 0.01039383839815855,
+        "pos_act_mean": 0.03416213020682335,
+        "selectivity": 0.023768290877342224
+      },
+      {
+        "feature_id": 24101,
+        "neg_act_mean": 0.002552832942456007,
+        "pos_act_mean": 0.025811700150370598,
+        "selectivity": 0.023258866742253304
+      },
+      {
+        "feature_id": 16544,
+        "neg_act_mean": 0.009294508956372738,
+        "pos_act_mean": 0.03172527626156807,
+        "selectivity": 0.022430766373872757
+      },
+      {
+        "feature_id": 13509,
+        "neg_act_mean": 0.0023286244831979275,
+        "pos_act_mean": 0.024208152666687965,
+        "selectivity": 0.02187952771782875
+      },
+      {
+        "feature_id": 24533,
+        "neg_act_mean": 0.015883484855294228,
+        "pos_act_mean": 0.035968974232673645,
+        "selectivity": 0.020085489377379417
+      },
+      {
+        "feature_id": 17896,
+        "neg_act_mean": 0.03417825326323509,
+        "pos_act_mean": 0.05106515437364578,
+        "selectivity": 0.01688690111041069
+      },
+      {
+        "feature_id": 7966,
+        "neg_act_mean": 0.015815524384379387,
+        "pos_act_mean": 0.03171658515930176,
+        "selectivity": 0.01590106077492237
+      },
+      {
+        "feature_id": 10352,
+        "neg_act_mean": 0.011655103415250778,
+        "pos_act_mean": 0.027365006506443024,
+        "selectivity": 0.015709903091192245
+      },
+      {
+        "feature_id": 14739,
+        "neg_act_mean": 0.001524848979897797,
+        "pos_act_mean": 0.01705470122396946,
+        "selectivity": 0.015529852360486984
+      },
+      {
+        "feature_id": 15712,
+        "neg_act_mean": 0.0030063262674957514,
+        "pos_act_mean": 0.018026240170001984,
+        "selectivity": 0.015019914135336876
+      },
+      {
+        "feature_id": 11867,
+        "neg_act_mean": 0.012566927820444107,
+        "pos_act_mean": 0.026980597525835037,
+        "selectivity": 0.01441366970539093
+      },
+      {
+        "feature_id": 13755,
+        "neg_act_mean": 0.002963719656690955,
+        "pos_act_mean": 0.016871878877282143,
+        "selectivity": 0.013908158987760544
+      },
+      {
+        "feature_id": 24278,
+        "neg_act_mean": 0.007964988239109516,
+        "pos_act_mean": 0.02156415767967701,
+        "selectivity": 0.013599169440567493
+      },
+      {
+        "feature_id": 14303,
+        "neg_act_mean": 0.028541475534439087,
+        "pos_act_mean": 0.04204104095697403,
+        "selectivity": 0.013499565422534943
+      },
+      {
+        "feature_id": 32637,
+        "neg_act_mean": 0.008606956340372562,
+        "pos_act_mean": 0.021997597068548203,
+        "selectivity": 0.01339064072817564
+      },
+      {
+        "feature_id": 19182,
+        "neg_act_mean": 0.017288777977228165,
+        "pos_act_mean": 0.030509650707244873,
+        "selectivity": 0.013220872730016708
+      },
+      {
+        "feature_id": 6621,
+        "neg_act_mean": 0.007406627293676138,
+        "pos_act_mean": 0.020311793312430382,
+        "selectivity": 0.012905165553092957
+      },
+      {
+        "feature_id": 1979,
+        "neg_act_mean": 0.07513043284416199,
+        "pos_act_mean": 0.08778397738933563,
+        "selectivity": 0.012653544545173645
+      },
+      {
+        "feature_id": 30750,
+        "neg_act_mean": 0.000729916209820658,
+        "pos_act_mean": 0.013154400512576103,
+        "selectivity": 0.012424483895301819
+      }
+    ],
+    "window_shape": [
+      6,
+      4096
+    ]
+  },
+  "gen_batch_size": 8,
+  "magnitudes": [
+    -16,
+    -12,
+    -10,
+    -8,
+    -7,
+    -6,
+    -5,
+    -4,
+    -3,
+    -2,
+    -1,
+    -0.5,
+    0,
+    0.5,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    10,
+    12,
+    16
+  ],
+  "max_new_tokens": 1024,
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "python": "3.11.11 (main, Dec  4 2024, 08:55:07) [GCC 11.4.0]",
+  "started_unix": 1785530836.2295146,
+  "torch": "2.8.0.dev20250319+cu128",
+  "train_key": "f437e623fabc37ec"
+}

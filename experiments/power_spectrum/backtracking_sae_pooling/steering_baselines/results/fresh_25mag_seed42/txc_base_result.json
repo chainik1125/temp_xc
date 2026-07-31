@@ -1,0 +1,385 @@
+{
+  "arm": "txc_base",
+  "artifacts": {
+    "judge_outputs": "/workspace/steering_baselines_20k/results/fresh_25mag_seed42/judge_outputs.jsonl",
+    "workspace": "/workspace/steering_baselines_20k/results/fresh_25mag_seed42"
+  },
+  "canonical_git_revision": "1c213513fe0c89220e8a00e53a9b258081ffe749",
+  "checkpoint_config": {
+    "act_cache_key": "fb2a74be884e512a",
+    "agent": "agent_back",
+    "arch": "txc_base",
+    "arch_version": "1.0.0",
+    "datasource": "llama_3_1_8b_base_l10_ward_nousmirror",
+    "saved_ts": "2026-05-05T10:29:36Z",
+    "seed": 42,
+    "train_key": "08fe3af07682fab4",
+    "training_cfg": {
+      "batch_size": 1024,
+      "bricken_enabled": false,
+      "bricken_max_resample_fraction": 0.5,
+      "bricken_min_fires": 1,
+      "bricken_n_check": 2048,
+      "bricken_resample_every": 500,
+      "dead_threshold_tokens": 10000000,
+      "ema_auxk_alpha": 0.03125,
+      "learning_rate": 0.0003,
+      "n_steps": 20000,
+      "optimizer": "adam",
+      "plateau_early_stop": false,
+      "plateau_min_delta": 0.0001,
+      "plateau_patience": 5000,
+      "precision": "bf16",
+      "warmup_steps": 1000
+    }
+  },
+  "checkpoint_sha256": "ed2ecf4670f889fd97e82c53a949f963c36a292f05944cd678f943a87f1f9cb1",
+  "checkpoint_state_dtypes": [
+    "torch.bfloat16",
+    "torch.int64"
+  ],
+  "cohort": {
+    "correct": 30,
+    "qids": [
+      "test/algebra/1072.json",
+      "test/algebra/1184.json",
+      "test/algebra/1275.json",
+      "test/algebra/2193.json",
+      "test/algebra/305.json",
+      "test/counting_and_probability/430.json",
+      "test/counting_and_probability/737.json",
+      "test/counting_and_probability/765.json",
+      "test/geometry/477.json",
+      "test/intermediate_algebra/1102.json",
+      "test/intermediate_algebra/1217.json",
+      "test/number_theory/203.json",
+      "test/number_theory/368.json",
+      "test/number_theory/46.json",
+      "test/number_theory/516.json",
+      "test/number_theory/598.json",
+      "test/number_theory/737.json",
+      "test/number_theory/911.json",
+      "test/prealgebra/1044.json",
+      "test/prealgebra/1114.json",
+      "test/prealgebra/1353.json",
+      "test/prealgebra/1512.json",
+      "test/prealgebra/153.json",
+      "test/prealgebra/1733.json",
+      "test/prealgebra/1865.json",
+      "test/prealgebra/465.json",
+      "test/prealgebra/930.json",
+      "test/prealgebra/954.json",
+      "test/prealgebra/993.json",
+      "test/precalculus/452.json",
+      "test/precalculus/881.json",
+      "test/algebra/1035.json",
+      "test/algebra/114.json",
+      "test/algebra/1199.json",
+      "test/algebra/1255.json",
+      "test/algebra/1425.json",
+      "test/algebra/1837.json",
+      "test/algebra/2064.json",
+      "test/algebra/2251.json",
+      "test/algebra/2743.json",
+      "test/algebra/694.json",
+      "test/counting_and_probability/23957.json",
+      "test/geometry/1097.json",
+      "test/geometry/73.json",
+      "test/intermediate_algebra/1422.json",
+      "test/number_theory/1090.json",
+      "test/number_theory/1185.json",
+      "test/number_theory/255.json",
+      "test/number_theory/410.json",
+      "test/number_theory/483.json",
+      "test/number_theory/627.json",
+      "test/number_theory/686.json",
+      "test/number_theory/914.json",
+      "test/number_theory/978.json",
+      "test/prealgebra/1297.json",
+      "test/prealgebra/1558.json",
+      "test/prealgebra/192.json",
+      "test/prealgebra/1924.json",
+      "test/prealgebra/1973.json",
+      "test/prealgebra/951.json",
+      "test/precalculus/323.json"
+    ],
+    "wrong": 31
+  },
+  "cuda_device": "NVIDIA H100 80GB HBM3",
+  "cut_fraction": 0.25,
+  "expected_judge_keys": 1525,
+  "feature": {
+    "decoder_norm": 0.41440942883491516,
+    "feature_id": 25630,
+    "n_negative_windows": 22035,
+    "n_positive_windows": 3169,
+    "neg_act_mean": 0.2935207784175873,
+    "pos_act_mean": 0.4262734055519104,
+    "selectivity": 0.13275262713432312,
+    "top_32": [
+      {
+        "feature_id": 25630,
+        "neg_act_mean": 0.2935207784175873,
+        "pos_act_mean": 0.4262734055519104,
+        "selectivity": 0.13275262713432312
+      },
+      {
+        "feature_id": 26255,
+        "neg_act_mean": 0.0005110832280479372,
+        "pos_act_mean": 0.12823261320590973,
+        "selectivity": 0.12772153317928314
+      },
+      {
+        "feature_id": 11536,
+        "neg_act_mean": 0.5112553834915161,
+        "pos_act_mean": 0.597581684589386,
+        "selectivity": 0.08632630109786987
+      },
+      {
+        "feature_id": 10203,
+        "neg_act_mean": 0.2778376340866089,
+        "pos_act_mean": 0.3483576476573944,
+        "selectivity": 0.07052001357078552
+      },
+      {
+        "feature_id": 7137,
+        "neg_act_mean": 0.1700495481491089,
+        "pos_act_mean": 0.2362302988767624,
+        "selectivity": 0.0661807507276535
+      },
+      {
+        "feature_id": 3176,
+        "neg_act_mean": 0.0018323122058063745,
+        "pos_act_mean": 0.06624723970890045,
+        "selectivity": 0.06441492587327957
+      },
+      {
+        "feature_id": 16093,
+        "neg_act_mean": 0.0016622613184154034,
+        "pos_act_mean": 0.06245747581124306,
+        "selectivity": 0.06079521402716637
+      },
+      {
+        "feature_id": 25993,
+        "neg_act_mean": 0.07802794128656387,
+        "pos_act_mean": 0.134660542011261,
+        "selectivity": 0.05663260072469711
+      },
+      {
+        "feature_id": 13996,
+        "neg_act_mean": 0.06377391517162323,
+        "pos_act_mean": 0.11660076677799225,
+        "selectivity": 0.05282685160636902
+      },
+      {
+        "feature_id": 13467,
+        "neg_act_mean": 0.02804943546652794,
+        "pos_act_mean": 0.08024238049983978,
+        "selectivity": 0.052192945033311844
+      },
+      {
+        "feature_id": 26729,
+        "neg_act_mean": 0.0703248605132103,
+        "pos_act_mean": 0.12010040134191513,
+        "selectivity": 0.049775540828704834
+      },
+      {
+        "feature_id": 10497,
+        "neg_act_mean": 0.06835170835256577,
+        "pos_act_mean": 0.11365844309329987,
+        "selectivity": 0.0453067347407341
+      },
+      {
+        "feature_id": 13977,
+        "neg_act_mean": 0.038560900837183,
+        "pos_act_mean": 0.08180352300405502,
+        "selectivity": 0.043242622166872025
+      },
+      {
+        "feature_id": 3529,
+        "neg_act_mean": 0.0020969833713024855,
+        "pos_act_mean": 0.042296960949897766,
+        "selectivity": 0.04019997641444206
+      },
+      {
+        "feature_id": 26209,
+        "neg_act_mean": 0.19253069162368774,
+        "pos_act_mean": 0.23032978177070618,
+        "selectivity": 0.03779909014701843
+      },
+      {
+        "feature_id": 5588,
+        "neg_act_mean": 0.10718490183353424,
+        "pos_act_mean": 0.14495158195495605,
+        "selectivity": 0.037766680121421814
+      },
+      {
+        "feature_id": 1887,
+        "neg_act_mean": 0.02521197497844696,
+        "pos_act_mean": 0.06230955943465233,
+        "selectivity": 0.03709758445620537
+      },
+      {
+        "feature_id": 28418,
+        "neg_act_mean": 0.02239742875099182,
+        "pos_act_mean": 0.05703260749578476,
+        "selectivity": 0.03463517874479294
+      },
+      {
+        "feature_id": 19031,
+        "neg_act_mean": 0.031085088849067688,
+        "pos_act_mean": 0.06451167911291122,
+        "selectivity": 0.033426590263843536
+      },
+      {
+        "feature_id": 13964,
+        "neg_act_mean": 0.04533550143241882,
+        "pos_act_mean": 0.07827600091695786,
+        "selectivity": 0.03294049948453903
+      },
+      {
+        "feature_id": 26219,
+        "neg_act_mean": 0.01753779500722885,
+        "pos_act_mean": 0.048377905040979385,
+        "selectivity": 0.030840110033750534
+      },
+      {
+        "feature_id": 9067,
+        "neg_act_mean": 0.016480660066008568,
+        "pos_act_mean": 0.046701814979314804,
+        "selectivity": 0.030221154913306236
+      },
+      {
+        "feature_id": 948,
+        "neg_act_mean": 0.034694671630859375,
+        "pos_act_mean": 0.0648333951830864,
+        "selectivity": 0.03013872355222702
+      },
+      {
+        "feature_id": 5547,
+        "neg_act_mean": 0.02093096636235714,
+        "pos_act_mean": 0.050804056227207184,
+        "selectivity": 0.029873089864850044
+      },
+      {
+        "feature_id": 28766,
+        "neg_act_mean": 0.0323982760310173,
+        "pos_act_mean": 0.06181234121322632,
+        "selectivity": 0.029414065182209015
+      },
+      {
+        "feature_id": 4477,
+        "neg_act_mean": 0.02051614411175251,
+        "pos_act_mean": 0.04924445226788521,
+        "selectivity": 0.028728308156132698
+      },
+      {
+        "feature_id": 2545,
+        "neg_act_mean": 0.042271193116903305,
+        "pos_act_mean": 0.07074331492185593,
+        "selectivity": 0.02847212180495262
+      },
+      {
+        "feature_id": 7126,
+        "neg_act_mean": 0.02715548314154148,
+        "pos_act_mean": 0.05512170121073723,
+        "selectivity": 0.027966218069195747
+      },
+      {
+        "feature_id": 28156,
+        "neg_act_mean": 0.020193370059132576,
+        "pos_act_mean": 0.04802074655890465,
+        "selectivity": 0.027827376499772072
+      },
+      {
+        "feature_id": 11680,
+        "neg_act_mean": 0.09959077835083008,
+        "pos_act_mean": 0.1274164468050003,
+        "selectivity": 0.027825668454170227
+      },
+      {
+        "feature_id": 11615,
+        "neg_act_mean": 0.016312647610902786,
+        "pos_act_mean": 0.044053785502910614,
+        "selectivity": 0.027741137892007828
+      },
+      {
+        "feature_id": 26733,
+        "neg_act_mean": 0.01699245348572731,
+        "pos_act_mean": 0.044377971440553665,
+        "selectivity": 0.027385517954826355
+      }
+    ],
+    "window_shape": [
+      6,
+      4096
+    ]
+  },
+  "finished_unix": 1785535268.4482553,
+  "gen_batch_size": 8,
+  "magnitudes": [
+    -16,
+    -12,
+    -10,
+    -8,
+    -7,
+    -6,
+    -5,
+    -4,
+    -3,
+    -2,
+    -1,
+    -0.5,
+    0,
+    0.5,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    10,
+    12,
+    16
+  ],
+  "max_new_tokens": 1024,
+  "metrics": {
+    "delta_gc_mag_+0.0": 0.0,
+    "delta_gc_mag_+0.5": 0.06557377049180328,
+    "delta_gc_mag_+1.0": 0.04918032786885246,
+    "delta_gc_mag_+10.0": 0.19672131147540983,
+    "delta_gc_mag_+12.0": 0.09836065573770492,
+    "delta_gc_mag_+16.0": -0.11475409836065574,
+    "delta_gc_mag_+2.0": 0.11475409836065574,
+    "delta_gc_mag_+3.0": 0.08196721311475409,
+    "delta_gc_mag_+4.0": 0.01639344262295082,
+    "delta_gc_mag_+5.0": 0.01639344262295082,
+    "delta_gc_mag_+6.0": 0.09836065573770492,
+    "delta_gc_mag_+7.0": 0.03278688524590164,
+    "delta_gc_mag_+8.0": 0.04918032786885246,
+    "delta_gc_mag_-0.5": 0.0,
+    "delta_gc_mag_-1.0": 0.0,
+    "delta_gc_mag_-10.0": 0.22950819672131148,
+    "delta_gc_mag_-12.0": 0.45901639344262296,
+    "delta_gc_mag_-16.0": -0.13114754098360656,
+    "delta_gc_mag_-2.0": 0.0,
+    "delta_gc_mag_-3.0": 0.03278688524590164,
+    "delta_gc_mag_-4.0": 0.03278688524590164,
+    "delta_gc_mag_-5.0": 0.06557377049180328,
+    "delta_gc_mag_-6.0": 0.13114754098360656,
+    "delta_gc_mag_-7.0": 0.19672131147540983,
+    "delta_gc_mag_-8.0": 0.09836065573770492,
+    "delta_gc_peak": 0.45901639344262296,
+    "delta_gc_peak_magnitude": -12.0,
+    "n_judge_calls": 1525.0
+  },
+  "platform": "Linux-6.8.0-90-generic-x86_64-with-glibc2.35",
+  "primary_metric": "delta_gc_peak",
+  "python": "3.11.11 (main, Dec  4 2024, 08:55:07) [GCC 11.4.0]",
+  "started_unix": 1785533203.1941707,
+  "successful_judge_keys": 1525,
+  "torch": "2.8.0.dev20250319+cu128",
+  "train_key": "08fe3af07682fab4"
+}

@@ -1,0 +1,23 @@
+{
+  "pod_id": "k804r98a0a6w6b",
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "hourly_rate_usd": 2.99,
+  "primary_run": {
+    "started_at": "2026-07-31T20:46:34Z",
+    "stopped_at": "2026-07-31T22:01:10Z",
+    "gpu_seconds": 4476,
+    "estimated_cost_usd": 3.717566666666667
+  },
+  "artifact_recovery_restart": {
+    "started_at": "2026-07-31T22:02:41Z",
+    "stopped_at": "2026-07-31T22:04:51Z",
+    "gpu_seconds": 130,
+    "estimated_cost_usd": 0.10797222222222223
+  },
+  "total_gpu_seconds": 4606,
+  "estimated_gpu_cost_usd": 3.825538888888889,
+  "previous_pooling_phase_gpu_cost_usd": 0.76,
+  "pooling_plus_steering_gpu_cost_usd": 4.585538888888889,
+  "api_judge_cost_usd": null,
+  "note": "API judge cost was not exposed by the evaluation runner and is not included in the RunPod compute total."
+}
