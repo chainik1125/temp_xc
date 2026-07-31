@@ -116,7 +116,8 @@ Only final weights are retained; optimizer-state checkpoints are not saved.
 For horizons 1, 2, and 4, validation-selected ridge probes compare:
 
 - current axis only;
-- current axis plus latest user embedding;
+- current axis plus turn position and domain;
+- current axis, turn/domain, and latest user embedding;
 - raw current activation;
 - raw activation history;
 - SAE latents;
@@ -125,9 +126,11 @@ For horizons 1, 2, and 4, validation-selected ridge probes compare:
 - SAE plus TXC latents; and
 - T-SAE plus TXC latents.
 
-All nontrivial models include current axis and latest-user covariates. The
-critical nested comparison is `(SAE + TXC) - SAE`; the latent-free information
-gate is `raw history - raw local`. Confidence intervals use a conversation-level
+All nontrivial models include current axis, normalized turn position, domain
+indicators, and latest-user covariates. This prevents a temporal representation
+from winning merely by recovering the scheduled script position. The critical
+nested comparison is `(SAE + TXC) - SAE`; the latent-free information gate is
+`raw history - raw local`. Confidence intervals use a conversation-level
 bootstrap stratified by domain. The predeclared primary cell is \(W=8\),
 horizon 4; other cells are exploratory.
 

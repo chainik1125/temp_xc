@@ -266,6 +266,7 @@ def _future_embedding_oracle(
 def _feature_sets(
     *,
     current_axis: np.ndarray,
+    position_context: np.ndarray,
     user: np.ndarray,
     raw_current: np.ndarray,
     raw_history: np.ndarray,
@@ -278,37 +279,43 @@ def _feature_sets(
     axis = current_axis[:, None]
     result = {
         "axis_only": axis,
-        "user_axis": np.concatenate((axis, user), axis=1),
-        "raw_local": np.concatenate((axis, user, raw_current), axis=1),
-        "raw_history": np.concatenate((axis, user, raw_history), axis=1),
-        "sae": np.concatenate((axis, user, sae), axis=1),
-        "tsae": np.concatenate((axis, user, tsae), axis=1),
-        "txc": np.concatenate((axis, user, txc), axis=1),
-        "sae_plus_txc": np.concatenate((axis, user, sae, txc), axis=1),
-        "tsae_plus_txc": np.concatenate((axis, user, tsae, txc), axis=1),
+        "axis_position": np.concatenate((axis, position_context), axis=1),
+        "user_axis": np.concatenate((axis, position_context, user), axis=1),
+        "raw_local": np.concatenate((axis, position_context, user, raw_current), axis=1),
+        "raw_history": np.concatenate((axis, position_context, user, raw_history), axis=1),
+        "sae": np.concatenate((axis, position_context, user, sae), axis=1),
+        "tsae": np.concatenate((axis, position_context, user, tsae), axis=1),
+        "txc": np.concatenate((axis, position_context, user, txc), axis=1),
+        "sae_plus_txc": np.concatenate((axis, position_context, user, sae, txc), axis=1),
+        "tsae_plus_txc": np.concatenate((axis, position_context, user, tsae, txc), axis=1),
     }
     if user_history is not None and future_user_oracle is not None:
         result.update(
             {
-                "past_user_axis": np.concatenate((axis, user_history), axis=1),
+                "past_user_axis": np.concatenate((axis, position_context, user_history), axis=1),
                 "future_user_oracle": np.concatenate(
-                    (axis, user_history, future_user_oracle),
+                    (
+                        axis,
+                        position_context,
+                        user_history,
+                        future_user_oracle,
+                    ),
                     axis=1,
                 ),
                 "raw_local_user_history": np.concatenate(
-                    (axis, user_history, raw_current),
+                    (axis, position_context, user_history, raw_current),
                     axis=1,
                 ),
                 "raw_history_user_history": np.concatenate(
-                    (axis, user_history, raw_history),
+                    (axis, position_context, user_history, raw_history),
                     axis=1,
                 ),
                 "sae_user_history": np.concatenate(
-                    (axis, user_history, sae),
+                    (axis, position_context, user_history, sae),
                     axis=1,
                 ),
                 "sae_plus_txc_user_history": np.concatenate(
-                    (axis, user_history, sae, txc),
+                    (axis, position_context, user_history, sae, txc),
                     axis=1,
                 ),
             }
@@ -377,9 +384,21 @@ def run_probes(
             sae = _code_at_endpoint(sae_codes, rows, code_window=1).float().numpy()
             tsae = _code_at_endpoint(tsae_codes, rows, code_window=1).float().numpy()
             txc = _code_at_endpoint(txc_codes, rows, code_window=window).float().numpy()
+            domain_names = list(config["domains"])
+            position_context = np.asarray(
+                [
+                    [
+                        row.turn / max(int(config["turns_per_conversation"]) - 1, 1),
+                        *[float(row.domain == domain) for domain in domain_names[:-1]],
+                    ]
+                    for row in rows
+                ],
+                dtype=np.float32,
+            )
             is_primary_cell = window == primary_window and int(horizon) == primary_horizon
             features = _feature_sets(
                 current_axis=targets["current"],
+                position_context=position_context,
                 user=user,
                 raw_current=current,
                 raw_history=history,
@@ -609,7 +628,7 @@ def plot_probe_results(
 ) -> None:
     models = ("user_axis", "raw_local", "raw_history", "sae", "txc", "sae_plus_txc")
     labels = {
-        "user_axis": "Axis + user",
+        "user_axis": "Axis + position + user",
         "raw_local": "Raw local",
         "raw_history": "Raw history",
         "sae": "SAE",
