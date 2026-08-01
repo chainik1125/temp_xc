@@ -1,0 +1,139 @@
+{
+  "conclusion": {
+    "one_fixed_position_explains_feature": false,
+    "reason": "Feature selectivity is positive at all five positions, no single-position miner ranks it first, and max pooling produces substantially greater selectivity and cross-validated detection than any fixed position.",
+    "remaining_uncertainty": "Stored summaries do not retain per-example feature activations, so they cannot distinguish temporal jitter across examples from repeated evidence within the same example."
+  },
+  "detection_fold_dominance": {
+    "1": {
+      "best_single_position_pr_auc": 0.13121425126627606,
+      "fold_count": 5,
+      "folds_beating_every_single_position": 5,
+      "max_pool_pr_auc": 0.15364567815678626
+    },
+    "16": {
+      "best_single_position_pr_auc": 0.20158461432364003,
+      "fold_count": 5,
+      "folds_beating_every_single_position": 4,
+      "max_pool_pr_auc": 0.21179986424615907
+    },
+    "2": {
+      "best_single_position_pr_auc": 0.13618005810572717,
+      "fold_count": 5,
+      "folds_beating_every_single_position": 5,
+      "max_pool_pr_auc": 0.16013328961825088
+    },
+    "32": {
+      "best_single_position_pr_auc": 0.2187606980923144,
+      "fold_count": 5,
+      "folds_beating_every_single_position": 3,
+      "max_pool_pr_auc": 0.23138428528433153
+    },
+    "4": {
+      "best_single_position_pr_auc": 0.15154401296865558,
+      "fold_count": 5,
+      "folds_beating_every_single_position": 5,
+      "max_pool_pr_auc": 0.17041014050944017
+    },
+    "8": {
+      "best_single_position_pr_auc": 0.16840442043675166,
+      "fold_count": 5,
+      "folds_beating_every_single_position": 5,
+      "max_pool_pr_auc": 0.1941188076238744
+    }
+  },
+  "feature_id": 24530,
+  "max_pool": {
+    "best_single_position": "position_4",
+    "best_single_position_selectivity": 0.03678406774997711,
+    "feature_selectivity": 0.0966106504201889,
+    "negative_activation_mean": 0.05816991254687309,
+    "positive_activation_mean": 0.1547805666923523,
+    "selectivity_ratio_vs_best_single_position": 2.6264265028233322
+  },
+  "per_position": {
+    "position_0": {
+      "feature_absolute_selectivity_rank": 12,
+      "feature_positive_selectivity_rank": 10,
+      "feature_selectivity": 0.0242110937833786,
+      "position_top_feature_id": 31559,
+      "position_top_feature_selectivity": 0.04600941762328148,
+      "pr_auc": {
+        "1": 0.1300622074966597,
+        "16": 0.20158461432364003,
+        "2": 0.13564505617540829,
+        "32": 0.2187606980923144,
+        "4": 0.14136352974655164,
+        "8": 0.15890645132946585
+      }
+    },
+    "position_1": {
+      "feature_absolute_selectivity_rank": 13,
+      "feature_positive_selectivity_rank": 11,
+      "feature_selectivity": 0.022463154047727585,
+      "position_top_feature_id": 2083,
+      "position_top_feature_selectivity": 0.05419760197401047,
+      "pr_auc": {
+        "1": 0.12728291370406644,
+        "16": 0.19952441308382166,
+        "2": 0.1295831867771963,
+        "32": 0.21792194607508136,
+        "4": 0.1370434000940946,
+        "8": 0.1585207543546778
+      }
+    },
+    "position_2": {
+      "feature_absolute_selectivity_rank": 5,
+      "feature_positive_selectivity_rank": 4,
+      "feature_selectivity": 0.024962391704320908,
+      "position_top_feature_id": 9822,
+      "position_top_feature_selectivity": 0.0361909419298172,
+      "pr_auc": {
+        "1": 0.12813638543462505,
+        "16": 0.18159042898666394,
+        "2": 0.13618005810572717,
+        "32": 0.2059778036566052,
+        "4": 0.14762411285569757,
+        "8": 0.16340403276573315
+      }
+    },
+    "position_3": {
+      "feature_absolute_selectivity_rank": 16,
+      "feature_positive_selectivity_rank": 14,
+      "feature_selectivity": 0.02264801599085331,
+      "position_top_feature_id": 31559,
+      "position_top_feature_selectivity": 0.05885544791817665,
+      "pr_auc": {
+        "1": 0.13121425126627606,
+        "16": 0.1843887495691708,
+        "2": 0.13577670359240215,
+        "32": 0.20184359940226188,
+        "4": 0.13662282128246747,
+        "8": 0.15911593941125696
+      }
+    },
+    "position_4": {
+      "feature_absolute_selectivity_rank": 5,
+      "feature_positive_selectivity_rank": 5,
+      "feature_selectivity": 0.03678406774997711,
+      "position_top_feature_id": 10668,
+      "position_top_feature_selectivity": 0.05528492480516434,
+      "pr_auc": {
+        "1": 0.12919320743326118,
+        "16": 0.18575126095048072,
+        "2": 0.1337198016730344,
+        "32": 0.21504242950842722,
+        "4": 0.15154401296865558,
+        "8": 0.16840442043675166
+      }
+    }
+  },
+  "position_order": "oldest_to_newest",
+  "schema_version": 1,
+  "sources": {
+    "detection_results": "experiments/power_spectrum/backtracking_sae_pooling/results/raw_results.json",
+    "detection_results_sha256": "0efd92f0b2eec10240bd3066c1e67112184fc86b5df8d73ed3e1333a7181289a",
+    "steering_result": "experiments/power_spectrum/backtracking_sae_pooling/steering_baselines/results/fresh_25mag_seed42/pooled_sae_max_result.json",
+    "steering_result_sha256": "ab2ab5c21bc267149726773f0f795ec1d1062c52249dde183c8e6d8dd0380fb6"
+  }
+}

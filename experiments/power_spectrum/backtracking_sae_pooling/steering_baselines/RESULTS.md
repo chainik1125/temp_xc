@@ -87,6 +87,41 @@ evidence across positions to discover the feature. The narrower remaining
 question is whether a learned TXC is a more efficient or robust aggregator
 than fixed pooling, not whether only TXC contains a causally useful direction.
 
+## Positional audit of feature 24530
+
+The stored detection artifacts allow a direct check of whether max pooling
+merely exposed one especially useful earlier position. They do not support
+that explanation.
+
+| Position | Feature 24530 selectivity | Positive-selectivity rank | Position's top feature | PR-AUC at S=1 | PR-AUC at S=8 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 0, oldest | 0.0242 | 10 | 31559 | 0.1301 | 0.1589 |
+| 1 | 0.0225 | 11 | 2083 | 0.1273 | 0.1585 |
+| 2 | 0.0250 | 4 | 9822 | 0.1281 | 0.1634 |
+| 3 | 0.0226 | 14 | 31559 | 0.1312 | 0.1591 |
+| 4, newest | 0.0368 | 5 | 10668 | 0.1292 | 0.1684 |
+| **Max over positions** | **0.0966** | **1** | **24530** | **0.1536** | **0.1941** |
+
+Feature 24530 is positively associated with backtracking at every position,
+but no single-position miner chooses it. Its best fixed position is the newest
+one, where selectivity is 0.0368; max pooling increases this to 0.0966, a
+**2.63x** increase. Thus, the effect is not access to one fixed earlier
+"better token."
+
+The general detection result agrees. At `S=1` and the paper's `S=8` operating
+point, max pooling beats *every* individual position in all five held-out
+question folds. It also beats the best aggregate single-position score at
+every tested feature budget, although foldwise dominance falls to 4/5 at
+`S=16` and 3/5 at `S=32`.
+
+The best current description is therefore **window-level presence detection**:
+feature 24530 becomes useful when the miner can ask whether it fired anywhere
+in the recent window. This may reflect temporal jitter, where the relevant
+event lands at different relative positions in different examples, or repeated
+weak evidence within each example. The stored summaries do not contain the
+per-example feature activations needed to distinguish those two mechanisms.
+That argmax-position histogram is the one remaining positional check.
+
 ## High-dose caveat
 
 The two largest pooled peaks occur at the edge of the 25-point search grid.
@@ -170,6 +205,8 @@ checkpoint seed, one judged cohort, and a post-hoc sign-aligned comparison.
 - API judge cost is not available from the runner and is excluded.
 - Compact machine-readable results: `results/fresh_25mag_seed42/summary.json`.
 - Paired bootstrap audit: `results/fresh_25mag_seed42/paired_audit.json`.
+- Feature-24530 positional audit:
+  `results/fresh_25mag_seed42/positional_feature_24530.json`.
 - Compressed raw judgments:
   `results/fresh_25mag_seed42/judge_outputs.jsonl.gz`.
 - Checkpoint and runner provenance: `results/fresh_25mag_seed42/provenance.json`.

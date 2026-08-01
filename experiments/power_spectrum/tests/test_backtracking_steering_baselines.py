@@ -7,6 +7,7 @@ import torch
 
 from experiments.power_spectrum.backtracking_sae_pooling.steering_baselines import (
     paired_audit,
+    positional_feature_audit,
     run_baselines,
     summarize,
 )
@@ -82,3 +83,17 @@ def test_successful_labels_keep_last_valid_retry() -> None:
         {"transcript_id": "q", "magnitude": 0, "arch": "txc_base", "seed": 42, "label": 2},
     ]
     assert paired_audit.successful_labels(rows) == {("q", 0.0, "txc_base"): 2}
+
+
+def test_feature_position_summary_reports_positive_rank() -> None:
+    arm = {
+        "top_feature_ids_abs_diff": [7, 5, 9],
+        "top_feature_signed_diffs": [-0.8, 0.4, 0.2],
+        "steering_feature_id_signed_positive": 5,
+        "steering_feature_selectivity": 0.4,
+        "pr_auc": {"1": 0.6},
+    }
+    summary = positional_feature_audit.feature_position_summary(arm, 9)
+    assert summary["feature_selectivity"] == 0.2
+    assert summary["feature_positive_selectivity_rank"] == 2
+    assert summary["feature_absolute_selectivity_rank"] == 3
