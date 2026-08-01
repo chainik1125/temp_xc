@@ -23,6 +23,7 @@ ARM_COLORS = {
     "txc_base": "#d1495b",
 }
 NEGATIVE_LOBE_MAGNITUDES = [-12.0, -10.0, -8.0, -7.0, -6.0, -5.0]
+POSITIVE_LOBE_MAGNITUDES = [5.0, 6.0, 7.0, 8.0, 10.0, 12.0]
 
 
 def metric_curve(metrics: dict[str, Any], magnitudes: list[float]) -> list[float]:
@@ -40,6 +41,7 @@ def summarize(workspace: Path, historical_path: Path, output_dir: Path) -> dict[
     summary: dict[str, Any] = {
         "magnitudes": magnitudes,
         "negative_lobe_magnitudes": NEGATIVE_LOBE_MAGNITUDES,
+        "positive_lobe_magnitudes": POSITIVE_LOBE_MAGNITUDES,
         "arms": {},
     }
     for arm, result in fresh.items():
@@ -47,6 +49,7 @@ def summarize(workspace: Path, historical_path: Path, output_dir: Path) -> dict[
         curve = metric_curve(metrics, magnitudes)
         fresh_by_magnitude = dict(zip(magnitudes, curve, strict=True))
         negative_lobe = [fresh_by_magnitude[value] for value in NEGATIVE_LOBE_MAGNITUDES]
+        positive_lobe = [fresh_by_magnitude[value] for value in POSITIVE_LOBE_MAGNITUDES]
         decoder_norm = float(result["feature"]["decoder_norm"])
         summary["arms"][arm] = {
             "train_key": result["train_key"],
@@ -58,6 +61,7 @@ def summarize(workspace: Path, historical_path: Path, output_dir: Path) -> dict[
             "delta_gc_peak": float(metrics["delta_gc_peak"]),
             "delta_gc_peak_magnitude": float(metrics["delta_gc_peak_magnitude"]),
             "negative_lobe_mean": sum(negative_lobe) / len(negative_lobe),
+            "positive_lobe_mean": sum(positive_lobe) / len(positive_lobe),
             "successful_judge_keys": int(result["successful_judge_keys"]),
         }
         reference = historical["arms"].get(arm)
@@ -108,7 +112,7 @@ def summarize(workspace: Path, historical_path: Path, output_dir: Path) -> dict[
     ax.axvline(0.0, color="#999999", linewidth=0.8, linestyle=":")
     ax.set_xlabel("Steering magnitude")
     ax.set_ylabel("Backtracking inducement, Δgc")
-    ax.set_title("C7 cut25 steering: matched 20k baselines")
+    ax.set_title("C7 cut25 steering: pooled SAE vs matched 20k controls")
     ax.legend(frameon=False, fontsize=8, ncol=2)
     ax.grid(alpha=0.18)
     fig.tight_layout()

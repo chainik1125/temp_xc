@@ -13,8 +13,13 @@ best TXC.
 - Old last-token SAE: **0.1684**.
 
 The pre-registered steering gate required matching or beating TXC-pro at
-`S=8`; it failed. We therefore did **not** spend money on new generation or
-Sonnet judging.
+`S=8`; it failed, so the original gated run stopped before generation. A later
+user-requested follow-up nevertheless steered the mean- and max-pooled SAE
+features against the fresh final-token SAE and TXC-base controls. That causal
+follow-up materially changes the conclusion: max-pooled SAE matches TXC-base
+on a robust productive-sign lobe and has the larger high-dose peak. See
+`steering_baselines/RESULTS.md` for the complete curves, paired intervals, and
+caveats.
 
 ![Shared SAE pooling comparison](results/comparison.png)
 
@@ -85,15 +90,15 @@ This result changes how C7 should be described:
 4. **Pooling changes the causal candidate.** The most positive-selectivity
    feature is ID 10668 for the final token, 31559 for mean pooling, and 24530
    for max pooling. The top-32 feature sets still overlap substantially
-   (20--22 features), but a pooled steering experiment would require new
-   generations rather than reusing the old SAE curve.
+   (20--22 features). The subsequent fresh steering experiment confirms that
+   this matters causally: max-pooled feature 24530 matches TXC-base's robust
+   effect and exceeds its high-dose peak.
 
-The skeptical conclusion is therefore: **yes, shared-SAE pooling can beat the
-weaker TXC-base at one important detection operating point; no, it does not
-currently beat the strongest TXC or establish a steering win.** The clean next
-step, if we continue, is a label-blind learned pooling adapter over frozen SAE
-codes. It should be compared against both fixed mean/max and TXC-pro before any
-new judged steering sweep.
+The combined skeptical conclusion is therefore: **shared-SAE pooling narrowly
+beats TXC-base at one important detection operating point and removes its
+causal steering advantage, but it does not beat TXC-pro in detection and
+TXC-pro steering remains untested.** The ordinary SAE dictionary already
+contains the strong causal direction; temporal pooling is needed to select it.
 
 ## Reproducibility and spend
 
@@ -106,4 +111,3 @@ new judged steering sweep.
 - API/judge cost: **$0**. Pod stopped immediately after artifact recovery.
 - Exact numbers: `results/raw_results.json`; hashes and remote paths:
   `results/provenance.json`; spend receipt: `results/spend.json`.
-

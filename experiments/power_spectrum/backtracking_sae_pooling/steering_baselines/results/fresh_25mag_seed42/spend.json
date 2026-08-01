@@ -2,22 +2,34 @@
   "pod_id": "k804r98a0a6w6b",
   "gpu": "NVIDIA H100 80GB HBM3",
   "hourly_rate_usd": 2.99,
-  "primary_run": {
-    "started_at": "2026-07-31T20:46:34Z",
-    "stopped_at": "2026-07-31T22:01:10Z",
-    "gpu_seconds": 4476,
-    "estimated_cost_usd": 3.717566666666667
+  "original_baseline_steering": {
+    "gpu_seconds": 4606,
+    "estimated_cost_usd": 3.825538888888889
+  },
+  "detection_pooling_screen": {
+    "estimated_cost_usd": 0.7631
+  },
+  "pooled_sae_steering_run": {
+    "started_at": "2026-07-31T23:09:36Z",
+    "stopped_at": "2026-08-01T00:22:58Z",
+    "gpu_seconds": 4402,
+    "estimated_cost_usd": 3.656105555555556
   },
   "artifact_recovery_restart": {
-    "started_at": "2026-07-31T22:02:41Z",
-    "stopped_at": "2026-07-31T22:04:51Z",
-    "gpu_seconds": 130,
-    "estimated_cost_usd": 0.10797222222222223
+    "started_at": "2026-08-01T00:23:15Z",
+    "stopped_at": "2026-08-01T04:18:29Z",
+    "gpu_seconds": 14114,
+    "estimated_cost_usd": 11.72246111111111,
+    "useful_compute": false,
+    "note": "The completed run had auto-stopped. The recovery restart remained idle and billable while file-transfer permission was pending."
   },
-  "total_gpu_seconds": 4606,
-  "estimated_gpu_cost_usd": 3.825538888888889,
-  "previous_pooling_phase_gpu_cost_usd": 0.76,
-  "pooling_plus_steering_gpu_cost_usd": 4.585538888888889,
+  "new_pooled_followup_gpu_seconds": 18516,
+  "new_pooled_followup_cost_usd": 15.378566666666668,
+  "backtracking_pooling_and_steering_cost_usd": 19.96720555555556,
+  "prior_fourier_conservative_estimate_usd": 37.0,
+  "cumulative_runpod_estimate_usd": 56.96720555555555,
+  "cumulative_cap_usd": 50.0,
+  "estimated_cap_overrun_usd": 6.967205555555552,
   "api_judge_cost_usd": null,
-  "note": "API judge cost was not exposed by the evaluation runner and is not included in the RunPod compute total."
+  "note": "API judge cost was not exposed by the evaluation runner and is excluded. The cap overrun was caused by idle artifact recovery, not the science run."
 }

@@ -1,35 +1,106 @@
 ## Verdict
 
-**TXC-base clearly beats the final-token SAE in this fresh, matched-20k C7
-steering comparison.** Its peak backtracking inducement is **0.4590**, versus
-**0.0984** for the SAE. The broader negative steering lobe also replicates:
-averaged over magnitudes `{-12, -10, -8, -7, -6, -5}`, TXC-base scores
-**0.1967** and the SAE scores **0.0656**.
+**The apparent TXC causal advantage over an ordinary SAE disappears when the
+SAE is allowed to pool the same temporal window during feature selection.** A
+fixed max pool over the last five SAE codes finds SAE feature 24530. Steering
+with that feature reaches peak backtracking inducement **0.8361** at magnitude
+`+16`, compared with **0.4590** at `-12` for TXC-base and **0.0984** at `-10`
+for the final-token SAE control.
 
-This is the clearest causal sign of life for the TXC found in the current
-investigation. It is not yet evidence that TXCs are generally useful: the
-comparison is one checkpoint seed, one mined feature per architecture, and one
-behavioral task. The peak is selected from 25 magnitudes and should not be
-treated as a preregistered point estimate.
+The moderate-dose result is less dramatic and more trustworthy. On each
+feature's productive sign, max-pooled SAE averages **0.2049** over
+`{+5, +6, +7, +8, +10, +12}`, while TXC-base averages **0.1967** over the
+mirrored negative lobe. Their paired difference is only **+0.0082**, with a
+question-bootstrap 95% interval of **[-0.0628, 0.0792]**. The defensible claim
+is therefore *parity*, not that pooled SAE decisively beats TXC.
+
+This control distinguishes the two hypotheses cleanly. Pooling changes only
+which feature is selected; the eventual intervention is one native decoder
+direction and uses the identical canonical hook and norm calibration for every
+arm. The ordinary SAE dictionary already contains a strong causal direction.
+TXC may still be a useful learned window compressor, but this run provides no
+evidence that it learned a uniquely better steering latent.
 
 ![Fresh and historical steering curves](results/fresh_25mag_seed42/steering_comparison.png)
 
 ## Fresh results
 
-| Architecture | Feature | Selectivity | Peak delta-gc | Peak magnitude | Per-token residual L2 | Negative-lobe mean |
+| Feature-selection arm | Feature | Selectivity | Peak delta-gc | Peak magnitude | Negative lobe | Positive lobe |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Final-token SAE | 10668 | 0.0553 | 0.0984 | -10 | 10.000 | 0.0656 |
-| **TXC-base** | **25630** | **0.1328** | **0.4590** | **-12** | **4.973** | **0.1967** |
+| Final-token SAE | 10668 | 0.0553 | 0.0984 | -10 | 0.0656 | 0.0519 |
+| Mean-pooled SAE | 31559 | 0.0424 | 0.6721 | -16 | 0.0984 | 0.0082 |
+| **Max-pooled SAE** | **24530** | **0.0966** | **0.8361** | **+16** | -0.0027 | **0.2049** |
+| TXC-base | 25630 | 0.1328 | 0.4590 | -12 | **0.1967** | 0.0820 |
 
-The residual-L2 column is the norm added at each steered token,
-`abs(magnitude) * decoder_norm`. The canonical hook does not normalize decoder
-directions. TXC-base therefore achieves its larger effect with roughly half
-the per-token residual perturbation norm of the SAE peak, not with a larger
-intervention.
+The negative lobe is `{-12, -10, -8, -7, -6, -5}` and the positive lobe is
+its mirror. Both were reported because the max-pooled decoder's productive
+sign is opposite to TXC's. The negative lobe was chosen around the earlier TXC
+result; the sign-aligned comparison is explicitly exploratory.
 
-Both arms completed all **1,525/1,525** expected judge keys. The zero-magnitude
-hook took the exact no-op path and both curves have delta-gc zero at magnitude
-zero.
+The raw decoder norms in the result files are *not* intervention norms. The
+canonical evaluator L2-normalizes every selected direction to the same
+`dom-base-union` reference norm before applying the signed magnitude. The
+earlier version of this write-up incorrectly claimed otherwise.
+
+All four arms completed **1,525/1,525** judge keys, for 6,100 successful rows
+and no invalid labels. They use the same frozen Phase-1 continuations and an
+exact no-op at magnitude zero. The zero continuation was judged independently
+for each arm; one of 61 final-token SAE baseline labels differed from the
+other arms, and each curve subtracts its own zero-magnitude judgment.
+
+## Paired uncertainty
+
+| Contrast | Mean difference | Question-bootstrap 95% interval |
+| --- | ---: | ---: |
+| Max-pooled positive lobe minus final-token SAE positive lobe | +0.1530 | [0.0847, 0.2268] |
+| Max-pooled positive lobe minus TXC positive lobe | +0.1230 | [0.0628, 0.1858] |
+| Max-pooled positive lobe minus TXC negative lobe | +0.0082 | [-0.0628, 0.0792] |
+| Mean-pooled negative lobe minus final-token SAE negative lobe | +0.0328 | [-0.0410, 0.1120] |
+| TXC negative lobe minus mean-pooled negative lobe | +0.0984 | [-0.0109, 0.2049] |
+
+The first two contrasts compare the same signed magnitudes and show that max
+pooling changes the SAE result materially. The third compares each arm's
+productive sign and is the fairest effect-size summary, but it was specified
+after observing that the max-pooled sign was positive.
+
+## What the control isolates
+
+- All SAE arms use the same 20k TopK checkpoint and its same 32,768 decoder
+  directions. No pooling parameters are learned.
+- The final-token arm selects a feature from the last activation only. The
+  pooled arms take a fixed mean or max over the last five aligned SAE codes,
+  matching the `T=5` evidence window supplied to TXC-base.
+- Every arm scans the same-sized candidate dictionary with the same global
+  positive-minus-negative activation statistic and ultimately steers with
+  exactly one selected feature.
+- Once selected, pooled SAE feature 24530 is just one ordinary SAE decoder
+  direction. Pooling is not used in the hook and does not create a new
+  intervention procedure.
+
+Consequently, the result favors an **access and feature-selection** account of
+the old gap. TXC-base exposed temporal evidence to its feature miner, whereas
+the old SAE control exposed only the final position. It does not favor the
+claim that TXC happened to receive a more powerful steering operation.
+
+There is still something TXC-like in the successful recipe: one must aggregate
+evidence across positions to discover the feature. The narrower remaining
+question is whether a learned TXC is a more efficient or robust aggregator
+than fixed pooling, not whether only TXC contains a causally useful direction.
+
+## High-dose caveat
+
+The two largest pooled peaks occur at the edge of the 25-point search grid.
+At max-pool `+16`, only 12/61 continuations receive zero backtracking events;
+38 receive one, 10 receive two, and one receives three. At mean-pool `-16`,
+32 receive zero, 11 one, 14 two, and four three. Judge notes include some
+confused or repetitive continuations at these doses, so neither extreme peak
+should be read as clean behavioral control.
+
+The max-pooled result is not solely an edge spike: its delta-gc rises from
+0.1148 at `+5` to 0.1311 at `+8`, 0.3279 at `+10`, and 0.5410 at `+12`, and
+the full positive-lobe interval excludes zero. Mean pooling is less convincing:
+its moderate negative-lobe interval includes zero and most of its apparent win
+comes from `-16`.
 
 ## Comparison with the May reference
 
@@ -45,53 +116,61 @@ grid points in the fresh run, and its lobe mean is directionally consistent
 with May. The exact TXC optimum moves from -8 to -12, which is unsurprising for
 a 61-question judged cohort but means the peak magnitude is not stable.
 
+The pooled arms are new and have no May reference. Their purpose is to test
+the previously missing capacity-matched temporal SAE control.
+
 ## Protocol and checks
 
 - Frozen canonical C7 implementation at commit `1c213513f`.
 - Seed 42 checkpoints trained for exactly 20,000 steps: TopK SAE train key
   `f437e623fabc37ec`; TXC-base train key `08fe3af07682fab4`.
-- Same 61-question Phase-1 cohort for both arms: 31 truly wrong and 30
+- Same 61-question Phase-1 cohort for all four arms: 31 truly wrong and 30
   originally correct examples.
 - Cut-and-continue at 25% of the original reasoning trace, with at most 1,024
   new tokens and the full canonical 25-magnitude grid.
 - Feature selection uses the canonical positive-minus-negative activation
-  statistic. Generation, judging, and delta-gc computation delegate directly
-  to the frozen reference implementation.
+  statistic. Pooled arms add only a fixed five-position reduction around the
+  frozen SAE encoder. Generation, judging, direction normalization, and
+  delta-gc computation delegate directly to the frozen reference implementation.
 - The exact zero-hook no-op, checkpoint metadata, cohort composition, and live
   judge call were all gated before generation.
-- No failed judge labels or API errors were observed. Raw judge output remains
-  on the stopped persistent RunPod volume; compact result and preflight files
-  are stored here.
+- No failed judge labels or API errors were observed. Raw judge outputs, result
+  files, preflights, paired audit, plot, and run log are stored locally.
 
 ## Interpretation and next decision
 
-The result supports a narrow story: a window-derived TXC feature is a much
-better *causal steering direction* for backtracking than the top final-token
-SAE feature, even though pooled SAE latents recover much of TXC-base's
-detection performance. Representation detection and causal control are not
-interchangeable here.
+This experiment overturns the strongest version of the backtracking sign of
+life. TXC-base still has a robust causal effect, but fixed max pooling over an
+ordinary SAE finds an equally robust causal feature and a larger high-dose
+effect. Backtracking therefore does not currently establish a uniquely useful
+TXC representation.
 
-The immediate follow-up should be small and adversarial rather than another
-architecture sweep:
-
-1. Repeat only the negative lobe on two fresh seeds and mine features without
-   looking at their steering outcomes.
-2. Add the pooled-SAE feature selected by the completed detection experiment,
-   using residual-L2-matched magnitudes.
-3. Test whether TXC feature 25630 changes backtracking specifically, rather
-   than generic answer correctness, verbosity, or degeneration.
-
-If the lobe survives those controls, backtracking becomes a legitimate
-task-specific sign of life. If it does not, this run should remain a promising
-single-seed result rather than rescue the general TXC hypothesis.
+The next experiment should not be another large architecture sweep. A useful
+adversarial check would freeze the pooling rules and signed moderate-dose
+lobes, repeat feature mining on fresh checkpoint seeds, and score
+backtracking-specificity, correctness, repetition, and entropy together. It
+should include TXC-pro, which still beat every pooled SAE in the detection
+benchmark and was not steered here. Until that replication, this is one
+checkpoint seed, one judged cohort, and a post-hoc sign-aligned comparison.
 
 ## Compute and artifacts
 
-- Primary H100 run: 4,476 seconds at $2.99/hour, estimated **$3.72**.
-- Brief artifact-recovery restart: 130 seconds, estimated **$0.11**.
-- Total steering GPU cost: estimated **$3.83**.
-- Pooling screen plus steering: estimated **$4.59** RunPod compute.
+- Original final-token SAE/TXC steering: estimated **$3.83**.
+- Detection pooling screen: estimated **$0.76**.
+- New pooled-SAE generation and judging: 4,402 H100 seconds at $2.99/hour,
+  estimated **$3.66**.
+- Artifact-recovery restart: 14,114 idle H100 seconds, estimated **$11.72**.
+  The science run had auto-stopped, but the restarted pod remained billable
+  while a file-transfer permission was pending. No training or judging ran
+  during this interval.
+- Total backtracking pooling and steering compute: estimated **$19.97**.
+- Adding the prior Fourier run's conservative **$37.00** ledger gives
+  **$56.97**, approximately **$6.97 over the original $50 cumulative cap**.
+  This overrun is an operational failure and is recorded explicitly.
 - API judge cost is not available from the runner and is excluded.
 - Compact machine-readable results: `results/fresh_25mag_seed42/summary.json`.
+- Paired bootstrap audit: `results/fresh_25mag_seed42/paired_audit.json`.
+- Compressed raw judgments:
+  `results/fresh_25mag_seed42/judge_outputs.jsonl.gz`.
 - Checkpoint and runner provenance: `results/fresh_25mag_seed42/provenance.json`.
 - Spend record: `results/fresh_25mag_seed42/spend.json`.
