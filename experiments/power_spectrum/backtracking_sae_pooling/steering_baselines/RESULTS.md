@@ -175,6 +175,14 @@ for TXC-pro. Recent training does not repair this gap: train key
 `26e69fdc60452c27` is a 300k **Stacked SAE**, and the recent
 `reviewer-btk-tsae-300k` RunPod lane is a **T-SAE**, not a TXC.
 
+There is one unresolved recovery lead. The stopped RunPod
+`reviewer-headline-multiseed` (`2rj9rjw1i2m3tc`) was restarted after the
+public HF snapshot and exited on 2026-07-31 with a persistent 300 GB
+`/workspace` volume. Its name and timing are consistent with the seed-1/2
+300k TXC top-up. No corresponding public HF file, train key, completed-result
+receipt, or git record was found, so it must not yet be cited as a completed
+checkpoint. The volume should be inspected before deciding to retrain.
+
 Consequently, the present negative supports the statement that the 20k TXC
 causal advantage is recoverable by a fixed pooled SAE. Testing whether that
 remains true against the 300k headline TXC requires recovering or retraining
