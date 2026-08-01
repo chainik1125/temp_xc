@@ -154,6 +154,33 @@ a 61-question judged cohort but means the peak magnitude is not stable.
 The pooled arms are new and have no May reference. Their purpose is to test
 the previously missing capacity-matched temporal SAE control.
 
+## The published 300k TXC reference
+
+This experiment deliberately uses matched 20k checkpoints. It must not be
+described as a direct rerun of the stronger paper-scale cell. The exact
+durable Hugging Face reference for that result is the
+[seed-42 published evaluation](https://huggingface.co/datasets/dmanningcoe/temp-xc-reviewer-results/blob/main/reviewer_seed_audit_2026-07-27/c7_headline/seed42_published_eval.json):
+
+- architecture `txc_base`, T=5, seed 42, 300,000 steps;
+- train key `8787f8fe527218ad` and eval key `3979ceaa4ecfefe4`;
+- peak \(\Delta gc=0.540984\) at magnitude -12;
+- PR-AUC 0.249917 at S=32.
+
+That HF object preserves metrics and provenance, not model weights. A public
+inventory of `han1823123123/temp-bench-models` contains no 300k checkpoint,
+and the direct train-key path returns HTTP 404. The two other C7 300k TXC keys
+in `origin/300k-tfa` are likewise absent from the public checkpoint store:
+`6ae8db21b1bba495` for the earlier TXC-base cell and `4bf2edb494878ac1`
+for TXC-pro. Recent training does not repair this gap: train key
+`26e69fdc60452c27` is a 300k **Stacked SAE**, and the recent
+`reviewer-btk-tsae-300k` RunPod lane is a **T-SAE**, not a TXC.
+
+Consequently, the present negative supports the statement that the 20k TXC
+causal advantage is recoverable by a fixed pooled SAE. Testing whether that
+remains true against the 300k headline TXC requires recovering or retraining
+the 300k weights; substituting the public 20--30k checkpoints would not answer
+that question.
+
 ## Protocol and checks
 
 - Frozen canonical C7 implementation at commit `1c213513f`.
