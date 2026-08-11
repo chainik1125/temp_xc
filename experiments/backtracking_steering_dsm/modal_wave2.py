@@ -6,8 +6,18 @@
     uvx modal run --detach experiments/backtracking_steering_dsm/modal_wave2.py::mine_cmd
     # 3. the grid (unprojected sources + the projected variant of w6_dsm)
     uvx modal run --detach experiments/backtracking_steering_dsm/modal_wave2.py
+    # 3b. re-merge shards only (the grid entrypoint already does this)
+    uvx modal run experiments/backtracking_steering_dsm/modal_wave2.py::merge_cmd
 
-Everything downstream of generation (judging, aggregation) is shared with wave 1.
+The grid is sharded by PROMPT across N_SHARDS containers per source (7 sources
+x 5 = 35 containers) so the wave finishes in roughly one generate-pass rather
+than seven. Sharding by prompt rather than by magnitude keeps the batch
+prompt-major -- one prompt's whole magnitude sweep per generate call -- which
+keeps every row in a batch at the same token length and so keeps left padding
+out of the projected arm's window buffer. See steer_one_w6 for why that matters.
+
+Everything downstream of generation (judging, aggregation) is shared with wave 1,
+and runs against the merged rows__<tag>.json, not the per-shard files.
 """
 
 import json
@@ -68,8 +78,18 @@ from experiments.backtracking_steering_dsm.protocol import (  # noqa: E402
 
 FEAT_DIR = "/vol/backtracking_eval/steering/features_w6"
 OUT_DIR = "/vol/backtracking_eval/steering/wave2"
+SHARD_DIR = OUT_DIR + "/shards"
 DISTILL_TRACES = 40        # traces forwarded through the distill for pre-flight
+N_SHARDS = 5               # prompt shards per source: 7 sources x 5 = 35 containers
 hf_secret = modal.Secret.from_name("hf-token")
+
+
+def _shard_bounds(n: int, shard: int, n_shards: int = N_SHARDS) -> tuple[int, int]:
+    """Contiguous prompt slice for `shard`, so concatenating shards 0..k-1
+    reproduces the unsharded row order exactly."""
+    per, rem = divmod(n, n_shards)
+    lo = shard * per + min(shard, rem)
+    return lo, lo + per + (1 if shard < rem else 0)
 
 
 # --------------------------------------------------------------------------
@@ -315,7 +335,26 @@ def _w6_sources():
 
 @app.function(image=image, gpu="L40S", timeout=14400, memory=32768,
               volumes={"/vol": vol, "/hf": hf_cache}, secrets=[hf_secret])
-def steer_one_w6(tag: str, gen_bs: int = 25) -> dict:
+def steer_one_w6(args: tuple[str, int], gen_bs: int = 25) -> dict:
+    """One (source, prompt-shard) cell of the wave-2 grid.
+
+    Sharding is by PROMPT, not by magnitude, and the batch stays prompt-major
+    (one prompt's whole 25-magnitude sweep per generate call). Both halves of
+    that choice are load-bearing:
+
+      - every row in a batch is then the same prompt text, so all rows have the
+        same token length and the batch needs no left padding. Batching by
+        magnitude instead (20 different prompts at one alpha) would left-pad,
+        and the projected arm's rolling window buffer would ingest pad-token
+        activations into the window for the first T-1 real tokens of every row
+        -- silently corrupting the projector input for exactly the arm the
+        denoise-after-steer variant exists to measure.
+      - it is also the larger batch: 25 magnitudes > 20 prompts.
+
+    The wall-clock win therefore comes from the sharding, not from re-shaping
+    the batch. N_SHARDS x 7 sources = 35 containers, each doing N_EVAL/N_SHARDS
+    prompts.
+    """
     import sys
     import time
 
@@ -326,14 +365,19 @@ def steer_one_w6(tag: str, gen_bs: int = 25) -> dict:
         KEYWORD_RE, _eval_prompts, _generate_panels, _kw_rate, _load_lm,
     )
 
+    tag, shard = args
     t0 = time.time()
     src = next(s for s in _w6_sources() if s["tag"] == tag)
-    out_path = pathlib.Path(OUT_DIR) / f"rows__{tag}.json"
+    out_path = pathlib.Path(SHARD_DIR) / f"rows__{tag}__s{shard}.json"
     if out_path.exists():
-        return {"tag": tag, "skipped": True}
+        return {"tag": tag, "shard": shard, "skipped": True}
 
-    prompts = _eval_prompts(pathlib.Path("/work/data/prompts.json"),
-                            n=N_EVAL, seed=PROMPT_SEED)
+    all_prompts = _eval_prompts(pathlib.Path("/work/data/prompts.json"),
+                                n=N_EVAL, seed=PROMPT_SEED)
+    lo, hi = _shard_bounds(len(all_prompts), shard)
+    prompts = all_prompts[lo:hi]
+    print(f"[shard] {tag} s{shard}: prompts[{lo}:{hi}] of {len(all_prompts)}",
+          flush=True)
     model, tok = _load_lm(HF_ID, "cuda")
     chat_texts = []
     for p in prompts:
@@ -393,6 +437,7 @@ def steer_one_w6(tag: str, gen_bs: int = 25) -> dict:
         "steered_vector_norm": float(src["vector"].norm()),
         "layer": LAYER, "magnitudes": MAGNITUDES, "max_new_tokens": MAX_NEW,
         "n_eval_prompts": len(prompts), "gen_batch_size": gen_bs,
+        "shard": shard, "n_shards": N_SHARDS, "prompt_slice": [lo, hi],
         "target_model": HF_ID, "decoding": "greedy (do_sample=False)",
         "projector": "w6_dsm denoise, slot T-1 replaces current position, "
                      "buffer holds pre-projection activations",
@@ -403,10 +448,54 @@ def steer_one_w6(tag: str, gen_bs: int = 25) -> dict:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(out))
     vol.commit()
-    print(f"[done] {tag} rows={len(rows)} proj={hook.n_projected} "
+    print(f"[done] {tag} s{shard} rows={len(rows)} proj={hook.n_projected} "
           f"in {out['meta']['_runtime_s']}s", flush=True)
-    return {"tag": tag, "n_rows": len(rows),
+    return {"tag": tag, "shard": shard, "n_rows": len(rows),
             "runtime_s": out["meta"]["_runtime_s"]}
+
+
+@app.function(image=image, timeout=1800, volumes={"/vol": vol})
+def merge_shards() -> dict:
+    """Concatenate each source's prompt shards into one rows__<tag>.json.
+
+    Downstream (modal_judge, analyse) keys on `rows__*.json` per source and
+    indexes judgements by row position, so the shards must be merged BEFORE
+    judging or one source would be read as N_SHARDS separate arms.
+    """
+    vol.reload()
+    sd = pathlib.Path(SHARD_DIR)
+    out_dir = pathlib.Path(OUT_DIR)
+    tags = sorted({p.name[len("rows__"):p.name.rindex("__s")]
+                   for p in sd.glob("rows__*__s*.json")})
+    report = {}
+    for tag in tags:
+        parts = sorted(sd.glob(f"rows__{tag}__s*.json"),
+                       key=lambda p: int(p.name[p.name.rindex("__s") + 3:-5]))
+        if len(parts) != N_SHARDS:
+            report[tag] = {"error": "incomplete",
+                           "have": [p.name for p in parts]}
+            continue
+        objs = [json.loads(p.read_text()) for p in parts]
+        rows = [r for o in objs for r in o["rows"]]
+        meta = dict(objs[0]["meta"])
+        meta.pop("shard", None)
+        meta.pop("prompt_slice", None)
+        meta["n_eval_prompts"] = len({r["prompt_id"] for r in rows})
+        meta["n_positions_projected"] = sum(
+            o["meta"].get("n_positions_projected", 0) for o in objs)
+        meta["n_positions_passthrough"] = sum(
+            o["meta"].get("n_positions_passthrough", 0) for o in objs)
+        meta["shard_runtimes_s"] = [o["meta"]["_runtime_s"] for o in objs]
+        meta["_runtime_s"] = max(meta["shard_runtimes_s"])
+        (out_dir / f"rows__{tag}.json").write_text(
+            json.dumps({"rows": rows, "meta": meta}))
+        report[tag] = {"n_rows": len(rows),
+                       "n_prompts": meta["n_eval_prompts"],
+                       "n_magnitudes": len({r["magnitude"] for r in rows})}
+        print(f"[merge] {tag}: {len(rows)} rows from {len(parts)} shards",
+              flush=True)
+    vol.commit()
+    return report
 
 
 @app.function(image=image, timeout=600, volumes={"/vol": vol})
@@ -417,9 +506,17 @@ def list_sources_w6() -> list[dict]:
 @app.local_entrypoint()
 def main():
     srcs = list_sources_w6.remote()
-    print(f"[wave2] {len(srcs)} sources")
+    cells = [(s["tag"], i) for s in srcs for i in range(N_SHARDS)]
+    print(f"[wave2] {len(srcs)} sources x {N_SHARDS} prompt shards "
+          f"= {len(cells)} containers")
     for s in srcs:
         print(f"   {s['tag']:44s} arm={s['arm']:10s} mode={s['mode']} "
               f"proj={s['projected']}")
-    res = list(steer_one_w6.map([s["tag"] for s in srcs]))
+    res = list(steer_one_w6.map(cells))
     print(json.dumps(res, indent=2))
+    print(json.dumps(merge_shards.remote(), indent=2))
+
+
+@app.local_entrypoint()
+def merge_cmd():
+    print(json.dumps(merge_shards.remote(), indent=2))
