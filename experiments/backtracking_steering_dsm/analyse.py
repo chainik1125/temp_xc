@@ -143,6 +143,8 @@ def summarise(tag: str, rows: list[dict], meta: dict) -> dict:
     p_run = peak(lambda x: x["cell_coh_run"])
     p_son = peak(lambda x: x["cell_coh_sonnet"])
     lo, hi = _boot_delta(rows, p_run["magnitude"]) if p_run else (float("nan"),) * 2
+    slo, shi = (_boot_delta(rows, p_son["magnitude"]) if p_son
+                else (float("nan"),) * 2)
     worst = min((x for x in c if x["magnitude"] != 0.0),
                 key=lambda x: x["gc"], default=None)
     # Peak-across-grid is the published metric but it is a max over 24 noisy
@@ -176,6 +178,7 @@ def summarise(tag: str, rows: list[dict], meta: dict) -> dict:
         "peak_rows_coh_magnitude": p_rc["magnitude"] if p_rc else None,
         "delta_gc_peak_at_coh_sonnet": (p_son["gc"] - gc0) if p_son else float("nan"),
         "peak_sonnet_magnitude": p_son["magnitude"] if p_son else None,
+        "peak_sonnet_ci95": [slo, shi],
         "gc_min": worst["gc"] if worst else float("nan"),
         "gc_min_magnitude": worst["magnitude"] if worst else None,
         "delta_event_rate_at_peak_run":
@@ -216,10 +219,13 @@ def _ci(pair) -> str:
 
 
 def table_md(summaries: list[dict]) -> str:
+    # Sonnet-floor columns lead: on this model the run-length floor passes the
+    # most degenerate magnitudes and fires at random elsewhere (see the doc), so
+    # it is carried as a diagnostic rather than as the headline.
     head = ("| source | arm | mode | mining score (t) | gc base | "
-            "Δgc peak (coh, run) | at α | "
-            "95% CI | Δgc peak (coh rows) | at α | "
-            "mean abs Δgc | Δgc peak (coh, Sonnet) | at α | "
+            "Δgc peak (coh, Sonnet) | at α | 95% CI | "
+            "Δgc peak (coh rows) | at α | "
+            "mean abs Δgc | Δgc peak (coh, run) | at α | "
             "Δgc peak (no floor) | at α | gc min | event-rate base → peak | "
             "coherent cells (run/Sonnet) |\n")
     head += "|" + "---|" * 18 + "\n"
@@ -227,7 +233,7 @@ def table_md(summaries: list[dict]) -> str:
     # nan sorts unpredictably, so arms with no coherent cell are pinned last
     # rather than landing at an arbitrary rank.
     def _rank(x):
-        d = x["delta_gc_peak_at_coh_run"]
+        d = x["delta_gc_peak_at_coh_sonnet"]
         return float("inf") if (d is None or d != d) else -abs(d)
 
     for s in sorted(summaries, key=_rank):
@@ -236,14 +242,14 @@ def table_md(summaries: list[dict]) -> str:
         body += (
             f"| `{s['source']}` | {s['arm']} | {s['mode']} | {msc} | "
             f"{_f(s['gc_baseline'])} | "
-            f"{_f(s['delta_gc_peak_at_coh_run'], 3, sign=True)} | "
-            f"{_m(s['peak_run_magnitude'])} | "
-            f"{_ci(s['peak_run_ci95'])} | "
+            f"{_f(s['delta_gc_peak_at_coh_sonnet'], 3, sign=True)} | "
+            f"{_m(s['peak_sonnet_magnitude'])} | "
+            f"{_ci(s['peak_sonnet_ci95'])} | "
             f"{_f(s['delta_gc_peak_rows_coh'], 3, sign=True)} | "
             f"{_m(s['peak_rows_coh_magnitude'])} | "
             f"{_f(s['mean_abs_delta_gc_over_coh'], 3)} | "
-            f"{_f(s['delta_gc_peak_at_coh_sonnet'], 3, sign=True)} | "
-            f"{_m(s['peak_sonnet_magnitude'])} | "
+            f"{_f(s['delta_gc_peak_at_coh_run'], 3, sign=True)} | "
+            f"{_m(s['peak_run_magnitude'])} | "
             f"{_f(s['delta_gc_peak_any'], 3, sign=True)} | "
             f"{_m(s['peak_any_magnitude'])} | "
             f"{_f(s['gc_min'])} | "
