@@ -36,6 +36,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from experiments.ward_backtracking_txc.metrics import _coh_ok, _max_repeat_run
 
 SONNET_FLOOR = 2
+ROWS_COH_MIN_FRAC = 0.5    # min share of prompts surviving for a magnitude to
+                           # be eligible as the row-level coherent peak
 
 
 def _mean(xs):
@@ -47,13 +49,21 @@ def load_wave(wave_dir: Path) -> dict[str, list[dict]]:
     out = {}
     for rp in sorted(wave_dir.glob("rows__*.json")):
         tag = rp.name[len("rows__"):-len(".json")]
-        obj = json.loads(rp.read_text())
-        rows = obj["rows"]
         jp = wave_dir / f"judged__{tag}.json"
         if not jp.exists():
             print(f"[warn] no judgements for {tag}, skipping", file=sys.stderr)
             continue
-        judged = json.loads(jp.read_text())
+        # A source still being downloaded parses as truncated JSON. Skip it with
+        # a warning rather than killing the whole aggregation -- partial waves
+        # are the normal case while a sweep is still committing.
+        try:
+            obj = json.loads(rp.read_text())
+            judged = json.loads(jp.read_text())
+        except ValueError as e:
+            print(f"[warn] {tag}: unreadable ({e.__class__.__name__}), skipping",
+                  file=sys.stderr)
+            continue
+        rows = obj["rows"]
         for i, r in enumerate(rows):
             j = judged.get(str(i), {})
             r["genuine_count"] = int(j.get("genuine_count", -1))
@@ -76,13 +86,15 @@ def curve(rows: list[dict]) -> list[dict]:
         valid = [r for r in cell if r["genuine_count"] >= 0]
         counts = [r["genuine_count"] for r in valid]
         # Row-level coherent subset, reported alongside the cell-level rule.
-        # The cell rule ("every prompt at this magnitude passes") is the
-        # reference's own, and is kept as the headline, but at 20 prompts and a
-        # 1500-token budget a handful of individually repetitive generations
-        # disqualifies a whole magnitude -- including alpha = 0. Restricting to
-        # the coherent rows keeps a usable estimate at magnitudes the cell rule
-        # throws away entirely.
-        valid_coh = [r for r in valid if r["coh_ok"]]
+        # The cell rule ("every prompt at this magnitude passes") throws away a
+        # whole magnitude over one or two bad generations; restricting to the
+        # coherent rows keeps a usable estimate there.
+        #
+        # The filter is the SONNET grade, not the run-length floor. Filtering on
+        # run length puts the peak at alpha = +-16 for most arms, because that
+        # floor passes phrase-level looping and so admits precisely the
+        # degenerate generations this column exists to exclude.
+        valid_coh = [r for r in valid if r["sonnet_ok"]]
         out.append({
             "magnitude": mag,
             "n": len(cell), "n_valid": len(valid),
@@ -155,8 +167,12 @@ def summarise(tag: str, rows: list[dict], meta: dict) -> dict:
 
     # Same peak, computed on the row-level coherent subset instead. Baseline is
     # the alpha = 0 row-coherent mean, so the comparison stays within-source.
+    # A magnitude only qualifies if at least half its prompts survive the floor.
+    # Without that guard the peak lands at |alpha| = 12-16, where one or two
+    # coherent generations out of twenty produce a wild mean.
     base_rc = base["gc_rows_coh"] if base else float("nan")
-    rc_cand = [x for x in c if x["magnitude"] != 0.0 and x["n_rows_coh"] > 0]
+    rc_cand = [x for x in c if x["magnitude"] != 0.0
+               and x["n_rows_coh"] >= ROWS_COH_MIN_FRAC * x["n"]]
     p_rc = (max(rc_cand, key=lambda x: abs(x["gc_rows_coh"] - base_rc))
             if rc_cand and base_rc == base_rc else None)
 
