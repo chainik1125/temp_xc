@@ -519,8 +519,17 @@ def list_sources_w6() -> list[dict]:
 
 
 @app.local_entrypoint()
-def main():
+def main(only_projected: bool = False, skip_projected: bool = False):
+    """`--skip-projected` runs only the six unprojected window sources;
+    `--only-projected` runs just the denoise-after-steer arm. The split exists
+    because the projector pre-flight can fail its NMSE threshold while the
+    unprojected arms remain perfectly runnable, and there is no reason to hold
+    those behind a decision about the variant."""
     srcs = list_sources_w6.remote()
+    if skip_projected:
+        srcs = [s for s in srcs if not s["projected"]]
+    if only_projected:
+        srcs = [s for s in srcs if s["projected"]]
     cells = [(s["tag"], i) for s in srcs for i in range(N_SHARDS)]
     print(f"[wave2] {len(srcs)} sources x {N_SHARDS} prompt shards "
           f"= {len(cells)} containers")
