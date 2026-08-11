@@ -1,0 +1,212 @@
+{
+ "coh_threshold": 2,
+ "n_rows": 20,
+ "n_valid_judgements": 20,
+ "n_unparsed": 0,
+ "n_coherent": 19,
+ "n_dropped": 1,
+ "gc_mean_unfiltered": 1.35,
+ "gc_mean_coherence_filtered": 1.4210526315789473,
+ "per_prompt_event_rate_unfiltered": 0.85,
+ "per_prompt_event_rate_filtered": 0.8947368421052632,
+ "published_baseline_61prompt": 0.6557377049180327,
+ "band": [
+  0.45,
+  0.85
+ ],
+ "in_band_unfiltered": false,
+ "in_band_filtered": false,
+ "dropped_rows": [
+  {
+   "prompt_id": "set_theory_008",
+   "category": "set_theory",
+   "genuine_count": 0,
+   "max_repeat_run": 3,
+   "coh_ok": false,
+   "n_words": 620,
+   "n_chars": 2807
+  }
+ ],
+ "rows": [
+  {
+   "prompt_id": "algebra_word_problems_019",
+   "category": "algebra_word_problems",
+   "genuine_count": 3,
+   "max_repeat_run": 1,
+   "coh_ok": true,
+   "n_words": 991,
+   "n_chars": 4745
+  },
+  {
+   "prompt_id": "probability_019",
+   "category": "probability",
+   "genuine_count": 4,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 1124,
+   "n_chars": 5922
+  },
+  {
+   "prompt_id": "sequences_000",
+   "category": "sequences",
+   "genuine_count": 1,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 691,
+   "n_chars": 3588
+  },
+  {
+   "prompt_id": "probability_007",
+   "category": "probability",
+   "genuine_count": 1,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 1113,
+   "n_chars": 5721
+  },
+  {
+   "prompt_id": "counting_028",
+   "category": "counting",
+   "genuine_count": 2,
+   "max_repeat_run": 1,
+   "coh_ok": true,
+   "n_words": 1124,
+   "n_chars": 5763
+  },
+  {
+   "prompt_id": "set_theory_013",
+   "category": "set_theory",
+   "genuine_count": 1,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 1013,
+   "n_chars": 5163
+  },
+  {
+   "prompt_id": "sequences_022",
+   "category": "sequences",
+   "genuine_count": 2,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 672,
+   "n_chars": 3708
+  },
+  {
+   "prompt_id": "algebra_word_problems_014",
+   "category": "algebra_word_problems",
+   "genuine_count": 1,
+   "max_repeat_run": 1,
+   "coh_ok": true,
+   "n_words": 1026,
+   "n_chars": 5028
+  },
+  {
+   "prompt_id": "arithmetic_014",
+   "category": "arithmetic",
+   "genuine_count": 0,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 285,
+   "n_chars": 1753
+  },
+  {
+   "prompt_id": "set_theory_008",
+   "category": "set_theory",
+   "genuine_count": 0,
+   "max_repeat_run": 3,
+   "coh_ok": false,
+   "n_words": 620,
+   "n_chars": 2807
+  },
+  {
+   "prompt_id": "inequalities_019",
+   "category": "inequalities",
+   "genuine_count": 1,
+   "max_repeat_run": 1,
+   "coh_ok": true,
+   "n_words": 698,
+   "n_chars": 4384
+  },
+  {
+   "prompt_id": "number_theory_020",
+   "category": "number_theory",
+   "genuine_count": 1,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 823,
+   "n_chars": 4470
+  },
+  {
+   "prompt_id": "basic_logic_014",
+   "category": "basic_logic",
+   "genuine_count": 1,
+   "max_repeat_run": 1,
+   "coh_ok": true,
+   "n_words": 1098,
+   "n_chars": 5622
+  },
+  {
+   "prompt_id": "number_theory_022",
+   "category": "number_theory",
+   "genuine_count": 1,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 893,
+   "n_chars": 4183
+  },
+  {
+   "prompt_id": "geometry_019",
+   "category": "geometry",
+   "genuine_count": 1,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 907,
+   "n_chars": 4517
+  },
+  {
+   "prompt_id": "inequalities_018",
+   "category": "inequalities",
+   "genuine_count": 2,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 809,
+   "n_chars": 4652
+  },
+  {
+   "prompt_id": "arithmetic_023",
+   "category": "arithmetic",
+   "genuine_count": 0,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 448,
+   "n_chars": 2513
+  },
+  {
+   "prompt_id": "counting_026",
+   "category": "counting",
+   "genuine_count": 1,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 1180,
+   "n_chars": 5795
+  },
+  {
+   "prompt_id": "basic_logic_013",
+   "category": "basic_logic",
+   "genuine_count": 2,
+   "max_repeat_run": 1,
+   "coh_ok": true,
+   "n_words": 1114,
+   "n_chars": 5705
+  },
+  {
+   "prompt_id": "geometry_025",
+   "category": "geometry",
+   "genuine_count": 2,
+   "max_repeat_run": 2,
+   "coh_ok": true,
+   "n_words": 938,
+   "n_chars": 4863
+  }
+ ]
+}
