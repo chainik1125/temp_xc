@@ -432,6 +432,26 @@ also differ in capture (teacher-forced full text vs generation-time rolling
 windows) and in checkpoint step. A low NMSE is not evidence of manifold
 competence unless the live-pool count is read alongside it.
 
+#### Wave-2 reading rules
+
+Wave 2 is read under exactly the wave-1 rules, so the two tables are
+comparable:
+
+- Headline is Δgc at the **Sonnet** coherence floor; run-length is a reported
+  diagnostic only. Both floors' cell pass-counts appear in the table so the
+  selection base stays auditable.
+- The row-level coherent variant is reported alongside, filtered on the Sonnet
+  grade and requiring at least half the prompts to survive.
+- The suppression/degeneration confound, the possibility of a steering sign
+  inverted against the mining sign, the uncorrected multiple comparisons across
+  sources × magnitudes, and the n = 20 prompt width all carry over unchanged.
+- `w6_bayes` is included to complete the matrix but is a **labelled-degenerate
+  arm**: 91% of its latents are dead at the end of training and it reconstructs
+  distill windows worse than the mean. "What does a collapsed dictionary's best
+  feature do under steering" is a legitimate datapoint; it is not evidence about
+  the gated objective done properly, and its row carries the degenerate label in
+  every table.
+
 #### Wave-2 results
 
 Pending — the T=6 arms truncate at ~20:20 EDT and the grid runs after that.
