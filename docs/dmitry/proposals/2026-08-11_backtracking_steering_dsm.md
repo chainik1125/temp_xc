@@ -34,10 +34,13 @@ backtracking. This one asks whether they can *cause* it.
   what a norm perturbation looks like rather than a control knob.
 - Mined selectivity does not predict causal potency: the strongest mined feature
   (+0.806) gives one of the weakest effects.
-- **Projector pre-flight fails its threshold.** The `w6_dsm` denoiser scores
-  NMSE 0.815 on distill activations against ~0.061 at its training site, with
-  only 617 of 16384 latents ever firing. The denoise-after-steer variant is
-  flagged: a flattened Δgc under this projector would be uninformative.
+- **DSM dictionaries do not transfer to the deployment distribution, and the
+  failure is direction-deep.** At the same NMSE, `w6_dsm` draws its 96 active
+  latents per window from a pool of 617 of 16384 (3.8%) on distill activations
+  while `w6_recon` keeps 71.3% of its pool alive. Per-latent threshold
+  recalibration on distill windows revives recon 8,586 → 16,046 but dsm
+  214 → 215, because the DSM encoder's preactivations are almost all negative
+  off-distribution. This is one of the central results here — see below.
 - *(wave-2 headline pending)*
 
 ### What is reused rather than reimplemented
@@ -360,23 +363,74 @@ distribution-shift effect. `w6_bayes` at NMSE 2.26 reconstructs *worse than
 predicting the mean window*, which with its 0.912 training dead fraction makes
 it non-functional as a reconstruction.
 
-This is the same phenomenon the workstream's own recalibration probe found at
-the per-token scale — DSM dictionaries collapsing direction-deep off
-distribution, with per-latent rate recalibration reviving 98% of the recon pool
-but almost none of the DSM pool (see `experiments/diffusion_txc/README.md`).
-The T=6 window result is a sharper version of it, and the corroboration from an
-independent probe is the reason to read it as a real property rather than as a
-pre-flight bug.
+#### Objective-dependent OOD collapse — a primary result
 
-**Consequence for the variant.** A flattened Δgc curve under this projector
-would be uninformative: it is equally consistent with "denoising removes the
-steer's temporal signature" and with "the projector destroys the
-representation". The grid does contain its own control at no extra cost — the
-projected source sweeps all 25 magnitudes including α = 0, so the projected
-α = 0 cell against the unprojected α = 0 cell isolates projector damage from any
-interaction with steering. The arm is therefore held pending a decision, and if
-run will be reported against that control rather than as a test of temporal
-structure.
+The live-pool contrast is not a side-effect of this study, it is one of its main
+findings. Three probes now show the same thing at different scales and
+hookpoints:
+
+| probe | scale | DSM | recon |
+| --- | --- | --- | --- |
+| backtracking detection (per-token dictionaries, ln1 L10) | token | ~50% dead on distill traces | ~10% dead |
+| this pre-flight (T=6 windows, resid L10) | window | 617 / 16384 live (3.8%) | 11684 / 16384 (71.3%) |
+| recalibration probe (T=6 windows, resid L10) | window | 214 → 215 live after distill-side recalibration | 8586 → 16046 |
+
+Both objectives train to comparable fidelity on their own distribution (NMSE
+0.048 vs 0.061; both ~0% dead on FineWeb). The difference appears only off
+distribution, and it is asymmetric: the reconstruction dictionary's failure is a
+*threshold* problem that per-latent recalibration repairs almost completely,
+while the denoising dictionary's failure is a *direction* problem that
+recalibration cannot touch, because its preactivations go negative almost
+everywhere. Whatever DSM buys — and the detection and absorption results say it
+buys real things — it buys by specialising hard to the activation distribution
+it was trained on.
+
+This directly motivates trace-domain or mixed-corpus training, and it is the
+concrete reason a DSM dictionary trained on FineWeb through base Llama cannot be
+used as a projector on reasoning traces through the distill model.
+
+**How strong is the convergence?** These are three probes, not three independent
+replications: they share the same deployment distribution (distill traces) and
+differ in probe design, scale and hookpoint. A fourth line on a second
+off-distribution corpus would be needed to call it airtight, which belongs with
+the mixed-corpus training round rather than here.
+
+**Is the collapse threshold-shallow or direction-deep?** A separate
+recalibration probe answers this, and the answer is direction-deep. Replacing
+TopK-96 with a per-latent threshold gate calibrated on distill windows (θ_i at
+the `1 − 96/16384` quantile of each latent's own preactivation, 60/40
+calibration/eval, 27,900 windows) revives `w6_dsm` from a live pool of 214 to
+215 — that is, not at all — at a recalibrated mean L0 of 1.36 against the target
+of 96. The encoder's preactivations are almost entirely negative on distill
+windows, roughly 1.4 latents above zero per window, so no choice of threshold
+can help: the directions themselves do not respond off-distribution. The same
+probe run on `w6_recon` as an instrument control revives 8,586 → 16,046 of
+16,384 at L0 111 ≈ target, for a mild NMSE cost (0.238 → 0.278). So for a
+density-blind dictionary the collapse *is* shallow and recalibration fixes it;
+for the DSM dictionary it is not. A recalibrated-projector variant was
+considered and dropped on this evidence.
+
+**Pre-registered reading of the variant** (fixed before the arm was run):
+
+> At pre-flight NMSE 0.815 on the steering distribution, this variant primarily
+> measures projector robustness under distribution shift. The α = 0
+> projected-vs-unprojected comparison is the confound control: if projected
+> α = 0 generations are already degraded, the arm measures projector damage, not
+> steering dynamics. A POSITIVE result (extended coherent range despite the
+> shift) would be strong evidence for manifold-projected steering; a negative or
+> flattened result bounds the method to domain-matched projectors and does not
+> speak to temporal structure.
+
+Quality-vs-α leads the reporting; a flattened Δgc is never read as evidence
+about temporal structure.
+
+One caution on comparing pre-flight NMSE figures across probes: the
+recalibration probe reports a `w6_dsm` TopK NMSE of 0.259, far below the 0.815
+here, but with only ~1.4 positive latents per window that number is mostly
+`b_dec` plus one or two strong latents rather than feature transfer. The probes
+also differ in capture (teacher-forced full text vs generation-time rolling
+windows) and in checkpoint step. A low NMSE is not evidence of manifold
+competence unless the live-pool count is read alongside it.
 
 #### Wave-2 results
 

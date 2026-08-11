@@ -209,6 +209,33 @@ def dom_source(dom_path: str | Path) -> dict:
             "vector": v}
 
 
+def random_source(ref_norm: float, d_model: int = D_MODEL, seed: int = 0) -> dict:
+    """Norm-matched random direction: the nonspecific-perturbation control.
+
+    Every real source is rescaled to the DoM base-union norm before steering, so
+    the magnitude axis means the same thing for all of them. A random unit
+    vector put through the same rescale therefore isolates whatever part of the
+    genuine-event response comes from perturbing the layer-10 residual stream by
+    that much *at all*, independent of direction.
+
+    It exists because several arms raise gc in BOTH steering directions. That
+    U-shape in |alpha| is either a nonspecific norm-perturbation effect, in
+    which case this control reproduces it and every arm should be read net of
+    it, or it is direction-specific, in which case this control stays flat and
+    the mined signs carry meaning. Without the control the ambiguity sits over
+    every comparison in the table.
+
+    Seed 0 reproduces the vector modal_gates.py used for the hook no-op gate.
+    """
+    from experiments.ward_backtracking_txc.b1_steer_eval import _normalize_to
+    g = torch.Generator().manual_seed(seed)
+    v = torch.randn(d_model, generator=g)
+    return {"tag": "control_random", "arm": "control", "arch": "random",
+            "hook": "resid", "feature_id": -2, "mode": "random",
+            "raw_norm": float(v.norm()), "seed": seed,
+            "vector": _normalize_to(v, ref_norm)}
+
+
 def save_features(feats: list[dict], out_dir: str | Path) -> list[str]:
     out_dir = Path(out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)

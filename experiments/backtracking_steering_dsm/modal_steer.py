@@ -69,7 +69,9 @@ def _build_all_sources():
 
     ref = steer_core.dom_source("/work/data/dom_vectors.pt")
     ref_norm = ref["raw_norm"]
-    sources = [ref]
+    # Norm-matched random direction, so the U-shape several arms show in |alpha|
+    # can be read against a nonspecific-perturbation baseline.
+    sources = [ref, steer_core.random_source(ref_norm)]
     for arm in steer_core.WAVE1_ARMS:
         p = pathlib.Path(FEAT_DIR) / f"{arm['name']}.npz"
         if not p.exists():
