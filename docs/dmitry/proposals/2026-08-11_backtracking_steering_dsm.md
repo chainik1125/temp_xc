@@ -332,6 +332,52 @@ Accepting a checkpoint the moment the log crosses the threshold would load a
 number. `w6.resolve_ckpt` therefore requires the log to be 750 rows *past* the
 checkpoint write — longer than one commit interval — before it accepts.
 
+#### Projector pre-flight — the denoise-after-steer arm is compromised
+
+The denoise-after-steer variant projects the steered residual stream through
+`w6_dsm`'s denoising map. That only tests anything if the projector is alive at
+the steering site, so it is measured before the grid rather than inferred from
+it. The dictionaries are trained on FineWeb through *base* Llama-3.1-8B; the
+steering site is *DeepSeek-R1-Distill* on reasoning traces.
+
+Interim numbers, step-5000 checkpoints, 78,395 distill tokens → 20,000 windows
+at `resid_L10`. NMSE is `psc_train_sae.py`'s own definition on raw unnormalised
+activations, so the two NMSE columns are directly comparable:
+
+| arm | NMSE on distill | NMSE at training site | live latents | train dead_frac |
+| --- | --- | --- | --- | --- |
+| `w6_recon` | 0.847 | 0.048 | 11684 / 16384 (71.3%) | 0.008 |
+| `w6_dsm` | **0.815** | 0.061 | **617 / 16384 (3.8%)** | 0.000 |
+| `w6_bayes` | 2.259 | 0.061 | 7720 / 16384 (47.1%) | 0.912 |
+
+`w6_dsm` explains about 18% of the variance at the steering site against ~94% at
+its training site, and fires only 617 distinct latents across 20,000 windows.
+Since a TopK dictionary with `k = 96` fires exactly 96 latents per window by
+construction, that means every window is being reconstructed from the same
+~617-atom sub-dictionary. `w6_recon`, at essentially the same NMSE, keeps 71% of
+its latents alive — so this is a property of the DSM objective, not a shared
+distribution-shift effect. `w6_bayes` at NMSE 2.26 reconstructs *worse than
+predicting the mean window*, which with its 0.912 training dead fraction makes
+it non-functional as a reconstruction.
+
+This is the same phenomenon the workstream's own recalibration probe found at
+the per-token scale — DSM dictionaries collapsing direction-deep off
+distribution, with per-latent rate recalibration reviving 98% of the recon pool
+but almost none of the DSM pool (see `experiments/diffusion_txc/README.md`).
+The T=6 window result is a sharper version of it, and the corroboration from an
+independent probe is the reason to read it as a real property rather than as a
+pre-flight bug.
+
+**Consequence for the variant.** A flattened Δgc curve under this projector
+would be uninformative: it is equally consistent with "denoising removes the
+steer's temporal signature" and with "the projector destroys the
+representation". The grid does contain its own control at no extra cost — the
+projected source sweeps all 25 magnitudes including α = 0, so the projected
+α = 0 cell against the unprojected α = 0 cell isolates projector damage from any
+interaction with steering. The arm is therefore held pending a decision, and if
+run will be reported against that control rather than as a test of temporal
+structure.
+
 #### Wave-2 results
 
 Pending — the T=6 arms truncate at ~20:20 EDT and the grid runs after that.
