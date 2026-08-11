@@ -16,9 +16,9 @@ rate 0.126). The paper's own ordering reproduces — the temporal (TXC)
 arms lead the table (0.215–0.243) — consistent with the program's thesis
 that behavioural detection signal is temporal, not per-token. The
 post-hoc gate swap, which bought +3–5 probing points on Gemma, transfers
-**nothing** here (every change ≤ ±0.01, within fold spread): the
-readout gain is specific to mean-pooled concept probing, not max-pooled
-window detection. One strong asymmetry did appear: on the reasoning-trace
+**nothing for per-token dictionaries** (all ≤ ±0.01, signs flip across
+seeds); the one suggestive exception is the stage-B **window** TXC
+(+0.014, the table's largest move — one arm, one seed). One strong asymmetry did appear: on the reasoning-trace
 distribution the dsm dictionaries are ~50% dead vs ~10% for recon —
 distribution shift punishes denoising-trained ln1 dictionaries far
 harder than reconstruction-trained ones.
@@ -169,10 +169,17 @@ PR-AUC, native TopK gate (`sentence` / `far`; base rates 0.126 / 0.166):
 | stage-B txc (resid, orientation) | 0.215 | 0.239 | 0.298 | 0.331 | — |
 | stage-B txc_h13 (resid, orientation) | 0.215 | **0.243** | **0.307** | **0.351** | — |
 
-Gate swap (same dictionaries, threshold gate): every cell moves by at
-most ±0.010 (e.g. recon_s3 sentence S=32: 0.222 → 0.228; dsm_s3 sentence
-S=8: 0.191 → 0.181) — inside per-fold spread. No transfer of the Gemma
-probing gain.
+Gate swap (same dictionaries, threshold gate; `sentence` S=8, TopK →
+gate): recon 0.1897 → 0.1890 / 0.1908 → 0.1916, dsm 0.1760 → 0.1751 /
+0.1910 → 0.1814, stage-B SAE 0.2021 → 0.2028 — all within ±0.01 with
+sign flips across seeds: a clean null for **per-token** dictionaries;
+the Gemma probing gain does not transfer. The one cell outside ±0.01 is
+the **window** dictionary: stage-B TXC-base 0.2149 → **0.2288**
+(+0.0139), the largest move in the table and an improvement (TXC-h13:
+−0.002). One arm, one seed — suggestive, not a finding — but it points
+where to look if the gate swap is revisited: window dictionaries, not
+per-token ones. Rate-matching verified throughout (gate L0 60–64 vs
+native 64; window arms 87–90 vs 96).
 
 Readings:
 
