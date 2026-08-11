@@ -208,7 +208,15 @@ def preflight_cmd(interim: bool = False):
 
 @app.function(image=image, gpu="L4", timeout=7200, memory=65536,
               volumes={"/vol": vol, "/hf": hf_cache}, secrets=[hf_secret])
-def mine_w6() -> dict:
+def mine_w6(min_step: int = TRUNC_MIN_STEP, feat_dir: str = FEAT_DIR) -> dict:
+    """Rank each w6 arm's backtracking feature by the paper's meandiff score.
+
+    `min_step=0` with a scratch `feat_dir` mines the current periodic
+    checkpoints mid-training. That is a dry run, not a result: it exercises the
+    capture -> window -> encode -> decoder path against real checkpoints so a
+    bug does not surface for the first time on the critical path after the
+    checkpoints truncate.
+    """
     import sys
     import time
 
@@ -222,7 +230,8 @@ def mine_w6() -> dict:
 
     t0 = time.time()
     vol.reload()
-    resolved = {a["name"]: w6.resolve_ckpt("/vol", a) for a in w6.W6_ARMS}
+    resolved = {a["name"]: w6.resolve_ckpt("/vol", a, min_step=min_step)
+                for a in w6.W6_ARMS}
     status = {k: v[1] for k, v in resolved.items()}
     ready = {k: v[0] for k, v in resolved.items()}
     missing = [k for k, v in ready.items() if v is None]
@@ -277,18 +286,24 @@ def mine_w6() -> dict:
         del model
         torch.cuda.empty_cache()
 
-    steer_core.save_features(feats, FEAT_DIR)
+    steer_core.save_features(feats, feat_dir)
     out = {"arms": summary, "capture": cap_meta, "n_examples": len(examples),
            "n_pos": int(is_bt.sum()), "ckpt_status": status,
+           "min_step": min_step, "feat_dir": feat_dir,
            "_runtime_s": round(time.time() - t0, 1)}
-    pathlib.Path(FEAT_DIR + "/mining_summary.json").write_text(
+    pathlib.Path(feat_dir + "/mining_summary.json").write_text(
         json.dumps(out, indent=1))
     vol.commit()
     return out
 
 
 @app.local_entrypoint()
-def mine_cmd():
+def mine_cmd(interim: bool = False):
+    """`--interim` dry-runs the mining path on the current periodic
+    checkpoints, into a scratch feature dir."""
+    print(json.dumps(mine_w6.remote(
+        min_step=0 if interim else TRUNC_MIN_STEP,
+        feat_dir=FEAT_DIR + "_interim" if interim else FEAT_DIR), indent=2))
     print(json.dumps(mine_w6.remote(), indent=2))
 
 
