@@ -26,8 +26,18 @@ backtracking. This one asks whether they can *cause* it.
   the published coherence filter does not close the gap (1.42 over the 19
   coherent rows of 20). Every comparison in this document is therefore internal
   to this run; no arm's absolute number is compared to a published absolute.
-- *(wave-1 headline pending)*
-- *(projector pre-flight pending)*
+- **Wave 1**: the Stage B temporal crosscoder's slot-0 decoder is the only
+  source with directional control over backtracking — a monotone, antisymmetric
+  dose-response (gc 2.25 at α = −8, 1.25 at α = 0, 0.25 at α = +10) at flat
+  generation length, Δgc = +1.00 [+0.50, +1.50] at the peak. Conventional DoM
+  steering is U-shaped in |α|, raising the count in both directions, which is
+  what a norm perturbation looks like rather than a control knob.
+- Mined selectivity does not predict causal potency: the strongest mined feature
+  (+0.806) gives one of the weakest effects.
+- **Projector pre-flight fails its threshold.** The `w6_dsm` denoiser scores
+  NMSE 0.815 on distill activations against ~0.061 at its training site, with
+  only 617 of 16384 latents ever firing. The denoise-after-steer variant is
+  flagged: a flattened Δgc under this projector would be uninformative.
 - *(wave-2 headline pending)*
 
 ### What is reused rather than reimplemented
@@ -223,7 +233,79 @@ Selectivity scores are not comparable across architectures — they inherit each
 dictionary's own activation scale — so the column is provenance, not a ranking.
 The Welch t is scale-free and is the closer thing to a like-for-like read.
 
-*(wave-1 steering table pending)*
+#### Results
+
+All eight sources, 20 prompts × 25 magnitudes each, judged for genuine
+backtracking count and 0–3 coherence. `Δgc` is against each source's *own*
+α = 0 row, so the baseline offset from gate 2 cancels. Peak is taken over the
+Sonnet-coherent cells; the CI is a prompt-resampling bootstrap at that peak.
+
+| source | arm | mode | mining score (t) | gc base | Δgc peak | at α | 95% CI | Sonnet-coherent cells |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `stageB_txc_f14621_pos0` | stageB_txc | pos0 | +0.227 (17.5) | 1.25 | **+1.000** | −8 | **[+0.50, +1.50]** | 12 of 25 |
+| `ours_dsm_s2_f4366_pos0` | ours_dsm_s2 | pos0 | +0.442 (18.6) | 1.35 | +0.600 | +12 | [+0.05, +1.10] | 15 of 25 |
+| `dom_base_union` | dom | dom | n/a | 1.30 | +0.450 | −8 | [−0.05, +0.95] | 15 of 25 |
+| `stageB_txc_f14621_union` | stageB_txc | union | +0.227 (17.5) | 1.45 | +0.400 | −6 | [−0.15, +0.90] | 11 of 25 |
+| `ours_recon_s2_f13776_pos0` | ours_recon_s2 | pos0 | +0.492 (22.0) | 1.30 | +0.350 | −7 | [−0.15, +0.80] | 16 of 25 |
+| `stageB_topk_sae_f9876_pos0` | stageB_topk_sae | pos0 | +0.806 (19.8) | 1.25 | +0.300 | −6 | [−0.10, +0.70] | 16 of 25 |
+| `stageB_txc_h13_f1183_pos0` | stageB_txc_h13 | pos0 | +0.179 (14.3) | 1.35 | −0.250 | −0.5 | [−0.60, +0.05] | 14 of 25 |
+| `stageB_txc_h13_f1183_union` | stageB_txc_h13 | union | +0.179 (14.3) | 1.40 | −0.250 | −1 | [−0.60, +0.10] | 15 of 25 |
+
+The mining-score column is the selectivity confound: the arms did not enter the
+sweep with equally good features, scores spanning +0.179 to +0.806. Note that
+the ranking here is close to *inverted* against it — the arm with the strongest
+mined feature (`stageB_topk_sae`, +0.806, t = 19.8) produces one of the smallest
+causal effects, and the arm with the winning effect has a mid-table score. Mined
+selectivity does not predict causal potency in this setup.
+
+#### The Stage B crosscoder is the only arm with directional control
+
+The headline is not the peak height, it is the shape of the curve. For
+`stageB_txc` slot 0 the dose-response is monotone and antisymmetric through the
+whole coherent region:
+
+| α | −10 | −8 | −6 | −4 | −2 | 0 | +2 | +4 | +6 | +8 | +10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gc | 2.25 | 2.25 | 1.75 | 1.50 | 1.25 | 1.25 | 1.20 | 1.15 | 0.90 | 0.70 | 0.25 |
+| mean words | 943 | 908 | 906 | 867 | 830 | 862 | 852 | 898 | 922 | 969 | 989 |
+
+Negative α nearly doubles the genuine-event count; positive α drives it toward
+zero. Generation length is flat across that range (830–990 words), so this is
+not a length effect, and at α = −8 all 20 prompts pass the coherence floor, so
+it is not a coherence-selection effect either.
+
+The conventional DoM baseline behaves completely differently — it is **U-shaped
+in |α|**, raising the count in *both* directions (1.75 at α = −8, 1.85 at
+α = +8, against 1.30 at α = 0). Raising the target behaviour whichever way you
+push is the signature of a norm perturbation, not of a direction that encodes
+the behaviour. On this evidence the temporal crosscoder's slot-0 decoder is a
+genuine control knob for backtracking and conventional steering at this site is
+not, even though their peak Δgc values (+1.00 vs +0.45) differ by less than a
+factor of three.
+
+#### What this does not show
+
+- **Suppression is confounded with degeneration.** The induction side is clean:
+  α = −8 is fully coherent and the effect is large. The suppression side is not
+  — gc falls monotonically as α rises, but the magnitudes where it falls
+  furthest (+10 and beyond, gc → 0.05) are exactly the ones failing the Sonnet
+  floor. Within the fully coherent region suppression is small: 1.25 → 1.15 at
+  α = +4. "Suppresses backtracking to near zero" is not a supported claim; "gc
+  decreases monotonically with α, and the strong suppression coincides with
+  coherence collapse" is.
+- **The sign is inverted against mining.** Feature 14621 was selected for
+  *higher* activation on backtracking sentences (score +0.227), yet it is
+  *negative* α that induces backtracking. Steering along the +decoder direction
+  suppresses. This is reported as found; no attempt is made to redefine the sign
+  to make it read more naturally.
+- **Multiple comparisons are uncorrected.** Eight sources, each with a peak
+  chosen over 11–16 coherent magnitudes. One nominal 95% CI excluding zero
+  across that many selections is weak on its own; `stageB_txc` pos0 is
+  comfortable ([+0.50, +1.50]) and `ours_dsm_s2` is marginal ([+0.05, +1.10]).
+  The monotone dose-response, not the CI, is what makes the crosscoder result
+  credible.
+- **n = 20 prompts.** Every CI here is wide. These are ordering claims among
+  arms run through one pipeline, not calibrated effect sizes.
 
 ### Wave 2 — window dictionaries and denoise-after-steer
 
@@ -250,9 +332,9 @@ Accepting a checkpoint the moment the log crosses the threshold would load a
 number. `w6.resolve_ckpt` therefore requires the log to be 750 rows *past* the
 checkpoint write — longer than one commit interval — before it accepts.
 
-#### Results
+#### Wave-2 results
 
-*(pending)*
+Pending — the T=6 arms truncate at ~20:20 EDT and the grid runs after that.
 
 ### Files
 
