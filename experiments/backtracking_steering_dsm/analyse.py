@@ -170,6 +170,30 @@ def summarise(tag: str, rows: list[dict], meta: dict) -> dict:
     }
 
 
+def _f(x, nd: int = 2, sign: bool = False) -> str:
+    """Numbers that do not exist print as an em dash, not as `nan`.
+
+    An arm with no coherent magnitude cell is a reportable outcome -- the
+    denoise-after-steer arm flattening its curve is one of the things this study
+    is looking for -- so that row must read as "no coherent cell" rather than as
+    a formatting accident.
+    """
+    if x is None or x != x:
+        return "—"
+    return f"{x:+.{nd}f}" if sign else f"{x:.{nd}f}"
+
+
+def _m(x) -> str:
+    return "—" if x is None else f"{x:g}"
+
+
+def _ci(pair) -> str:
+    lo, hi = pair
+    if lo is None or lo != lo or hi is None or hi != hi:
+        return "—"
+    return f"[{lo:+.2f}, {hi:+.2f}]"
+
+
 def table_md(summaries: list[dict]) -> str:
     head = ("| source | arm | mode | mining score (t) | gc base | "
             "Δgc peak (coh, run) | at α | "
@@ -178,21 +202,29 @@ def table_md(summaries: list[dict]) -> str:
             "coherent cells (run/Sonnet) |\n")
     head += "|" + "---|" * 16 + "\n"
     body = ""
-    for s in sorted(summaries, key=lambda x: -abs(x["delta_gc_peak_at_coh_run"])):
+    # nan sorts unpredictably, so arms with no coherent cell are pinned last
+    # rather than landing at an arbitrary rank.
+    def _rank(x):
+        d = x["delta_gc_peak_at_coh_run"]
+        return float("inf") if (d is None or d != d) else -abs(d)
+
+    for s in sorted(summaries, key=_rank):
         msc = ("n/a" if s.get("mining_score") is None else
                f"{s['mining_score']:+.3f} ({s['mining_tstat']:.1f})")
         body += (
             f"| `{s['source']}` | {s['arm']} | {s['mode']} | {msc} | "
-            f"{s['gc_baseline']:.2f} | {s['delta_gc_peak_at_coh_run']:+.3f} | "
-            f"{s['peak_run_magnitude']} | "
-            f"[{s['peak_run_ci95'][0]:+.2f}, {s['peak_run_ci95'][1]:+.2f}] | "
-            f"{s['mean_abs_delta_gc_over_coh']:.3f} | "
-            f"{s['delta_gc_peak_at_coh_sonnet']:+.3f} | "
-            f"{s['peak_sonnet_magnitude']} | "
-            f"{s['delta_gc_peak_any']:+.3f} | {s['peak_any_magnitude']} | "
-            f"{s['gc_min']:.2f} | "
-            f"{s['event_rate_baseline']:.2f} → "
-            f"{s['event_rate_baseline'] + s['delta_event_rate_at_peak_run']:.2f} | "
+            f"{_f(s['gc_baseline'])} | "
+            f"{_f(s['delta_gc_peak_at_coh_run'], 3, sign=True)} | "
+            f"{_m(s['peak_run_magnitude'])} | "
+            f"{_ci(s['peak_run_ci95'])} | "
+            f"{_f(s['mean_abs_delta_gc_over_coh'], 3)} | "
+            f"{_f(s['delta_gc_peak_at_coh_sonnet'], 3, sign=True)} | "
+            f"{_m(s['peak_sonnet_magnitude'])} | "
+            f"{_f(s['delta_gc_peak_any'], 3, sign=True)} | "
+            f"{_m(s['peak_any_magnitude'])} | "
+            f"{_f(s['gc_min'])} | "
+            f"{_f(s['event_rate_baseline'])} → "
+            f"{_f(s['event_rate_baseline'] + s['delta_event_rate_at_peak_run'])} | "
             f"{s['n_coherent_cells_run']}/{s['n_coherent_cells_sonnet']} of "
             f"{s['n_cells']} |\n")
     return head + body
