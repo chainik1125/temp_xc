@@ -75,10 +75,20 @@ def curve(rows: list[dict]) -> list[dict]:
         cell = by_mag[mag]
         valid = [r for r in cell if r["genuine_count"] >= 0]
         counts = [r["genuine_count"] for r in valid]
+        # Row-level coherent subset, reported alongside the cell-level rule.
+        # The cell rule ("every prompt at this magnitude passes") is the
+        # reference's own, and is kept as the headline, but at 20 prompts and a
+        # 1500-token budget a handful of individually repetitive generations
+        # disqualifies a whole magnitude -- including alpha = 0. Restricting to
+        # the coherent rows keeps a usable estimate at magnitudes the cell rule
+        # throws away entirely.
+        valid_coh = [r for r in valid if r["coh_ok"]]
         out.append({
             "magnitude": mag,
             "n": len(cell), "n_valid": len(valid),
             "gc": _mean(counts),
+            "gc_rows_coh": _mean([r["genuine_count"] for r in valid_coh]),
+            "n_rows_coh": len(valid_coh),
             "event_rate": _mean([1.0 if c >= 1 else 0.0 for c in counts]),
             "kw_rate": _mean([r["keyword_rate"] for r in cell]),
             "frac_coh_run": _mean([1.0 if r["coh_ok"] else 0.0 for r in cell]),
@@ -141,6 +151,13 @@ def summarise(tag: str, rows: list[dict], meta: dict) -> dict:
     coh_nonzero = [x for x in c if x["magnitude"] != 0.0 and x["cell_coh_run"]]
     mean_abs = _mean([abs(x["gc"] - gc0) for x in coh_nonzero])
 
+    # Same peak, computed on the row-level coherent subset instead. Baseline is
+    # the alpha = 0 row-coherent mean, so the comparison stays within-source.
+    base_rc = base["gc_rows_coh"] if base else float("nan")
+    rc_cand = [x for x in c if x["magnitude"] != 0.0 and x["n_rows_coh"] > 0]
+    p_rc = (max(rc_cand, key=lambda x: abs(x["gc_rows_coh"] - base_rc))
+            if rc_cand and base_rc == base_rc else None)
+
     return {
         "source": tag, "arm": meta["arm"], "arch": meta["arch"],
         "hook": meta["hook"], "mode": meta["mode"],
@@ -153,6 +170,10 @@ def summarise(tag: str, rows: list[dict], meta: dict) -> dict:
         "peak_run_magnitude": p_run["magnitude"] if p_run else None,
         "peak_run_ci95": [lo, hi],
         "mean_abs_delta_gc_over_coh": mean_abs,
+        "gc_baseline_rows_coh": base_rc,
+        "delta_gc_peak_rows_coh": (p_rc["gc_rows_coh"] - base_rc) if p_rc
+                                  else float("nan"),
+        "peak_rows_coh_magnitude": p_rc["magnitude"] if p_rc else None,
         "delta_gc_peak_at_coh_sonnet": (p_son["gc"] - gc0) if p_son else float("nan"),
         "peak_sonnet_magnitude": p_son["magnitude"] if p_son else None,
         "gc_min": worst["gc"] if worst else float("nan"),
@@ -197,10 +218,11 @@ def _ci(pair) -> str:
 def table_md(summaries: list[dict]) -> str:
     head = ("| source | arm | mode | mining score (t) | gc base | "
             "Δgc peak (coh, run) | at α | "
-            "95% CI | mean abs Δgc | Δgc peak (coh, Sonnet) | at α | "
+            "95% CI | Δgc peak (coh rows) | at α | "
+            "mean abs Δgc | Δgc peak (coh, Sonnet) | at α | "
             "Δgc peak (no floor) | at α | gc min | event-rate base → peak | "
             "coherent cells (run/Sonnet) |\n")
-    head += "|" + "---|" * 16 + "\n"
+    head += "|" + "---|" * 18 + "\n"
     body = ""
     # nan sorts unpredictably, so arms with no coherent cell are pinned last
     # rather than landing at an arbitrary rank.
@@ -217,6 +239,8 @@ def table_md(summaries: list[dict]) -> str:
             f"{_f(s['delta_gc_peak_at_coh_run'], 3, sign=True)} | "
             f"{_m(s['peak_run_magnitude'])} | "
             f"{_ci(s['peak_run_ci95'])} | "
+            f"{_f(s['delta_gc_peak_rows_coh'], 3, sign=True)} | "
+            f"{_m(s['peak_rows_coh_magnitude'])} | "
             f"{_f(s['mean_abs_delta_gc_over_coh'], 3)} | "
             f"{_f(s['delta_gc_peak_at_coh_sonnet'], 3, sign=True)} | "
             f"{_m(s['peak_sonnet_magnitude'])} | "
