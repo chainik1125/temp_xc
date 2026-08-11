@@ -122,6 +122,53 @@ passes, which is `metrics.cell_metric`'s own cell-level rule. Generation length
 (words, characters, re-tokenised token count) is recorded per row so a Δgc that
 is really a length effect is visible as one.
 
+#### The run-length floor does not work on this model, and the Sonnet floor does
+
+The two floors disagree sharply here, and the disagreement is not noise — the
+run-length floor is *anti*-correlated with quality at exactly the magnitudes
+that matter. Per-magnitude failure counts for the conventional-steering
+baseline, out of 20 prompts:
+
+| α | fail run-length | fail Sonnet | mean Sonnet grade |
+| --- | --- | --- | --- |
+| −16 | 2 | 20 | 1.00 |
+| −12 | 1 | 9 | 1.60 |
+| −8 | 1 | 0 | 2.55 |
+| 0 | 6 | 0 | 2.85 |
+| +4 | 2 | 0 | 2.80 |
+| +8 | 5 | 6 | 2.00 |
+| +12 | 2 | 19 | 1.05 |
+| +16 | 0 | 20 | 1.00 |
+
+The Sonnet floor behaves as a coherence floor should: zero failures across the
+whole interior of the grid, rising monotonically at both extremes as steering
+destroys the generation. The run-length floor fires on 0–6 prompts at *every*
+magnitude with no relationship to α — including 6 of 20 at α = 0, where the
+model is unsteered — and it passes α = +16 with **zero** failures, the cell
+where every single generation is graded 1.
+
+The reason is visible in the generations. `_max_repeat_run` counts consecutive
+*identical words*, which catches the "Wait Wait Wait" collapse it was written
+for. The degeneration mode here is phrase-level looping, which it cannot see. An
+α = +16 generation the run-length floor certifies as coherent
+(`max_repeat_run = 1`):
+
+```text
+So, she can't. So, maybe she can't. So, she can't. So, she can't. So, s
+```
+
+Consequences, and what this document does about them:
+
+- Only 1–3 of 25 cells pass the run-length rule for any source, so a peak
+  selected under it is chosen from a handful of survivors and rewards variance.
+  Worse, the survivors are biased toward the *most* degenerate magnitudes.
+- **The Sonnet floor is therefore the headline coherence gate**, and 11–16 of 25
+  cells pass it. The run-length numbers are retained as a reported diagnostic,
+  not as the basis for any claim.
+- A row-level variant (`gc_rows_coh`, restricted to individually coherent rows
+  rather than requiring all 20) is reported alongside, because the all-20 cell
+  rule discards whole magnitudes over one or two repetitive generations.
+
 ### Gates
 
 Gate 1 — hook no-op. Generations with no hook registered are byte-identical to
