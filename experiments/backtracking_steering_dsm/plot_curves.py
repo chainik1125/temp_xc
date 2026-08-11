@@ -40,7 +40,11 @@ def plot(curves: dict, out: Path, only: list[str] | None = None,
         gc0 = next(x["gc"] for x in c if x["magnitude"] == 0.0)
         d = [x["gc"] - gc0 for x in c]
         ax.plot(mags, d, "-", color=col, lw=1.6, label=tag, zorder=3)
-        coh = [x["cell_coh_run"] for x in c]
+        # Marker fill encodes the SONNET cell floor. Using the run-length floor
+        # here would draw alpha = +-16 as coherent on most arms, which is where
+        # every generation is graded 1 -- the marker would say "trust this
+        # point" at exactly the points that must not be trusted.
+        coh = [x["cell_coh_sonnet"] for x in c]
         ax.scatter([m for m, k in zip(mags, coh) if k],
                    [v for v, k in zip(d, coh) if k],
                    s=26, color=col, zorder=4)
@@ -66,7 +70,7 @@ def plot(curves: dict, out: Path, only: list[str] | None = None,
     axq.text(0.99, 0.08, "solid: run-length floor   dashed: Sonnet grade $\\geq$ 2",
              transform=axq.transAxes, ha="right", fontsize=8, color="0.35",
              bbox=box)
-    ax.text(0.99, 0.97, "hollow markers: cell fails the run-length floor",
+    ax.text(0.99, 0.97, "hollow markers: cell fails the Sonnet floor",
             transform=ax.transAxes, ha="right", va="top", fontsize=8,
             color="0.35", bbox=box)
 
