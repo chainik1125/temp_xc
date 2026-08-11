@@ -72,6 +72,70 @@ class TopKSAE(nn.Module):
         return float((self.steps_since_fire > self.dead_window).float().mean())
 
 
+class BayesGateSAE(nn.Module):
+    """MMSE-form activation (docs/dmitry/proposals/2026-08-11_jumprelu_mmse_note.md):
+    per-latent sigmoid gate x Wiener-shrunken magnitude, conditioned on the
+    batch noise level u = (sigma/rms)^2. No TopK, no AuxK — soft gates give
+    every latent gradient. Sparsity via a prior-rate penalty lambda*mean(g)
+    (the ln(pi/(1-pi)) term of the gate's log-odds, regularised).
+
+      gate_i  = sigmoid((pre_i - (theta0_i + theta1_i*u)) / (tau0_i + tau1_i*u))
+      shrink_i = s2_i / (s2_i + u)
+      z_i     = gate_i * shrink_i * relu(pre_i)
+
+    At u=0 (clean eval) this is a soft JumpReLU with unshrunken magnitudes.
+    """
+
+    def __init__(self, d, H):
+        super().__init__()
+        self.W_enc = nn.Parameter(torch.randn(d, H) / d**0.5)
+        self.b_enc = nn.Parameter(torch.zeros(H))
+        self.W_dec = nn.Parameter(self.W_enc.data.T.clone())
+        self.b_dec = nn.Parameter(torch.zeros(d))
+        self.theta0 = nn.Parameter(torch.full((H,), 0.1))
+        self.theta1 = nn.Parameter(torch.full((H,), 0.5))
+        self.tau0_raw = nn.Parameter(torch.full((H,), -3.0))   # softplus -> 0.049
+        self.tau1_raw = nn.Parameter(torch.full((H,), -0.5))
+        self.s_raw = nn.Parameter(torch.full((H,), 0.54))      # softplus -> ~1.0
+        self.register_buffer("steps_since_fire", torch.zeros(H))
+        self.dead_window = 800
+        self._norm()
+
+    @torch.no_grad()
+    def _norm(self):
+        self.W_dec.data /= self.W_dec.data.norm(dim=1, keepdim=True).clamp_min(1e-8)
+
+    def encode(self, x, u=0.0):
+        if not torch.is_tensor(u):
+            u = torch.tensor(float(u), device=x.device)
+        u = u.reshape(-1, 1)
+        pre = (x - self.b_dec) @ self.W_enc + self.b_enc
+        T = nn.functional.softplus(self.tau0_raw) + 1e-3 \
+            + nn.functional.softplus(self.tau1_raw) * u
+        th = self.theta0 + self.theta1 * u
+        g = torch.sigmoid((pre - th) / T)
+        s2 = nn.functional.softplus(self.s_raw) + 1e-3
+        z = g * (s2 / (s2 + u)) * torch.relu(pre)
+        return z, g
+
+    def forward(self, x, target=None, u=0.0, sparsity_coef=0.02,
+                update_fires=False):
+        if target is None:
+            target = x
+        z, g = self.encode(x, u)
+        recon = z @ self.W_dec + self.b_dec
+        loss = (recon - target).pow(2).mean() + sparsity_coef * g.mean()
+        if update_fires:
+            with torch.no_grad():
+                self.steps_since_fire += 1
+                self.steps_since_fire[(g > 0.5).any(dim=0)] = 0
+        return loss, recon, z
+
+    @torch.no_grad()
+    def dead_fraction(self):
+        return float((self.steps_since_fire > self.dead_window).float().mean())
+
+
 def text_stream(dataset: str, seed: int):
     from datasets import load_dataset
 
@@ -122,7 +186,12 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--model", required=True)
     ap.add_argument("--hook", required=True)      # resid12 | ln110 | ln124
-    ap.add_argument("--arm", required=True, choices=["recon", "dsm", "dsm_anneal"])
+    ap.add_argument("--arm", required=True,
+                    choices=["recon", "dsm", "dsm_anneal", "bayes_gate"])
+    ap.add_argument("--sparsity-coef", type=float, default=0.02)
+    ap.add_argument("--target-l0", type=float, default=0.0,
+                    help="if >0, controller multiplies sparsity_coef toward "
+                         "this eval-time gate L0 (bayes_gate arm only)")
     ap.add_argument("--seed", type=int, required=True)
     ap.add_argument("--steps", type=int, required=True)
     ap.add_argument("--k", type=int, default=40)
@@ -151,11 +220,13 @@ def main():
         args.model, torch_dtype=torch.bfloat16).to(dev).eval()
     cap = make_hook(model, args.hook)
     d = model.config.hidden_size
-    sae = TopKSAE(d, args.H, args.k).to(dev)
+    sae = (BayesGateSAE(d, args.H) if args.arm == "bayes_gate"
+           else TopKSAE(d, args.H, args.k)).to(dev)
     opt = torch.optim.Adam(sae.parameters(), lr=args.lr)
 
     texts = text_stream(args.dataset, seed=args.seed)
     buf: list[int] = []
+    sparsity_coef = args.sparsity_coef
 
     def next_acts(n_tokens: int) -> torch.Tensor:
         got = []
@@ -197,6 +268,13 @@ def main():
             xb = R[perm[b0:b0 + args.batch]]
             if args.arm == "recon":
                 loss, _, _ = sae(xb, update_fires=True)
+            elif args.arm == "bayes_gate":
+                sig = torch.exp(torch.empty(args.batch, 1, device=dev).uniform_(
+                    float(np.log(lo)), float(np.log(hi0)))) * rms
+                loss, _, _ = sae(xb + sig * torch.randn_like(xb), target=xb,
+                                 u=(sig / rms) ** 2,
+                                 sparsity_coef=sparsity_coef,
+                                 update_fires=True)
             else:
                 hi = hi0 if args.arm == "dsm" else hi0 - (hi0 - 0.3) * (step / args.steps)
                 sig = torch.exp(torch.empty(args.batch, 1, device=dev).uniform_(
@@ -213,6 +291,16 @@ def main():
                        "train_loss": float(loss), "nmse_clean": nmse(),
                        "dead_frac": sae.dead_fraction(), "rms": rms,
                        "elapsed_s": round(time.time() - t0, 1)}
+                if args.arm == "bayes_gate":
+                    with torch.no_grad():
+                        _, g_ev = sae.encode(X_eval[:8192], u=0.0)
+                    row["mean_gate"] = float(g_ev.mean())
+                    row["l0_gate_half"] = float((g_ev > 0.5).float().sum(1).mean())
+                    if args.target_l0 > 0:
+                        ratio = (row["l0_gate_half"] + 1.0) / args.target_l0
+                        sparsity_coef = float(np.clip(
+                            sparsity_coef * ratio**0.3, 1e-4, 30.0))
+                        row["sparsity_coef"] = sparsity_coef
                 log_f.write(json.dumps(row) + "\n")
                 log_f.flush()
                 print(row, flush=True)
