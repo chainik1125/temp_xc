@@ -86,6 +86,17 @@ hook.
   magnitude sweep. Every row in a batch shares a prompt length, so there is no
   left-padding in any batch — which also means no padded positions enter the
   wave-2 window buffer.
+- Sharding (wave 2): each source's sweep is split across five contiguous
+  prompt slices, one container each, and the slices are concatenated back into
+  a single row file before judging. Sharding is by prompt rather than by
+  magnitude precisely to preserve the no-padding property above: a batch of 20
+  *different* prompts at one magnitude must be left-padded, and the projected
+  arm's window buffer would then read pad-token activations into the window for
+  the first `T-1` real tokens of every row — corrupting the projector input for
+  the one arm the denoise-after-steer variant exists to measure, in a way that
+  would look like a slightly different curve rather than like a bug. Shard
+  bounds are contiguous and complete, so the merged row order is identical to
+  the unsharded order.
 
 ### Metrics
 
@@ -168,6 +179,31 @@ The Welch t is scale-free and is the closer thing to a like-for-like read.
 *(wave-1 steering table pending)*
 
 ### Wave 2 — window dictionaries and denoise-after-steer
+
+#### How the wave-2 checkpoints are defined
+
+The T=6 trio (`w6_recon`, `w6_dsm`, `w6_bayes`, all `resid_L10`, `H=16384`,
+window `L0=96`) was launched with a 20,000-step plan under a 6-hour Modal
+function timeout. At the observed ~1.27 s/step that plan is not reachable, so
+the arms end by **timeout truncation**, and the trainer's `_final.json`
+completion marker — written only on a clean finish — never appears. The usable
+checkpoint is the periodic `.pt`, rewritten every 5,000 steps, so the last one
+to land is **step 15,000**.
+
+These arms are therefore reported as *15k steps (timeout-truncated from a 20k
+plan; incidentally stage-B-budget-matched, since stage B's own config also
+trains 15k)*. They are never labelled as the 20k arm.
+
+One implementation note worth recording, because the failure mode is silent.
+The trainer writes the checkpoint locally and a separate thread commits the
+volume every 300 s, so there is a window in which the training log has passed
+step 15,000 while the `.pt` visible on the volume is still the step-10,000 one.
+Accepting a checkpoint the moment the log crosses the threshold would load a
+10k dictionary and label it 15k, with nothing anomalous in any downstream
+number. `w6.resolve_ckpt` therefore requires the log to be 750 rows *past* the
+checkpoint write — longer than one commit interval — before it accepts.
+
+#### Results
 
 *(pending)*
 
