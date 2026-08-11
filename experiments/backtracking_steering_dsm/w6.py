@@ -34,6 +34,16 @@ D_EFF = D_MODEL * T_WINDOW
 H_SAE = 16384
 K_WINDOW = 96
 
+# Running statistics the trainer keeps for its own bookkeeping and that play no
+# part in encode/decode, so a checkpoint may legitimately lack them:
+#   steps_since_fire - dead-latent counter, drives AuxK revival during training.
+#   rate_ema         - EMA of per-latent gate rate, used only in BayesGateSAE's
+#                      rate-KL sparsity term. It is a later, uncommitted
+#                      addition to psc_train_sae.py than the running wave-2 job,
+#                      so that job's checkpoints will never contain it.
+# Anything else missing is a genuine architecture mismatch and still raises.
+TRAIN_ONLY_BUFFERS = {"steps_since_fire", "rate_ema"}
+
 W6_ARMS = [
     {"name": "w6_recon", "dir": "txc_w6/txc_recon", "stem": "recon_s0"},
     {"name": "w6_dsm", "dir": "txc_w6/txc_dsm", "stem": "dsm_s0"},
@@ -58,7 +68,7 @@ def load_w6(ckpt_path: str | Path, device: str = "cuda"):
     else:
         m = TopKSAE(d_eff, H, K_WINDOW)
     missing, unexpected = m.load_state_dict(sd, strict=False)
-    bad = [k for k in missing if k != "steps_since_fire"]
+    bad = [k for k in missing if k not in TRAIN_ONLY_BUFFERS]
     if bad:
         raise RuntimeError(f"{ckpt_path}: missing keys {bad}")
     m.eval().to(device)
@@ -67,7 +77,8 @@ def load_w6(ckpt_path: str | Path, device: str = "cuda"):
     return m, {"arch": "bayes_gate_w6" if is_bayes else "topk_sae_w6",
                "d_eff": int(d_eff), "d_sae": int(H), "T": T_WINDOW,
                "k": None if is_bayes else K_WINDOW,
-               "unexpected_keys": list(unexpected)}
+               "unexpected_keys": list(unexpected),
+               "absent_train_buffers": sorted(missing)}
 
 
 @torch.no_grad()
