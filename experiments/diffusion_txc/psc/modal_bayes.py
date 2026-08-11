@@ -36,8 +36,15 @@ JOBS = {
                  "extra": ["--target-l0", "40", "--sparsity-coef", "0.05"]},
     "bg2_sol": {"steps": 6000, "subdir": "gemma2-2b-l12-sol-bg2",
                 "extra": ["--target-l0", "40", "--sparsity-coef", "0.05"]},
+    # v3: bg2 railed at coef clamp 30 with L0~185; raise clamp + exponent
+    "bg3_sol": {"steps": 6000, "subdir": "gemma2-2b-l12-sol-bg3",
+                "extra": ["--target-l0", "40", "--sparsity-coef", "1.0",
+                          "--ctrl-exp", "0.5", "--coef-max", "300"]},
+    "bg3_100M": {"steps": 24000, "subdir": "gemma2-2b-l12-100M-bg3",
+                 "extra": ["--target-l0", "40", "--sparsity-coef", "1.0",
+                           "--ctrl-exp", "0.5", "--coef-max", "300"]},
 }
-LAUNCH = ["bg2_100M", "bg2_sol"]
+LAUNCH = ["bg3_100M"]
 
 
 @app.function(image=image, gpu="L40S", timeout=14400, volumes={"/vol": vol},

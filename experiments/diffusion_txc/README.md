@@ -31,6 +31,31 @@ Headlines:
 - The Bayes-form posterior head dominates both axes on discrete-template
   data but is a specialist; TXC+DSM is the general transfer candidate.
 
+### Motivations for the denoising objective (ranked 2026-08-11, post-Matryoshka comparison)
+
+1. **Robust steering**: (a) robust features as causal handles (measured:
+   perturbation support-overlap 0.74 vs 0.60); (b) **manifold-projected
+   steering** — a DSM dictionary is a score model of its activation site,
+   so one denoiser application after the steering hook re-projects
+   off-distribution activations toward the manifold, potentially
+   extending the coherent α range (the EM steer-finely-over-a-large-range
+   fragility). Denoise-after-steer variant added to steering wave 2;
+   reconstruction SAEs cannot offer this (no defined off-manifold
+   behaviour).
+2. **Temporal binding** — reconstruction provably cannot force
+   cross-position binding; denoising makes it loss-bearing. Being tested
+   by the TXC trio.
+3. **Bayes semantics** — the objective derives its own encoder (posterior
+   codes, principled activations, σ-conditioning) instead of needing
+   patches; death-free training under weak sparsity pressure (0–2% vs
+   31–57% TopK; caveat: strong prior-rate penalties reintroduce ~24%
+   gate-death, though non-absorbing in principle).
+4. **Density/anomaly monitoring (unexploited)** — the dictionary doubles
+   as an activation-space OOD detector via the learned score.
+5. Absorption reduction (−29 to −42%) — real but dominated by Matryoshka's
+   architectural fix (−90%, same model/layer/L0); the two compose and the
+   {standard, matryoshka} × {recon, dsm} 2×2 is an open cell.
+
 ### Planned next
 
 - LLM transfer: add the σ-ladder corruption (σ scaled to per-layer RMS)
