@@ -149,6 +149,42 @@ arm (σ-annealing or AuxK-on-corrupted), a 5–10× budget run, then the
 actual target — the temporal (TXC) version evaluated on behavioural
 detection, where the theory says the advantage lives.
 
+### Scale-up results (100M tokens, stream-trained overnight 2026-08-10/11)
+
+Training (2 seeds/arm, Modal L40S, single-pass fresh tokens): recon NMSE
+0.279/0.293 dead 31%; dsm 0.303/0.316 dead 57%; **dsm_anneal 0.291/0.304
+dead 41%** — the annealed arm recovers most of the NMSE gap and a third of
+the death gap, as preregistered. Llama-3.1-8B ln1_L10 pairs (82M tokens):
+recon 0.313 dead 0.0%; dsm 0.346 dead 4.6% — hookpoint geometry dominates
+death. Dictionary death grows with budget for every objective (recon
+7.5% → 31% from 10M → 100M).
+
+Evals (2 seeds/arm; autointerp skipped — stream-trained checkpoints have
+no context dumps):
+
+| metric | recon | dsm | dsm_anneal |
+| --- | --- | --- | --- |
+| absorption (↓) | 0.494 | **0.349** | 0.410 |
+| fragility support-Jaccard @ ε=0.5 (↑) | 0.598 | **0.743** | 0.656 |
+| first-letter decodability | 0.910 | 0.912 | 0.916 |
+| sparse probing (12 cells) | mixed | mixed | mixed |
+
+Verdicts at 10× budget:
+
+- **Structural gains replicate and sharpen**: absorption *grows with
+  training* for reconstruction (0.306 → 0.494) far faster than for DSM
+  (0.179 → 0.349) — reconstruction training progressively absorbs
+  features; denoising resists it. Fragility likewise (recon 0.627 → 0.598,
+  dsm 0.762 → 0.743).
+- **dsm_anneal lands between the parents on every axis** (predicted):
+  most of recon's NMSE, most of dsm's structure, a third less death.
+- **Sparse probing stays a wash for all arms** — and notably dsm_anneal's
+  reduced death did NOT unlock a probing win, weakening the "dead-capacity
+  tax" explanation and strengthening the alternatives: per-token
+  topic/sentiment concepts are too dense/easy to discriminate objectives,
+  and the detection advantage should live in temporal/behavioural
+  structure (next: backtracking detection on the Llama pairs).
+
 ### Files
 
 - `cache_activations.py` — one-off cache job (model forwards on Modal).

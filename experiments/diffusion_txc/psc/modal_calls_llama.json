@@ -1,0 +1,14 @@
+{
+  "gpu": "L40S",
+  "seeds": [
+    2,
+    3
+  ],
+  "backend": "modal",
+  "calls": {
+    "llama_dsm_s2": "fc-01KZQEW5M8KZVVPQCRR3ZY7M2K",
+    "llama_dsm_s3": "fc-01KZQEW5Q9PTSD2QN8B0W55P1B",
+    "llama_recon_s2": "fc-01KZQEW5T7MA7EG0TTMRBEBPNQ",
+    "llama_recon_s3": "fc-01KZQEW5Y0JYH9ADXWAWGFZRYX"
+  }
+}
