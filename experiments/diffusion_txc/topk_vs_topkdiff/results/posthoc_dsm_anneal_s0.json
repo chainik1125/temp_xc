@@ -1,0 +1,56 @@
+{
+  "experiment": "posthoc_gate",
+  "arm": "dsm_anneal",
+  "seed": 0,
+  "ckpt_dir": "logs_100M",
+  "calibration": {
+    "topk_mean_l0": 40.0,
+    "alive_under_topk": 5323,
+    "gate_mean_l0": 40.34449768066406,
+    "gate_l0_std": 9.480896949768066
+  },
+  "sparse_probing": {
+    "ag_news": {
+      "k=1": 0.4925,
+      "k=5": 0.695,
+      "k=20": 0.84625,
+      "k=all": 0.9
+    },
+    "amazon_polarity": {
+      "k=1": 0.54375,
+      "k=5": 0.83,
+      "k=20": 0.88875,
+      "k=all": 0.8925
+    },
+    "dbpedia": {
+      "k=1": 0.57125,
+      "k=5": 0.9625,
+      "k=20": 0.985,
+      "k=all": 0.985
+    }
+  },
+  "absorption": {
+    "first_letter_probe_acc": 0.9175395858708891,
+    "absorption_rate_mean": 0.4322803682967571,
+    "n_letters": 24
+  },
+  "fragility": {
+    "eps=0.05": {
+      "support_jaccard": 0.9631323218345642,
+      "probe_flip_rate": 0.0
+    },
+    "eps=0.1": {
+      "support_jaccard": 0.9273099899291992,
+      "probe_flip_rate": 6.319514661274014e-05
+    },
+    "eps=0.25": {
+      "support_jaccard": 0.8222032189369202,
+      "probe_flip_rate": 0.000884732052578362
+    },
+    "eps=0.5": {
+      "support_jaccard": 0.6367343664169312,
+      "probe_flip_rate": 0.007962588473205258
+    }
+  },
+  "_runtime_s": 1487.6
+}

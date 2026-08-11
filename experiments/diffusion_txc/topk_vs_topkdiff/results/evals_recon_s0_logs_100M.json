@@ -1,0 +1,59 @@
+{
+  "experiment": "topkdiff_evals",
+  "arm": "recon",
+  "seed": 0,
+  "ckpt_dir": "logs_100M",
+  "sparse_probing": {
+    "ag_news": {
+      "k=1": 0.4675,
+      "k=5": 0.66875,
+      "k=20": 0.85,
+      "k=all": 0.8825
+    },
+    "amazon_polarity": {
+      "k=1": 0.6375,
+      "k=5": 0.6675,
+      "k=20": 0.81375,
+      "k=all": 0.8875
+    },
+    "dbpedia": {
+      "k=1": 0.61375,
+      "k=5": 0.95625,
+      "k=20": 0.97875,
+      "k=all": 0.98875
+    }
+  },
+  "absorption": {
+    "first_letter_probe_acc": 0.9121802679658952,
+    "absorption_rate_mean": 0.4927746351360038,
+    "n_letters": 24
+  },
+  "fragility": {
+    "eps=0.05": {
+      "support_jaccard": 0.9489504098892212,
+      "probe_flip_rate": 0.0
+    },
+    "eps=0.1": {
+      "support_jaccard": 0.9058291912078857,
+      "probe_flip_rate": 0.0001263902932254803
+    },
+    "eps=0.25": {
+      "support_jaccard": 0.7840349674224854,
+      "probe_flip_rate": 0.000884732052578362
+    },
+    "eps=0.5": {
+      "support_jaccard": 0.597632646560669,
+      "probe_flip_rate": 0.0056243680485338725
+    }
+  },
+  "autointerp": {
+    "skipped": "no autointerp dump at /vol/logs_100M/recon_s0_autointerp.json"
+  },
+  "_runtime_s": 693.2,
+  "provenance": {
+    "backend": "modal",
+    "budget": "100M",
+    "base_model": "gemma-2-2b",
+    "ckpt_dir": "logs_100M"
+  }
+}

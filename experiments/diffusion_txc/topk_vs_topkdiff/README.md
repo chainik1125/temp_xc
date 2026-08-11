@@ -185,6 +185,21 @@ Verdicts at 10× budget:
   and the detection advantage should live in temporal/behavioural
   structure (next: backtracking detection on the Llama pairs).
 
+### Post-hoc gate swap (σ→0-slice ablation, 2026-08-11)
+
+Same trained 100M checkpoints, TopK replaced at eval by rate-calibrated
+per-latent threshold gates (mean L0 = 40 matched; per-token std ≈ 10).
+Result: **weight-borne properties don't move** (absorption identical to
+three decimals; fragility equal or slightly lower) while **readout-borne
+properties improve for every arm** — k=5 sparse probing +3.2 to +5.3
+points (recon 0.789 → 0.835, dsm 0.779 → 0.811, dsm_anneal 0.787 →
+0.840), k=1 flat. Interpretation per the MMSE note: absorption and
+robustness live in the dictionary; the gate shape governs readout, and
+the Bayes-limit gate (variable L0, no winner-take-all) reads better than
+TopK regardless of training objective. Free eval-time improvement;
+strengthens the case for training the full σ-conditioned `bayes_gate`
+family. The arm-vs-arm probing wash persists under both gates.
+
 ### Files
 
 - `cache_activations.py` — one-off cache job (model forwards on Modal).

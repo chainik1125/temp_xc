@@ -1,0 +1,59 @@
+{
+  "experiment": "topkdiff_evals",
+  "arm": "dsm_anneal",
+  "seed": 1,
+  "ckpt_dir": "logs_100M",
+  "sparse_probing": {
+    "ag_news": {
+      "k=1": 0.5025,
+      "k=5": 0.71875,
+      "k=20": 0.80875,
+      "k=all": 0.8925
+    },
+    "amazon_polarity": {
+      "k=1": 0.635,
+      "k=5": 0.78375,
+      "k=20": 0.87125,
+      "k=all": 0.87375
+    },
+    "dbpedia": {
+      "k=1": 0.57375,
+      "k=5": 0.9425,
+      "k=20": 0.985,
+      "k=all": 0.98875
+    }
+  },
+  "absorption": {
+    "first_letter_probe_acc": 0.915347137637028,
+    "absorption_rate_mean": 0.38541345535754523,
+    "n_letters": 24
+  },
+  "fragility": {
+    "eps=0.05": {
+      "support_jaccard": 0.9567214846611023,
+      "probe_flip_rate": 6.319514661274014e-05
+    },
+    "eps=0.1": {
+      "support_jaccard": 0.9197167754173279,
+      "probe_flip_rate": 0.0001263902932254803
+    },
+    "eps=0.25": {
+      "support_jaccard": 0.8166577219963074,
+      "probe_flip_rate": 0.0009479271991911021
+    },
+    "eps=0.5": {
+      "support_jaccard": 0.6552836894989014,
+      "probe_flip_rate": 0.010111223458038422
+    }
+  },
+  "autointerp": {
+    "skipped": "no autointerp dump at /vol/logs_100M/dsm_anneal_s1_autointerp.json"
+  },
+  "_runtime_s": 614.3,
+  "provenance": {
+    "backend": "modal",
+    "budget": "100M",
+    "base_model": "gemma-2-2b",
+    "ckpt_dir": "logs_100M"
+  }
+}
