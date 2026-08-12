@@ -602,7 +602,22 @@ Pending — the remaining window-arm shards are still generating.
   decode-time window buffer matches a full-sequence projection.
 - `experiments/backtracking_steering_dsm/modal_mine.py`,
   `modal_steer.py`, `modal_wave2.py`, `modal_judge.py` — the Modal entrypoints.
+  Name the entrypoint explicitly (`::main`, `::drive`): these modules have
+  several, and a bare `modal run <file>` prints the list and exits without
+  running anything, which is indistinguishable from a launch in a detached log.
+  `modal_wave2.py::drive` runs the fan-out and merge from inside a container so
+  a client disconnect cannot cancel the grid.
 - `experiments/backtracking_steering_dsm/coh_check.py`, `analyse.py` — the
   CPU-side gate check and wave aggregation.
-- Artifacts on the `diffusion-txc` volume under `backtracking_eval/steering/`:
-  `gates.json`, `coh_check.json`, `features/`, `wave1/`, `wave2/`.
+- `experiments/backtracking_steering_dsm/symmetry.py` — the even/odd
+  decomposition and the bootstrap CI on the excess directional component;
+  `plot_symmetry.py` draws it.
+- `experiments/backtracking_steering_dsm/projector_damage.py` — the α = 0
+  projected-vs-unprojected confound control.
+- `experiments/backtracking_steering_dsm/plot_curves.py` — the two-panel
+  α-curve figure, effect over quality.
+- Derived artifacts in `results/backtracking_steering/`; figures in
+  `docs/dmitry/proposals/figures/`.
+- Raw generations (9 + 7 sources × 500 rows) stay on the `diffusion-txc` volume
+  under `backtracking_eval/steering/`: `gates.json`, `coh_check.json`,
+  `features/`, `features_w6/`, `wave1/`, `wave2/`, and the pre-flight JSONs.
