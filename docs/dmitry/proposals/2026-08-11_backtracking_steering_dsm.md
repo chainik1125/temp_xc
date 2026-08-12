@@ -544,9 +544,53 @@ comparable:
   with rate-KL is expected to be non-degenerate, so nothing here should be read
   as evidence against gated dictionaries at T=6.
 
+#### The denoise-after-steer arm: the projector destroys generation
+
+The result is the flattened Δgc curve the pre-registration anticipated, and the
+α = 0 control identifies the cause unambiguously. Δgc is not merely flat — `gc`
+is **0.00 at every one of the 25 magnitudes**, and not a single row at any
+magnitude clears the Sonnet floor.
+
+| α | −16 | −8 | −4 | −1 | **0** | +1 | +4 | +7 | +12 | +16 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gc | 0.00 | 0.00 | 0.00 | 0.00 | **0.00** | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| mean Sonnet grade | 0.00 | 0.10 | 0.20 | 0.40 | **0.55** | 0.50 | 0.45 | 1.00 | 0.00 | 0.00 |
+| frac ≥ floor | 0.00 | 0.00 | 0.00 | 0.00 | **0.00** | 0.00 | 0.00 | 0.00 | 0.00 | 0.00 |
+| mean words | 1390 | 592 | 574 | 408 | **423** | 197 | 261 | 761 | 871 | 1474 |
+
+**At α = 0 the steering vector contributes exactly nothing, and generation is
+already destroyed** — mean Sonnet grade 0.55, zero rows above the floor. The
+projector alone, with the steer switched off, reduces the model to word salad:
+
+```text
+ So, I's, about,. I's the a  . I.. the  thth. the  So. the 0... the
+ the.0.0.0.0. SoSo. the...........................................
+```
+
+By the pre-registered reading this settles it: the arm measures **projector
+damage, not steering dynamics**. The flattened Δgc curve carries no information
+about whether denoising removes a steer's temporal signature, because there is
+no surviving generation in which such a signature could be observed. Per the
+pre-registration, a negative result here "bounds the method to domain-matched
+projectors and does not speak to temporal structure", and that is exactly the
+conclusion.
+
+This is a coherent story rather than a surprise. A dictionary that reconstructs
+distill windows at NMSE 0.795 while drawing every window from the same 605-atom
+sub-dictionary cannot substitute for the residual stream, and replacing 786,150
+positions with its output destroys the computation. The mechanics of the hook
+were sound — 786,150 positions projected against exactly 2,500 passed through,
+which is precisely 500 generations × (T−1) prefill positions with no history,
+matching the unit test — so this is the projector's representational failure,
+not an implementation fault.
+
+Manifold-projected steering remains untested. It needs a projector that is alive
+on the deployment distribution, which is the mixed-corpus training round rather
+than anything available tonight.
+
 #### Wave-2 results
 
-Pending — the T=6 arms truncate at ~20:20 EDT and the grid runs after that.
+Pending — the remaining window-arm shards are still generating.
 
 ### Files
 
