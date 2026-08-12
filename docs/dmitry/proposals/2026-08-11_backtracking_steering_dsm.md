@@ -388,12 +388,16 @@ Two readings this table does **not** support:
   *negative* α that induces backtracking. Steering along the +decoder direction
   suppresses. This is reported as found; no attempt is made to redefine the sign
   to make it read more naturally.
-- **Multiple comparisons are uncorrected.** Eight sources, each with a peak
-  chosen over 11–16 coherent magnitudes. One nominal 95% CI excluding zero
-  across that many selections is weak on its own; `stageB_txc` pos0 is
-  comfortable ([+0.50, +1.50]) and `ours_dsm_s2` is marginal ([+0.05, +1.10]).
-  The monotone dose-response, not the CI, is what makes the crosscoder result
-  credible.
+- **The peak Δgc column is selection-biased.** Nine sources, each with a peak
+  chosen over 11–20 coherent magnitudes, so a nominal 95% CI on the *peak*
+  excluding zero is weak evidence on its own; `stageB_txc` pos0 is comfortable
+  ([+0.50, +1.50]) and `ours_dsm_s2` marginal ([+0.05, +1.10]).
+
+  The excess-directional statistic does not share this problem, which is the
+  main reason it carries the headline. It is a fixed functional of the whole
+  curve — the mean odd component over every paired magnitude — with no maximum
+  taken anywhere, so there is no selection to correct for. Its bootstrap
+  resamples prompts, the actual unit of replication here.
 - **n = 20 prompts.** Every CI here is wide. These are ordering claims among
   arms run through one pipeline, not calibrated effect sizes.
 
