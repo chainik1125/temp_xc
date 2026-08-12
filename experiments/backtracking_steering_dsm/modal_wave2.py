@@ -26,15 +26,17 @@ out of the projected arm's window buffer. See steer_one_w6 for why that matters.
 Everything downstream of generation (judging, aggregation) is shared with wave 1,
 and runs against the merged rows__<tag>.json, not the per-shard files.
 
-Operational note, held with some uncertainty but cheap to respect: do not invoke
-a second entrypoint of THIS module while a detached ::drive grid is running. The
-grid died once at 17/35 with `ClientClosed` inside the driver container roughly
-eight minutes after a `::merge_cmd` run against the same app name completed,
-while the projected-arm driver -- which nothing was run against -- finished
-cleanly. That is circumstantial rather than proven, but the grid is expensive
-and the cost of waiting is nil: merge is idempotent and the driver runs it at
-the end anyway. Shards are individually resumable, so a relaunch after any such
-death only reruns what is missing.
+LAUNCH THE GRID WITH `::drive`, WHICH SPAWNS AND EXITS. The reason is empirical:
+a driver invoked with a blocking `.remote()` died twice mid-grid (at 17/35 and
+again at 19/35) with `ClientClosed` inside the driver container, each time when
+the long-lived local client process disappeared -- `--detach` did not save it.
+A first guess that a concurrent `::merge_cmd` run was to blame was WRONG: the
+second death happened with nothing else touching the module.
+
+What survives is a client that exits in seconds. `drive` therefore `.spawn()`s
+the driver and returns the call id immediately, so there is no hours-long local
+process whose death can take the app with it. Shards are individually
+resumable, so any relaunch only reruns what is missing.
 """
 
 import json
@@ -585,10 +587,19 @@ def drive_grid(only_projected: bool = False,
 
 
 @app.local_entrypoint()
-def drive(only_projected: bool = False, skip_projected: bool = False):
-    """Preferred launcher -- survives client disconnects. See drive_grid."""
-    print(json.dumps(drive_grid.remote(only_projected=only_projected,
-                                       skip_projected=skip_projected), indent=2))
+def drive(only_projected: bool = False, skip_projected: bool = False,
+          block: bool = False):
+    """Preferred launcher. Spawns the driver and exits within seconds, so no
+    long-lived local process exists whose death can stop the app -- which is how
+    two earlier grids died. Progress is read off the volume, not off this
+    process. `--block` restores the old waiting behaviour for short runs."""
+    call = drive_grid.spawn(only_projected=only_projected,
+                            skip_projected=skip_projected)
+    print(json.dumps({"spawned_call_id": call.object_id,
+                      "only_projected": only_projected,
+                      "skip_projected": skip_projected}, indent=2))
+    if block:
+        print(json.dumps(call.get(), indent=2))
 
 
 @app.local_entrypoint()
