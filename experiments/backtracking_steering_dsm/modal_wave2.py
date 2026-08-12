@@ -12,7 +12,8 @@
     #    ... or one half of it at a time:
     uvx modal run --detach .../modal_wave2.py::main --skip-projected
     uvx modal run --detach .../modal_wave2.py::main --only-projected
-    # 3b. re-merge shards only (the grid entrypoint already does this)
+    # 3b. re-merge shards only (the grid entrypoint already does this).
+    #     Do NOT run this while a ::drive grid is in flight -- see below.
     uvx modal run experiments/backtracking_steering_dsm/modal_wave2.py::merge_cmd
 
 The grid is sharded by PROMPT across N_SHARDS containers per source (7 sources
@@ -24,6 +25,16 @@ out of the projected arm's window buffer. See steer_one_w6 for why that matters.
 
 Everything downstream of generation (judging, aggregation) is shared with wave 1,
 and runs against the merged rows__<tag>.json, not the per-shard files.
+
+Operational note, held with some uncertainty but cheap to respect: do not invoke
+a second entrypoint of THIS module while a detached ::drive grid is running. The
+grid died once at 17/35 with `ClientClosed` inside the driver container roughly
+eight minutes after a `::merge_cmd` run against the same app name completed,
+while the projected-arm driver -- which nothing was run against -- finished
+cleanly. That is circumstantial rather than proven, but the grid is expensive
+and the cost of waiting is nil: merge is idempotent and the driver runs it at
+the end anyway. Shards are individually resumable, so a relaunch after any such
+death only reruns what is missing.
 """
 
 import json
