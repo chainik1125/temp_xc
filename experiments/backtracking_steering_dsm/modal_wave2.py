@@ -4,8 +4,14 @@
     uvx modal run experiments/backtracking_steering_dsm/modal_wave2.py::preflight_cmd
     # 2. mine the trio's best backtracking feature
     uvx modal run --detach experiments/backtracking_steering_dsm/modal_wave2.py::mine_cmd
-    # 3. the grid (unprojected sources + the projected variant of w6_dsm)
-    uvx modal run --detach experiments/backtracking_steering_dsm/modal_wave2.py
+    # 3. the grid. NAME THE ENTRYPOINT -- this module has four local
+    #    entrypoints, so a bare `modal run <file>` does not default to main:
+    #    it prints the entrypoint list and exits 1 without running anything,
+    #    which looks like a launch until you check the volume.
+    uvx modal run --detach experiments/backtracking_steering_dsm/modal_wave2.py::main
+    #    ... or one half of it at a time:
+    uvx modal run --detach .../modal_wave2.py::main --skip-projected
+    uvx modal run --detach .../modal_wave2.py::main --only-projected
     # 3b. re-merge shards only (the grid entrypoint already does this)
     uvx modal run experiments/backtracking_steering_dsm/modal_wave2.py::merge_cmd
 
