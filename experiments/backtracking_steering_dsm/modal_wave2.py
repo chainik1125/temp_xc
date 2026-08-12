@@ -524,6 +524,43 @@ def list_sources_w6() -> list[dict]:
     return [{k: v for k, v in s.items() if k != "vector"} for s in _w6_sources()]
 
 
+@app.function(image=image, timeout=21600, volumes={"/vol": vol})
+def drive_grid(only_projected: bool = False,
+               skip_projected: bool = False) -> dict:
+    """Fan the grid out from INSIDE Modal, then merge.
+
+    `modal run --detach` only keeps the LAST-triggered function alive once the
+    local client disconnects, and a `.map()` issued from a local entrypoint is
+    not that -- so a client-side gRPC drop cancels every running shard. That
+    happened twice tonight, the second time killing the grid at 8 of 35 shards
+    with no error on the remote side.
+
+    Driving the map from a container makes the driver itself the single
+    triggered function, so the client can die freely: the driver keeps the
+    shards alive and runs the merge when they finish. Shards are individually
+    resumable, so re-running this after any failure only reruns what is
+    missing.
+    """
+    srcs = _w6_sources()
+    if skip_projected:
+        srcs = [s for s in srcs if not s["projected"]]
+    if only_projected:
+        srcs = [s for s in srcs if s["projected"]]
+    cells = [(s["tag"], i) for s in srcs for i in range(N_SHARDS)]
+    print(f"[drive] {len(srcs)} sources x {N_SHARDS} shards = {len(cells)} cells",
+          flush=True)
+    res = list(steer_one_w6.map(cells))
+    print(f"[drive] all {len(res)} cells returned; merging", flush=True)
+    return {"cells": res, "merge": merge_shards.remote()}
+
+
+@app.local_entrypoint()
+def drive(only_projected: bool = False, skip_projected: bool = False):
+    """Preferred launcher -- survives client disconnects. See drive_grid."""
+    print(json.dumps(drive_grid.remote(only_projected=only_projected,
+                                       skip_projected=skip_projected), indent=2))
+
+
 @app.local_entrypoint()
 def main(only_projected: bool = False, skip_projected: bool = False):
     """`--skip-projected` runs only the six unprojected window sources;
