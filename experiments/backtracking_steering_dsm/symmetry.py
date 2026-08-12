@@ -24,11 +24,83 @@ from __future__ import annotations
 
 import argparse
 import json
+import random
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
 def _mean(xs):
     return (sum(xs) / len(xs)) if xs else float("nan")
+
+
+# --------------------------------------------------------------------------
+# bootstrap CI on the excess directional component
+# --------------------------------------------------------------------------
+
+def _per_prompt(wave_dir: Path) -> dict:
+    """-> {tag: {(prompt_id, magnitude): genuine_count}}, judged rows only."""
+    out = {}
+    for rp in sorted(wave_dir.glob("rows__*.json")):
+        tag = rp.name[len("rows__"):-len(".json")]
+        jp = wave_dir / f"judged__{tag}.json"
+        if not jp.exists():
+            continue
+        try:
+            rows = json.loads(rp.read_text())["rows"]
+            judged = json.loads(jp.read_text())
+        except ValueError:
+            continue
+        d = {}
+        for i, r in enumerate(rows):
+            g = int(judged.get(str(i), {}).get("genuine_count", -1))
+            if g >= 0:
+                d[(r["prompt_id"], r["magnitude"])] = g
+        out[tag] = d
+    return out
+
+
+def _mean_anti(d: dict, pids: list[str], mags: list[float]) -> float:
+    """Mean odd component over |mags|, evaluated on the given prompt multiset."""
+    vals = []
+    for a in mags:
+        hi = [d[(p, a)] for p in pids if (p, a) in d]
+        lo = [d[(p, -a)] for p in pids if (p, -a) in d]
+        if hi and lo:
+            vals.append((_mean(lo) - _mean(hi)) / 2)
+    return _mean(vals)
+
+
+def bootstrap_excess_anti(wave_dir: Path, control: str, mags: list[float],
+                          n_resamples: int = 2000, seed: int = 42,
+                          ci: float = 0.95) -> dict:
+    """Percentile CI on (arm mean_anti - control mean_anti).
+
+    Prompts are resampled with replacement and the SAME resampled prompt set is
+    used for the arm and for the control, so the pairing that makes the
+    subtraction meaningful is preserved -- resampling them independently would
+    inflate the interval with variance the comparison does not actually carry.
+    """
+    per = _per_prompt(wave_dir)
+    if control not in per:
+        return {}
+    pids = sorted({p for p, _ in per[control]})
+    rng = random.Random(seed)
+    draws = [[pids[rng.randrange(len(pids))] for _ in pids]
+             for _ in range(n_resamples)]
+    out = {}
+    for tag, d in per.items():
+        if tag == control:
+            continue
+        point = _mean_anti(d, pids, mags) - _mean_anti(per[control], pids, mags)
+        vals = sorted(_mean_anti(d, s, mags) - _mean_anti(per[control], s, mags)
+                      for s in draws)
+        lo = vals[int((1 - ci) / 2 * n_resamples)]
+        hi = vals[int((1 + ci) / 2 * n_resamples) - 1]
+        out[tag] = {"excess_anti": point, "ci95": [lo, hi],
+                    "excludes_zero": (lo > 0) or (hi < 0)}
+    return out
 
 
 def decompose(curve: list[dict], require_coherent: bool = True) -> dict:
@@ -64,6 +136,8 @@ def main(argv=None) -> int:
     p.add_argument("--curves", type=Path, required=True)
     p.add_argument("--control", default="control_random")
     p.add_argument("--out", type=Path, default=None)
+    p.add_argument("--wave-dir", type=Path, default=None,
+                   help="rows+judged dir; enables the bootstrap CI on excess anti")
     a = p.parse_args(argv)
 
     curves = json.loads(a.curves.read_text())
@@ -109,6 +183,20 @@ def main(argv=None) -> int:
     else:
         print(f"\n[warn] control '{a.control}' not in curves; "
               f"no excess computed", flush=True)
+
+    if ctl and a.wave_dir:
+        mags = sorted({r["abs_magnitude"] for r in ctl["per_magnitude"]})
+        boot = bootstrap_excess_anti(a.wave_dir, a.control, mags)
+        print(f"\nexcess anti with prompt-bootstrap 95% CI "
+              f"(|alpha| in {[f'{m:g}' for m in mags]}):")
+        print(f"{'source':38s} {'excess anti':>12} {'95% CI':>20} {'sig':>5}")
+        for tag, b in sorted(boot.items(), key=lambda kv: -kv[1]["excess_anti"]):
+            print(f"{tag:38s} {b['excess_anti']:>+12.3f} "
+                  f"[{b['ci95'][0]:>+7.3f}, {b['ci95'][1]:>+7.3f}] "
+                  f"{'yes' if b['excludes_zero'] else 'no':>5}")
+        for tag, d in dec.items():
+            if tag in boot:
+                d["bootstrap_excess_anti"] = boot[tag]
 
     if a.out:
         a.out.parent.mkdir(parents=True, exist_ok=True)

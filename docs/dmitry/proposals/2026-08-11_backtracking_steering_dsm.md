@@ -32,11 +32,12 @@ backtracking. This one asks whether they can *cause* it.
   generation length, Δgc = +1.00 [+0.50, +1.50] at the peak.
 - **A norm-matched random direction reproduces conventional steering's entire
   effect.** Splitting each curve into its even (magnitude) and odd (direction)
-  parts about α = 0, and subtracting the random control at matched |α|, the DoM
-  baseline retains a directional component of **+0.015** while the crosscoder
-  retains **+0.417**. DoM steering at this site does nothing a random vector of
-  the same norm would not also do; the crosscoder does. Without the control the
-  raw peak column ranks DoM third, on an effect that is free.
+  parts about α = 0 and subtracting the random control at matched |α|, the DoM
+  baseline's directional component is **indistinguishable from zero (+0.015,
+  CI [−0.13, +0.15])** while the crosscoder's is **+0.42 (CI [+0.31, +0.52])**.
+  DoM steering at this site does nothing a random vector of the same norm would
+  not also do; the crosscoder does. Without the control the raw peak column
+  ranks DoM third, on an effect that is free.
 - Mined selectivity does not predict causal potency: the strongest mined feature
   (+0.806) gives one of the weakest effects.
 - **DSM dictionaries do not transfer to the deployment distribution, and the
@@ -312,36 +313,57 @@ destroying the generation.
 
 Decomposed into even and odd parts about α = 0:
 
-| source | sym (magnitude) | anti (direction) | excess sym vs control | **excess anti vs control** |
+| source | sym (magnitude) | anti (direction) | **excess anti vs control** | 95% CI |
 | --- | --- | --- | --- | --- |
-| `stageB_txc_f14621_pos0` | −0.040 | +0.406 | −0.187 | **+0.417** |
-| `stageB_txc_f14621_union` | −0.210 | +0.381 | −0.358 | **+0.392** |
-| `stageB_topk_sae_f9876_pos0` | +0.117 | +0.058 | −0.031 | +0.069 |
-| `stageB_txc_h13_f1183_union` | −0.004 | +0.042 | −0.152 | +0.052 |
-| `stageB_txc_h13_f1183_pos0` | +0.017 | +0.037 | −0.131 | +0.048 |
-| `ours_recon_s2_f13776_pos0` | +0.027 | +0.027 | −0.121 | +0.038 |
-| `dom_base_union` | +0.113 | +0.004 | −0.035 | **+0.015** |
-| `ours_dsm_s2_f4366_pos0` | +0.023 | −0.135 | −0.125 | −0.125 |
+| `stageB_txc_f14621_pos0` | −0.040 | +0.406 | **+0.417** | [+0.31, +0.52] |
+| `stageB_txc_f14621_union` | −0.210 | +0.381 | **+0.392** | [+0.27, +0.52] |
+| `stageB_topk_sae_f9876_pos0` | +0.117 | +0.058 | +0.069 | [+0.01, +0.14] |
+| `stageB_txc_h13_f1183_union` | −0.004 | +0.042 | +0.052 | [−0.10, +0.18] |
+| `stageB_txc_h13_f1183_pos0` | +0.017 | +0.037 | +0.048 | [−0.10, +0.18] |
+| `ours_recon_s2_f13776_pos0` | +0.027 | +0.027 | +0.038 | [−0.09, +0.16] |
+| `dom_base_union` | +0.113 | +0.004 | **+0.015** | **[−0.13, +0.15]** |
+| `ours_dsm_s2_f4366_pos0` | +0.023 | −0.135 | −0.125 | [−0.23, −0.04] |
 | `control_random` | +0.148 | −0.010 | — | — |
+
+The CI is a prompt-resampling bootstrap on the excess itself, with the *same*
+resampled prompt set used for the arm and the control so the pairing that makes
+the subtraction meaningful is preserved.
 
 The control answers the question it was added for, and the answer is the
 uncomfortable one for conventional steering. A norm-matched *random* direction
 reproduces the U-shape — its symmetric component (+0.148) is in fact slightly
 **larger** than the DoM baseline's (+0.113) — and both have an antisymmetric
-component indistinguishable from zero (−0.010 and +0.004). Subtracting the
-control at matched |α|, conventional DoM steering retains an excess directional
-component of **+0.015**. On this evidence, DoM steering at layer 10 of this
-model does nothing a random vector of the same norm would not also do.
+component indistinguishable from zero (−0.010 and +0.004).
 
-Against that baseline the Stage B crosscoder's slot-0 direction retains an
-excess directional component of **+0.417**, roughly 28× dom's and 6× the next
-best arm. The union mode of the same feature retains +0.392. Every other
-source, including both of our own flat dictionaries, sits at or below +0.069.
+The headline statistic is therefore this: **the DoM baseline's directional
+component is indistinguishable from zero (+0.015, CI [−0.13, +0.15]), while the
+Stage B crosscoder's slot-0 direction is +0.42 (CI [+0.31, +0.52])**. Only three
+sources have an excess whose interval excludes zero — the crosscoder in both
+modes, and `stageB_topk_sae` marginally at +0.069 [+0.01, +0.14]. Conventional
+DoM steering at layer 10 of this model does nothing a random vector of the same
+norm would not also do. (The ratio between the two numbers is not a meaningful
+quantity: it divides by something consistent with zero.)
 
 This is the strongest claim in the study, and note that it *only* becomes
 available with the control: the raw peak Δgc column ranks `dom_base_union`
 third, ahead of five mined directions, purely on a nonspecific effect that the
 control shows is available for free.
+
+Two readings this table does **not** support:
+
+- `control_random` is the least *damaging* source in the study — 20 of 25 cells
+  clear the Sonnet floor against 11–16 for the mined directions. That shows the
+  mined directions do **structured** harm at matched norm, i.e. they move the
+  model somewhere specific rather than adding isotropic noise. It does not by
+  itself show the harm is on-target; the coherent-cell counts are in the main
+  table so the two can be read together.
+- `ours_dsm_s2` has a *negative* excess directional component
+  (−0.125, CI [−0.23, −0.04]). This should not be read as "DSM steers
+  backwards". Two known factors apply and neither is resolvable here: the arm's
+  mined feature carries the sign inversion described below, and the dictionary
+  enters the comparison OOD-capped, with 3.7% of its latents alive at the
+  steering site. Its status is the same as the projected arm's — uninformative
+  under transfer failure.
 
 #### What this does not show
 
