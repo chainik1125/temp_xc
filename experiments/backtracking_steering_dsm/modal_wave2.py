@@ -105,7 +105,8 @@ def _shard_bounds(n: int, shard: int, n_shards: int = N_SHARDS) -> tuple[int, in
 @app.function(image=image, gpu="L40S", timeout=5400, memory=65536,
               volumes={"/vol": vol, "/hf": hf_cache}, secrets=[hf_secret])
 def preflight(n_traces: int = DISTILL_TRACES, n_windows: int = 20000,
-              min_step: int = 0, label: str = "final") -> dict:
+              min_step: int = 0, label: str = "final",
+              arms: str = "w6") -> dict:
     """NMSE + live-latent fraction of each w6 dictionary on DeepSeek-R1-Distill
     resid_L10 windows.
 
@@ -128,8 +129,9 @@ def preflight(n_traces: int = DISTILL_TRACES, n_windows: int = 20000,
     # the volume right now -- an interim read while training is still going. The
     # gating run passes w6.TRUNC_MIN_STEP.
     vol.reload()
+    arm_list = w6.W6MIX_ARMS if arms == "w6mix" else w6.W6_ARMS
     resolved = {a["name"]: w6.resolve_ckpt("/vol", a, min_step=min_step)
-                for a in w6.W6_ARMS}
+                for a in arm_list}
     status = {k: v[1] for k, v in resolved.items()}
     ready = {k: v[0] for k, v in resolved.items()}
     missing = [k for k, v in ready.items() if v is None]
@@ -178,8 +180,8 @@ def preflight(n_traces: int = DISTILL_TRACES, n_windows: int = 20000,
 
     out = {"n_traces": n_traces, "target_model": HF_ID, "layer": LAYER,
            "n_tokens": int(acts.shape[0]), "label": label,
-           "min_step": min_step, "arms": []}
-    for a in w6.W6_ARMS:
+           "min_step": min_step, "arm_set": arms, "arms": []}
+    for a in arm_list:
         model, meta = w6.load_w6(ready[a["name"]])
         r = w6.preflight(model, meta["arch"], win)
         r["name"] = a["name"]
@@ -192,6 +194,21 @@ def preflight(n_traces: int = DISTILL_TRACES, n_windows: int = 20000,
         del model
         torch.cuda.empty_cache()
 
+    # Pre-registered projector gate. Both conditions must hold: a dictionary
+    # that fires ~1 latent per window can score a low NMSE by reproducing little
+    # more than b_dec, so NMSE alone would pass a projector that is dead.
+    g = w6.PROJECTOR_GATE
+    out["projector_gate"] = {
+        "thresholds": g,
+        "verdict": {r["name"]: {
+            "nmse": r["nmse"], "live_fraction": r["live_fraction"],
+            "passes": (r["nmse"] < g["max_nmse"]
+                       and r["live_fraction"] > g["min_live_fraction"])}
+            for r in out["arms"]}}
+    for n, v in out["projector_gate"]["verdict"].items():
+        print(f"[gate] {n:10s} nmse={v['nmse']:.4f} live={v['live_fraction']:.4f}"
+              f" -> {'PASS' if v['passes'] else 'FAIL'}", flush=True)
+
     out["_runtime_s"] = round(time.time() - t0, 1)
     d = pathlib.Path("/vol/backtracking_eval/steering")
     d.mkdir(parents=True, exist_ok=True)
@@ -201,11 +218,13 @@ def preflight(n_traces: int = DISTILL_TRACES, n_windows: int = 20000,
 
 
 @app.local_entrypoint()
-def preflight_cmd(interim: bool = False):
-    """`--interim` reads the current periodic checkpoints mid-training."""
+def preflight_cmd(interim: bool = False, mix: bool = False):
+    """`--interim` reads the current periodic checkpoints mid-training.
+    `--mix` gates the mixed-corpus DSM dictionary as a candidate projector."""
     print(json.dumps(preflight.remote(
-        min_step=0 if interim else TRUNC_MIN_STEP,
-        label="interim" if interim else "final"), indent=2))
+        min_step=0 if (interim or mix) else TRUNC_MIN_STEP,
+        label="w6mix" if mix else ("interim" if interim else "final"),
+        arms="w6mix" if mix else "w6"), indent=2))
 
 
 # --------------------------------------------------------------------------

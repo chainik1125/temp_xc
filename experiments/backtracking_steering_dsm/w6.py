@@ -50,6 +50,20 @@ W6_ARMS = [
     {"name": "w6_bayes", "dir": "txc_w6/txc_bayes", "stem": "bayes_gate_s0"},
 ]
 
+# Mixed-corpus DSM window dictionary: same recipe and hookpoint as w6_dsm, but
+# trained on a 72/28 trace/FineWeb mix. It exists to test whether the
+# direction-deep OOD collapse that made w6_dsm unusable as a projector is fixed
+# by covering the deployment TEXT domain in training.
+W6MIX_ARMS = [
+    {"name": "w6mix_dsm", "dir": "txc_w6_mix/txc_dsm", "stem": "dsm_s0"},
+]
+
+# Pre-registered gate for reusing a dictionary as a steering-time projector,
+# fixed before the mixed-corpus checkpoint existed. Both must hold: a low NMSE
+# alone is not evidence of manifold competence, because a dictionary firing ~1
+# latent per window scores well by predicting little more than b_dec.
+PROJECTOR_GATE = {"max_nmse": 0.4, "min_live_fraction": 0.30}
+
 
 def load_w6(ckpt_path: str | Path, device: str = "cuda"):
     """-> (model, meta). Architecture is inferred from the state_dict keys:
