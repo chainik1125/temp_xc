@@ -1,0 +1,83 @@
+{
+ "n_traces": 40,
+ "target_model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+ "layer": 10,
+ "n_tokens": 78395,
+ "label": "final",
+ "min_step": 15000,
+ "arms": [
+  {
+   "arch": "topk_sae_w6",
+   "n_windows": 20000,
+   "nmse": 0.853131480914901,
+   "live_latents": 10673,
+   "d_sae": 16384,
+   "live_fraction": 0.65142822265625,
+   "dead_fraction": 0.34857177734375,
+   "mean_l0": 95.99334716796875,
+   "std_l0": 0.3554040491580963,
+   "median_l0": 96.0,
+   "name": "w6_recon",
+   "train_final": null,
+   "ckpt": {
+    "arm": "w6_recon",
+    "ckpt_exists": true,
+    "finished": false,
+    "last_logged_step": 15750,
+    "ckpt_step": 15000,
+    "last_nmse_clean": 0.0458955984685896,
+    "last_dead_frac": 0.0093994140625,
+    "train_status": "partial"
+   }
+  },
+  {
+   "arch": "topk_sae_w6",
+   "n_windows": 20000,
+   "nmse": 0.7948743306077298,
+   "live_latents": 605,
+   "d_sae": 16384,
+   "live_fraction": 0.03692626953125,
+   "dead_fraction": 0.96307373046875,
+   "mean_l0": 95.91590118408203,
+   "std_l0": 0.5289055705070496,
+   "median_l0": 96.0,
+   "name": "w6_dsm",
+   "train_final": null,
+   "ckpt": {
+    "arm": "w6_dsm",
+    "ckpt_exists": true,
+    "finished": false,
+    "last_logged_step": 16000,
+    "ckpt_step": 15000,
+    "last_nmse_clean": 0.06080411475782338,
+    "last_dead_frac": 0.01190185546875,
+    "train_status": "partial"
+   }
+  },
+  {
+   "arch": "bayes_gate_w6",
+   "n_windows": 20000,
+   "nmse": 1.9167394871341554,
+   "live_latents": 8521,
+   "d_sae": 16384,
+   "live_fraction": 0.52008056640625,
+   "dead_fraction": 0.47991943359375,
+   "mean_l0": 131.8824005126953,
+   "std_l0": 105.96377563476562,
+   "median_l0": 128.0,
+   "name": "w6_bayes",
+   "train_final": null,
+   "ckpt": {
+    "arm": "w6_bayes",
+    "ckpt_exists": true,
+    "finished": false,
+    "last_logged_step": 17500,
+    "ckpt_step": 15000,
+    "last_nmse_clean": 0.05980355887220238,
+    "last_dead_frac": 0.947021484375,
+    "train_status": "partial"
+   }
+  }
+ ],
+ "_runtime_s": 102.8
+}

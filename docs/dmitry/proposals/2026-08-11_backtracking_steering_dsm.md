@@ -41,8 +41,8 @@ backtracking. This one asks whether they can *cause* it.
   (+0.806) gives one of the weakest effects.
 - **DSM dictionaries do not transfer to the deployment distribution, and the
   failure is direction-deep.** At the same NMSE, `w6_dsm` draws its 96 active
-  latents per window from a pool of 617 of 16384 (3.8%) on distill activations
-  while `w6_recon` keeps 71.3% of its pool alive. Per-latent threshold
+  latents per window from a pool of 605 of 16384 (3.7%) on distill activations
+  while `w6_recon` keeps 65.1% of its pool alive. Per-latent threshold
   recalibration on distill windows revives recon 8,586 → 16,046 but dsm
   214 → 215, because the DSM encoder's preactivations are almost all negative
   off-distribution. This is one of the central results here — see below.
@@ -400,25 +400,31 @@ the steering site, so it is measured before the grid rather than inferred from
 it. The dictionaries are trained on FineWeb through *base* Llama-3.1-8B; the
 steering site is *DeepSeek-R1-Distill* on reasoning traces.
 
-Interim numbers, step-5000 checkpoints, 78,395 distill tokens → 20,000 windows
+Gating numbers, step-15000 checkpoints, 78,395 distill tokens → 20,000 windows
 at `resid_L10`. NMSE is `psc_train_sae.py`'s own definition on raw unnormalised
 activations, so the two NMSE columns are directly comparable:
 
-| arm | NMSE on distill | NMSE at training site | live latents | train dead_frac |
-| --- | --- | --- | --- | --- |
-| `w6_recon` | 0.847 | 0.048 | 11684 / 16384 (71.3%) | 0.008 |
-| `w6_dsm` | **0.815** | 0.061 | **617 / 16384 (3.8%)** | 0.000 |
-| `w6_bayes` | 2.259 | 0.061 | 7720 / 16384 (47.1%) | 0.912 |
+| arm | NMSE on distill | NMSE at training site | live latents | L0 | train dead_frac |
+| --- | --- | --- | --- | --- | --- |
+| `w6_recon` | 0.853 | 0.046 | 10673 / 16384 (65.1%) | 96.0 | 0.009 |
+| `w6_dsm` | **0.795** | 0.061 | **605 / 16384 (3.7%)** | 95.9 | 0.012 |
+| `w6_bayes` | 1.917 | 0.060 | 8521 / 16384 (52.0%) | 131.9 | 0.947 |
 
-`w6_dsm` explains about 18% of the variance at the steering site against ~94% at
-its training site, and fires only 617 distinct latents across 20,000 windows.
+Training length is not the issue. An interim pre-flight on the step-5000
+checkpoints gave 0.847 / **0.815** / 2.259 with a `w6_dsm` live fraction of
+3.8%; ten thousand further steps moved `w6_dsm` to 0.795 at 3.7% live. The
+transfer failure is a property of the objective, not of undertraining.
+
+`w6_dsm` explains about 20% of the variance at the steering site against ~94% at
+its training site, and fires only 605 distinct latents across 20,000 windows.
 Since a TopK dictionary with `k = 96` fires exactly 96 latents per window by
 construction, that means every window is being reconstructed from the same
-~617-atom sub-dictionary. `w6_recon`, at essentially the same NMSE, keeps 71% of
+~605-atom sub-dictionary. `w6_recon`, at essentially the same NMSE, keeps 65% of
 its latents alive — so this is a property of the DSM objective, not a shared
-distribution-shift effect. `w6_bayes` at NMSE 2.26 reconstructs *worse than
-predicting the mean window*, which with its 0.912 training dead fraction makes
-it non-functional as a reconstruction.
+distribution-shift effect. `w6_bayes` at NMSE 1.92 reconstructs *worse than
+predicting the mean window*, which with its 0.947 training dead fraction makes
+it non-functional as a reconstruction; its L0 of 131.9 also overshoots the
+target of 96.
 
 #### Objective-dependent OOD collapse — a primary result
 
@@ -429,7 +435,7 @@ hookpoints:
 | probe | scale | DSM | recon |
 | --- | --- | --- | --- |
 | backtracking detection (per-token dictionaries, ln1 L10) | token | ~50% dead on distill traces | ~10% dead |
-| this pre-flight (T=6 windows, resid L10) | window | 617 / 16384 live (3.8%) | 11684 / 16384 (71.3%) |
+| this pre-flight (T=6 windows, resid L10) | window | 605 / 16384 live (3.7%) | 10673 / 16384 (65.1%) |
 | recalibration probe (T=6 windows, resid L10) | window | 214 → 215 live after distill-side recalibration | 8586 → 16046 |
 
 Both objectives train to comparable fidelity on their own distribution (NMSE

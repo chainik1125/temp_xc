@@ -1,0 +1,97 @@
+{
+ "arms": [
+  {
+   "arm": "w6_recon",
+   "arch": "topk_sae_w6",
+   "top_feature": 10063,
+   "top_score": 0.15238213539123535,
+   "top_tstat": 16.058185803459583,
+   "top8_features": [
+    10063,
+    3066,
+    6606,
+    16228,
+    2213,
+    15930,
+    13838,
+    4758
+   ]
+  },
+  {
+   "arm": "w6_dsm",
+   "arch": "topk_sae_w6",
+   "top_feature": 10440,
+   "top_score": -0.11328554153442383,
+   "top_tstat": -14.710384056418423,
+   "top8_features": [
+    10440,
+    12813,
+    14511,
+    2675,
+    13571,
+    3108,
+    8304,
+    1737
+   ]
+  },
+  {
+   "arm": "w6_bayes",
+   "arch": "bayes_gate_w6",
+   "top_feature": 8209,
+   "top_score": -0.22116315364837646,
+   "top_tstat": -14.387363546973456,
+   "top8_features": [
+    8209,
+    13705,
+    13123,
+    4912,
+    6311,
+    13880,
+    1798,
+    12672
+   ]
+  }
+ ],
+ "capture": {
+  "model": "NousResearch/Meta-Llama-3.1-8B",
+  "hooks_agree": true,
+  "n_tokens": 540337
+ },
+ "n_examples": 23664,
+ "n_pos": 3023,
+ "ckpt_status": {
+  "w6_recon": {
+   "arm": "w6_recon",
+   "ckpt_exists": true,
+   "finished": false,
+   "last_logged_step": 16000,
+   "ckpt_step": 15000,
+   "last_nmse_clean": 0.04594759080547531,
+   "last_dead_frac": 0.0091552734375,
+   "train_status": "partial"
+  },
+  "w6_dsm": {
+   "arm": "w6_dsm",
+   "ckpt_exists": true,
+   "finished": false,
+   "last_logged_step": 16000,
+   "ckpt_step": 15000,
+   "last_nmse_clean": 0.06080411475782338,
+   "last_dead_frac": 0.01190185546875,
+   "train_status": "partial"
+  },
+  "w6_bayes": {
+   "arm": "w6_bayes",
+   "ckpt_exists": true,
+   "finished": false,
+   "last_logged_step": 17750,
+   "ckpt_step": 15000,
+   "last_nmse_clean": 0.059683443818506494,
+   "last_dead_frac": 0.944091796875,
+   "train_status": "partial"
+  }
+ },
+ "min_step": 15000,
+ "feat_dir": "/vol/backtracking_eval/steering/features_w6",
+ "_runtime_s": 315.5
+}
