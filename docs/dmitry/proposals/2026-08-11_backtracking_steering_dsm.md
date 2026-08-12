@@ -349,6 +349,14 @@ available with the control: the raw peak Δgc column ranks `dom_base_union`
 third, ahead of five mined directions, purely on a nonspecific effect that the
 control shows is available for free.
 
+The one other source with a significantly positive excess is worth naming:
+`stageB_topk_sae`, the flat per-token SAE, at +0.069 [+0.01, +0.14]. So a
+per-token dictionary does find a small but real directional handle on
+backtracking where conventional steering finds none — and the T=6 window
+dictionary's handle is about six times larger. That ordering (nothing →
+per-token → windowed) is what the temporal-binding account predicts, and it
+falls out of the data without any additional assumption.
+
 Two readings this table does **not** support:
 
 - `control_random` is the least *damaging* source in the study — 20 of 25 cells
