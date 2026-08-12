@@ -29,9 +29,14 @@ backtracking. This one asks whether they can *cause* it.
 - **Wave 1**: the Stage B temporal crosscoder's slot-0 decoder is the only
   source with directional control over backtracking — a monotone, antisymmetric
   dose-response (gc 2.25 at α = −8, 1.25 at α = 0, 0.25 at α = +10) at flat
-  generation length, Δgc = +1.00 [+0.50, +1.50] at the peak. Conventional DoM
-  steering is U-shaped in |α|, raising the count in both directions, which is
-  what a norm perturbation looks like rather than a control knob.
+  generation length, Δgc = +1.00 [+0.50, +1.50] at the peak.
+- **A norm-matched random direction reproduces conventional steering's entire
+  effect.** Splitting each curve into its even (magnitude) and odd (direction)
+  parts about α = 0, and subtracting the random control at matched |α|, the DoM
+  baseline retains a directional component of **+0.015** while the crosscoder
+  retains **+0.417**. DoM steering at this site does nothing a random vector of
+  the same norm would not also do; the crosscoder does. Without the control the
+  raw peak column ranks DoM third, on an effect that is free.
 - Mined selectivity does not predict causal potency: the strongest mined feature
   (+0.806) gives one of the weakest effects.
 - **DSM dictionaries do not transfer to the deployment distribution, and the
@@ -286,6 +291,58 @@ genuine control knob for backtracking and conventional steering at this site is
 not, even though their peak Δgc values (+1.00 vs +0.45) differ by less than a
 factor of three.
 
+#### The random-direction control: conventional steering is nonspecific
+
+`control_random` is a random unit vector at the same site, rescaled to the same
+DoM base-union norm as every real source, swept over the same grid and prompts.
+Its own curve:
+
+| α | −10 | −8 | −6 | −4 | −2 | 0 | +2 | +4 | +6 | +8 | +10 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| gc | 1.50 | 1.20 | 1.45 | 1.55 | 1.45 | 1.30 | 1.30 | 1.30 | 1.40 | 1.55 | 1.75 |
+| mean words | 908 | 920 | 900 | 914 | 876 | 862 | 862 | 821 | 880 | 858 | 918 |
+
+Generation length is flat, so the control passes the same length check the real
+arms do. Its peak Δgc at the Sonnet floor is **+0.450, CI [−0.05, +0.95]** —
+numerically identical to `dom_base_union`'s +0.450 [−0.05, +0.95]. It is also
+the *least* damaging source in the study, with 20 of 25 cells clearing the
+Sonnet floor (more than any mined direction) and a `gc` minimum of 1.15 against
+dom's 0.65: a random direction of this norm perturbs the count without ever
+destroying the generation.
+
+Decomposed into even and odd parts about α = 0:
+
+| source | sym (magnitude) | anti (direction) | excess sym vs control | **excess anti vs control** |
+| --- | --- | --- | --- | --- |
+| `stageB_txc_f14621_pos0` | −0.040 | +0.406 | −0.187 | **+0.417** |
+| `stageB_txc_f14621_union` | −0.210 | +0.381 | −0.358 | **+0.392** |
+| `stageB_topk_sae_f9876_pos0` | +0.117 | +0.058 | −0.031 | +0.069 |
+| `stageB_txc_h13_f1183_union` | −0.004 | +0.042 | −0.152 | +0.052 |
+| `stageB_txc_h13_f1183_pos0` | +0.017 | +0.037 | −0.131 | +0.048 |
+| `ours_recon_s2_f13776_pos0` | +0.027 | +0.027 | −0.121 | +0.038 |
+| `dom_base_union` | +0.113 | +0.004 | −0.035 | **+0.015** |
+| `ours_dsm_s2_f4366_pos0` | +0.023 | −0.135 | −0.125 | −0.125 |
+| `control_random` | +0.148 | −0.010 | — | — |
+
+The control answers the question it was added for, and the answer is the
+uncomfortable one for conventional steering. A norm-matched *random* direction
+reproduces the U-shape — its symmetric component (+0.148) is in fact slightly
+**larger** than the DoM baseline's (+0.113) — and both have an antisymmetric
+component indistinguishable from zero (−0.010 and +0.004). Subtracting the
+control at matched |α|, conventional DoM steering retains an excess directional
+component of **+0.015**. On this evidence, DoM steering at layer 10 of this
+model does nothing a random vector of the same norm would not also do.
+
+Against that baseline the Stage B crosscoder's slot-0 direction retains an
+excess directional component of **+0.417**, roughly 28× dom's and 6× the next
+best arm. The union mode of the same feature retains +0.392. Every other
+source, including both of our own flat dictionaries, sits at or below +0.069.
+
+This is the strongest claim in the study, and note that it *only* becomes
+available with the control: the raw peak Δgc column ranks `dom_base_union`
+third, ahead of five mined directions, purely on a nonspecific effect that the
+control shows is available for free.
+
 #### What this does not show
 
 - **Suppression is confounded with degeneration.** The induction side is clean:
@@ -446,11 +503,18 @@ comparable:
   inverted against the mining sign, the uncorrected multiple comparisons across
   sources × magnitudes, and the n = 20 prompt width all carry over unchanged.
 - `w6_bayes` is included to complete the matrix but is a **labelled-degenerate
-  arm**: 91% of its latents are dead at the end of training and it reconstructs
-  distill windows worse than the mean. "What does a collapsed dictionary's best
-  feature do under steering" is a legitimate datapoint; it is not evidence about
-  the gated objective done properly, and its row carries the degenerate label in
-  every table.
+  arm**: 94.7% of its latents are dead at the end of training and it
+  reconstructs distill windows worse than the mean (NMSE 1.92). "What does a
+  collapsed dictionary's best feature do under steering" is a legitimate
+  datapoint; it is not evidence about the gated objective done properly, and its
+  row carries the degenerate label in every table.
+
+  The cause is known and is not window-ness. This arm was trained with the
+  mean-gate-style sparsity controller, whose collapse mode is exactly this; the
+  per-latent rate-KL fix developed the same day removes it (alive 1.0, dead 0.0
+  at three separate L0 targets in the Gemma-scale runs). A `w6_bayes` retrained
+  with rate-KL is expected to be non-degenerate, so nothing here should be read
+  as evidence against gated dictionaries at T=6.
 
 #### Wave-2 results
 
