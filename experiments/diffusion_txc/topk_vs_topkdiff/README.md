@@ -200,6 +200,55 @@ TopK regardless of training objective. Free eval-time improvement;
 strengthens the case for training the full σ-conditioned `bayes_gate`
 family. The arm-vs-arm probing wash persists under both gates.
 
+### Trained bayes_gate arms at signs-of-life scale (2026-08-11 eve)
+
+Two σ-conditioned `bayes_gate` SAEs (per-latent rate-KL sparsity, DSM
+objective, 1 seed, ~24M streamed tokens vs the TopK arms' 10M cache —
+budget bias favours bayes) evaluated with the identical suite and eval
+shard, gate conditioned at σ=0 (JumpReLU limit), hard threshold 0.5,
+z = m·1[g>0.5]. Checkpoints `bayes_gate/bg6_sol` (L0 ≈ 68, NMSE 0.291)
+and `bg7_sol` (L0 ≈ 49, NMSE 0.344); results
+`logs_bayes_evals/evals_bayes_*.json`.
+
+| arm | L0 | absorb ↓ | 1L-acc ↑ | probe k=5 ↑ | probe k=all ↑ | frag ε=.5 ↑ |
+| --- | --- | --- | --- | --- | --- | --- |
+| recon (2s mean) | 40 | 0.306 | 0.928 | 0.724 | 0.918 | 0.627 |
+| dsm (2s mean) | 40 | 0.180 | 0.918 | 0.737 | 0.908 | 0.762 |
+| bg6_sol | 68 | **0.137** | **0.943** | **0.835** | **0.941** | 0.523 |
+| bg7_sol | 49 | 0.217 | 0.935 | 0.768 | 0.939 | 0.515 |
+
+Split verdict against the pre-registered readings:
+
+- **Interpretability wins are real**: bg7 (nearest matched L0) cuts
+  absorption 29% below recon; bg6 is the lowest-absorption arm we have
+  trained, below even TopK-dsm. k=5 sparse probing jumps +7–11 points
+  over every TopK arm — the post-hoc gate swap's +3–5 readout gain
+  roughly doubles when the gate is trained in, and it breaks the probing
+  wash for the first time. k=all probing best of all arms (no dead
+  capacity). First-letter probe acc best of all arms.
+- **Robustness regression — dictionary-borne, not a readout artifact**
+  (settled by `modal_frag_sigma.py`, results
+  `logs_bayes_evals/fragility_sigma_matched.json`): support-Jaccard is
+  the worst of any arm (0.52 vs dsm's 0.76 at ε=0.5), and neither
+  σ-matched conditioning (encode the perturbed input with u=ε², i.e.
+  the model used as trained: 0.54–0.55) nor a rank/top-k readout
+  (TopK-style relative support: 0.55–0.56) recovers it. The bayes
+  encoder directions are genuinely less noise-stable than the
+  TopK-dsm dictionary's. Working interpretation: the adaptive gate
+  *externalizes* noise-handling into the conditioning channel, freeing
+  the dictionary to specialise — which is plausibly the same property
+  that buys the absorption and probing wins. Stable-causal-handle
+  robustness (motivation 1a) belongs to DSM-TopK, not to bayes_gate;
+  the two benefits currently do not co-occur in one arm.
+- Caveats: 1 seed per bayes arm, token budget not matched (favours
+  bayes), L0 not exactly matched (68/49 vs 40; within the bayes family
+  higher L0 tracks lower absorption, so part of bg6's absorption edge
+  may be L0-driven — bg7 is the honest comparison point).
+
+Program call: the arm survives — first single change to move probing —
+but its steering claims now rest on the wave-2 `w6_bayes`/future runs,
+not on this table.
+
 ### Files
 
 - `cache_activations.py` — one-off cache job (model forwards on Modal).

@@ -10,6 +10,11 @@ Arms
       txc__resid_L10__k16__s42, txc_h13__resid_L10__k16__s42
   floor:
       raw ln1 activations, 6 positions stacked
+  w6 trio (resid_L10, run with w6_only=True into detection_results_w6.json):
+      w6_recon w6_dsm w6_bayes -- flat window-6 dictionaries (T*d=24576 in,
+      H=16384; recon/dsm TopK k=96, bayes BayesGateSAE at u=0, g>0.5) trained
+      by psc_train_sae.py --window 6, loaded from the Modal volume. Same
+      resid_L10 window cache, score = window latent |z|.
 
 Every arm goes through the identical example sets, window, probe and metrics.
 """
@@ -33,6 +38,11 @@ STAGEB_CELLS = [
     "txc__resid_L10__k16__s42",          # TXC-base, resid hookpoint
     "txc_h13__resid_L10__k16__s42",      # TXC-pro family, resid hookpoint
 ]
+W6_FILES = [                             # on the diffusion-txc volume
+    ("recon", "txc_recon/recon_s0.pt"),
+    ("dsm", "txc_dsm/dsm_s0.pt"),
+    ("bayes", "txc_bayes/bayes_gate_s0.pt"),
+]
 
 
 def run(device: str = "cuda", vol: str = "/vol",
@@ -40,7 +50,9 @@ def run(device: str = "cuda", vol: str = "/vol",
         labels_path: str = "/work/data/sentence_labels.json",
         limit_traces: int | None = None, tag_suffix: str = "",
         commit_cb=None, modes: tuple[str, ...] = ("topk",),
-        calib_rows: int = 50_000) -> dict:
+        calib_rows: int = 50_000, w6_dir: str = "",
+        w6_only: bool = False) -> dict:
+    import torch
     from huggingface_hub import hf_hub_download
 
     t_start = time.time()
@@ -50,7 +62,8 @@ def run(device: str = "cuda", vol: str = "/vol",
         "probe": "l1-logistic C=1 liblinear, 5-fold GroupKFold by trace, "
                  "top-S by train-fold Welch t-stat, S in {8,32}",
         "score": "max-pool |z| over the 6 window positions (per-token dicts); "
-                 "window latent |z| (T=6 window dicts)",
+                 "window latent |z| (T=6 window dicts, incl. the w6_flat "
+                 "time-major-flattened dicts)",
         "labels": "results/ward_backtracking/sentence_labels.json "
                   "(Haiku-4.5 sentence judge, label_sentences.py)",
         "trace_model": "DeepSeek-R1-Distill-Llama-8B generations",
@@ -98,6 +111,9 @@ def run(device: str = "cuda", vol: str = "/vol",
             for sname in sets:
                 F = dc.window_features(model, arch, windows[hook][sname], device)
                 r[sname] = dc.probe_cv(F, sets[sname]["y"], sets[sname]["groups"])
+                nz = (F > 0).sum(1)          # per-token arms: pooled-union L0
+                r[f"{sname}_l0_mean"] = float(nz.mean())
+                r[f"{sname}_l0_std"] = float(nz.std())
                 del F
             if do_dead:
                 r["dead_on_traces"] = dc.dead_on_traces(model, arch, cache[hook],
@@ -106,6 +122,7 @@ def run(device: str = "cuda", vol: str = "/vol",
             print(f"[arm {tag}] sentence S8 PR={r['sentence']['prauc_S8']:.4f} "
                   f"ROC={r['sentence']['rocauc_S8']:.4f} | far S8 "
                   f"PR={r['far']['prauc_S8']:.4f} ROC={r['far']['rocauc_S8']:.4f}"
+                  f" | L0 {r['sentence_l0_mean']:.1f}"
                   + (f" | dead={r['dead_on_traces']['dead_fraction']:.4f}"
                      if do_dead else ""), flush=True)
             _flush(out, vol, tag_suffix, commit_cb)
@@ -140,7 +157,7 @@ def run(device: str = "cuda", vol: str = "/vol",
             _flush(out, vol, tag_suffix, commit_cb)
 
     # --- floor: raw activations, 6 positions stacked (gate-independent) ----
-    if "topk" in modes:
+    if "topk" in modes and not w6_only:
         r = {"hookpoint": "ln1", "arch": "raw", "gate": "n/a"}
         for sname in sets:
             W = windows["ln1"][sname]
@@ -153,33 +170,82 @@ def run(device: str = "cuda", vol: str = "/vol",
               f"| far S8 PR={r['far']['prauc_S8']:.4f}", flush=True)
         _flush(out, vol, tag_suffix, commit_cb)
 
-    # --- the four new dictionaries ---------------------------------------
-    import torch
-    for arm, seed in NEW_ARMS:
-        tag = f"new_{arm}_s{seed}"
-        ckpt = hf_hub_download(NEW_REPO, f"{NEW_SUBDIR}/{arm}_s{seed}.pt")
-        final = json.loads(pathlib.Path(hf_hub_download(
-            NEW_REPO, f"{NEW_SUBDIR}/{arm}_s{seed}_final.json")).read_text())
-        model, meta = dc.load_new_dict(ckpt, device)
-        meta.update({"train_arm": arm, "train_seed": seed,
-                     "train_model": final.get("model"),
-                     "train_hook": final.get("hook"),
-                     "train_steps": final.get("steps"),
-                     "train_tokens": final.get("tokens"),
-                     "train_final_nmse": final.get("final_nmse"),
-                     "train_final_dead_frac": final.get("final_dead_frac")})
-        score_arm(tag, model, "topk_sae_flat", "ln1", meta, do_dead=True)
-        del model
-        torch.cuda.empty_cache()
+    if not w6_only:
+        # --- the four new dictionaries -----------------------------------
+        for arm, seed in NEW_ARMS:
+            tag = f"new_{arm}_s{seed}"
+            ckpt = hf_hub_download(NEW_REPO, f"{NEW_SUBDIR}/{arm}_s{seed}.pt")
+            final = json.loads(pathlib.Path(hf_hub_download(
+                NEW_REPO, f"{NEW_SUBDIR}/{arm}_s{seed}_final.json")).read_text())
+            model, meta = dc.load_new_dict(ckpt, device)
+            meta.update({"train_arm": arm, "train_seed": seed,
+                         "train_model": final.get("model"),
+                         "train_hook": final.get("hook"),
+                         "train_steps": final.get("steps"),
+                         "train_tokens": final.get("tokens"),
+                         "train_final_nmse": final.get("final_nmse"),
+                         "train_final_dead_frac": final.get("final_dead_frac")})
+            score_arm(tag, model, "topk_sae_flat", "ln1", meta, do_dead=True)
+            del model
+            torch.cuda.empty_cache()
 
-    # --- Stage B originals ------------------------------------------------
-    for cell in STAGEB_CELLS:
-        model, meta = dc.load_stageb_dict(cell, STAGEB_REPO, device)
-        hook = "ln1" if meta["hook_component"] == "ln1" else "resid"
-        flat = meta["arch"] == "topk_sae"
-        score_arm(f"stageb_{cell}", model, meta["arch"], hook, meta, do_dead=flat)
-        del model
-        torch.cuda.empty_cache()
+        # --- Stage B originals -------------------------------------------
+        for cell in STAGEB_CELLS:
+            model, meta = dc.load_stageb_dict(cell, STAGEB_REPO, device)
+            hook = "ln1" if meta["hook_component"] == "ln1" else "resid"
+            flat = meta["arch"] == "topk_sae"
+            score_arm(f"stageb_{cell}", model, meta["arch"], hook, meta,
+                      do_dead=flat)
+            del model
+            torch.cuda.empty_cache()
+
+    # --- w6 trio: window-6 flat dictionaries from the diffusion arm -------
+    # Same resid_L10 window cache as the Stage B window dicts; score is the
+    # window latent |z|. Flatten order is verified empirically on w6_recon
+    # before any arm is scored (see detect_core.w6_nmse_both_orders).
+    if w6_dir:
+        for kind, fname in W6_FILES:
+            tag = f"w6_{kind}"
+            path = str(pathlib.Path(w6_dir) / fname)
+            if not pathlib.Path(path).exists():
+                print(f"[{tag}] SKIP: {path} not present", flush=True)
+                continue
+            model, meta = dc.load_w6_dict(path, kind, device)
+            jl = pathlib.Path(path[:-3] + ".jsonl")
+            if jl.exists():
+                try:
+                    last = json.loads(jl.read_text().strip().splitlines()[-1])
+                    meta.update({
+                        "train_step": last.get("step"),
+                        "train_nmse_clean": last.get("nmse_clean"),
+                        "train_dead_frac": last.get("dead_frac"),
+                        "train_l0_gate_half": last.get("l0_gate_half")})
+                except Exception as e:                        # noqa: BLE001
+                    print(f"[w6 {kind}] jsonl meta unreadable: {e}", flush=True)
+            if kind == "recon":
+                chk = dc.w6_nmse_both_orders(model, windows["resid"]["sentence"],
+                                             device)
+                out["w6_ordering_check"] = chk
+                print(f"[w6 ordering] NMSE time_major="
+                      f"{chk['nmse_time_major']:.4f} dim_major="
+                      f"{chk['nmse_dim_major']:.4f} (n={chk['n_rows']})",
+                      flush=True)
+                if not chk["nmse_time_major"] < 0.9 * chk["nmse_dim_major"]:
+                    _flush(out, vol, tag_suffix, commit_cb)
+                    raise RuntimeError(
+                        "w6 flatten-order gate failed: time_major NMSE "
+                        f"{chk['nmse_time_major']:.4f} not clearly below "
+                        f"dim_major {chk['nmse_dim_major']:.4f}; not scoring")
+            if kind == "bayes":
+                gm, gs = dc.w6_gate_l0(model, windows["resid"]["sentence"],
+                                       device)
+                meta["gate_l0_mean_sentence"] = gm
+                meta["gate_l0_std_sentence"] = gs
+                print(f"[w6_bayes] gate L0 (g>0.5, u=0) on sentence windows: "
+                      f"{gm:.1f}+-{gs:.1f}", flush=True)
+            score_arm(tag, model, "w6_flat", "resid", meta, do_dead=True)
+            del model
+            torch.cuda.empty_cache()
 
     out["_runtime_s"] = round(time.time() - t_start, 1)
     _flush(out, vol, tag_suffix, commit_cb)

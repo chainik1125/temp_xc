@@ -34,14 +34,14 @@ Headlines:
 ### Motivations for the denoising objective (ranked 2026-08-11, post-Matryoshka comparison)
 
 1. **Robust steering**: (a) robust features as causal handles (measured:
-   perturbation support-overlap 0.74 vs 0.60); (b) **manifold-projected
-   steering** — a DSM dictionary is a score model of its activation site,
-   so one denoiser application after the steering hook re-projects
-   off-distribution activations toward the manifold, potentially
-   extending the coherent α range (the EM steer-finely-over-a-large-range
-   fragility). Denoise-after-steer variant added to steering wave 2;
-   reconstruction SAEs cannot offer this (no defined off-manifold
-   behaviour).
+   perturbation support-overlap 0.74 vs 0.60); (b) ~~manifold-projected
+   steering~~ — **falsified 2026-08-13**: even a density-matched
+   (distill-captured, on-domain) DSM projector destroys generation at
+   α=0 (Sonnet 0.25, 0/20 above floor), and the recon-twin control is
+   less bad on every metric — substituting a k=96 reconstruction at
+   every position kills computation-carrying precision regardless of
+   objective. The claim that reconstruction SAEs cannot offer projection
+   is moot: neither objective can, in this form.
 2. **Temporal binding** — reconstruction provably cannot force
    cross-position binding; denoising makes it loss-bearing. Being tested
    by the TXC trio.
@@ -51,7 +51,14 @@ Headlines:
    31–57% TopK; caveat: strong prior-rate penalties reintroduce ~24%
    gate-death, though non-absorbing in principle).
 4. **Density/anomaly monitoring (unexploited)** — the dictionary doubles
-   as an activation-space OOD detector via the learned score.
+   as an activation-space OOD detector via the learned score. Flip side,
+   now measured (2026-08-11 recalibration probe, volume
+   `ooc_recal/results.json`): DSM dictionaries collapse *direction-deep*
+   off-distribution — per-latent rate recalibration on distill windows
+   revives 98% of the recon pool but 214→215 of 16,384 for dsm
+   (preactivations almost all negative OOD). Portability requires
+   training-side coverage of the deployment activation distribution;
+   post-hoc calibration cannot rescue it.
 5. Absorption reduction (−29 to −42%) — real but dominated by Matryoshka's
    architectural fix (−90%, same model/layer/L0); the two compose and the
    {standard, matryoshka} × {recon, dsm} 2×2 is an open cell.

@@ -346,6 +346,91 @@ def load_stageb_dict(cell: str, repo: str, device="cuda"):
                "final_eval_fvu": (hist[-1] if hist else {}).get("fvu_eval")}
 
 
+def load_w6_dict(path: str, kind: str, device="cuda", d=D_MODEL, T=None,
+                 H=16384, k=96):
+    """The window-6 trio trained by psc_train_sae.py --window 6 on Llama-3.1-8B
+    resid L10: flat T*d = 24576 inputs, H=16384. The training flatten is
+    TIME-MAJOR ([x_t0; x_t1; ...; x_t5]): unfold(1, T, 1) puts the window
+    offset in the last axis, permute(0, 1, 3, 2) moves it before d, and the
+    reshape therefore lays out d-blocks in time order — exactly what
+    gather_windows' (n, T, d) gives under a plain reshape(B, T*d). The
+    two-ordering NMSE gate in run_detection verifies this empirically.
+
+    recon/dsm: psc TopKSAE state dicts loaded into topk_vs_topkdiff.sae.TopKSAE
+    (verified state-dict identical: same parameter/buffer names and shapes,
+    same encode = scatter(relu(topk(pre)))).
+    bayes: BayesGateSAE via bayes_eval_adapter (pinned eval semantics: gate
+    conditioned at u=0, hard threshold g>0.5, z = m * 1[g>0.5]).
+    """
+    T = T or len(WIN_OFF)
+    d_eff = d * T
+    if kind == "bayes":
+        from experiments.diffusion_txc.topk_vs_topkdiff.bayes_eval_adapter \
+            import load_bayes_sae
+        m = load_bayes_sae(path, device, d=d_eff)
+        return m, {"arch": "w6_flat", "kind": "bayes_gate", "d_in": d_eff,
+                   "T": T, "d_sae": H, "flatten": "time_major",
+                   "gate_rule": "u=0, hard g>0.5, z=m*1[g>0.5]",
+                   "ckpt": str(path)}
+    from experiments.diffusion_txc.topk_vs_topkdiff.sae import TopKSAE
+    sd = torch.load(path, map_location="cpu", weights_only=True)
+    if tuple(sd["W_enc"].shape) != (d_eff, H):
+        raise RuntimeError(f"{path}: W_enc {tuple(sd['W_enc'].shape)}, "
+                           f"expected {(d_eff, H)}")
+    m = TopKSAE(d_eff, H, k)
+    missing, unexpected = m.load_state_dict(sd, strict=False)
+    if any(x != "steps_since_fire" for x in missing) or unexpected:
+        raise RuntimeError(f"{path}: missing={missing} unexpected={unexpected}")
+    m.eval().to(device)
+    for p in m.parameters():
+        p.requires_grad_(False)
+    return m, {"arch": "w6_flat", "kind": kind, "d_in": d_eff, "T": T,
+               "d_sae": H, "k": k, "flatten": "time_major", "ckpt": str(path)}
+
+
+@torch.no_grad()
+def w6_nmse_both_orders(model, X: torch.Tensor, device="cuda", batch=1024,
+                        max_rows=4096) -> dict:
+    """Flatten-order verification gate for the w6 dictionaries.
+
+    Encodes/decodes the same (n, T, d) windows under both flatten conventions:
+      time_major: x.reshape(B, T*d)               = [x_t0; x_t1; ...; x_t5]
+                  (the psc_train_sae --window unfold+permute convention)
+      dim_major:  x.permute(0, 2, 1).reshape(B, d*T)
+    and returns the NMSE (sum||x-recon||^2 / sum||x-mean||^2, the training
+    script's metric) of each. The training convention must be clearly lower;
+    the caller aborts the arm otherwise.
+    """
+    X = X[:max_rows]
+    res = {"n_rows": int(X.shape[0])}
+    for name, flat in (("time_major", lambda t: t.reshape(t.shape[0], -1)),
+                       ("dim_major",
+                        lambda t: t.permute(0, 2, 1).reshape(t.shape[0], -1))):
+        mu = flat(X.mean(0, dtype=torch.float32).unsqueeze(0)).to(device)
+        num = den = 0.0
+        for s in range(0, X.shape[0], batch):
+            xb = flat(X[s:s + batch].to(device, torch.float32))
+            z = model.encode(xb)
+            r = z @ model.W_dec + model.b_dec
+            num += float((xb - r).pow(2).sum())
+            den += float((xb - mu).pow(2).sum())
+        res[f"nmse_{name}"] = num / den
+    return res
+
+
+@torch.no_grad()
+def w6_gate_l0(model, X: torch.Tensor, device="cuda", batch=1024):
+    """Mean/std of the bayes gate count (g > 0.5 at u=0 — training's
+    ``l0_gate_half``) over the (n, T, d) eval windows, time-major flatten."""
+    l0 = []
+    for s in range(0, X.shape[0], batch):
+        x = X[s:s + batch].to(device, torch.float32)
+        _, g = model.sae.encode(x.reshape(x.shape[0], -1), u=0.0)
+        l0.append((g > 0.5).float().sum(1))
+    l0 = torch.cat(l0)
+    return float(l0.mean()), float(l0.std())
+
+
 WINDOW_ARCHS = {"txc", "txc_h8", "txc_h13", "stacked_sae"}
 
 
@@ -358,7 +443,10 @@ def window_features(model, arch: str, X: torch.Tensor, device="cuda",
     across them (c7_detect.py::Dict5.maxpool_codes). Window dictionaries with
     T == 6 consume the whole window in one encode and yield a single window
     latent, so |z| is already the window-level score (this is the same latent
-    mine_features.py ranks D+/D- selectivity on).
+    mine_features.py ranks D+/D- selectivity on). "w6_flat" dictionaries are
+    window dictionaries that consume the time-major-flattened (B, T*d) window
+    (the psc --window training convention; see load_w6_dict), same window
+    latent |z| score.
     """
     outs = []
     for s in range(0, X.shape[0], batch):
@@ -367,6 +455,9 @@ def window_features(model, arch: str, X: torch.Tensor, device="cuda",
             z = model.encode(x)                             # (B, d_sae)
             if isinstance(z, tuple):
                 z = z[0]
+            f = z.abs()
+        elif arch == "w6_flat":
+            z = model.encode(x.reshape(x.shape[0], -1))     # time-major flatten
             f = z.abs()
         else:
             z = model.encode(x.reshape(-1, x.shape[-1]))
@@ -459,10 +550,51 @@ def gate_window_features(gate, is_window: bool, X: torch.Tensor,
 
 
 @torch.no_grad()
+def w6_fire_counts(model, cache_hook: np.ndarray, device="cuda") -> np.ndarray:
+    """Per-latent fire counts (post-TopK z > 0) over every stride-1 time-major
+    T-window of the trace cache — the counts behind dead_on_traces' w6_flat
+    summary, exposed as an array so the live-pool-matched controls can take
+    the exact live latent index set."""
+    T = len(WIN_OFF)
+    d_flat = cache_hook.shape[1] * T
+    d_sae = int(model.encode(torch.zeros(2, d_flat, device=device)
+                             ).shape[-1])
+    counts = torch.zeros(d_sae, dtype=torch.int64, device=device)
+    n_win = cache_hook.shape[0] - T + 1
+    step = 4096
+    for s in range(0, n_win, step):
+        m_rows = min(step, n_win - s)
+        block = np.asarray(cache_hook[s:s + m_rows + T - 1])
+        w = np.lib.stride_tricks.sliding_window_view(block, T, axis=0)
+        x = torch.from_numpy(np.ascontiguousarray(
+            w.transpose(0, 2, 1)).reshape(m_rows, d_flat)).to(
+            device, torch.float32)                           # time-major
+        counts += (model.encode(x) > 0).sum(0)
+    return counts.cpu().numpy()
+
+
+@torch.no_grad()
 def dead_on_traces(model, arch: str, cache_hook: np.ndarray, device="cuda",
                    chunk=8192) -> dict:
     """Fraction of latents that never fire (post-TopK value > 0) on any of the
-    ~481k trace tokens. Same fire definition as sae_deadlatent_audit."""
+    ~481k trace tokens. Same fire definition as sae_deadlatent_audit.
+
+    For "w6_flat" arms the unit is the stride-1 T-window instead of the token
+    (time-major flatten, matching training). The stride-1 sweep ignores the
+    ~299 trace boundaries — a negligible fraction of ~481k windows — same
+    simplification as calibration_matrix.
+    """
+    if arch == "w6_flat":
+        c = w6_fire_counts(model, cache_hook, device)
+        d_sae = int(c.shape[0])
+        n_win = cache_hook.shape[0] - len(WIN_OFF) + 1
+        return {"d_sae": d_sae, "unit": "stride1_window", "n_windows": int(n_win),
+                "dead_never_fired": int((c == 0).sum()),
+                "dead_fraction": float((c == 0).mean()),
+                "fire_rate_median": float(np.median(c / max(n_win, 1))),
+                "effective_alive_fraction_gt_1e-5":
+                    float(((c / max(n_win, 1)) > 1e-5).mean())}
+
     d_sae = int(model.encode(torch.zeros(2, cache_hook.shape[1], device=device)
                              ).shape[-1])
     counts = torch.zeros(d_sae, dtype=torch.int64, device=device)

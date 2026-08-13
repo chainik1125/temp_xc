@@ -98,6 +98,7 @@ class BayesGateSAE(nn.Module):
         self.tau1_raw = nn.Parameter(torch.full((H,), -0.5))
         self.s_raw = nn.Parameter(torch.full((H,), 0.54))      # softplus -> ~1.0
         self.register_buffer("steps_since_fire", torch.zeros(H))
+        self.register_buffer("rate_ema", torch.full((H,), 1.0 / H))
         self.dead_window = 800
         self._norm()
 
@@ -119,12 +120,25 @@ class BayesGateSAE(nn.Module):
         return z, g
 
     def forward(self, x, target=None, u=0.0, sparsity_coef=0.02,
-                update_fires=False):
+                rate_kl_coef=0.0, rho_target=0.0, update_fires=False):
         if target is None:
             target = x
         z, g = self.encode(x, u)
         recon = z @ self.W_dec + self.b_dec
         loss = (recon - target).pow(2).mean() + sparsity_coef * g.mean()
+        if rate_kl_coef > 0 and rho_target > 0:
+            # per-latent firing-rate KL to a shared target (Ng-style):
+            # penalises under-firing (collapse) as much as over-firing (density)
+            batch_rate = g.mean(0)
+            with torch.no_grad():
+                self.rate_ema.mul_(0.99).add_(0.01 * batch_rate.detach())
+            rho_hat = (0.9 * self.rate_ema.detach()
+                       + 0.1 * batch_rate).clamp(1e-6, 1 - 1e-6)
+            rho = rho_target
+            kl = (rho * np.log(rho) - rho * torch.log(rho_hat)
+                  + (1 - rho) * np.log(1 - rho)
+                  - (1 - rho) * torch.log(1 - rho_hat))
+            loss = loss + rate_kl_coef * kl.sum()
         if update_fires:
             with torch.no_grad():
                 self.steps_since_fire += 1
@@ -147,6 +161,34 @@ def text_stream(dataset: str, seed: int):
         seed=seed, buffer_size=10_000)
     for row in ds:
         yield row[col]
+
+
+def trace_docs(path: str, seed: int):
+    """Infinite stream of trace documents (prompt + full_response) from a
+    traces JSON (list of dicts with keys question_id/category/prompt/
+    full_response/thinking_process/answer/answer_index). Cycles forever with
+    a fresh shuffle each epoch."""
+    import random
+
+    rows = json.load(open(path))
+    docs = [r["prompt"] + "\n\n" + r["full_response"] for r in rows]
+    rng = random.Random(seed)
+    while True:
+        order = list(range(len(docs)))
+        rng.shuffle(order)
+        for i in order:
+            yield docs[i]
+
+
+def mixed_stream(traces_path: str, seed: int):
+    """50/50 document-level interleave of (a) trace docs and (b) the fineweb
+    stream. Yields (source, text) pairs, source in {"trace", "web"}, so the
+    caller can count tokens drawn from each source."""
+    tr = trace_docs(traces_path, seed)
+    web = text_stream("fineweb", seed)
+    while True:
+        yield "trace", next(tr)
+        yield "web", next(web)
 
 
 def make_hook(model, hook: str):
@@ -189,6 +231,9 @@ def main():
     ap.add_argument("--arm", required=True,
                     choices=["recon", "dsm", "dsm_anneal", "bayes_gate"])
     ap.add_argument("--sparsity-coef", type=float, default=0.02)
+    ap.add_argument("--rate-kl-coef", type=float, default=0.0)
+    ap.add_argument("--ctrl-exp", type=float, default=0.3)
+    ap.add_argument("--coef-max", type=float, default=30.0)
     ap.add_argument("--target-l0", type=float, default=0.0,
                     help="if >0, controller multiplies sparsity_coef toward "
                          "this eval-time gate L0 (bayes_gate arm only)")
@@ -199,11 +244,18 @@ def main():
     ap.add_argument("--batch", type=int, default=4096)
     ap.add_argument("--ctx", type=int, default=128)
     ap.add_argument("--lr", type=float, default=3e-4)
-    ap.add_argument("--dataset", default="pile", choices=["pile", "fineweb"])
+    ap.add_argument("--dataset", default="pile",
+                    choices=["pile", "fineweb", "mixed_traces"])
+    ap.add_argument("--traces-path", default="",
+                    help="traces JSON for --dataset mixed_traces (50/50 "
+                         "document-level trace/fineweb interleave)")
     ap.add_argument("--out", required=True)
     ap.add_argument("--hf-repo", default="")
     ap.add_argument("--hf-subdir", default="")
     ap.add_argument("--fwd-seqs", type=int, default=32)
+    ap.add_argument("--window", type=int, default=1,
+                    help="temporal window T; >1 trains a window dictionary "
+                         "(TXC) on stride-1 windows of T*d flattened inputs")
     args = ap.parse_args()
 
     from transformers import AutoModelForCausalLM, AutoTokenizer
@@ -220,30 +272,51 @@ def main():
         args.model, torch_dtype=torch.bfloat16).to(dev).eval()
     cap = make_hook(model, args.hook)
     d = model.config.hidden_size
-    sae = (BayesGateSAE(d, args.H) if args.arm == "bayes_gate"
-           else TopKSAE(d, args.H, args.k)).to(dev)
+    T_win = args.window
+    d_eff = d * T_win
+    sae = (BayesGateSAE(d_eff, args.H) if args.arm == "bayes_gate"
+           else TopKSAE(d_eff, args.H, args.k)).to(dev)
     opt = torch.optim.Adam(sae.parameters(), lr=args.lr)
 
-    texts = text_stream(args.dataset, seed=args.seed)
+    mixed = args.dataset == "mixed_traces"
+    if mixed:
+        if not args.traces_path:
+            ap.error("--dataset mixed_traces requires --traces-path")
+        texts = mixed_stream(args.traces_path, seed=args.seed)
+    else:
+        texts = text_stream(args.dataset, seed=args.seed)
+    src_tokens = {"trace": 0, "web": 0}
     buf: list[int] = []
     sparsity_coef = args.sparsity_coef
 
-    def next_acts(n_tokens: int) -> torch.Tensor:
+    def next_acts(n_rows: int) -> torch.Tensor:
+        """(n_rows, d_eff): tokens if window==1, else stride-1 T-windows
+        (windows never cross sequence boundaries)."""
         got = []
         n = 0
         with torch.no_grad():
-            while n < n_tokens:
+            while n < n_rows:
                 while len(buf) < args.fwd_seqs * args.ctx:
-                    buf.extend(tok(next(texts), add_special_tokens=False)["input_ids"])
+                    if mixed:
+                        src, txt = next(texts)
+                        ids_new = tok(txt, add_special_tokens=False)["input_ids"]
+                        src_tokens[src] += len(ids_new)
+                        buf.extend(ids_new)
+                    else:
+                        buf.extend(tok(next(texts), add_special_tokens=False)["input_ids"])
                 ids = torch.tensor(buf[: args.fwd_seqs * args.ctx],
                                    device=dev).view(args.fwd_seqs, args.ctx)
                 del buf[: args.fwd_seqs * args.ctx]
                 a = cap(ids).float()
+                if T_win > 1:
+                    a = a.view(args.fwd_seqs, args.ctx, d)
+                    a = a.unfold(1, T_win, 1)          # (S, ctx-T+1, d, T)
+                    a = a.permute(0, 1, 3, 2).reshape(-1, d_eff)
                 got.append(a)
                 n += a.shape[0]
-        return torch.cat(got)[:n_tokens]
+        return torch.cat(got)[:n_rows]
 
-    X_eval = next_acts(100_000)
+    X_eval = next_acts(100_000 if T_win == 1 else 20_000)
     rms = float(X_eval.pow(2).mean().sqrt())
     lo, hi0 = 0.05, 1.0
 
@@ -258,7 +331,7 @@ def main():
                 den += float((xb - mu).pow(2).sum())
         return num / den
 
-    RESERVOIR = 40 * args.batch
+    RESERVOIR = (40 if T_win == 1 else 8) * args.batch
     step = 0
     t0 = time.time()
     while step < args.steps:
@@ -274,6 +347,9 @@ def main():
                 loss, _, _ = sae(xb + sig * torch.randn_like(xb), target=xb,
                                  u=(sig / rms) ** 2,
                                  sparsity_coef=sparsity_coef,
+                                 rate_kl_coef=args.rate_kl_coef,
+                                 rho_target=(args.target_l0 / args.H
+                                             if args.rate_kl_coef > 0 else 0.0),
                                  update_fires=True)
             else:
                 hi = hi0 if args.arm == "dsm" else hi0 - (hi0 - 0.3) * (step / args.steps)
@@ -291,15 +367,24 @@ def main():
                        "train_loss": float(loss), "nmse_clean": nmse(),
                        "dead_frac": sae.dead_fraction(), "rms": rms,
                        "elapsed_s": round(time.time() - t0, 1)}
+                if mixed:
+                    row["tokens_trace"] = src_tokens["trace"]
+                    row["tokens_web"] = src_tokens["web"]
                 if args.arm == "bayes_gate":
                     with torch.no_grad():
                         _, g_ev = sae.encode(X_eval[:8192], u=0.0)
                     row["mean_gate"] = float(g_ev.mean())
                     row["l0_gate_half"] = float((g_ev > 0.5).float().sum(1).mean())
-                    if args.target_l0 > 0:
+                    row["alive_rate_frac"] = float(
+                        (sae.rate_ema > (args.target_l0 / args.H) / 10)
+                        .float().mean()) if hasattr(sae, "rate_ema") else None
+                    # controller only when the mean-gate penalty is in use;
+                    # with rate-KL-only runs, target_l0 just sets rho
+                    if args.target_l0 > 0 and sparsity_coef > 0:
                         ratio = (row["l0_gate_half"] + 1.0) / args.target_l0
                         sparsity_coef = float(np.clip(
-                            sparsity_coef * ratio**0.3, 1e-4, 30.0))
+                            sparsity_coef * ratio**args.ctrl_exp,
+                            1e-4, args.coef_max))
                         row["sparsity_coef"] = sparsity_coef
                 log_f.write(json.dumps(row) + "\n")
                 log_f.flush()
@@ -311,12 +396,16 @@ def main():
         del R
 
     torch.save(sae.state_dict(), out / f"{tag}.pt")
-    (out / f"{tag}_final.json").write_text(json.dumps({
+    final = {
         "arm": args.arm, "seed": args.seed, "model": args.model,
         "hook": args.hook, "H": args.H, "k": args.k, "steps": args.steps,
         "tokens": args.steps * args.batch, "rms": rms,
         "final_nmse": nmse(), "final_dead_frac": sae.dead_fraction(),
-        "wall_s": round(time.time() - t0, 1)}))
+        "wall_s": round(time.time() - t0, 1)}
+    if mixed:
+        final["tokens_trace"] = src_tokens["trace"]
+        final["tokens_web"] = src_tokens["web"]
+    (out / f"{tag}_final.json").write_text(json.dumps(final))
     print("TRAINING DONE", flush=True)
 
     if args.hf_repo:

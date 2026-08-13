@@ -47,7 +47,13 @@ backtracking. This one asks whether they can *cause* it.
   recalibration on distill windows revives recon 8,586 → 16,046 but dsm
   214 → 215, because the DSM encoder's preactivations are almost all negative
   off-distribution. This is one of the central results here — see below.
-- *(wave-2 headline pending)*
+- **Wave 2 is a null against the control.** None of the six T=6 window sources
+  shows a directional effect beyond the norm-matched random control — every
+  excess-anti CI spans zero in the mined-sign-folded convention — and the
+  negative-mined arms' raw direction effects do not flip sign with the mined
+  score, the fingerprint of a nonspecific perturbation. The informative null is
+  `w6_recon`, which is 65% live at the steering site and so has no
+  transfer-failure excuse.
 
 ### What is reused rather than reimplemented
 
@@ -600,9 +606,234 @@ Manifold-projected steering remains untested. It needs a projector that is alive
 on the deployment distribution, which is the mixed-corpus training round rather
 than anything available tonight.
 
-#### Wave-2 results
+#### Wave-2 results: no window source survives the random-direction control
 
-Pending — the remaining window-arm shards are still generating.
+All six unprojected sources, 20 prompts × 25 magnitudes each, judged and
+aggregated by the same `analyse.py` pipeline as wave 1. The projected source is
+excluded from both tables here: its verdict was settled by the α = 0 confound
+control in the projector-damage section above (generation destroyed with the
+steer switched off — gc 0.00 at all 25 magnitudes, zero rows above the Sonnet
+floor), so its flat row carries no information about steering.
+
+| source | arm | mode | mining score (t) | gc base | Δgc peak | at α | 95% CI | Sonnet-coherent cells |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `w6_dsm_f10440_union` | w6_dsm | union | −0.113 (−14.7) | 1.30 | +0.500 | −7 | [+0.00, +1.00] | 13 of 25 |
+| `w6_recon_f10063_union` | w6_recon | union | +0.152 (+16.1) | 1.45 | +0.400 | +8 | [+0.00, +0.90] | 19 of 25 |
+| `w6_bayes_f8209_pos0` (degenerate) | w6_bayes | pos0 | −0.221 (−14.4) | 1.30 | −0.350 | +3 | [−0.65, −0.05] | 13 of 25 |
+| `w6_dsm_f10440_pos0` | w6_dsm | pos0 | −0.113 (−14.7) | 1.40 | +0.350 | −8 | [−0.10, +0.85] | 16 of 25 |
+| `w6_bayes_f8209_union` (degenerate) | w6_bayes | union | −0.221 (−14.4) | 1.45 | −0.300 | −1 | [−0.60, +0.00] | 14 of 25 |
+| `w6_recon_f10063_pos0` | w6_recon | pos0 | +0.152 (+16.1) | 1.25 | +0.300 | −8 | [−0.10, +0.70] | 16 of 25 |
+
+The peak column is **descriptive only**: each entry is a maximum over 13–19
+noisy 20-prompt cells, and the wave-1 random control's own raw peak under the
+identical rule was +0.450 [−0.05, +0.95] — the null *produces* numbers of this
+size, so nothing in this column is evidence of a directional effect. Two of the
+three mined features carry **negative** mining scores (`w6_dsm` f10440 −0.113,
+`w6_bayes` f8209 −0.221; only `w6_recon` f10063 is positive at +0.152), so the
+sign-inversion caveat from wave 1 applies with the extra twist that the α axis
+means opposite things across arms unless folded.
+
+#### Wave-2 decomposition against the wave-1 control
+
+The claim-bearing statistic is the same one that carried wave 1: the excess
+antisymmetric component over `control_random`, a fixed functional of the whole
+curve with no maximum taken anywhere. The wave-1 control rows are reused
+directly — same 20 eval prompts, same 25-magnitude grid, same judge — and the
+prompt pairing was verified exact before subtraction. Components are means over
+all 12 paired |α| values; the CI is the paired prompt-resampling bootstrap. The
+**folded** columns flip the α axis for the two negative-mined arms so that
+every arm is read in its own mined-sign convention; `w6_recon` needs no fold.
+
+| source | mined sign | sym | anti (raw) | excess anti, raw | 95% CI | excess anti, folded | 95% CI |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `w6_bayes_f8209_pos0` (degenerate) | − | −0.123 | +0.073 | +0.083 | [+0.000, +0.165] | −0.063 | [−0.177, +0.052] |
+| `w6_dsm_f10440_pos0` | − | −0.192 | +0.071 | +0.081 | [−0.035, +0.204] | −0.060 | [−0.190, +0.056] |
+| `w6_bayes_f8209_union` (degenerate) | − | −0.200 | +0.063 | +0.073 | [−0.054, +0.192] | −0.052 | [−0.165, +0.071] |
+| `w6_dsm_f10440_union` | − | −0.048 | +0.052 | +0.062 | [−0.052, +0.167] | −0.042 | [−0.162, +0.058] |
+| `w6_recon_f10063_pos0` | + | +0.119 | −0.027 | −0.017 | [−0.127, +0.087] | (= raw) | — |
+| `w6_recon_f10063_union` | + | −0.021 | −0.029 | −0.019 | [−0.144, +0.106] | (= raw) | — |
+
+**No wave-2 source survives the control.** In the folded convention every CI
+spans zero. The one nominally significant raw entry — `w6_bayes` pos0 at
++0.083, lower bound exactly at +0.000 — is marginal, comes from the
+labelled-degenerate arm, and points in the direction its negative mining score
+says it should not. For scale, the wave-1 Stage B crosscoder's excess was
++0.42 [+0.31, +0.52] on the same statistic; the largest wave-2 magnitude is a
+fifth of that and consistent with zero.
+
+The sharper observation is *how* the arms fail. All four negative-mined
+sources show a raw excess-anti of the **same sign** the positive-mined wave-1
+arms showed (negative α raises the count). If the mined direction meant
+something causally, flipping the mined sign would flip the steering direction;
+it does not. The direction of the effect is set by something other than the
+feature's relationship to backtracking — which is exactly what a nonspecific
+perturbation looks like, and is the same U-shape signature the wave-1 control
+exposed in the DoM baseline. The mined sign not modulating the steering
+direction is the single cleanest piece of evidence that these window
+dictionaries found no causal handle here.
+
+The informative null is `w6_recon`. Its excess is −0.02 in both conventions
+with a CI comfortably around zero, and unlike `w6_dsm` it has no
+transfer-failure excuse: the pre-flight put it at 65.1% live latents on distill
+windows at the steering site. A T=6 window dictionary, reconstruction-trained
+to NMSE 0.046 on FineWeb (15k steps, timeout-truncated from a 20k plan) and
+demonstrably alive at the deployment site, still yields no directional handle
+on backtracking — while wave 1's Stage B crosscoder, trained *on reasoning
+traces*, yields the largest in the study. Architecture alone does not produce
+the handle; the training distribution has to contain the behaviour. That is the
+causal-side counterpart of the detection-side domain lesson, and it points the
+same way: at trace-domain or mixed-corpus training for the next round.
+
+Standing caveats, carried unchanged from wave 1: n = 20 prompts, so every CI
+is wide and these are ordering claims among arms run through one pipeline, not
+calibrated effect sizes; the wave-2 checkpoints are 15k-step timeout-truncated
+arms, never to be read as the 20k plan; the suppression/degeneration confound
+and the uncorrected multiple comparisons across sources × magnitudes carry
+over; and everything here is one steering site on one model
+(`layers[10]` residual of the R1-distill Llama-8B), so none of it bounds these
+dictionaries at other sites. `w6_bayes` rows remain labelled-degenerate per
+the reading rules above. Derived artifacts:
+`results/backtracking_steering/wave2/` (`table.md`, `summary.json`,
+`curves.json`, `symmetry.json`).
+
+#### Pre-registered reading — the distill-captured projector (`projected_dist`)
+
+*This subsection is written before the rerun's results land.*
+
+The distill-captured DSM window dictionary
+(`txc_w6_distill/txc_dsm/dsm_s0`, 8,000 steps, clean finish — the same
+72/28 stream as `w6mix_dsm` with only the capture model changed) hit its
+pre-registered P1/P3 predictions from
+[[2026-08-12_bird_transfer_theory]]: live pool 1,063 of 16,384 on distill
+traces (predicted 600–2,500), 162 positive preactivations per window
+(predicted 10²–10³), on-domain NMSE 0.16 (predicted ≤ 0.45 at the 8k-step
+budget). The remaining sharp prediction is P2's projector half: with
+*this* checkpoint as the denoise-after-steer projector, the α = 0 cell
+**passes** coherence (mean Sonnet grade ≥ 2 for the majority of prompts)
+*despite* the ~93.5%-dead pool — directly against the earlier reading
+that a concentrated sub-dictionary cannot substitute for the residual
+stream.
+
+Rerun protocol, fixed with the readings: projected arm only, tag
+`projected_dist`; the steered vector is unchanged (`w6_dsm` f10440 pos0)
+so the projector checkpoint is the only difference against
+`w6_dsm_f10440_pos0_proj`; reduced grid {0, ±4, ±8} × the same 20
+prompts, with the α = 0 cell mandatory and claim-bearing; standard judge
+pipeline. Reference points: the base-captured projector's destroyed
+α = 0 cell (gc 0.00, mean Sonnet grade 0.55, 0/20 above floor, 423 mean
+words) and the unprojected α = 0 cell (gc ≈ 1.3, ≈ 862 mean words,
+grade ≥ 2 for the large majority).
+
+The two readings, pre-registered:
+
+- **P2 pass** — the α = 0 cell recovers to near-unprojected coherence
+  (majority of prompts at Sonnet grade ≥ 2; word count and gc in the
+  neighbourhood of the unprojected baseline rather than the destroyed
+  one). The framework is vindicated at its sharpest, most
+  counter-intuitive point: on-domain fidelity decouples from pool size,
+  and the wave-2 projector failure was OOD-ness, not concentration.
+- **P2 fail** — with the pool and NMSE as measured (1,063 live, 0.16), a
+  destroyed or heavily degraded α = 0 cell means the Tweedie-projection
+  story is wrong even with a density-matched projector. That is a
+  **partial K1** and is recorded as such — partial because full K1 also
+  requires pool < 300 and NMSE ≥ 0.5, both already contradicted by the
+  P1/P3 measurements.
+
+**Recon-projector control, added before that control ran** (after
+`projected_dist` generation had finished but before any judging):
+motivated by the densification concern — a passing α = 0 cell might be a
+property of *any* decent k-sparse reconstructor on its own distribution,
+not of the DSM objective. Control: identical projector mechanism at the
+same hook, substituting the distill-captured *recon* twin
+(`txc_w6_distill/txc_recon/recon_s0`, clean finish; 14,894 live, NMSE
+0.102 on-domain), tag `projected_dist_recon`, same reduced grid with
+α = 0 mandatory. Pre-registered readings:
+
+- **Both projectors pass α = 0 coherence** — projector viability is a
+  property of any decent k-sparse reconstructor on-distribution (the
+  densification / reconstruction-quality explanation), and motivation
+  1b's "reconstruction SAEs cannot offer this" clause is **falsified**.
+- **DSM passes and recon fails, or recon degrades measurably more** —
+  the density/Tweedie story survives its most direct head-to-head.
+- Both failing is already covered by the P2-fail reading above.
+
+To measure the densification axis rather than assume it, the effective
+L0 actually used per projected window (count of nonzero entries in the
+top-96 after ReLU) is reported for both projectors on distill windows,
+via the pre-flight instrument.
+
+#### P2 measured — the α = 0 cell fails for both projectors; partial K1 recorded
+
+Both arms ran the reduced grid (5 shards each, merged, judged by the
+standard pipeline, 0 judge errors). The claim-bearing α = 0 cells, against
+both references:
+
+| α = 0 cell | mean Sonnet grade | frac ≥ floor | mean words | gc |
+| --- | --- | --- | --- | --- |
+| unprojected (`w6_dsm_f10440_pos0`) | 2.85 | 1.00 | 862 | 1.40 |
+| base-captured projector (wave 2) | 0.55 | 0.00 | 423 | 0.00 |
+| **`projected_dist` (distill DSM)** | **0.25** | **0.00** | **758** | **0.15** |
+| **`projected_dist_recon` (distill recon)** | **0.50** | **0.20** | **826** | **0.40** |
+
+**P2 fails.** The pre-registered pass condition — mean Sonnet grade ≥ 2
+for the majority of prompts — is missed by every margin: 0 of 20 prompts
+reach the floor under the distill-DSM projector. By the pre-registered
+reading this is a **partial K1**: with the pool and on-domain NMSE as
+measured, the Tweedie-projection story failed at its sharpest point even
+with a distribution-matched projector. Partial, because full K1's other
+conditions (pool < 300, near-frozen preactivations) remain contradicted.
+
+The recon control settles the head-to-head in neither pre-registered
+direction: **both projectors fail**, so the "both pass ⇒ densification
+explanation, 1b falsified" reading does not fire — but the density-blind
+recon twin is *measurably less bad on every α = 0 metric* (grade 0.50 vs
+0.25, floor 0.20 vs 0.00, gc 0.40 vs 0.15, words 826 vs 758). Whatever
+the DSM objective's density modelling buys, it does not buy projector
+robustness even on its own training distribution; on this axis the
+ordering favours reconstruction quality.
+
+The full small grid:
+
+| α | −8 | −4 | 0 | +4 | +8 |
+| --- | --- | --- | --- | --- | --- |
+| dist-DSM gc | 0.20 | 0.20 | 0.15 | 0.20 | 0.10 |
+| dist-DSM mean grade | 0.25 | 0.25 | 0.25 | 0.20 | 0.25 |
+| dist-DSM mean words | 971 | 1034 | 758 | 630 | 329 |
+| dist-recon gc | 0.50 | 0.60 | 0.40 | 0.45 | 0.40 |
+| dist-recon mean grade | 0.50 | 0.50 | 0.50 | 0.40 | 0.45 |
+| dist-recon mean words | 950 | 928 | 826 | 819 | 634 |
+
+Three observations that keep the record honest:
+
+- **The failure mode changed qualitatively.** The base-captured
+  projector produced word salad — grammar itself destroyed. The
+  distill-captured projector produces syntactically fluent English at
+  near-natural length (758 vs 423 words) whose *content* is corrupted:
+  numerals garbled mid-equation, problem statements misread, and
+  re-reading loops ("Wait, no, let me read again"). Distribution
+  matching repaired the surface statistics of the residual stream but
+  not the computation-carrying precision. Δgc across the grid is flat
+  for both arms, and per the pre-registration a flattened curve is read
+  as projector damage, not as evidence about temporal structure.
+- **The effective L0 axis does not separate the projectors.** Measured
+  on 20,000 distill windows: mean = median = 96.0 of 96, std 0.0, for
+  *both* dictionaries — every projected window uses a full dense-in-k
+  code. The distill-DSM's top-96 draws from its ~162 positive
+  preactivations, the recon twin's from thousands; pool concentration
+  (1,413 vs 15,109 live) and reconstruction error, not per-window code
+  density, are the separating variables.
+- **Instrument discrepancy, recorded rather than adjudicated.** The
+  pre-registered projector gate's own instrument reads these
+  checkpoints at NMSE 0.811 (dist-DSM) and 0.658 (dist-recon) on
+  distill trace windows — both *fail* the gate (max 0.4) that
+  `w6mix_dsm` was to be held to, while the P1/P3 scorecard's
+  variance-convention read the same dictionaries at 0.16 and 0.102
+  on-domain. The live-pool count is the convention-free number and
+  agrees across instruments. By the gate instrument, no projector run
+  so far — base or distill, DSM or recon — entered its grid gate-passing,
+  and none survived the α = 0 cell; the P2 prediction was registered off
+  the scorecard convention, and its failure is reported under that same
+  convention.
 
 ### Files
 

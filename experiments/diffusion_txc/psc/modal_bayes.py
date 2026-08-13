@@ -43,8 +43,27 @@ JOBS = {
     "bg3_100M": {"steps": 24000, "subdir": "gemma2-2b-l12-100M-bg3",
                  "extra": ["--target-l0", "40", "--sparsity-coef", "1.0",
                            "--ctrl-exp", "0.5", "--coef-max", "300"]},
+    # v4: replace mean-gate controller with per-latent rate-KL (anti-collapse)
+    "bg4_sol": {"steps": 6000, "subdir": "gemma2-2b-l12-sol-bg4",
+                "extra": ["--target-l0", "40", "--sparsity-coef", "0",
+                          "--rate-kl-coef", "0.01"]},
+    # v5: bg4's rate-KL never reached the loss (silent edit no-op) and the
+    # controller ran instead; v5 decouples them and actually wires the KL
+    "bg5_sol": {"steps": 6000, "subdir": "gemma2-2b-l12-sol-bg5",
+                "extra": ["--target-l0", "40", "--sparsity-coef", "0",
+                          "--rate-kl-coef", "0.01"]},
+    # v6: bg5 proved rate-KL keeps the pool 100% alive but L0 landed 219;
+    # raise coefficient toward the L0=40 equilibrium
+    "bg6_sol": {"steps": 6000, "subdir": "gemma2-2b-l12-sol-bg6",
+                "extra": ["--target-l0", "40", "--sparsity-coef", "0",
+                          "--rate-kl-coef", "0.06"]},
+    # v7: coef->L0 map {0.01: 219, 0.06: 67.6} gives L0 ~ coef^-0.66;
+    # 0.13 targets L0=40. bg6 NMSE 0.291 at L0 68 (vs TopK-40 recon 0.299)
+    "bg7_sol": {"steps": 6000, "subdir": "gemma2-2b-l12-sol-bg7",
+                "extra": ["--target-l0", "40", "--sparsity-coef", "0",
+                          "--rate-kl-coef", "0.13"]},
 }
-LAUNCH = ["bg3_100M"]
+LAUNCH = ["bg7_sol"]
 
 
 @app.function(image=image, gpu="L40S", timeout=14400, volumes={"/vol": vol},

@@ -262,3 +262,154 @@ uvx modal volume get diffusion-txc backtracking_eval/detection_results_gate.json
 Code: `experiments/backtracking_detection_dsm/` (`detect_core.py`,
 `run_detection.py`, `modal_detect.py`). Results JSON is committed to the
 `diffusion-txc` Modal volume under `backtracking_eval/`.
+
+## w6 trio: first LLM DSM-TXC detection (2026-08-11 late)
+
+The window-6 trio trained tonight (Llama resid_L10, k=96, H=16384,
+~16.5k steps FineWeb/pile stream; `txc_w6/` on the volume) evaluated under
+the identical protocol (`detection_results_w6.json`; smoke-gated window
+flatten order, time-major NMSE 0.86 vs dim-major 2.39). Sentence-set
+PR-AUC, same-protocol references from `detection_results.json`:
+
+| arm | train dist | sent S8 | sent S32 | far S8 | dead-on-traces |
+| --- | --- | --- | --- | --- | --- |
+| raw stacked | — | 0.190 | 0.216 | 0.259 | — |
+| per-token recon (2s) | FineWeb | 0.190 | 0.221 | 0.269 | ~0.10 |
+| stage-B TopK SAE k64 | traces | 0.202 | 0.238 | 0.302 | — |
+| stage-B TXC / h13 k16 | traces | 0.215 | 0.239–0.243 | 0.298–0.307 | — |
+| w6_recon | FineWeb | 0.196 | 0.215 | 0.275 | 0.076 |
+| w6_dsm | FineWeb | 0.181 | 0.209 | 0.277 | **0.962** |
+| w6_bayes | FineWeb | 0.194 | 0.216 | 0.281 | 0.424 |
+
+Three findings:
+
+- **Temporal architecture alone does not reproduce the stage-B edge.**
+  The FineWeb-trained window dicts sit at the raw floor (0.18–0.20 S8),
+  not at stage-B TXC's 0.215. The 2×2 across
+  {per-token, temporal} × {FineWeb, trace-trained} now decomposes the
+  stage-B advantage: temporal-on-FineWeb ≈ +0.006, trace-domain
+  per-token ≈ +0.012, both together ≈ +0.025 — the temporal gain
+  mostly manifests *on top of* domain match. Trace-domain (mixed-corpus)
+  training is the decisive next run, now with a factorial argument
+  rather than a hunch.
+- **Objective does not separate at matched recipe** (recon 0.196 vs
+  dsm 0.181 vs bayes 0.194 at S8; fold spreads ±0.03 overlap): no DSM
+  detection win, and no bayes win, on off-domain-trained window dicts.
+- **DSM near-parity from 3.7% capacity.** w6_dsm reaches within ~0.015
+  of recon while 96.2% dead on trace windows — ~600 live latents match
+  ~15k. Per-latent, the surviving DSM features are far more informative
+  (consistent with low-band concentration), but the OOD collapse caps
+  the arm; it cannot win while dead. Same story as steering: coverage
+  of the deployment distribution is the binding constraint on DSM
+  everywhere.
+
+## Mixed-corpus pair: the objective×domain interaction (2026-08-12 morning)
+
+Same recipe as the w6 trio but trained on the 72/28 trace/FineWeb mixed
+corpus (8000 steps, A100-80GB; `txc_w6_mix/`, results
+`detection_results_w6mix.json`). Same protocol, sentence-set PR-AUC with
+the trio and stage-B rows for comparison:
+
+| arm | corpus | sent S8 | sent S32 | far S32 | dead-on-traces |
+| --- | --- | --- | --- | --- | --- |
+| w6_recon | FineWeb | 0.196 | 0.215 | 0.326 | 0.076 |
+| w6_dsm | FineWeb | 0.181 | 0.209 | 0.308 | 0.962 |
+| w6mix_recon | mixed | 0.190 | 0.228 | 0.332 | 0.068 |
+| **w6mix_dsm** | mixed | **0.208** | **0.242** | **0.352** | **0.948** |
+| stage-B TXC / h13 | traces | 0.215 | 0.239–0.243 | 0.331–0.351 | — |
+
+Three findings, one pre-registration verdict:
+
+- **First DSM detection win, and it is an interaction, not a main
+  effect.** Domain training barely moved recon (S8 0.196→0.190, S32
+  0.215→0.228) but flipped dsm from worst to best-of-ours (S8
+  0.181→0.208, S32 0.209→0.242, far S32 0.352), reaching stage-B TXC
+  level on every column (folds overlap; "matches", not "beats"). The
+  density-model theory predicts exactly this asymmetry: DSM learns the
+  training density, so deployment-density match unlocks it; recon was
+  never density-limited and gains little.
+- **Pre-registered mechanism prediction FAILED while the outcome
+  prediction succeeded**: we predicted domain match would revive the
+  dead pool (96% → toward 8%). It did not — w6mix_dsm is still 94.8%
+  dead on traces. The gain came from the ~850 live latents becoming the
+  *right* latents, not from more latents. Extreme pool concentration
+  appears intrinsic to DSM; what domain training changes is what the
+  concentrated pool encodes.
+- **Site dissociation in one morning**: the same w6mix_dsm still fails
+  the steering-site gate (distill-model activations: NMSE 0.807, 5.2%
+  live vs 0.795/3.7% FineWeb-trained). Text-domain match fixed the
+  detection site (base-Llama activations over trace text — the trained
+  distribution) and did nothing for the cross-model site. Model
+  identity, not text domain, is the binding axis for the steering
+  transfer failure; distill-captured training is the implied next cell.
+
+Caveats: 1 seed per cell; S8 fold spreads (±0.03) overlap between
+w6mix_dsm and both w6mix_recon and stage-B — the direction is consistent
+across all four columns but no single comparison is individually
+significant; the mixed corpus overlaps the eval traces (label-free, same
+status as stage-B training); w6mix ordering-gate NMSE on trace windows
+halved vs FineWeb-trained (0.448 vs 0.861), confirming on-domain fit
+improved even though the live pool did not widen.
+
+## Instrument-sensitivity controls (2026-08-12, arc-review experiment 1)
+
+Three controls on the w6mix pair decide whether the detection table can
+distinguish dictionary quality at all, and whether "DSM's survivors are
+disproportionately informative" is licensed
+(`backtracking_eval/detection_controls.json`; same capture, example sets,
+probe and folds — only the dictionary/feature source varies):
+
+| arm | latents | sent S8 | sent S32 | far S32 |
+| --- | --- | --- | --- | --- |
+| w6mix_dsm | 849 | 0.203 | 0.237 | 0.346 |
+| w6mix_recon (full) | 15,274 | 0.201 | 0.226 | 0.321 |
+| recon subsampled to 849 (3 draws) | 849 | 0.123–0.146 | 0.158–0.174 | 0.216–0.252 |
+| random (untrained) dictionary | 16,382 | 0.128 | 0.160 | 0.221 |
+| label shuffle (chance) | — | 0.142–0.146 | ≈0.156 | ≈0.167 |
+
+- **The per-latent-informativeness claim is licensed.** Matched-capacity
+  recon collapses to near the untrained-dictionary floor; dsm's 849
+  survivors carry ≈ the total signal of recon's full 15,274-latent pool
+  (18× the per-latent informativeness of a random recon subset). The
+  near-equality dsm@849 ≈ recon@15274 is itself suggestive: both
+  dictionaries appear to capture similar total domain signal, with DSM
+  allocating it into a minimal template set.
+- **The instrument has dynamic range** (random 0.128 vs trained 0.20+),
+  so the compression among top arms is signal, not floor artifact — but
+  differences of ~0.01–0.02 between top arms remain within fold noise
+  (within this run, dsm-vs-recon at sentence S8 is a wash; the far-set
+  and capacity-normalized comparisons are the robust ones).
+- Reference values shift slightly between runs (dsm 0.208→0.203, recon
+  0.190→0.201 at S8) from probe-refit variance — within-run comparisons
+  share all pipeline randomness and are the ones quoted above.
+
+## Survivor-interpretation battery (2026-08-13) — SUPERSEDES the controls reading
+
+Full battery on the w6mix pair (`backtracking_eval/survivor_interp.json`;
+single-latent probes, capacity curves, pairwise correlations,
+mass-matched selected controls, judged autointerp; pre-registered
+readings embedded in the artifact):
+
+- **The 18× per-latent claim dissolves under selected controls.**
+  Yesterday's subsampled-recon control used RANDOM 849-latent subsets
+  (0.12–0.15) — the wrong null. Recon's top-248-by-mass slice scores
+  **0.223 > dsm's full 849 survivors (0.208)**; count-matched
+  top-849-by-rate recon 0.214. Both dictionaries have a concentrated,
+  label-free-discoverable informative core; DSM training deletes the
+  tail rather than creating concentration. Surviving claim: equal total
+  signal in an 18×-smaller pool (deployment/audit virtue), not
+  information creation.
+- **Not an interaction code**: smooth capacity curve (0.133→0.208, no
+  cliff), bulk pairwise |corr| median 0.007. **Not super-features
+  either**: best single survivor 0.179 ≈ recon's best 0.184; signal is
+  additive over ~256+ weak units in both dictionaries. Pathology found:
+  ~1% of survivor pairs are near-duplicate atoms (|corr| ≈ 1.0) —
+  effective distinct-template count < 849.
+- **Autointerp (judged, Haiku)**: dsm survivors 0.77 ± 0.05 > recon
+  top-usage 0.64 ± 0.04 (rate-matched comparison — DSM's high-rate core
+  is cleaner), but recon random-live 0.84 ± 0.03 is highest —
+  interpretability tracks rarity, and DSM deleted the rare monosemantic
+  tail.
+- **Synthesis**: DSM ≈ label-free pruning of a shared core. Value =
+  compactness and a cleaner high-rate unit set; cost = the crisp rare
+  tail; information beyond recon = none demonstrated on this task.
