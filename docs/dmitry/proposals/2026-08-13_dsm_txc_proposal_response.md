@@ -118,3 +118,38 @@ point for its Conjecture 7.6.
 - Import the arc's instrument discipline into §Evaluation matching
   verbatim (selected-core baselines, floors, live-pool metric,
   convention-pinned NMSE).
+
+### H6/H7 measured (same day)
+
+Both hypotheses were run on real artifacts within hours of this
+response (`backtracking_eval/h6_bird_phase.json`, `h7_mi_matching.json`;
+code in `experiments/backtracking_detection_dsm/modal_h6_bird.py`,
+`run_h7_mi.py`, `modal_h7_mi.py`).
+
+- **H6 PASS.** On distill resid_L10 T=6 windows, empirical posterior
+  entropy tracks max{0, log n − MI} to ≤0.02 nats against the I–MMSE
+  estimate and ≤0.05 nats against the Gaussian bound for n ≤ 256, with
+  the transition within ±11% in γ of MI = log n. Large-n deviations go
+  the direction the note's caveats predict (heavy-topped spectra make
+  the Gaussian bound overshoot; near-duplicate windows floor the
+  entropy). First empirical confirmation of the BIRD transition on
+  real model activations that we are aware of.
+- **Exemplar-memorization diagnostic: covering-law reading wins.**
+  Train/test nearest-training-window concentration gap +0.004 (inside
+  the random-dictionary control's wobble; top-1 mass near-uniform over
+  69.5k references; 60 fresh distill generations as the held-out set).
+  The ~850 survivors are genuine reusable templates, not exemplar
+  retrieval — and a measured "support-frozen, exemplar-unfrozen" data
+  point for the note's hierarchical-BIRD conjecture.
+- **H7 PASS.** At equal ℓ0 ≈ 96 the activation families nearly tie
+  (TopK 0.190, JumpReLU 0.187, smooth 0.200–0.203 sentence-S8); at
+  equal MI proxy every softer gate beats TopK, gaps triple
+  (+0.013 → +0.033), JumpReLU flips sign, and the smooth-temperature
+  ordering inverts. Fixed ℓ0 = 96 spans a ~100-nat MI range across
+  families, and MI-matching is sometimes infeasible (the hot gate caps
+  35 nats below TopK-96). Caveats: the MI numbers are an ordinal
+  fixed-ν₀ Gaussian log-det proxy, and softer codes reach the MI
+  target partly via larger ℓ0 — the accounting difference H7 asserts.
+  Consequence: ℓ0-matched activation comparisons (including this
+  repo's own earlier tables) are not capacity-fair, in a direction
+  that flatters hard gates.
