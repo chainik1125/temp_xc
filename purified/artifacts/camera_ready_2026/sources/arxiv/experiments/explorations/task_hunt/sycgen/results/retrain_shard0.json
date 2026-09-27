@@ -1,0 +1,650 @@
+[
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "batchtopk_sae_btkonly",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.054999999701976776,
+      "e_mean_max_cos": 0.056758858263492584,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.8769077690335572,
+      "l0_per_window": 8.0,
+      "l0_per_token": 8.0,
+      "lambda_recovery": 0.22300609991943887,
+      "lambda_r2": -0.06451976299285889,
+      "lambda_chance": 0.011969220297989584
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "batchtopk_sae_btkonly",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.04999999701976776,
+      "e_mean_max_cos": 0.051312580704689026,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.8804969547150145,
+      "l0_per_window": 8.0,
+      "l0_per_token": 8.0,
+      "lambda_recovery": 0.226738596763756,
+      "lambda_r2": -0.06306695938110352,
+      "lambda_chance": -0.01045495653734274
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "batchtopk_sae_btkonly",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.057500001043081284,
+      "e_mean_max_cos": 0.054358672350645065,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.8915768189833236,
+      "l0_per_window": 8.0,
+      "l0_per_token": 8.0,
+      "lambda_recovery": 0.23046541428397713,
+      "lambda_r2": -0.0579833984375,
+      "lambda_chance": -0.016385297391539985
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "tsae_btkonly",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.057500001043081284,
+      "e_mean_max_cos": 0.054358672350645065,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.8915768189833236,
+      "l0_per_window": 8.0,
+      "l0_per_token": 8.0,
+      "lambda_recovery": 0.23046541428397713,
+      "lambda_r2": -0.0579833984375,
+      "lambda_chance": -0.016385297391539985
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "tsae_btkonly",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.054999999701976776,
+      "e_mean_max_cos": 0.056758858263492584,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.8769077690335572,
+      "l0_per_window": 8.0,
+      "l0_per_token": 8.0,
+      "lambda_recovery": 0.22300609991943887,
+      "lambda_r2": -0.06451976299285889,
+      "lambda_chance": 0.011969220297989584
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "tsae_btkonly",
+    "T": 1,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.04999999701976776,
+      "e_mean_max_cos": 0.051312580704689026,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.8804969547150145,
+      "l0_per_window": 8.0,
+      "l0_per_token": 8.0,
+      "lambda_recovery": 0.226738596763756,
+      "lambda_r2": -0.06306695938110352,
+      "lambda_chance": -0.01045495653734274
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 2,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.04999999701976776,
+      "e_mean_max_cos": 0.05436280742287636,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.9355366173951469,
+      "l0_per_window": 8.0,
+      "l0_per_token": 4.0,
+      "lambda_recovery": 0.22595464662904896,
+      "lambda_r2": -0.10779774188995361,
+      "lambda_chance": 0.009364850144673408
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 2,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.05249999836087227,
+      "e_mean_max_cos": 0.05547230690717697,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.9364245098026251,
+      "l0_per_window": 8.0,
+      "l0_per_token": 4.0,
+      "lambda_recovery": 0.21622072734872144,
+      "lambda_r2": -0.12744474411010742,
+      "lambda_chance": 0.011469711326946824
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 2,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.057500001043081284,
+      "e_mean_max_cos": 0.055504243820905685,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.9383673330452658,
+      "l0_per_window": 8.0,
+      "l0_per_token": 4.0,
+      "lambda_recovery": 0.21148249867191274,
+      "lambda_r2": -0.12330913543701172,
+      "lambda_chance": 0.0013692504882360163
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 4,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.054999999701976776,
+      "e_mean_max_cos": 0.057696741074323654,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.9644848951016237,
+      "l0_per_window": 8.0,
+      "l0_per_token": 2.0,
+      "lambda_recovery": 0.1952459096667758,
+      "lambda_r2": -0.49352073669433594,
+      "lambda_chance": -0.00028662337157299265
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 4,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.057500001043081284,
+      "e_mean_max_cos": 0.05793792009353638,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.9673195634004359,
+      "l0_per_window": 8.0,
+      "l0_per_token": 2.0,
+      "lambda_recovery": 0.16485666900875573,
+      "lambda_r2": -0.5961867570877075,
+      "lambda_chance": 0.0243461451586242
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 4,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.054999999701976776,
+      "e_mean_max_cos": 0.05535068362951279,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.963247963128501,
+      "l0_per_window": 8.0,
+      "l0_per_token": 2.0,
+      "lambda_recovery": 0.16303105022822129,
+      "lambda_r2": -0.5551744699478149,
+      "lambda_chance": 0.023765353658294103
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 6,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "ok": false,
+    "error": "ValueError: eval window L=32 is not divisible by arch window T=6 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).",
+    "tb": "Traceback (most recent call last):\n  File \"/workspace/temp_xc/src/explorations/synthetic/grid.py\", line 74, in run_cell\n    r = run_experiment(\n        ^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/core/runner.py\", line 182, in run_experiment\n    metrics = evaluator.eval(model, spec)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 265, in eval\n    out[\"nmse\"] = _windowed_recon_nmse(model, data.x, L=L, n_windows=n_windows)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 133, in _windowed_recon_nmse\n    T = _check_tileable(model, L)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 82, in _check_tileable\n    raise ValueError(\nValueError: eval window L=32 is not divisible by arch window T=6 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).\n"
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 6,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "ok": false,
+    "error": "ValueError: eval window L=32 is not divisible by arch window T=6 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).",
+    "tb": "Traceback (most recent call last):\n  File \"/workspace/temp_xc/src/explorations/synthetic/grid.py\", line 74, in run_cell\n    r = run_experiment(\n        ^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/core/runner.py\", line 182, in run_experiment\n    metrics = evaluator.eval(model, spec)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 265, in eval\n    out[\"nmse\"] = _windowed_recon_nmse(model, data.x, L=L, n_windows=n_windows)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 133, in _windowed_recon_nmse\n    T = _check_tileable(model, L)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 82, in _check_tileable\n    raise ValueError(\nValueError: eval window L=32 is not divisible by arch window T=6 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).\n"
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 8,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.057500001043081284,
+      "e_mean_max_cos": 0.05732071399688721,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.9813344759987163,
+      "l0_per_window": 8.0,
+      "l0_per_token": 1.0,
+      "lambda_recovery": 0.09267163099316478,
+      "lambda_r2": -2.1642723083496094,
+      "lambda_chance": 0.028565057606885758
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 6,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "ok": false,
+    "error": "ValueError: eval window L=32 is not divisible by arch window T=6 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).",
+    "tb": "Traceback (most recent call last):\n  File \"/workspace/temp_xc/src/explorations/synthetic/grid.py\", line 74, in run_cell\n    r = run_experiment(\n        ^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/core/runner.py\", line 182, in run_experiment\n    metrics = evaluator.eval(model, spec)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 265, in eval\n    out[\"nmse\"] = _windowed_recon_nmse(model, data.x, L=L, n_windows=n_windows)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 133, in _windowed_recon_nmse\n    T = _check_tileable(model, L)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 82, in _check_tileable\n    raise ValueError(\nValueError: eval window L=32 is not divisible by arch window T=6 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).\n"
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 10,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "ok": false,
+    "error": "ValueError: eval window L=32 is not divisible by arch window T=10 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).",
+    "tb": "Traceback (most recent call last):\n  File \"/workspace/temp_xc/src/explorations/synthetic/grid.py\", line 74, in run_cell\n    r = run_experiment(\n        ^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/core/runner.py\", line 182, in run_experiment\n    metrics = evaluator.eval(model, spec)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 265, in eval\n    out[\"nmse\"] = _windowed_recon_nmse(model, data.x, L=L, n_windows=n_windows)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 133, in _windowed_recon_nmse\n    T = _check_tileable(model, L)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 82, in _check_tileable\n    raise ValueError(\nValueError: eval window L=32 is not divisible by arch window T=10 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).\n"
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 8,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.05249999836087227,
+      "e_mean_max_cos": 0.05540100485086441,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.982321398621027,
+      "l0_per_window": 8.0,
+      "l0_per_token": 1.0,
+      "lambda_recovery": 0.08069943168895949,
+      "lambda_r2": -2.4987239837646484,
+      "lambda_chance": -0.029099526824539833
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 10,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "ok": false,
+    "error": "ValueError: eval window L=32 is not divisible by arch window T=10 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).",
+    "tb": "Traceback (most recent call last):\n  File \"/workspace/temp_xc/src/explorations/synthetic/grid.py\", line 74, in run_cell\n    r = run_experiment(\n        ^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/core/runner.py\", line 182, in run_experiment\n    metrics = evaluator.eval(model, spec)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 265, in eval\n    out[\"nmse\"] = _windowed_recon_nmse(model, data.x, L=L, n_windows=n_windows)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 133, in _windowed_recon_nmse\n    T = _check_tileable(model, L)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 82, in _check_tileable\n    raise ValueError(\nValueError: eval window L=32 is not divisible by arch window T=10 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).\n"
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 10,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "ok": false,
+    "error": "ValueError: eval window L=32 is not divisible by arch window T=10 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).",
+    "tb": "Traceback (most recent call last):\n  File \"/workspace/temp_xc/src/explorations/synthetic/grid.py\", line 74, in run_cell\n    r = run_experiment(\n        ^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/core/runner.py\", line 182, in run_experiment\n    metrics = evaluator.eval(model, spec)\n              ^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 265, in eval\n    out[\"nmse\"] = _windowed_recon_nmse(model, data.x, L=L, n_windows=n_windows)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 133, in _windowed_recon_nmse\n    T = _check_tileable(model, L)\n        ^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/temp_xc/src/temp_bench/evals/synthetic_recovery.py\", line 82, in _check_tileable\n    raise ValueError(\nValueError: eval window L=32 is not divisible by arch window T=10 (TXCBatchTopKPostBTKOnly); use a power-of-two L and T (experiments/explorations/synthetic/README.md \u00a7 4).\n"
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 8,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.054999999701976776,
+      "e_mean_max_cos": 0.05578062683343887,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.981426381342411,
+      "l0_per_window": 8.0,
+      "l0_per_token": 1.0,
+      "lambda_recovery": 0.10932265977214478,
+      "lambda_r2": -2.8688268661499023,
+      "lambda_chance": 0.04040620020221867
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 16,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 1,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.054999999701976776,
+      "e_mean_max_cos": 0.05717482417821884,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.9907312918276376,
+      "l0_per_window": 8.0,
+      "l0_per_token": 0.5,
+      "lambda_recovery": 0.08243239260892198,
+      "lambda_r2": -3.6749167442321777,
+      "lambda_chance": -0.021699521536250224
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 16,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 2,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.054999999701976776,
+      "e_mean_max_cos": 0.055620260536670685,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.9915402692621698,
+      "l0_per_window": 8.0,
+      "l0_per_token": 0.5,
+      "lambda_recovery": 0.06999236629018067,
+      "lambda_r2": -2.7697231769561768,
+      "lambda_chance": 0.04371392568780666
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  },
+  {
+    "ds": "sycgen_real_age_llama31_8b_l14",
+    "arch": "txc_batchtopk_post_btkonly",
+    "T": 16,
+    "d_sae": 2048,
+    "k_pos": 8,
+    "seed": 42,
+    "n_steps": 0,
+    "kind": "untrained",
+    "eval_window_L": 32,
+    "buffer_tokens": 524288,
+    "eval_extra": {
+      "retrain_tag": "sycgen_keep_r1"
+    },
+    "metrics": {
+      "eauc": 0.057500001043081284,
+      "e_mean_max_cos": 0.05613439157605171,
+      "e_frac_recovered_90": 0.0,
+      "e_frac_recovered_80": 0.0,
+      "nmse": 0.9908094215889842,
+      "l0_per_window": 8.0,
+      "l0_per_token": 0.5,
+      "lambda_recovery": 0.07261924503512471,
+      "lambda_r2": -3.917499542236328,
+      "lambda_chance": -0.044211114870070435
+    },
+    "train_cached": false,
+    "eval_cached": false,
+    "ok": true
+  }
+]

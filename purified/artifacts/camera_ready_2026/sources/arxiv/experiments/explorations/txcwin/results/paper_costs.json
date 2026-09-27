@@ -1,0 +1,325 @@
+{
+ "convention": {
+  "flops_per_mac": 2,
+  "subject_forward_per_token": "2 * N_params (standard dense-transformer approximation, attention terms excluded)",
+  "training_flops": "3 * forward_per_token * tokens_seen (forward + backward), tokens_seen = n_steps * batch_size",
+  "note": "stride 1 = every position gets a window; stride T = windows tile the sequence, which is what the paper's one-code-per-tile evaluation implies"
+ },
+ "sections": {
+  "probing": {
+   "subject_model": "google/gemma-2-2b-it",
+   "d_in": 2304,
+   "hookpoint_layer": 13,
+   "subject_params": 2610000000.0,
+   "subject_forward_flops_per_token": 5220000000.0,
+   "training": {
+    "n_steps": 20000,
+    "batch_size": 4096,
+    "tokens_seen": 81920000
+   },
+   "archs": {
+    "topk_sae": {
+     "hparams": {
+      "d_sae": 18432,
+      "k_pos": 20
+     },
+     "params": 84955392,
+     "params_pct_of_subject": 3.25,
+     "flops": {
+      "T": 1,
+      "positions_per_window": 1,
+      "encode": 84934656,
+      "decode_dense": 84934656,
+      "decode_sparse": 92160,
+      "window_dense": 169869312,
+      "window_sparse": 85026816,
+      "per_token_stride1_sparse": 85026816,
+      "per_token_strideT_sparse": 85026816.0,
+      "per_token_strideT_dense": 169869312.0
+     },
+     "inference_pct_of_subject_forward": 1.629,
+     "training_flops_estimate": 2.089619030016e+16
+    },
+    "tsae": {
+     "hparams": {
+      "d_sae": 16384,
+      "k_pos": 20,
+      "h_frac": 0.2
+     },
+     "params": 75516160,
+     "params_pct_of_subject": 2.89,
+     "flops": {
+      "T": 1,
+      "positions_per_window": 1,
+      "encode": 75497472,
+      "decode_dense": 75497472,
+      "decode_sparse": 92160,
+      "window_dense": 150994944,
+      "window_sparse": 75589632,
+      "per_token_stride1_sparse": 75589632,
+      "per_token_strideT_sparse": 75589632.0,
+      "per_token_strideT_dense": 150994944.0
+     },
+     "inference_pct_of_subject_forward": 1.448,
+     "training_flops_estimate": 1.857690796032e+16
+    },
+    "txc_base": {
+     "hparams": {
+      "d_sae": 18432,
+      "k_pos": 20,
+      "T": 5
+     },
+     "params": 424703232,
+     "params_pct_of_subject": 16.27,
+     "flops": {
+      "T": 5,
+      "positions_per_window": 5,
+      "encode": 424673280,
+      "decode_dense": 424673280,
+      "decode_sparse": 460800,
+      "window_dense": 849346560,
+      "window_sparse": 425134080,
+      "per_token_stride1_sparse": 425134080,
+      "per_token_strideT_sparse": 85026816.0,
+      "per_token_strideT_dense": 169869312.0
+     },
+     "inference_pct_of_subject_forward": 1.629,
+     "training_flops_estimate": 2.089619030016e+16
+    },
+    "mlc": {
+     "hparams": {
+      "d_sae": 18432,
+      "k_pos": 20,
+      "n_layers": 5
+     },
+     "params": 424703232,
+     "params_pct_of_subject": 16.27,
+     "flops": {
+      "T": 1,
+      "positions_per_window": 1,
+      "encode": 424673280,
+      "decode_dense": 424673280,
+      "decode_sparse": 460800,
+      "window_dense": 849346560,
+      "window_sparse": 425134080,
+      "per_token_stride1_sparse": 425134080,
+      "per_token_strideT_sparse": 425134080.0,
+      "per_token_strideT_dense": 849346560.0
+     },
+     "inference_pct_of_subject_forward": 8.144,
+     "training_flops_estimate": 1.044809515008e+17
+    }
+   }
+  },
+  "backtracking": {
+   "subject_model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+   "d_in": 4096,
+   "hookpoint_layer": 10,
+   "subject_params": 8030000000.0,
+   "subject_forward_flops_per_token": 16060000000.0,
+   "training": {
+    "n_steps": 25000,
+    "batch_size": 1024,
+    "tokens_seen": 25600000
+   },
+   "archs": {
+    "topk_sae": {
+     "hparams": {
+      "d_sae": 32768,
+      "k_pos": 20
+     },
+     "params": 268472320,
+     "params_pct_of_subject": 3.34,
+     "flops": {
+      "T": 1,
+      "positions_per_window": 1,
+      "encode": 268435456,
+      "decode_dense": 268435456,
+      "decode_sparse": 163840,
+      "window_dense": 536870912,
+      "window_sparse": 268599296,
+      "per_token_stride1_sparse": 268599296,
+      "per_token_strideT_sparse": 268599296.0,
+      "per_token_strideT_dense": 536870912.0
+     },
+     "inference_pct_of_subject_forward": 1.672,
+     "training_flops_estimate": 2.06284259328e+16
+    },
+    "tsae": {
+     "hparams": {
+      "d_sae": 16384,
+      "k_pos": 20,
+      "h_frac": 0.2
+     },
+     "params": 134238208,
+     "params_pct_of_subject": 1.67,
+     "flops": {
+      "T": 1,
+      "positions_per_window": 1,
+      "encode": 134217728,
+      "decode_dense": 134217728,
+      "decode_sparse": 163840,
+      "window_dense": 268435456,
+      "window_sparse": 134381568,
+      "per_token_stride1_sparse": 134381568,
+      "per_token_strideT_sparse": 134381568.0,
+      "per_token_strideT_dense": 268435456.0
+     },
+     "inference_pct_of_subject_forward": 0.837,
+     "training_flops_estimate": 1.03205044224e+16
+    },
+    "txc_base": {
+     "hparams": {
+      "d_sae": 32768,
+      "k_pos": 20,
+      "T": 5
+     },
+     "params": 1342230528,
+     "params_pct_of_subject": 16.72,
+     "flops": {
+      "T": 5,
+      "positions_per_window": 5,
+      "encode": 1342177280,
+      "decode_dense": 1342177280,
+      "decode_sparse": 819200,
+      "window_dense": 2684354560,
+      "window_sparse": 1342996480,
+      "per_token_stride1_sparse": 1342996480,
+      "per_token_strideT_sparse": 268599296.0,
+      "per_token_strideT_dense": 536870912.0
+     },
+     "inference_pct_of_subject_forward": 1.672,
+     "training_flops_estimate": 2.06284259328e+16
+    },
+    "mlc": {
+     "hparams": {
+      "d_sae": 18432,
+      "k_pos": 20,
+      "n_layers": 5
+     },
+     "params": 755013632,
+     "params_pct_of_subject": 9.4,
+     "flops": {
+      "T": 1,
+      "positions_per_window": 1,
+      "encode": 754974720,
+      "decode_dense": 754974720,
+      "decode_sparse": 819200,
+      "window_dense": 1509949440,
+      "window_sparse": 755793920,
+      "per_token_stride1_sparse": 755793920,
+      "per_token_strideT_sparse": 755793920.0,
+      "per_token_strideT_dense": 1509949440.0
+     },
+     "inference_pct_of_subject_forward": 4.706,
+     "training_flops_estimate": 5.8044973056e+16
+    }
+   }
+  },
+  "em": {
+   "subject_model": "Qwen/Qwen2.5-7B-Instruct",
+   "d_in": 3584,
+   "hookpoint_layer": 15,
+   "subject_params": 7620000000.0,
+   "subject_forward_flops_per_token": 15240000000.0,
+   "training": {
+    "n_steps": 20000,
+    "batch_size": 4096,
+    "tokens_seen": 81920000
+   },
+   "archs": {
+    "topk_sae": {
+     "hparams": {
+      "d_sae": 18432,
+      "k_pos": 20
+     },
+     "params": 132142592,
+     "params_pct_of_subject": 1.73,
+     "flops": {
+      "T": 1,
+      "positions_per_window": 1,
+      "encode": 132120576,
+      "decode_dense": 132120576,
+      "decode_sparse": 143360,
+      "window_dense": 264241152,
+      "window_sparse": 132263936,
+      "per_token_stride1_sparse": 132263936,
+      "per_token_strideT_sparse": 132263936.0,
+      "per_token_strideT_dense": 264241152.0
+     },
+     "inference_pct_of_subject_forward": 0.868,
+     "training_flops_estimate": 3.250518491136e+16
+    },
+    "tsae": {
+     "hparams": {
+      "d_sae": 16384,
+      "k_pos": 20,
+      "h_frac": 0.2
+     },
+     "params": 117460480,
+     "params_pct_of_subject": 1.54,
+     "flops": {
+      "T": 1,
+      "positions_per_window": 1,
+      "encode": 117440512,
+      "decode_dense": 117440512,
+      "decode_sparse": 143360,
+      "window_dense": 234881024,
+      "window_sparse": 117583872,
+      "per_token_stride1_sparse": 117583872,
+      "per_token_strideT_sparse": 117583872.0,
+      "per_token_strideT_dense": 234881024.0
+     },
+     "inference_pct_of_subject_forward": 0.772,
+     "training_flops_estimate": 2.889741238272e+16
+    },
+    "txc_base": {
+     "hparams": {
+      "d_sae": 32768,
+      "k_pos": 25,
+      "T": 5
+     },
+     "params": 1174455808,
+     "params_pct_of_subject": 15.41,
+     "flops": {
+      "T": 5,
+      "positions_per_window": 5,
+      "encode": 1174405120,
+      "decode_dense": 1174405120,
+      "decode_sparse": 896000,
+      "window_dense": 2348810240,
+      "window_sparse": 1175301120,
+      "per_token_stride1_sparse": 1175301120,
+      "per_token_strideT_sparse": 235060224.0,
+      "per_token_strideT_dense": 469762048.0
+     },
+     "inference_pct_of_subject_forward": 1.542,
+     "training_flops_estimate": 5.776840065024e+16
+    },
+    "mlc": {
+     "hparams": {
+      "d_sae": 18432,
+      "k_pos": 20,
+      "n_layers": 5
+     },
+     "params": 660639232,
+     "params_pct_of_subject": 8.67,
+     "flops": {
+      "T": 1,
+      "positions_per_window": 1,
+      "encode": 660602880,
+      "decode_dense": 660602880,
+      "decode_sparse": 716800,
+      "window_dense": 1321205760,
+      "window_sparse": 661319680,
+      "per_token_stride1_sparse": 661319680,
+      "per_token_strideT_sparse": 661319680.0,
+      "per_token_strideT_dense": 1321205760.0
+     },
+     "inference_pct_of_subject_forward": 4.339,
+     "training_flops_estimate": 1.625259245568e+17
+    }
+   }
+  }
+ }
+}

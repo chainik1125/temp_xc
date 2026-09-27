@@ -1,0 +1,36 @@
+# λ-probe v2 smoke — the registered YAML entry for the probe-adequacy
+# contingency eval (`briefings/probe-adequacy.md` item 1; frozen convention
+# in experiments/explorations/task_hunt/lambda_intensity/PROBE_V2_SPEC.md).
+#
+# Exercises `lambda_recovery_v2` end-to-end through the canonical runner on
+# the synthetic self-exciting bench: the row carries BOTH the frozen v1
+# columns (lambda_recovery / lambda_r2 / lambda_chance — unchanged) and the
+# opt-in `*_v2` columns. Every v2 knob is EXPLICIT here so it is pinned into
+# eval_key (code defaults match, but a row should never depend on them).
+#
+# NOTE: running this WRITES leaderboard rows (as any sweep does). The
+# probe-adequacy task itself ships no leaderboard writes — this file is the
+# adopting agent's vehicle, validated structurally by
+# tests/test_lambda_recovery_v2.py (contract test d) + `python run.py validate`.
+#
+#   python run.py sweep configs/sweeps/lambda_probe_v2_smoke.yaml
+
+experiment: synthetic
+datasource: toy_backtracking_selfexcite_d64
+arch: [tsae]
+seed: [0]
+training_cfg:
+  n_steps: 500
+  batch_size: 256
+  buffer_tokens: 262_144
+eval_cfg:
+  eval_window_L: 32
+  lambda_probe_v2: true
+  lambda_v2_probe: ridge
+  lambda_v2_alphas: [0.01, 0.0316227766016838, 0.1, 0.316227766016838, 1.0,
+                     3.16227766016838, 10.0, 31.6227766016838, 100.0,
+                     316.227766016838, 1000.0, 3162.27766016838, 10000.0]
+  lambda_v2_n_windows: 8192
+  lambda_v2_split: trace
+skip_cached: true
+on_failure: continue

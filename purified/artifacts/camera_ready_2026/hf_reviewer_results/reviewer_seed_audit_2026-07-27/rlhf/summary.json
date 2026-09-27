@@ -1,0 +1,44 @@
+{
+  "status": "complete",
+  "protocol": "ACTMIX RLHF papermatch v1; seed-parameterized eval-only",
+  "code_pin": "ed9a6c77fdc697bd9739647eeb15d7d764aad1ca",
+  "checkpoint_repo": "han1823123123/txcdr-base",
+  "checkpoint_revision": "187666c5bfde80fe4ea20a64c1ed5d3092874320",
+  "arch_id": "agentic_txc_02",
+  "meta": {
+    "src_class": "MatryoshkaTXCDRContrastiveMultiscale",
+    "d_sae": 18432,
+    "k_pos": 100,
+    "k_win": 500,
+    "T": 5
+  },
+  "cache_integrity_gate": {
+    "rejected_mean": 36.232,
+    "chosen_mean": 28.573,
+    "p": 9.76467924311876e-10,
+    "pass": true
+  },
+  "seeds": [
+    {
+      "seed": 1,
+      "ordered_preference_auc": 0.622901,
+      "shuffled_preference_auc": 0.619592,
+      "shuffle_gap_auc": 0.003309,
+      "payload_status": "full result retained on stopped RunPod volume; headline metrics recovered from completed run log"
+    },
+    {
+      "seed": 2,
+      "ordered_preference_auc": 0.605258,
+      "shuffled_preference_auc": 0.604141,
+      "shuffle_gap_auc": 0.001117,
+      "payload_status": "full result retained on stopped RunPod volume; headline metrics recovered from completed run log"
+    },
+    {
+      "seed": 42,
+      "ordered_preference_auc": 0.6096472588185295,
+      "shuffled_preference_auc": 0.59752899034667,
+      "shuffle_gap_auc": 0.012118268471859595,
+      "payload_status": "published papermatch payload available"
+    }
+  ]
+}

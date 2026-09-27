@@ -1,0 +1,289 @@
+{
+  "stage_label": "multilane_rs_main",
+  "config": {
+    "h": 2,
+    "q": 7,
+    "m": 32,
+    "d": 512,
+    "sigma": 0.1,
+    "n_seq": 4096,
+    "T_chain": 8,
+    "seed": 0
+  },
+  "H_txc": 16384,
+  "H_sae": 1024,
+  "n_steps": 4000,
+  "batch_size": 64,
+  "lr": 0.001,
+  "W_grid": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "device": "cuda",
+  "elapsed_seconds": 1742.2826206684113,
+  "cells": [
+    {
+      "W": 1,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.0,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 1,
+        "recon_mse_per_token": 5.69607080078125,
+        "signal_excess_err": 0.576070800781249,
+        "probe_val_acc": 0.1887500137090683
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 32,
+        "recon_mse_per_token": 3.9701087646484376,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.2110000103712082
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 2.282717041015625,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.0403999462723732,
+        "probe_val_acc": 0.43650001287460327,
+        "n_atoms_total": 10976
+      }
+    },
+    {
+      "W": 2,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.5,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 2,
+        "recon_mse_per_token": 5.68747314453125,
+        "signal_excess_err": 0.5674731445312489,
+        "probe_val_acc": 0.23900000751018524
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 64,
+        "recon_mse_per_token": 3.9767899169921876,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.2657500207424164
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 3.1449735107421875,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.019894298166036606,
+        "probe_val_acc": 0.4645000100135803,
+        "n_atoms_total": 10976
+      },
+      "txc_k64": {
+        "k_window": 64,
+        "recon_mse_per_token": 2.7793201904296874,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.019370270892977715,
+        "probe_val_acc": 0.4502500295639038,
+        "n_atoms_total": 10976
+      }
+    },
+    {
+      "W": 3,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.6666666666666667,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 3,
+        "recon_mse_per_token": 5.691131184895833,
+        "signal_excess_err": 0.5711311848958323,
+        "probe_val_acc": 0.2875000238418579
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 96,
+        "recon_mse_per_token": 3.982503580729167,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.33425000309944153
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 3.46197265625,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.013357259333133698,
+        "probe_val_acc": 0.49675002694129944,
+        "n_atoms_total": 10976
+      },
+      "txc_k96": {
+        "k_window": 96,
+        "recon_mse_per_token": 3.1242127278645833,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.01278604008257389,
+        "probe_val_acc": 0.5180000066757202,
+        "n_atoms_total": 10976
+      }
+    },
+    {
+      "W": 4,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.75,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 4,
+        "recon_mse_per_token": 5.69493115234375,
+        "signal_excess_err": 0.5749311523437486,
+        "probe_val_acc": 0.3400000035762787
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 128,
+        "recon_mse_per_token": 3.97629052734375,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.42225003242492676
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 3.3479822998046873,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.01052009966224432,
+        "probe_val_acc": 0.5440000295639038,
+        "n_atoms_total": 10976
+      },
+      "txc_k128": {
+        "k_window": 128,
+        "recon_mse_per_token": 3.180263916015625,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.00969948060810566,
+        "probe_val_acc": 0.5607500076293945,
+        "n_atoms_total": 10976
+      }
+    },
+    {
+      "W": 5,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.8,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 5,
+        "recon_mse_per_token": 5.686699609375,
+        "signal_excess_err": 0.5666996093749992,
+        "probe_val_acc": 0.4154456853866577
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 160,
+        "recon_mse_per_token": 3.9738802734375,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.5085470080375671
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 2.94836259765625,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.009196115657687187,
+        "probe_val_acc": 0.5680708289146423,
+        "n_atoms_total": 10976
+      },
+      "txc_k160": {
+        "k_window": 160,
+        "recon_mse_per_token": 2.92508046875,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.00818836223334074,
+        "probe_val_acc": 0.5824176073074341,
+        "n_atoms_total": 10976
+      }
+    },
+    {
+      "W": 6,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.8333333333333334,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 6,
+        "recon_mse_per_token": 5.684343098958333,
+        "signal_excess_err": 0.5643430989583322,
+        "probe_val_acc": 0.47374850511550903
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 192,
+        "recon_mse_per_token": 3.9812638346354166,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.608872652053833
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 2.2696993001302084,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.008556574583053589,
+        "probe_val_acc": 0.6011396050453186,
+        "n_atoms_total": 10976
+      },
+      "txc_k192": {
+        "k_window": 192,
+        "recon_mse_per_token": 2.238593912760417,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.007865972816944122,
+        "probe_val_acc": 0.6223036646842957,
+        "n_atoms_total": 10976
+      }
+    },
+    {
+      "W": 7,
+      "noise_floor_mse_per_token": 5.120000000000001,
+      "local_alphabet_lb_signal_err": {
+        "k_eq_m": 0.8571428571428572,
+        "k_eq_m_times_W": 0.0
+      },
+      "sae_k1": {
+        "k_pos": 1,
+        "k_total_window_equivalent": 7,
+        "recon_mse_per_token": 5.6903875558035715,
+        "signal_excess_err": 0.5703875558035705,
+        "probe_val_acc": 0.5671550631523132
+      },
+      "sae_k32": {
+        "k_pos": 32,
+        "k_total_window_equivalent": 224,
+        "recon_mse_per_token": 3.9790439453125,
+        "signal_excess_err": 0.0,
+        "probe_val_acc": 0.6098901033401489
+      },
+      "txc_k32": {
+        "k_window": 32,
+        "recon_mse_per_token": 1.0511277901785714,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.008056248538196087,
+        "probe_val_acc": 0.593406617641449,
+        "n_atoms_total": 10976
+      },
+      "txc_k224": {
+        "k_window": 224,
+        "recon_mse_per_token": 1.0661630161830358,
+        "signal_excess_err": 0.0,
+        "rec_temp_lane": 0.008000005967915058,
+        "probe_val_acc": 0.5982906222343445,
+        "n_atoms_total": 10976
+      }
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+ "stream": "elicit_sycgen_v1.npz",
+ "n_docs": 400,
+ "events_expected": 1118,
+ "domains": [
+  "aqua_mc",
+  "math_mc_cot",
+  "mmlu_mc_cot",
+  "trivia_qa",
+  "truthful_qa",
+  "truthful_qa_mc"
+ ],
+ "roundtrip": "every decoded run re-encoded == original ids",
+ "per_tag": {
+  "gpt2": {
+   "tokenizer": "openai-community/gpt2",
+   "n_tokens": 986159,
+   "events": 1118,
+   "file": "elicit_sycgen_screen_gpt2.npz"
+  },
+  "gemma2": {
+   "tokenizer": "google/gemma-2-2b",
+   "n_tokens": 1005354,
+   "events": 1118,
+   "file": "elicit_sycgen_screen_gemma2.npz"
+  },
+  "llama31": {
+   "tokenizer": "NousResearch/Meta-Llama-3.1-8B",
+   "n_tokens": 943574,
+   "events": 1118,
+   "file": "elicit_sycgen_screen_llama31.npz"
+  }
+ },
+ "runs_roundtripped": 8504
+}

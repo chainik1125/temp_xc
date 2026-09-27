@@ -1,0 +1,272 @@
+[
+  {
+    "ref": "origin/final",
+    "path": "purified/experiments/c3_probing/results.json",
+    "reason": "C3 original mean curves or per-task/per-seed metrics and exact configuration; leaderboard also preserves C6 base results.",
+    "size_bytes": 14838
+  },
+  {
+    "ref": "origin/final",
+    "path": "purified/experiments/c3_probing_base/results.json",
+    "reason": "C3 original mean curves or per-task/per-seed metrics and exact configuration; leaderboard also preserves C6 base results.",
+    "size_bytes": 12696
+  },
+  {
+    "ref": "origin/final",
+    "path": "purified/experiments/c3_probing/analysis.py",
+    "reason": "C3 original mean curves or per-task/per-seed metrics and exact configuration; leaderboard also preserves C6 base results.",
+    "size_bytes": 17669
+  },
+  {
+    "ref": "origin/final",
+    "path": "purified/results/leaderboard.jsonl",
+    "reason": "C3 original mean curves or per-task/per-seed metrics and exact configuration; leaderboard also preserves C6 base results.",
+    "size_bytes": 6809327
+  },
+  {
+    "ref": "origin/final",
+    "path": "purified/configs/locked_archs.yaml",
+    "reason": "C3 original mean curves or per-task/per-seed metrics and exact configuration; leaderboard also preserves C6 base results.",
+    "size_bytes": 10764
+  },
+  {
+    "ref": "origin/final",
+    "path": "purified/results/runs/c6_9b011dfeea88f8af/stage4_frontier.json",
+    "reason": "C6 historical SAE-arditi/TXC-base seed-level steering frontier; insufficient for final TopK/T-SAE/TFA extension alone.",
+    "size_bytes": 15069
+  },
+  {
+    "ref": "origin/final",
+    "path": "purified/results/runs/c6_c0da3ed8794554a1/stage4_frontier.json",
+    "reason": "C6 historical SAE-arditi/TXC-base seed-level steering frontier; insufficient for final TopK/T-SAE/TFA extension alone.",
+    "size_bytes": 14933
+  },
+  {
+    "ref": "origin/final",
+    "path": "purified/results/runs/c6_2016074933c41e7f/stage4_frontier.json",
+    "reason": "C6 historical SAE-arditi/TXC-base seed-level steering frontier; insufficient for final TopK/T-SAE/TFA extension alone.",
+    "size_bytes": 15076
+  },
+  {
+    "ref": "origin/final",
+    "path": "purified/results/runs/c6_88a4ddf6819d8057/stage4_frontier.json",
+    "reason": "C6 historical SAE-arditi/TXC-base seed-level steering frontier; insufficient for final TopK/T-SAE/TFA extension alone.",
+    "size_bytes": 15084
+  },
+  {
+    "ref": "origin/final-aniket",
+    "path": "purified/docs/components/c7_paper_results.md",
+    "reason": "Complete seven-cell 300K C7 rounded point metrics, magnitude curves, and optimal rescue/coherence counts.",
+    "size_bytes": 8742
+  },
+  {
+    "ref": "origin/final-aniket",
+    "path": "purified/docs/components/c7_optimal_analysis.md",
+    "reason": "Complete seven-cell 300K C7 rounded point metrics, magnitude curves, and optimal rescue/coherence counts.",
+    "size_bytes": 2209
+  },
+  {
+    "ref": "origin/extended-300k",
+    "path": "purified/scripts/c7_paper_renderer.py",
+    "reason": "Historical C7 figure/LaTeX/optimal-count renderer; requires old path interfaces and missing exact raw inputs.",
+    "size_bytes": 67992
+  },
+  {
+    "ref": "origin/extended-300k",
+    "path": "purified/scripts/c7_tex_snippets.py",
+    "reason": "Historical C7 figure/LaTeX/optimal-count renderer; requires old path interfaces and missing exact raw inputs.",
+    "size_bytes": 9014
+  },
+  {
+    "ref": "origin/extended-300k",
+    "path": "purified/experiments/c7_backtracking/analyze_optimal.py",
+    "reason": "Historical C7 figure/LaTeX/optimal-count renderer; requires old path interfaces and missing exact raw inputs.",
+    "size_bytes": 20250
+  },
+  {
+    "ref": "origin/dmitry-em-repl",
+    "path": "plots/2026-05-07_paper_fig1_rose/global_rose_summary_data.json",
+    "reason": "Original rose chart raw values and renderer; metrics are stale/mixed relative to submitted C7/C8, archive for provenance only.",
+    "size_bytes": 3315
+  },
+  {
+    "ref": "origin/dmitry-em-repl",
+    "path": "plots/2026-05-07_paper_fig1_rose/make_global_rose_summary.py",
+    "reason": "Original rose chart raw values and renderer; metrics are stale/mixed relative to submitted C7/C8, archive for provenance only.",
+    "size_bytes": 12931
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "safety_research/results/umap_meta/sae/coords.npy",
+    "reason": "Small cached UMAP scatter inputs; redraw with NumPy/Matplotlib without embedding API or checkpoints. Filename tsae denotes StackedSAE.",
+    "size_bytes": 17160
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "safety_research/results/umap_meta/sae/labels.npy",
+    "reason": "Small cached UMAP scatter inputs; redraw with NumPy/Matplotlib without embedding API or checkpoints. Filename tsae denotes StackedSAE.",
+    "size_bytes": 17160
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "safety_research/results/umap_meta/sae/summary.json",
+    "reason": "Small cached UMAP scatter inputs; redraw with NumPy/Matplotlib without embedding API or checkpoints. Filename tsae denotes StackedSAE.",
+    "size_bytes": 9538
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "safety_research/results/umap_meta/tsae/coords.npy",
+    "reason": "Small cached UMAP scatter inputs; redraw with NumPy/Matplotlib without embedding API or checkpoints. Filename tsae denotes StackedSAE.",
+    "size_bytes": 67760
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "safety_research/results/umap_meta/tsae/labels.npy",
+    "reason": "Small cached UMAP scatter inputs; redraw with NumPy/Matplotlib without embedding API or checkpoints. Filename tsae denotes StackedSAE.",
+    "size_bytes": 67760
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "safety_research/results/umap_meta/tsae/summary.json",
+    "reason": "Small cached UMAP scatter inputs; redraw with NumPy/Matplotlib without embedding API or checkpoints. Filename tsae denotes StackedSAE.",
+    "size_bytes": 33132
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "safety_research/results/umap_meta/txc/coords.npy",
+    "reason": "Small cached UMAP scatter inputs; redraw with NumPy/Matplotlib without embedding API or checkpoints. Filename tsae denotes StackedSAE.",
+    "size_bytes": 40392
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "safety_research/results/umap_meta/txc/labels.npy",
+    "reason": "Small cached UMAP scatter inputs; redraw with NumPy/Matplotlib without embedding API or checkpoints. Filename tsae denotes StackedSAE.",
+    "size_bytes": 40392
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "safety_research/results/umap_meta/txc/summary.json",
+    "reason": "Small cached UMAP scatter inputs; redraw with NumPy/Matplotlib without embedding API or checkpoints. Filename tsae denotes StackedSAE.",
+    "size_bytes": 22249
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "safety_research/scripts/umap_meta.py",
+    "reason": "Qualitative figure recipe/provenance; full sentence heatmap still needs missing tiny activation slice and exact selected feature values.",
+    "size_bytes": 14099
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "temporal_crosscoders/NLP/sentence.py",
+    "reason": "Qualitative figure recipe/provenance; full sentence heatmap still needs missing tiny activation slice and exact selected feature values.",
+    "size_bytes": 25046
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "temporal_crosscoders/NLP/config.py",
+    "reason": "Qualitative figure recipe/provenance; full sentence heatmap still needs missing tiny activation slice and exact selected feature values.",
+    "size_bytes": 6891
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "temporal_crosscoders/NLP/fast_models.py",
+    "reason": "Qualitative figure recipe/provenance; full sentence heatmap still needs missing tiny activation slice and exact selected feature values.",
+    "size_bytes": 4633
+  },
+  {
+    "ref": "origin/andre-steering",
+    "path": "temporal_crosscoders/NLP/viz_outputs/sentence_case_studies/sentence_mid_res_k100_T5_chain12345_exclusive_stats.txt",
+    "reason": "Qualitative figure recipe/provenance; full sentence heatmap still needs missing tiny activation slice and exact selected feature values.",
+    "size_bytes": 672
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/results/case_studies/hh_rlhf/agentic_txc_02/feature_stats.json",
+    "reason": "C8 RLHF feature-level preference gaps, length correlations, and top-feature labels; CPU replot inputs.",
+    "size_bytes": 828445
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/results/case_studies/hh_rlhf/agentic_txc_02/top_features.json",
+    "reason": "C8 RLHF feature-level preference gaps, length correlations, and top-feature labels; CPU replot inputs.",
+    "size_bytes": 36198
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/results/case_studies/hh_rlhf/topk_sae/feature_stats.json",
+    "reason": "C8 RLHF feature-level preference gaps, length correlations, and top-feature labels; CPU replot inputs.",
+    "size_bytes": 900923
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/results/case_studies/hh_rlhf/topk_sae/top_features.json",
+    "reason": "C8 RLHF feature-level preference gaps, length correlations, and top-feature labels; CPU replot inputs.",
+    "size_bytes": 35279
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/results/case_studies/hh_rlhf/tsae_paper_k20/feature_stats.json",
+    "reason": "C8 RLHF feature-level preference gaps, length correlations, and top-feature labels; CPU replot inputs.",
+    "size_bytes": 855017
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/results/case_studies/hh_rlhf/tsae_paper_k20/top_features.json",
+    "reason": "C8 RLHF feature-level preference gaps, length correlations, and top-feature labels; CPU replot inputs.",
+    "size_bytes": 35481
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/results/case_studies/hh_rlhf/tsae_paper_k500/feature_stats.json",
+    "reason": "C8 RLHF feature-level preference gaps, length correlations, and top-feature labels; CPU replot inputs.",
+    "size_bytes": 1232762
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/results/case_studies/hh_rlhf/tsae_paper_k500/top_features.json",
+    "reason": "C8 RLHF feature-level preference gaps, length correlations, and top-feature labels; CPU replot inputs.",
+    "size_bytes": 35445
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/case_studies/hh_rlhf/summarize_hh_rlhf.py",
+    "reason": "Original C8 analysis/plotting code and helpers. Only summarize_hh_rlhf uses saved numbers without model/API calls.",
+    "size_bytes": 9900
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/case_studies/hh_rlhf/decompose_hh_rlhf.py",
+    "reason": "Original C8 analysis/plotting code and helpers. Only summarize_hh_rlhf uses saved numbers without model/API calls.",
+    "size_bytes": 9546
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/case_studies/hh_rlhf/label_top_features.py",
+    "reason": "Original C8 analysis/plotting code and helpers. Only summarize_hh_rlhf uses saved numbers without model/API calls.",
+    "size_bytes": 13197
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/case_studies/hh_rlhf/build_hh_rlhf_cache.py",
+    "reason": "Original C8 analysis/plotting code and helpers. Only summarize_hh_rlhf uses saved numbers without model/API calls.",
+    "size_bytes": 9632
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/case_studies/_paths.py",
+    "reason": "Original C8 analysis/plotting code and helpers. Only summarize_hh_rlhf uses saved numbers without model/API calls.",
+    "size_bytes": 3298
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "experiments/phase7_unification/_paths.py",
+    "reason": "Original C8 analysis/plotting code and helpers. Only summarize_hh_rlhf uses saved numbers without model/API calls.",
+    "size_bytes": 3731
+  },
+  {
+    "ref": "origin/dmitry-rlhf",
+    "path": "src/plotting/save_figure.py",
+    "reason": "Original C8 analysis/plotting code and helpers. Only summarize_hh_rlhf uses saved numbers without model/API calls.",
+    "size_bytes": 2063
+  }
+]

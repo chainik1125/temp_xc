@@ -1,0 +1,48 @@
+{
+ "card": "sycgen/RETRAIN_CARD.md \u00a7\u00a7 4\u20135",
+ "status": "PENDING TEAM REVIEW",
+ "partial": true,
+ "coverage": {
+  "trained": 15,
+  "overlay": 15,
+  "untrained": 18,
+  "of_each": 18,
+  "rendered_at": "03:57 28-07"
+ },
+ "x_axis": [
+  1,
+  2,
+  4,
+  8,
+  16
+ ],
+ "ordered": {
+  "T2": 0.49821330988558626,
+  "T4": 0.5242716125179425,
+  "T8": 0.5412355946184296,
+  "T16": 0.5922043057720682
+ },
+ "shuffled": {
+  "T2": 0.4648202247090803,
+  "T4": 0.5016111554270837,
+  "T8": 0.5013486715990543,
+  "T16": 0.5295598338377352
+ },
+ "untrained": {
+  "batchtopk_sae_btkonly/T1": 0.226736703655724,
+  "tsae_btkonly/T1": 0.226736703655724,
+  "txc_batchtopk_post_btkonly/T2": 0.21788595754989437,
+  "txc_batchtopk_post_btkonly/T4": 0.17437787630125093,
+  "txc_batchtopk_post_btkonly/T8": 0.09423124081808969,
+  "txc_batchtopk_post_btkonly/T16": 0.07501466797807578
+ },
+ "anchors": {
+  "batchtopk_sae_btkonly": 0.4819060583846584
+ },
+ "l0_range_claiming_arm": {
+  "min": 0.48870849609375,
+  "max": 2.8498331705729165
+ },
+ "budget_matched": false,
+ "match_rule": "min cell-mean realized l0 >= k_pos/2 = 4.0"
+}

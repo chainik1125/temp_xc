@@ -1,0 +1,398 @@
+{
+  "completed_cells": [
+    "T2_seed1",
+    "T2_seed2",
+    "T3_seed1",
+    "T3_seed2",
+    "T3_seed42",
+    "T4_seed1",
+    "T4_seed2",
+    "T4_seed42",
+    "T5_seed1",
+    "T5_seed2",
+    "T5_seed42"
+  ],
+  "missing_cells": [
+    "T1_seed1",
+    "T1_seed2",
+    "T1_seed42",
+    "T2_seed42",
+    "T6_seed1",
+    "T6_seed2",
+    "T6_seed42"
+  ],
+  "modal_status": {
+    "T2_seed1": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T2_seed1",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 3220.4565271899996,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T16:17:15.843117+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 47665709056,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5282145,
+        "files": 66,
+        "path": "/vol/results/cells/T2_seed1"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 1,
+      "started_at": "2026-07-26T15:23:35.386534+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 2
+    },
+    "T2_seed2": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T2_seed2",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 2975.044773539,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T16:13:25.048904+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 50867666944,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5223638,
+        "files": 66,
+        "path": "/vol/results/cells/T2_seed2"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 2,
+      "started_at": "2026-07-26T15:23:50.004085+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 2
+    },
+    "T3_seed1": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T3_seed1",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 4374.398902928,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T16:36:54.863128+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 47665709056,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5267484,
+        "files": 66,
+        "path": "/vol/results/cells/T3_seed1"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 1,
+      "started_at": "2026-07-26T15:24:00.464197+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 3
+    },
+    "T3_seed2": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T3_seed2",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 4302.9179530070005,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T16:35:47.060401+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 47665709056,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5312645,
+        "files": 66,
+        "path": "/vol/results/cells/T3_seed2"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 2,
+      "started_at": "2026-07-26T15:24:04.142409+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 3
+    },
+    "T3_seed42": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T3_seed42",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 5083.508311826,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T16:49:02.333423+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 47665709056,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5271571,
+        "files": 66,
+        "path": "/vol/results/cells/T3_seed42"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 42,
+      "started_at": "2026-07-26T15:24:18.825057+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 3
+    },
+    "T4_seed1": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T4_seed1",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 6578.544906833999,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T17:14:00.488356+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 47665709056,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5343126,
+        "files": 66,
+        "path": "/vol/results/cells/T4_seed1"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 1,
+      "started_at": "2026-07-26T15:24:21.943409+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 4
+    },
+    "T4_seed2": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T4_seed2",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 5669.9766461770005,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T16:58:52.230575+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 50867666944,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5339410,
+        "files": 66,
+        "path": "/vol/results/cells/T4_seed2"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 2,
+      "started_at": "2026-07-26T15:24:22.253893+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 4
+    },
+    "T4_seed42": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T4_seed42",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 5853.736841657,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T17:01:56.834537+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 47665709056,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5341624,
+        "files": 66,
+        "path": "/vol/results/cells/T4_seed42"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 42,
+      "started_at": "2026-07-26T15:24:23.097661+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 4
+    },
+    "T5_seed1": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T5_seed1",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 7325.630845505,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T17:26:46.534870+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 50867666944,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5044456,
+        "files": 66,
+        "path": "/vol/results/cells/T5_seed1"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 1,
+      "started_at": "2026-07-26T15:24:40.903976+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 5
+    },
+    "T5_seed2": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T5_seed2",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 7856.793445818,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T17:36:03.823233+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 47665709056,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5332403,
+        "files": 66,
+        "path": "/vol/results/cells/T5_seed2"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 2,
+      "started_at": "2026-07-26T15:25:07.029733+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 5
+    },
+    "T5_seed42": {
+      "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+      "cell": "T5_seed42",
+      "dictionary_steps_per_second": null,
+      "elapsed_seconds": 7179.890450082999,
+      "estimated_full_train_hours": null,
+      "finished_at": "2026-07-26T18:13:06.752481+00:00",
+      "gpu": {
+        "cuda_version": "12.8",
+        "memory_bytes": 50867666944,
+        "name": "NVIDIA L40S",
+        "torch_version": "2.8.0+cu128"
+      },
+      "persisted_result": {
+        "bytes": 5367330,
+        "files": 66,
+        "path": "/vol/results/cells/T5_seed42"
+      },
+      "phase": "all",
+      "protocol_version": "2026-07-23.2",
+      "requested_gpu": "L40S",
+      "retrieval": {
+        "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+        "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+        "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+        "volume": "txc-neurips-backtracking-results-v2"
+      },
+      "seed": 42,
+      "started_at": "2026-07-26T16:13:26.861988+00:00",
+      "status": "complete",
+      "steps": null,
+      "window": 5
+    }
+  },
+  "n_cells_complete": 11,
+  "retrieval": {
+    "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+    "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+    "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+    "volume": "txc-neurips-backtracking-results-v2"
+  },
+  "status": "partial",
+  "updated_at": "2026-07-27T05:15:10.093917+00:00"
+}

@@ -1,0 +1,413 @@
+[
+ {
+  "pair": [
+   "batchtopk_sae",
+   1,
+   null
+  ],
+  "rm_train_key": "3269d76389ce91f0",
+  "btk_train_key": "ff09e755ea6d97d5",
+  "tensors_compared": 7,
+  "tensor_mismatches": [],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0,
+  "verdict": "IDENTICAL"
+ },
+ {
+  "pair": [
+   "batchtopk_sae",
+   2,
+   null
+  ],
+  "rm_train_key": "eb3c2333848f4ffd",
+  "btk_train_key": "746b660048933b1b",
+  "tensors_compared": 0,
+  "per_task_metric_mismatches": [],
+  "mean_auc_delta_at_shared_k": 0.0,
+  "verdict": "METRIC-IDENTICAL (weights remote)"
+ },
+ {
+  "pair": [
+   "batchtopk_sae",
+   42,
+   null
+  ],
+  "rm_train_key": "a48fb4fc78744da2",
+  "btk_train_key": "4ce694e79b494b35",
+  "tensors_compared": 7,
+  "tensor_mismatches": [],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0,
+  "verdict": "IDENTICAL"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   1,
+   6
+  ],
+  "rm_train_key": "07eb5a63a1cbc14f",
+  "btk_train_key": "a7f3d026d65e615b",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.010157814947644117,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   1,
+   8
+  ],
+  "rm_train_key": "5296d53263a454ae",
+  "btk_train_key": "e7ab0739bd15bfe6",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.009822449920063203,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   1,
+   10
+  ],
+  "rm_train_key": "73178cce297961a7",
+  "btk_train_key": "c9a72bf3cbc201b1",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.002293863009965147,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   1,
+   16
+  ],
+  "rm_train_key": "b7739483efb6b83f",
+  "btk_train_key": "64675aeb2638675d",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.007527158065420814,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   2,
+   6
+  ],
+  "rm_train_key": "4069e11326c6b14e",
+  "btk_train_key": "85f6eb3a2e073b38",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.013801088524594496,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   2,
+   8
+  ],
+  "rm_train_key": "7ccbaf485d606a96",
+  "btk_train_key": "e981f51d8d7b1bd8",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.005634208304711175,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   2,
+   10
+  ],
+  "rm_train_key": "8b2bd465991dcc99",
+  "btk_train_key": "b1df3b8d47359d6e",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.01410248898517208,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   2,
+   16
+  ],
+  "rm_train_key": "c7e57bd6406bef05",
+  "btk_train_key": "f5f12921edc7b366",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0007938869136197013,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   1
+  ],
+  "rm_train_key": "4bf1a84173b063d5",
+  "btk_train_key": "24dac05eafc8108e",
+  "tensors_compared": 7,
+  "tensor_mismatches": [],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0,
+  "verdict": "IDENTICAL"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   2
+  ],
+  "rm_train_key": "7ca12f094a793f3b",
+  "btk_train_key": "721773b9cad34b63",
+  "tensors_compared": 0,
+  "per_task_metric_mismatches": [
+   "auc__ag_news_business",
+   "auc__ag_news_scitech",
+   "auc__ag_news_sports",
+   "auc__ag_news_world",
+   "auc__amazon_reviews_cat1",
+   "auc__amazon_reviews_cat2",
+   "auc__amazon_reviews_cat3",
+   "auc__amazon_reviews_cat5",
+   "auc__amazon_reviews_cat6",
+   "auc__amazon_reviews_sentiment_1star",
+   "auc__amazon_reviews_sentiment_5star",
+   "auc__bias_in_bios_set1_prof0",
+   "auc__bias_in_bios_set1_prof1",
+   "auc__bias_in_bios_set1_prof2",
+   "auc__bias_in_bios_set1_prof6",
+   "auc__bias_in_bios_set1_prof9",
+   "auc__bias_in_bios_set2_prof11",
+   "auc__bias_in_bios_set2_prof13",
+   "auc__bias_in_bios_set2_prof14",
+   "auc__bias_in_bios_set2_prof18",
+   "auc__bias_in_bios_set2_prof19",
+   "auc__bias_in_bios_set3_prof20",
+   "auc__bias_in_bios_set3_prof21",
+   "auc__bias_in_bios_set3_prof22",
+   "auc__bias_in_bios_set3_prof25",
+   "auc__bias_in_bios_set3_prof26",
+   "auc__europarl_de",
+   "auc__europarl_es",
+   "auc__europarl_fr",
+   "auc__europarl_nl",
+   "auc__github_code_C",
+   "auc__github_code_HTML",
+   "auc__github_code_Java",
+   "auc__github_code_PHP",
+   "auc__github_code_Python",
+   "auc__winogrande_correct_completion",
+   "auc__wsc_coreference"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0045611285031722515,
+  "verdict": "METRIC-DIVERGES (weights remote)"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   4
+  ],
+  "rm_train_key": "3d683a32363e0503",
+  "btk_train_key": "6052cf964781d2e8",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.0015351184086067615,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   6
+  ],
+  "rm_train_key": "9309c6efccc857e1",
+  "btk_train_key": "c7935b5fb33f1624",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.016295183621460763,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   8
+  ],
+  "rm_train_key": "e91d887fac22fb33",
+  "btk_train_key": "2455b38fae76d745",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.008748724698755206,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   10
+  ],
+  "rm_train_key": "4d4ab33fa2d680c2",
+  "btk_train_key": "08e4ce47d26d5ec1",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": -0.0006119346043923501,
+  "verdict": "DIVERGES"
+ },
+ {
+  "pair": [
+   "txc_batchtopk_pre",
+   42,
+   16
+  ],
+  "rm_train_key": "e2f291ad98e54d88",
+  "btk_train_key": "c525ad919ccdc587",
+  "tensors_compared": 7,
+  "tensor_mismatches": [
+   "W_dec",
+   "W_enc",
+   "b_dec",
+   "b_enc",
+   "num_tokens_since_fired",
+   "threshold"
+  ],
+  "bookkeeping_only_keys": [
+   "threshold_set"
+  ],
+  "mean_auc_delta_at_shared_k": 0.002456676180041306,
+  "verdict": "DIVERGES"
+ }
+]

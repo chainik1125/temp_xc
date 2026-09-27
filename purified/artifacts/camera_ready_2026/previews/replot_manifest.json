@@ -1,0 +1,121 @@
+{
+  "runtime_seconds": 0.373,
+  "source_rows": 78,
+  "checks": {
+    "detection": {
+      "txc_S8_mean": 0.1874113463926792,
+      "txc_S8_sample_sd": 0.007970440907422827,
+      "seeds": [
+        1,
+        2,
+        42
+      ],
+      "historical_reference_has_errorbars": false
+    },
+    "window": {
+      "txc_ordered_ap": {
+        "windows": [
+          1,
+          2,
+          4,
+          6,
+          10
+        ],
+        "mean": [
+          0.2177600805709575,
+          0.22888026441320922,
+          0.24655668852537252,
+          0.25121816193671537,
+          0.25481848741262875
+        ],
+        "sample_sd": [
+          0.004928995620124656,
+          0.006404103601810353,
+          0.007165802898924995,
+          0.005844498409952478,
+          0.008453839938252728
+        ]
+      },
+      "txc_shuffle_ap": {
+        "windows": [
+          1,
+          2,
+          4,
+          6,
+          10
+        ],
+        "mean": [
+          0.2177600805709575,
+          0.22266127407811542,
+          0.22653672614712464,
+          0.22680464348387394,
+          0.23149321658123082
+        ],
+        "sample_sd": [
+          0.004928995620124656,
+          0.006067887792419798,
+          0.005837964393353371,
+          0.003942290974523158,
+          0.00923940983230041
+        ]
+      },
+      "sae_invariant_ap": {
+        "windows": [
+          1,
+          2,
+          4,
+          6,
+          10
+        ],
+        "mean": [
+          0.22144544377513986,
+          0.2112380043791985,
+          0.21897585306940903,
+          0.22019492317333503,
+          0.22335429039998123
+        ],
+        "sample_sd": [
+          0.016181946675831088,
+          0.007823156514899005,
+          0.005917952918716511,
+          0.007395536517348309,
+          0.006650064037142202
+        ]
+      }
+    },
+    "medical": {
+      "mean": 19.984375,
+      "sample_sd": 3.0952095673193116,
+      "values": {
+        "1": 16.71875,
+        "2": 20.359375,
+        "42": 22.875
+      },
+      "baseline_included": false,
+      "errorbars_included": false
+    }
+  },
+  "sources": {
+    "purified/results/neurips_rebuttal/backtracking_300k_seeded/publication/raw_detection_metrics.csv": "fbdb2ae491558c720519f3ac16cb0bcf4f5db6d099ed75a982c9b9eb82e8d58a",
+    "purified/results/neurips_rebuttal/backtracking_300k_seeded/publication/summary.json": "a2d7d50008c9c416cd0ceee5a5019c0c6f1e95f34e574c798accbfdc09104b4f",
+    "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/publication/window_sweep_seed_metrics.csv": "1ddd0e1bc9085c12bbd1a564c8e596b35fd7d0e6c3d39d1f8464e6dd2a4afcb2",
+    "purified/artifacts/camera_ready_2026/hf_reviewer_results/reviewer_seed_audit_2026-07-27/medical_em/steering_three_seed_summary.json": "95da3c83981751c1aee4c8e920fcc928ffd5aa1656304bc209bcea25f9579485",
+    "purified/scripts/camera_ready/palette.json": "e7932713ff745d748806fb904e4ba69874030744ec4d7d718f6742e28a201b02",
+    "purified/scripts/camera_ready/replot.py": "2f1a03a18216c18281e6744b2c5b1d6c6a7d6f44d43186531b0bb0494fb39b93"
+  },
+  "outputs": [
+    "backtracking_detection_300k.png",
+    "backtracking_detection_300k.svg",
+    "backtracking_window_20k.png",
+    "backtracking_window_20k.svg",
+    "medical_em_steering_seeds.png",
+    "medical_em_steering_seeds.svg",
+    "plot_source_values.csv",
+    "replot_manifest.json"
+  ],
+  "limits": [
+    "Preview design, not manuscript replacement.",
+    "300K replication, 20K window sweep, and medical steering remain separate experiments.",
+    "T-SAE historical values are rounded single-seed references without fabricated uncertainty."
+  ]
+}

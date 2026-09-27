@@ -1,0 +1,42 @@
+{
+  "delta_gc": {
+    "mlc": {
+      "peak": 0.16393442622950818,
+      "peak_magnitude": 16.0,
+      "stability": "13/24"
+    },
+    "stacked_sae": {
+      "peak": 0.32786885245901637,
+      "peak_magnitude": 12.0,
+      "stability": "18/24"
+    },
+    "tfa": {
+      "peak": 0.3442622950819672,
+      "peak_magnitude": 16.0,
+      "stability": "13/24"
+    },
+    "topk_sae": {
+      "peak": 0.22950819672131148,
+      "peak_magnitude": -16.0,
+      "stability": "13/24"
+    },
+    "tsae_paper": {
+      "peak": 0.2459016393442623,
+      "peak_magnitude": 16.0,
+      "stability": "13/24"
+    },
+    "txc_base": {
+      "peak": 0.4262295081967213,
+      "peak_magnitude": -8.0,
+      "stability": "15/24"
+    },
+    "txc_pro": {
+      "peak": 0.3770491803278688,
+      "peak_magnitude": 12.0,
+      "stability": "19/24"
+    }
+  },
+  "missing_archs": [],
+  "n_judge_calls": 12200,
+  "n_leaderboard_cells": 7
+}

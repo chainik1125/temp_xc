@@ -1,0 +1,91 @@
+{
+  "stage": "ambiguous_pair",
+  "config": {
+    "R": 8,
+    "d": 64,
+    "a": 0.7071067811865476,
+    "sigma": 0.1,
+    "n_seq": 128,
+    "n_segments_per_seq": 256,
+    "seed": 0
+  },
+  "isotropy_max_class_drift": 0.0145065645036562,
+  "n_middle_samples": 32768,
+  "n_steps": 4000,
+  "batch_size": 64,
+  "H": 64,
+  "k_pos": 8,
+  "W_grid": [
+    2,
+    3,
+    5
+  ],
+  "device": "cpu",
+  "sae_probe": {
+    "train_accuracy": 0.14366666972637177,
+    "val_accuracy": 0.1303333342075348,
+    "chance": 0.125,
+    "n_train": 24000,
+    "n_val": 6000
+  },
+  "raw_token_probe": {
+    "train_accuracy": 0.14391666650772095,
+    "val_accuracy": 0.12250000238418579,
+    "chance": 0.125,
+    "n_train": 24000,
+    "n_val": 6000
+  },
+  "txc": [
+    {
+      "W": 2,
+      "txc_probe": {
+        "train_accuracy": 1.0,
+        "val_accuracy": 1.0,
+        "chance": 0.125,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "raw_window_probe": {
+        "train_accuracy": 1.0,
+        "val_accuracy": 1.0,
+        "chance": 0.125,
+        "n_train": 24000,
+        "n_val": 6000
+      }
+    },
+    {
+      "W": 3,
+      "txc_probe": {
+        "train_accuracy": 1.0,
+        "val_accuracy": 1.0,
+        "chance": 0.125,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "raw_window_probe": {
+        "train_accuracy": 1.0,
+        "val_accuracy": 1.0,
+        "chance": 0.125,
+        "n_train": 24000,
+        "n_val": 6000
+      }
+    },
+    {
+      "W": 5,
+      "txc_probe": {
+        "train_accuracy": 1.0,
+        "val_accuracy": 0.999833345413208,
+        "chance": 0.125,
+        "n_train": 24000,
+        "n_val": 6000
+      },
+      "raw_window_probe": {
+        "train_accuracy": 0.999958336353302,
+        "val_accuracy": 0.999833345413208,
+        "chance": 0.125,
+        "n_train": 24000,
+        "n_val": 6000
+      }
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "artifact_revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+  "cell": "T4_seed2",
+  "dictionary_steps_per_second": null,
+  "elapsed_seconds": 5669.9766461770005,
+  "estimated_full_train_hours": null,
+  "finished_at": "2026-07-26T16:58:52.230575+00:00",
+  "gpu": {
+    "cuda_version": "12.8",
+    "memory_bytes": 50867666944,
+    "name": "NVIDIA L40S",
+    "torch_version": "2.8.0+cu128"
+  },
+  "persisted_result": {
+    "bytes": 5339410,
+    "files": 66,
+    "path": "/vol/results/cells/T4_seed2"
+  },
+  "phase": "all",
+  "protocol_version": "2026-07-23.2",
+  "requested_gpu": "L40S",
+  "retrieval": {
+    "completed_cells_command": "modal volume get txc-neurips-backtracking-results-v2 cells purified/results/neurips_rebuttal/backtracking_window_sweep/modal-cells",
+    "status_command": "modal run purified/experiments/backtracking_window_sweep/modal_app.py::status",
+    "summary_command": "modal volume get txc-neurips-backtracking-results-v2 aggregate/full purified/results/neurips_rebuttal/backtracking_window_sweep/modal-full",
+    "volume": "txc-neurips-backtracking-results-v2"
+  },
+  "seed": 2,
+  "started_at": "2026-07-26T15:24:22.253893+00:00",
+  "status": "complete",
+  "steps": null,
+  "window": 4
+}

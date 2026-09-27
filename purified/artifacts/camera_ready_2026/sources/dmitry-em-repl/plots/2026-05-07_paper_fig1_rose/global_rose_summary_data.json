@@ -1,0 +1,127 @@
+{
+  "case_studies": [
+    {
+      "axis": "Denoising",
+      "metric": "$R^2_{\\mathrm{global}}$",
+      "raw": {
+        "stacked_sae": 0.3695326050122579,
+        "txc_base": 0.4829211582740148,
+        "txc_pro": 0.2529747158288956,
+        "topk_sae": 0.36298478444417315,
+        "tsae_paper": 0.3819141765435537,
+        "tfa": 0.15710809131463369
+      }
+    },
+    {
+      "axis": "Coupling",
+      "metric": "peak $g$AUC",
+      "raw": {
+        "topk_sae": 0.8843537414965985,
+        "txc_base": 0.989795918367347,
+        "stacked_sae": 0.8673469387755102,
+        "txc_pro": 0.9761904761904762,
+        "tsae_paper": 0.9408163265306122,
+        "tfa": 0.6632653061224488
+      }
+    },
+    {
+      "axis": "Sparse Probing",
+      "metric": "$\\overline{\\mathrm{AUC}}$ over $\\log_2 k$",
+      "raw": {
+        "mlc": 0.9069955166968491,
+        "tfa": 0.7643505997022967,
+        "topk_sae": 0.8864521109828518,
+        "tsae_paper": 0.8994293712342843,
+        "txc_base_T10": 0.900748804288246,
+        "txc_base_T20": 0.9019510357896662,
+        "txc_base_T5": 0.8993589431814923,
+        "txc_pro": 0.8970300732974142,
+        "txc_base": 0.8993589431814923
+      }
+    },
+    {
+      "axis": "Backtracking",
+      "metric": "peak $\\Delta gc$",
+      "raw": {
+        "mlc": 0.16393442622950818,
+        "stacked_sae": 0.32786885245901637,
+        "tfa": 0.3442622950819672,
+        "topk_sae": 0.22950819672131148,
+        "tsae_paper": 0.2459016393442623,
+        "txc_base": 0.4262295081967213,
+        "txc_pro": 0.3770491803278688
+      }
+    },
+    {
+      "axis": "RLHF",
+      "metric": "peak grade @coh$\\geq$1.75",
+      "raw": {
+        "tfa": 0.3333333432674408,
+        "topk_sae": 1.6620635191599529,
+        "tsae_paper": 1.9342105388641357,
+        "txc_base": 0.7918128768603007,
+        "txc_pro": 1.2844444513320923
+      }
+    },
+    {
+      "axis": "EM",
+      "metric": "$\\Delta$align @coh$\\geq$70",
+      "raw": {
+        "txc_base": 19.796875,
+        "txc_pro": 15.65625,
+        "tsae_paper": 25.85615079365079,
+        "tfa": 22.578125,
+        "topk_sae": 21.453125
+      }
+    }
+  ],
+  "archs": [
+    "topk_sae",
+    "tsae_paper",
+    "tfa",
+    "txc_base",
+    "txc_pro"
+  ],
+  "normalised": {
+    "topk_sae": {
+      "Denoising": 0.6318859309445867,
+      "Coupling": 0.6770833333333329,
+      "Sparse Probing": 0.9039282034900693,
+      "Backtracking": 0.0,
+      "RLHF": 0.8300013139966395,
+      "EM": 0.5683266060399749
+    },
+    "tsae_paper": {
+      "Denoising": 0.6899848656375297,
+      "Coupling": 0.8499999999999996,
+      "Sparse Probing": 1.0,
+      "Backtracking": 0.0833333333333333,
+      "RLHF": 1.0,
+      "EM": 1.0
+    },
+    "tfa": {
+      "Denoising": 0.0,
+      "Coupling": 0.0,
+      "Sparse Probing": 0.0,
+      "Backtracking": 0.5833333333333334,
+      "RLHF": 0.0,
+      "EM": 0.6786217964304821
+    },
+    "txc_base": {
+      "Denoising": 1.0,
+      "Coupling": 1.0,
+      "Sparse Probing": 0.9994786149445005,
+      "Backtracking": 1.0,
+      "RLHF": 0.2863926944889553,
+      "EM": 0.4059475757428392
+    },
+    "txc_pro": {
+      "Denoising": 0.29423812067738075,
+      "Coupling": 0.9583333333333329,
+      "Sparse Probing": 0.982237786813882,
+      "Backtracking": 0.75,
+      "RLHF": 0.594118718587995,
+      "EM": 0.0
+    }
+  }
+}

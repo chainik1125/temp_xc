@@ -1,0 +1,25 @@
+{
+  "verified_at": "2026-07-28T19:56:34Z",
+  "repo_id": "dmanningcoe/temp-xc-reviewer-results",
+  "repo_type": "dataset",
+  "folder": "reviewer_seed_audit_2026-07-27",
+  "source_hf_commit": "67eeda90e1db16e6852eaa402a28c8a109d0e1ca",
+  "anonymous_summary_link_check": {
+    "distinct_urls": 28,
+    "http_200": 28,
+    "resolve_http_200": 27,
+    "all_ok": true,
+    "method": "GET every distinct huggingface.co URL in README.md without an Authorization header; for blob URLs also GET the corresponding resolve/main URL"
+  },
+  "content_manifest_check": {
+    "manifest_url": "https://huggingface.co/datasets/dmanningcoe/temp-xc-reviewer-results/resolve/main/reviewer_seed_audit_2026-07-27/content_manifest.json",
+    "manifest_http_status": 200,
+    "files_listed": 52,
+    "files_checked": 52,
+    "http_200": 52,
+    "byte_count_matches": 52,
+    "sha256_matches": 52,
+    "all_ok": true,
+    "failures": []
+  }
+}

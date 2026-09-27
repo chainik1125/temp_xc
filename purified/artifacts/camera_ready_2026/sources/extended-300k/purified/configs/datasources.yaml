@@ -1,0 +1,250 @@
+# Data-source registry.
+#
+# A "datasource" describes (subject_model, layer, hookpoint, dataset, n_seqs,
+# seq_len, tokenizer_revision) — everything that feeds into act_cache_key.
+#
+# Adding a datasource = add one entry here. Components reference datasources
+# by name in their experiments/cN/run.py file. Switching IT → BASE means
+# changing the DATASOURCE constant in the component's runner; nothing else
+# is rewired.
+#
+# act_cache_key = sha256(canonical_json({
+#     subject_model, layer, hookpoint, dataset, n_seqs, seq_len,
+#     tokenizer_revision
+# }))[:16]
+#
+# Toy/synthetic datasources have category=synthetic and the seed for the
+# generator IS part of training_cfg, not the act_cache_key (so different
+# seeds reuse the same "data spec" but produce different sequences).
+
+datasources:
+
+  # ── Real-LM datasources ─────────────────────────────────────────────
+
+  gemma_2_2b_it_l13_fineweb_24k128:
+    category: real_lm
+    subject_model: google/gemma-2-2b-it
+    layer: 13
+    hookpoint: resid_post
+    dataset: fineweb
+    n_seqs: 24000
+    seq_len: 128
+    tokenizer_revision: main
+    notes: |
+      Phase 5 + Phase 6 anchor. C3, C4, C5 default. May port Phase 5's
+      already-cached version (`data/cached_activations/gemma-2-2b-it/
+      fineweb/resid_L13.npy` in the wasteland) at first build to save
+      ~3 H100-hours.
+
+  gemma_2_2b_base_l13_fineweb_24k128:
+    category: real_lm
+    subject_model: google/gemma-2-2b
+    layer: 13
+    hookpoint: resid_post
+    dataset: fineweb
+    n_seqs: 24000
+    seq_len: 128
+    tokenizer_revision: main
+    notes: "Phase 7 anchor. C3 stretch goal."
+
+  gemma_2_2b_base_l12_fineweb_24k128:
+    category: real_lm
+    subject_model: google/gemma-2-2b
+    layer: 12
+    hookpoint: resid_post
+    dataset: fineweb
+    n_seqs: 24000
+    seq_len: 128
+    tokenizer_revision: main
+    notes: "T-SAE paper anchor. Stretch goal — paper-fidelity setup."
+
+  gemma_2_2b_it_l13_concat_v1:
+    category: real_lm
+    subject_model: google/gemma-2-2b-it
+    layer: 13
+    hookpoint: resid_post
+    dataset: concat_v1
+    n_seqs: 3
+    seq_len: variable
+    tokenizer_revision: main
+    notes: |
+      C4 qualitative-latents source. Three contiguous-passage
+      concatenations on disjoint topics:
+        concat_A: Newton Principia + MMLU genetics Q + Bhagavat Gita
+        concat_B: MMLU biology Q + Darwin letter + Animal Farm wiki
+                  + MMLU math Q
+        concat_random: 20-token windows from MMLU across 8 categories
+      Source JSONs already exist on the wasteland at
+      `origin/han-phase7-unification:experiments/phase6_qualitative_latents/concat_corpora/{concat_A,concat_B,concat_C}.json`
+      (concat_C is the random/TSNE set, used as concat_random here).
+      Generator on the wasteland:
+      `experiments/phase6_qualitative_latents/build_concat_corpora.py`.
+      Agent NLP: port the JSONs (or regenerate via the script) into
+      `purified/data/concat_corpora/` before running C4 cells.
+
+  qwen_2_5_14b_instruct_finance_l24_resid_post:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-14B-Instruct
+    layer: 24
+    hookpoint: resid_post
+    dataset: finance_em_prompts
+    n_seqs: 6000
+    seq_len: 128
+    tokenizer_revision: main
+    lora_adapter: ModelOrganismsForEM/Qwen2.5-14B-Instruct_R1_0_1_0_finance_extended_train
+    notes: "C6 R1 organism. d_model=5120. ~28 GB fp16 + LoRA."
+
+  qwen_2_5_7b_instruct_medical_l15_resid_post:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-7B-Instruct
+    layer: 15
+    hookpoint: resid_post
+    dataset: medical_em_prompts
+    n_seqs: 6000
+    seq_len: 128
+    tokenizer_revision: main
+    lora_adapter: andyrdt/Qwen2.5-7B-Instruct_bad-medical
+    notes: |
+      C6 7B-medical organism. d_model=3584. ~14 GB bf16 + LoRA.
+      Subject (BASE = `Qwen/Qwen2.5-7B-Instruct`) and adapter
+      (`andyrdt/Qwen2.5-7B-Instruct_bad-medical`, peft LoRA, verified
+      2026-05-04 via list_repo_files: adapter_config.json +
+      adapter_model.safetensors present) match Dmitry's
+      `experiments/em_features/run_wang_procedure.py` defaults
+      (origin/em-nanda @ a74d1be4). Training/probe corpus is
+      `cfierro/personality-qs-bad-medical-advice` on HF (17 120 user/
+      assistant pairs; the medical parallel of cfierro's finance
+      mirror). adapter README declares unsloth-Qwen2.5-7B-Instruct as
+      base — this is a quantized re-pack of the same weights, so the
+      LoRA parameters load against vanilla Qwen-2.5-7B-Instruct (PEFT
+      may emit a base-mismatch warning; weights still apply).
+      Layer 15 (= 54% depth on 28-layer Qwen-7B) is the relative-depth
+      match for L24 (= 50% depth) on Qwen-14B-finance and matches the
+      hookpoint Dmitry used for his published 7B-medical numbers.
+
+  llama_3_1_8b_base_l10_ward:
+    category: real_lm
+    subject_model: meta-llama/Llama-3.1-8B
+    layer: 10
+    hookpoint: resid_post
+    dataset: ward_backtracking_math500
+    n_seqs: 4044       # actual windows from 300 Stage A traces × seq_len/stride=128
+    seq_len: 128
+    tokenizer_revision: main
+    notes: |
+      C7 anchor — Ward et al. 2025 (arxiv 2507.12638) Stage B faithful
+      setup. Steering vectors are derived from BASE Llama-3.1-8B L10
+      activations and applied at inference time to the reasoning model
+      `deepseek-ai/DeepSeek-R1-Distill-Llama-8B` (paper Fig. 1, § 3).
+      L10 is paper-justified: Appendix B.1 / Fig. B.1 sweep over all
+      32 layers identified L10 as the optimal layer. d_model = 4096;
+      see locked_archs.yaml `per_component_hparams.c7` overrides for
+      d_sae expansion.
+
+      NOTE (2026-05-03 agent_back): the Meta `meta-llama/Llama-3.1-8B`
+      repo is gated; our HF token (han1823123123) does not yet have
+      manual approval. The C7 runner uses the alias datasource below
+      (`llama_3_1_8b_base_l10_ward_nousmirror`) which points at the
+      byte-identical NousResearch redistribution. Paper text still cites
+      "Llama-3.1-8B BASE" — the substitution is an HF distribution
+      detail. Open question for Han: prefer accepting the Meta gate +
+      switching back to this entry, or formally adopting the mirror as
+      the canonical C7 datasource? (See agent_back/briefing.md.)
+
+  llama_3_1_8b_base_l10_ward_nousmirror:
+    category: real_lm
+    subject_model: NousResearch/Meta-Llama-3.1-8B
+    layer: 10
+    hookpoint: resid_post
+    dataset: ward_backtracking_math500
+    n_seqs: 4044
+    seq_len: 128
+    tokenizer_revision: main
+    notes: |
+      C7 functional equivalent of `llama_3_1_8b_base_l10_ward` using the
+      NousResearch byte-identical mirror to bypass Meta's gated-repo
+      access wall. Same d_model=4096, same architecture, same weights
+      — paper claims about "Llama-3.1-8B BASE L10" are unaffected.
+      Cache key DIFFERS from the original entry (different
+      `subject_model` field) so we don't accidentally cross-contaminate
+      caches if Han later switches back. Owned by agent_back; see
+      open question #4 in agents/agent_back/briefing.md.
+
+  r1_distill_llama_8b_l10_traces:
+    category: real_lm
+    subject_model: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+    layer: 10
+    hookpoint: resid_post
+    dataset: ward_backtracking_math500
+    n_seqs: 300
+    seq_len: 4096
+    tokenizer_revision: main
+    notes: |
+      C7 reasoning-model side. We do not train on these activations;
+      they are the steering target. Stage A traces (300 MATH-500
+      problems) are read-only from `origin/aniket-ward-stage-b`
+      (`results/ward_backtracking_txc/stage_a/{traces,labels}.json`).
+
+  # ── Toy datasources ─────────────────────────────────────────────────
+
+  toy_markov_n20_d40:
+    category: synthetic
+    generator: temp_bench.data.toy:markov_chain_support
+    n_features: 20
+    d_in: 40
+    seq_len: 64
+    rho_levels: [0.0, 0.3, 0.5, 0.7, 0.9]   # 4 features per level
+    pi: 0.5
+    notes: "C1 default (Phase 2 Scheme C)."
+
+  toy_coupled_K10_M20_d256:
+    category: synthetic
+    generator: temp_bench.data.toy:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.7
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 default (Phase 3 OR-gated coupled features)."
+
+  # ── toy_full duplicates: same params as the canonical entries above
+  # but routed through temp_bench.data.toy_full, the wasteland-faithful
+  # port that adds leaky reset, factorial-HMM events, sigmoid coupling,
+  # and Gaussian copula. The distinct ``generator`` field gives these
+  # entries a different ``act_cache_key`` from the canonical ones, so
+  # leaderboard rows from c{1,2}_full sweeps don't collide with
+  # agent_filler's c{1,2} runs.
+
+  toy_markov_n20_d40_full:
+    category: synthetic
+    generator: temp_bench.data.toy_full.api:markov_chain_support
+    n_features: 20
+    d_in: 40
+    seq_len: 64
+    rho_levels: [0.0, 0.3, 0.5, 0.7, 0.9]
+    pi: 0.5
+    delta: 0.0   # leaky-reset extension (0 = standard reset, matches agent_filler)
+    n_seqs: 4096
+    notes: "C1 full-suite (toy_full); same params as toy_markov_n20_d40."
+
+  toy_coupled_K10_M20_d256_full:
+    category: synthetic
+    generator: temp_bench.data.toy_full.api:coupled_hmm
+    K_hidden: 10
+    M_emissions: 20
+    n_parents: 2
+    d_in: 256
+    seq_len: 64
+    pi: 0.05
+    rho: 0.7
+    delta: 0.0   # leaky-reset extension (0 = standard reset)
+    coupling_mode: or_gate   # or 'sigmoid' for the wasteland soft-coupling extension
+    magnitude_dist: folded_normal
+    magnitude_mean: 1.0
+    magnitude_std: 0.15
+    notes: "C2 default (Phase 3 OR-gated coupled features)."

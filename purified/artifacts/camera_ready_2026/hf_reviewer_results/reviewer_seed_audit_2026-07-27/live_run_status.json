@@ -1,0 +1,42 @@
+{
+  "snapshot_at": "2026-07-28T19:55:22Z",
+  "modal_apps": {
+    "medical_em_seed2": "ap-6HzQYzX3PWaJVoMKXFuiL2",
+    "c7_headline_seeds_1_2": "ap-qfiXBzvhbHSl2u8iTPpUgJ"
+  },
+  "chain": [
+    {
+      "task": "medical_em",
+      "arch": "txc_base",
+      "T": 5,
+      "seed": 2,
+      "steps_complete_at_snapshot": 25000,
+      "steps_target": 25000,
+      "status": "complete",
+      "train_key": "6053d429fe932181",
+      "eval_key": "2db9637f733c1bb1",
+      "hf_path": "reviewer_seed_audit_2026-07-27/medical_em/seed2_published_eval.json"
+    },
+    {
+      "task": "c7_headline",
+      "arch": "txc_base",
+      "T": 5,
+      "seed": 1,
+      "steps_complete_at_snapshot": 0,
+      "steps_target": 300000,
+      "status": "retry_pending_modal_capacity",
+      "checkpoint_saved": false
+    },
+    {
+      "task": "c7_headline",
+      "arch": "txc_base",
+      "T": 5,
+      "seed": 2,
+      "steps_complete_at_snapshot": 0,
+      "steps_target": 300000,
+      "status": "retry_pending_modal_capacity",
+      "checkpoint_saved": false
+    }
+  ],
+  "note": "Medical EM seed 2 is complete and published. Both C7 workers were interrupted before their final-only checkpoint and remain queued for retry pending restored Modal credit/capacity."
+}

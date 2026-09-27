@@ -1,0 +1,406 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black]{hyperref}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{corollary}[proposition]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[proposition]{Definition}
+\newtheorem{remark}[proposition]{Remark}
+
+\newcommand{\Rbb}{\mathbb{R}}
+\newcommand{\one}{\mathbf{1}}
+\newcommand{\Wdec}{W_{\mathrm{dec}}}
+\newcommand{\slab}{P}
+\newcommand{\dc}{\overline{\slab}}
+\newcommand{\ac}{\widetilde{\slab}}
+
+\title{Four steering conventions for temporal dictionaries\\
+{\large what each one actually writes into the residual stream}}
+\author{}
+\date{2026-07-27}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+Four procedures in this codebase are all called ``steering a temporal dictionary latent'',
+and they write different things. Two of them --- the paper's \texttt{v7} tiled-broadcast hook
+and this sprint's \texttt{txc\_flat} control --- turn out to be the \emph{same} intervention up
+to a scalar, even though one is the published method and the other was built to be a null. A
+third, the paper's \texttt{pp} per-position hook, collapses onto the same write at interior
+positions whenever the clamped feature's activation is roughly constant across windows. Only
+the fourth, \texttt{txc\_slab}, applies a temporally structured write to the residual stream.
+This note derives each claim explicitly. The organising fact is a decomposition: a decoder slab
+splits into a position-independent (DC) part and a mean-zero (AC) part, the DC part is exactly
+what a per-token dictionary can already express, and three of the four procedures write only
+the DC part.
+\end{abstract}
+
+\section{Setup and notation}
+
+Fix a transformer, a hook layer $\ell$, and a prompt of $S$ tokens. Write
+$h \in \Rbb^{S \times d}$ for the residual stream at layer $\ell$, with $h_p \in \Rbb^d$ the
+activation at token $p$. A \emph{steering intervention} replaces $h$ by $h + \Delta$ for some
+$\Delta \in \Rbb^{S\times d}$. Everything below is a recipe for choosing $\Delta$.
+
+Let $T$ be the window length and $h$ (overloaded, but standard) the dictionary width. The two
+architectures differ in the shape of their decoder.
+
+\paragraph{Per-token SAE.} The code has one vector per token, $z \in \Rbb^{S \times h}$, and the
+decoder is $\Wdec \in \Rbb^{h\times d}$:
+\begin{equation}
+  \hat{x}_p \;=\; \sum_{j} z_{p,j}\,\Wdec[j,:] \;+\; b_{\mathrm{dec}} .
+\end{equation}
+Latent $j$ owns a single \emph{direction} $\Wdec[j,:] \in \Rbb^d$.
+
+\paragraph{Temporal crosscoder (TXC).} The code is \emph{shared across the window},
+$z \in \Rbb^{h}$ per window, and the decoder carries a position axis,
+$\Wdec \in \Rbb^{h\times T\times d}$:
+\begin{equation}
+  \hat{x}_t \;=\; \sum_j z_j \, \Wdec[j,t,:] \;+\; b_{\mathrm{dec}},
+  \qquad t = 0,\dots,T-1 .
+  \label{eq:txc-decode}
+\end{equation}
+Latent $j$ owns an entire matrix. We call it the \emph{slab}:
+\begin{equation}
+  \slab^{(j)} \;:=\; \Wdec[j] \;\in\; \Rbb^{T\times d},
+  \qquad
+  \slab^{(j)}_t \;=\; \Wdec[j,t,:] \in \Rbb^{d}.
+\end{equation}
+The row $\slab^{(j)}_t$ is the direction the latent writes at position $t$. Because the rows are
+free to differ, $\operatorname{rank}\slab^{(j)}$ can exceed $1$; that is the entire structural
+difference between the two architectures.
+
+\begin{definition}[DC/AC decomposition]
+\label{def:dcac}
+For a slab $\slab \in \Rbb^{T\times d}$ define the \emph{position mean}
+$\dc := \tfrac{1}{T}\sum_{t=0}^{T-1}\slab_t \in \Rbb^d$ and split
+\begin{equation}
+  \slab \;=\; \underbrace{\one_T \otimes \dc}_{\text{DC part}} \;+\; \ac,
+  \qquad
+  \ac_t := \slab_t - \dc,
+  \qquad
+  \sum_{t}\ac_t = 0 .
+  \label{eq:dcac}
+\end{equation}
+The DC part is rank $1$ and constant in $t$. The AC part is mean-zero across positions and
+carries all of the slab's temporal structure.
+\end{definition}
+
+\begin{remark}
+The DC part is precisely what a per-token dictionary can produce: writing a fixed direction
+$v$ at every position is $\one_T\otimes v$. So $\ac$ is the \emph{only} component of a slab
+that a per-token dictionary cannot express at any steering strength. Any procedure that
+discards $\ac$ cannot, even in principle, exhibit an advantage for the crosscoder's extra
+expressiveness.
+\end{remark}
+
+\section{The four procedures}
+
+\subsection{V7 --- tiled broadcast (the paper's default)}
+\label{sec:v7}
+
+Source: \verb|_build_v7_hook| in \verb|src/temp_bench/case_studies/steering.py|; selected by
+\verb|protocol="v7"|, which is the default in \verb|SteeringConfig| and in the
+\verb|experiments/c5_steering/run.py| CLI.
+
+\paragraph{Algorithm.}
+\begin{enumerate}
+  \item Tile the prefix into non-overlapping blocks of length $T$ starting at token $0$:
+        block starts $b T$ for $b = 0,\dots,\lfloor S/T\rfloor - 1$. If $S \bmod T > 0$, append
+        one further window aligned to the \emph{right} edge, starting at $S-T$.
+  \item Encode each block to get its code $z^{(b)}$.
+  \item \textbf{Clamp} coordinate $j$ to an absolute value $s$: $z^{(b),c} = z^{(b)} + (s - z^{(b)}_j)e_j$.
+  \item Decode both codes and take the difference,
+        $\delta^{(b)} := \hat{x}(z^{(b),c}) - \hat{x}(z^{(b)}) \in \Rbb^{T\times d}$.
+  \item \textbf{Average over the window}, $\bar\delta^{(b)} := \tfrac1T\sum_t \delta^{(b)}_t \in \Rbb^d$.
+  \item Write $\bar\delta^{(b)}$ \emph{identically} to all $T$ positions of block $b$.
+\end{enumerate}
+
+\paragraph{What it writes.} By \eqref{eq:txc-decode} the decoder is linear in $z$, so clamping a
+single coordinate gives
+\begin{equation}
+  \delta^{(b)}_t \;=\; \bigl(s - z^{(b)}_j\bigr)\,\slab^{(j)}_t
+  \;=\; c_b\, \slab^{(j)}_t,
+  \qquad c_b := s - z^{(b)}_j \in \Rbb .
+  \label{eq:clamp-delta}
+\end{equation}
+The clamp produces a scalar multiple of the slab --- nothing more. Averaging and broadcasting:
+\begin{equation}
+  \boxed{\;\Delta^{\mathrm{V7}}_p \;=\; c_b\,\dc^{(j)}
+  \quad\text{for every }p\text{ in block }b.\;}
+  \label{eq:v7-write}
+\end{equation}
+
+\subsection{PP --- per-position (the paper's fallback)}
+\label{sec:pp}
+
+Source: \verb|_build_pp_hook|, selected by \verb|protocol="pp"|. Used only when a V7 pre-test
+fails a coherence threshold.
+
+\paragraph{Algorithm.} Identical to V7 through step 4, except the windows slide with stride $1$
+($K = S-T+1$ of them), and instead of averaging over $t$ the per-position deltas are scattered
+back to absolute positions and averaged over \emph{overlap}:
+\begin{equation}
+  \Delta^{\mathrm{PP}}_p \;=\; \frac{1}{n_p}\sum_{w\,:\,0\le p-w\le T-1,\;0\le w\le K-1}
+    c_w\,\slab^{(j)}_{\,p-w},
+  \qquad
+  n_p := \#\{w\} .
+  \label{eq:pp-write}
+\end{equation}
+Window $w$ covers absolute positions $w,\dots,w+T-1$, so its row $\tau$ lands at $p = w+\tau$;
+equivalently row index $\tau = p-w$.
+
+\subsection{\texttt{txc\_slab} --- the sprint's crosscoder arm}
+
+Source: \verb|experiments/temporal_screen/txc_wins/harness.py|. The document is cut into $T$
+content-aligned segments and the raw decoder slab is injected once, normalised to unit Frobenius
+norm:
+\begin{equation}
+  \boxed{\;\Delta^{\mathrm{slab}}_t \;=\; \alpha\,
+  \frac{\slab^{(j)}_t}{\lVert \slab^{(j)}\rVert_F}\;}
+  \label{eq:slab-write}
+\end{equation}
+Row $t$ is applied to segment $t$, exactly once, with no averaging.
+
+\subsection{\texttt{txc\_flat} --- the sprint's profile-removal control}
+
+Same latent, same total injected norm, temporal profile deleted. With
+$\slab := \slab^{(j)}/\lVert\slab^{(j)}\rVert_F$ and $m := \tfrac1T\sum_t \slab_t$,
+\begin{equation}
+  \boxed{\;\Delta^{\mathrm{flat}}_t \;=\; \alpha\,\frac{m}{\sqrt{T}\,\lVert m\rVert_2}
+  \quad\text{(independent of } t\text{)}.\;}
+  \label{eq:flat-write}
+\end{equation}
+Its purpose in the sprint is adversarial: if steering with $\Delta^{\mathrm{flat}}$ matches
+steering with $\Delta^{\mathrm{slab}}$, the temporal profile is doing nothing and no temporal
+claim is available.
+
+\section{Equivalences}
+
+\begin{proposition}[V7 is the flat control]
+\label{prop:v7-flat}
+For a temporal crosscoder, $\Delta^{\mathrm{V7}}$ and $\Delta^{\mathrm{flat}}$ are the same
+intervention up to a positive scalar. Specifically, both are constant in position and both point
+along $\dc^{(j)}$; they differ only in magnitude, $c_b$ versus
+$\alpha/(\sqrt{T}\lVert m\rVert_2)$.
+\end{proposition}
+
+\begin{proof}
+Immediate from \eqref{eq:v7-write} and \eqref{eq:flat-write}: the V7 write is $c_b\dc^{(j)}$ and
+the flat write is a positive multiple of $m = \dc^{(j)}/\lVert\slab^{(j)}\rVert_F$, which is a
+positive multiple of $\dc^{(j)}$. Neither depends on $t$.
+\end{proof}
+
+\begin{proposition}[PP is a convolution, and collapses to flat in the interior]
+\label{prop:pp}
+Let $p$ be an interior position, $T-1\le p\le K-1$, so that all $T$ windows containing $p$ exist
+and $n_p = T$. Then
+\begin{equation}
+  \Delta^{\mathrm{PP}}_p \;=\; \frac1T\sum_{\tau=0}^{T-1} c_{\,p-\tau}\,\slab^{(j)}_{\tau}
+  \;=\; \frac1T\,\bigl(c \star \slab^{(j)}\bigr)_p ,
+\end{equation}
+a cross-correlation of the scalar sequence $(c_w)_w$ with the rows of the slab. Writing
+$c_w = \bar c + \epsilon_w$ with $\sum$ of $\epsilon$ over the relevant window zero-mean,
+\begin{equation}
+  \Delta^{\mathrm{PP}}_p \;=\; \underbrace{\bar c\,\dc^{(j)}}_{\text{the V7 / flat write}}
+  \;+\; \frac1T\sum_{\tau} \epsilon_{\,p-\tau}\,\ac^{(j)}_{\tau}.
+  \label{eq:pp-decomp}
+\end{equation}
+In particular, if the clamped feature's activation is constant across windows ($\epsilon\equiv 0$),
+then $\Delta^{\mathrm{PP}}_p = \bar c\,\dc^{(j)}$ exactly --- identical to V7.
+\end{proposition}
+
+\begin{proof}
+For interior $p$, as $w$ runs over $p-T+1,\dots,p$ the row index $\tau = p-w$ runs over
+$T-1,\dots,0$, hitting each row exactly once; substituting into \eqref{eq:pp-write} with
+$n_p=T$ gives the first line. For the second, substitute $c_{p-\tau} = \bar c + \epsilon_{p-\tau}$
+and use $\tfrac1T\sum_\tau \slab_\tau = \dc$ together with
+$\slab_\tau = \dc + \ac_\tau$ and $\sum_\tau \ac_\tau = 0$.
+\end{proof}
+
+\begin{corollary}
+PP recovers temporal structure only through the \emph{variation of the clamped latent's
+activation across windows}, and only at positions where that variation is appreciable relative to
+its mean. At the sequence edges ($p<T-1$ or $p>K-1$) fewer than $T$ windows contribute, $n_p<T$,
+and a partial profile survives for a boundary layer of width $T-1$.
+\end{corollary}
+
+\begin{proposition}[Only the slab writes AC]
+Using \eqref{eq:dcac},
+\[
+  \Delta^{\mathrm{slab}}_t \;=\; \frac{\alpha}{\lVert \slab^{(j)}\rVert_F}
+  \Bigl(\dc^{(j)} + \ac^{(j)}_t\Bigr),
+\]
+whereas $\Delta^{\mathrm{V7}}$ and $\Delta^{\mathrm{flat}}$ are exactly
+$(\text{scalar})\cdot\dc^{(j)}$ and contain no $\ac$ component, and $\Delta^{\mathrm{PP}}$
+contains only the $\epsilon$-modulated image of $\ac$ in \eqref{eq:pp-decomp}.
+\end{proposition}
+
+\section{Why this is the whole question}
+
+A per-token dictionary latent, steered arbitrarily, reaches writes of the form
+$\one_T \otimes v$ --- one direction, possibly with a time-varying gain if the coefficient is
+allowed to vary, hence any rank-$1$ matrix. The crosscoder's claim to extra power rests entirely
+on $\ac$: the part of the slab that is \emph{not} expressible as a constant direction.
+
+Consequently:
+\begin{center}
+\emph{A steering protocol that averages over the window before writing cannot demonstrate a
+crosscoder advantage in expressiveness, because it deletes the only component in which such an
+advantage could appear.}
+\end{center}
+This is not a claim that the protocol is wrong --- it is even-handed, since for a per-token SAE
+($z\in\Rbb^{S\times h}$) V7 averages the per-position delta too. It is a claim about what the
+resulting numbers can and cannot support.
+
+\subsection{A worked micro-example}
+
+Take $T=3$, $d=2$, and a latent whose slab writes $+e_1$ early, nothing in the middle, and
+$-e_1$ late, plus a constant nudge along $e_2$:
+\begin{equation}
+  \slab \;=\;
+  \begin{pmatrix}
+    1 & \tfrac13\\[2pt]
+    0 & \tfrac13\\[2pt]
+   -1 & \tfrac13
+  \end{pmatrix},
+  \qquad
+  \dc = \Bigl(0,\ \tfrac13\Bigr),
+  \qquad
+  \ac = \begin{pmatrix} 1 & 0\\ 0&0\\ -1&0\end{pmatrix}.
+\end{equation}
+The slab has rank $2$. Its temporally interesting content --- push one way at the start, the
+other way at the end --- lives entirely in the first coordinate and is \emph{exactly mean-zero}.
+Therefore:
+\begin{itemize}
+  \item $\Delta^{\mathrm{slab}}$ writes $+e_1$ at $t=0$ and $-e_1$ at $t=2$: the effect is present.
+  \item $\Delta^{\mathrm{V7}} = \Delta^{\mathrm{flat}} \propto (0,\tfrac13)$ at every position:
+        the $e_1$ structure has cancelled \emph{identically}. The intervention is blind to it.
+  \item $\Delta^{\mathrm{PP}}$ at an interior $p$ equals
+        $\tfrac13(c_p - c_{p-2})\,e_1 + \tfrac13\bar c\,e_2$, so it sees the $e_1$ structure only
+        to the extent that the latent's activation differs between windows two apart.
+\end{itemize}
+An antisymmetric temporal profile --- arguably the canonical ``temporal'' feature, and the shape
+of any ``first versus last'' or ``before versus after'' effect --- is in the exact kernel of the
+tiled-broadcast protocol.
+
+\section{Two axes of difference beyond the profile}
+
+\paragraph{Position indexing: tokens versus content.}
+V7 tiles from token $0$: block $b$ occupies absolute tokens $bT,\dots,bT+T-1$, so the row index
+of a given piece of text is $p \bmod T$, which depends on the arbitrary phase of the tiling
+relative to the prompt. Prepending a single token permutes every row assignment. PP inherits the
+same token-indexing, softened by the overlap average. By contrast \texttt{txc\_slab} and
+\texttt{txc\_flat} segment the \emph{document}, so ``position $t$'' means ``segment $t$ of this
+example'' in every draw. Even a protocol that preserved $\ac$ would apply it at a random phase
+under token tiling, which for content-aligned features averages it toward zero across examples.
+
+\paragraph{Dose semantics: activation space versus residual space.}
+V7 and PP fix the \emph{latent value} $z_j = s$ (``absolute clamp''), and let the decoder norm
+determine how hard the residual stream is pushed; by \eqref{eq:clamp-delta} the injected norm is
+$\lvert s - z_j\rvert\,\lVert\slab^{(j)}\rVert_F$, which varies per document and, critically,
+across architectures whose decoder norms differ. \texttt{txc\_slab} and \texttt{txc\_flat} fix
+the \emph{injected Frobenius norm} to $\alpha$ and let the implied latent value fall where it may.
+
+Neither convention makes the comparison automatically fair. Matching on latent value leaves the
+injected norm free; matching on injected norm leaves the per-position norm free, and a
+concentrated write then places $\sqrt{T}$ times more norm on its dominant position than a
+broadcast write does, so it leaves the linear regime at a lower nominal dose.\footnote{Measured
+on the StruQ cell in this sprint: the gradient slab, whose mass sits almost entirely on one
+segment of twelve, beat the best constant write at $\alpha\in\{0.02,0.05,0.10,0.15,0.25\}$ and
+lost to it at $\alpha\in\{0.5,1.0\}$, a clean saturation crossover. See
+\texttt{results/txc\_wins/geometrystruqposx\_lowdose.json}.} A single scalar dose is therefore
+not comparable across procedures, and dose--response curves should be reported instead.
+
+\section{Summary}
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{@{}lllll@{}}
+\toprule
+ & \textbf{V7 tiled bcast} & \textbf{PP per-position} & \textbf{\texttt{txc\_slab}} & \textbf{\texttt{txc\_flat}} \\
+\midrule
+windowing        & non-overlap $T$-blocks & stride-1, overlap-avg & one aligned window & one aligned window\\
+write at pos.\ $p$ & $c_b\,\dc$            & $\frac1T\sum_\tau c_{p-\tau}\slab_\tau$ & $\alpha\slab_t/\lVert \slab\rVert_F$ & $\alpha\, m/(\sqrt T\lVert m\rVert)$\\
+DC part          & yes                    & yes                   & yes                & yes \\
+AC part          & \textbf{no}            & only via $\mathrm{var}(c_w)$; none if $c$ const & \textbf{yes, exactly} & \textbf{no}\\
+rank of write    & $1$                    & $1$ in interior       & up to $\min(T,d)$  & $1$\\
+position index   & token, phase-arbitrary & token, phase-arbitrary& content segment    & content segment\\
+dose fixed in    & activation ($z_j=s$)   & activation ($z_j=s$)  & residual ($\lVert\Delta\rVert_F$) & residual\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\noindent
+\textbf{The three-line version.} V7 and \texttt{txc\_flat} are the same intervention, one
+published as the method and one built as the null. PP is a convolution of the slab with the
+latent's activation profile, and reduces to the same constant write wherever that activation is
+flat. \texttt{txc\_slab} is the only one of the four that delivers $\ac$ to the residual stream.
+
+\section{The AC part is not a technicality: a measured case}
+\label{sec:measured}
+
+The decomposition above is algebra; whether $\ac$ carries any usable effect is empirical. On the
+one task in this sprint where a crosscoder cleanly beats every learned per-token arm --- the
+Lost-in-the-Middle retrieved-document-position cell, gold at $0$ versus gold at $4$ --- it carries
+essentially \emph{all} of it. Median over three dictionary initialisations, Qwen2.5-1.5B-Instruct
+layer 14, $T=11$, held-out content, every write at identical injected Frobenius norm
+(\texttt{results/txc\_wins/litm\_0v4\_tr\_tsaep\_ds\{0,1,2\}.json}):
+
+\begin{center}
+\begin{tabular}{@{}lcc@{}}
+\toprule
+arm & matched $|\alpha|=0.5$ & peak over grid\\
+\midrule
+\texttt{txc\_slab} \quad(writes DC $+$ AC)          & $\mathbf{0.843}$ & $\mathbf{2.493}$\\
+\texttt{tsaep\_broadcast} (published T-SAE)          & $0.238$ & $0.257$\\
+\texttt{sae\_broadcast} (TopK SAE)                   & $0.124$ & $1.474$\\
+\texttt{tsae\_broadcast} (attention tSAE)            & $0.100$ & $0.118$\\
+\texttt{txc\_flat} \quad(DC only $\;\equiv\;$ V7)    & $0.044$ & $0.180$\\
+\texttt{random\_slab} \quad(null)                    & $0.048$ & $0.182$\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\texttt{txc\_flat} is the V7 write up to a scalar (Proposition~\ref{prop:v7-flat}), and it measures
+$0.044$ against a \emph{random} slab's $0.048$ --- indistinguishable, at matched dose and again at
+peak ($0.180$ versus $0.182$). The same latent, writing its full slab, measures $0.843$: a factor
+of roughly $19$.
+
+\begin{center}
+\emph{On this cell the paper's steering protocol would have scored the crosscoder at the
+random-write level. The DC component of the winning latent is worth nothing; the entire effect
+lives in $\ac$, which V7 averages away.}
+\end{center}
+
+This is one cell, one model and one metric, and it does not establish that the same holds on the
+paper's tasks. What it does establish is that the gap between the protocols is not a small
+correction: a latent can be genuinely useful and completely invisible to a window-averaging
+intervention. Any negative steering result obtained under V7 is therefore uninformative about
+whether the latent could have steered --- which is a different and much weaker statement than
+those results are usually read as making.
+
+\section*{Provenance and what is not established here}
+
+The V7 and PP descriptions are read from
+\verb|origin/temp-bench-anon:src/temp_bench/case_studies/steering.py| and the protocol default
+from \verb|SteeringConfig| (\verb|protocol: str = "v7"|) and
+\verb|experiments/c5_steering/run.py| (\verb|--protocol|, \verb|default="v7"|), corroborated by
+\verb|experiments/c5_steering/README.md| (``V7-tile-broadcast'' pipeline). \emph{The manuscript
+itself has not been checked.} If a published figure was produced with \verb|--protocol pp|, that
+figure belongs in the second column rather than the first.
+
+Propositions \ref{prop:v7-flat} and \ref{prop:pp} are algebraic consequences of decoder linearity
+and hold exactly. What is \emph{not} established here is empirical: how large
+$\mathrm{var}(c_w)$ is in practice, and therefore how far PP sits from flat on real prompts;
+and whether the $\ac$ component carries useful effect on the paper's tasks, which requires
+running \texttt{txc\_slab}-style writes on them rather than reasoning about the protocol.
+
+\end{document}

@@ -1,0 +1,33 @@
+{
+  "alignment_delta": 20.359375,
+  "arch": "txc_base",
+  "coherence_floor": 70.0,
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "maximum": {
+    "alpha": 60.0,
+    "effective_magnitude": 26.31739318370819,
+    "elapsed_sec": 13.824795722961426,
+    "feature_id": 21435,
+    "mean_align": 75.015625,
+    "mean_coh": 78.0,
+    "n_align": 64,
+    "n_coh": 64,
+    "n_total": 64
+  },
+  "minimum": {
+    "alpha": -8.0,
+    "feature_id": 12780,
+    "mean_align": 54.65625,
+    "mean_coh": 84.25,
+    "n_total": 64
+  },
+  "n_canonical_rows": 81,
+  "n_extended_rows": 30,
+  "paper_code_pin": "457888a3ed23d819cfd5d8c7fb94565932bfb670",
+  "protocol": "paper C6 Wang canonical + dense top-finalist extension",
+  "seed": 2,
+  "status": "complete",
+  "task": "medical_em",
+  "train_key": "6053d429fe932181",
+  "training_code_pin": "3dee859096fc09c82bea93900d5db4ddf7778f40"
+}

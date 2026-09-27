@@ -1,0 +1,642 @@
+{
+  "date": "2026-09-27",
+  "source_commit": "00b45a8a7deadb49531da35a53b09ac436c709c9",
+  "description": "Already tracked native rebuttal code, compact numeric results and protocol notes; referenced in place, no duplicate data or prediction arrays. Not every draft was posted.",
+  "files": [
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/aniket-semisynthetic-candidates.md",
+      "bytes": 5894,
+      "sha256": "0125947d2bdc54bd5fae0c0fd9c8d26411718618d725fcfbbe13952b5b58c8c2"
+    },
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/backtracking-like-tasks.md",
+      "bytes": 99600,
+      "sha256": "6627912cc132ef8897a0bb6b2885e883c3d43b5009f416cfed2c4330c5c0d156"
+    },
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/backtracking-topk-relu-audit.md",
+      "bytes": 6277,
+      "sha256": "a8c85cf8cd9ed07cc3093fa838596f9a57cf4c0e18c78a8ac5fb68d2a5a53f5c"
+    },
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/july29-backtracking-closeout.md",
+      "bytes": 6809,
+      "sha256": "22fe7f003987e86ec869bce6eeae60648175e902b3de5078779ee8933bafa408"
+    },
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/reviewer-3-response.md",
+      "bytes": 5645,
+      "sha256": "ef0f286d4b6dcfd24900ccb21aba9394556eb09311412051539396a0bd290806"
+    },
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/reviewer-response-integration.md",
+      "bytes": 9669,
+      "sha256": "1d863c433979da4f6a2e8ec4c7e29f0f6f002577ef8a46ab757dcb137a7aa3c4"
+    },
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/tsae-capacity-audit.md",
+      "bytes": 4080,
+      "sha256": "dfac5557ffb5cf83f0488ee70305a9dc4b5d9168399fe82fe68ec2b4797d9b93"
+    },
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/updated-responses/README.md",
+      "bytes": 3804,
+      "sha256": "8414ccf7afa84b4fa0fd9135a7f8c5d15c2092a1576bbe17696ea4ba7bf633c9"
+    },
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/updated-responses/reviewer-1-bbby.md",
+      "bytes": 5056,
+      "sha256": "c474b09396f5a2904d412e393b62067fdf4d28aefe1b44c2fc6a0589ef7d82fb"
+    },
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/updated-responses/reviewer-2-4z15.md",
+      "bytes": 4289,
+      "sha256": "d534aacbade997a9e4d63b5141c9896966e2ab57350e41bcc1ea14941ec1b11d"
+    },
+    {
+      "path": "purified/docs/aniket/neurips-rebuttal/updated-responses/reviewer-3-eaxu.md",
+      "bytes": 5163,
+      "sha256": "124f527d9c74278618e5a9cbc35e042c7e9623efb048917bd317054c1b556353"
+    },
+    {
+      "path": "purified/experiments/backtracking_300k_seeded/README.md",
+      "bytes": 2692,
+      "sha256": "ca2d6288eac6b494fc0623f75d0245e047671ababede758f62d811ca09d21cea"
+    },
+    {
+      "path": "purified/experiments/backtracking_300k_seeded/detect.py",
+      "bytes": 6808,
+      "sha256": "87aaebcb8443d9d85e34f506c259ef189409df59909c8eec6603f9585f72cd37"
+    },
+    {
+      "path": "purified/experiments/backtracking_300k_seeded/launch_grid.sh",
+      "bytes": 1730,
+      "sha256": "13a96ed28be66a7c73b7c970420fad46507eaf8f2b0466a6d442f82493f928b9"
+    },
+    {
+      "path": "purified/experiments/backtracking_300k_seeded/plot_detection.py",
+      "bytes": 18443,
+      "sha256": "9cec12d5b47fc226f1e0341049511f2475912a910cd2644002cbbb994124ac88"
+    },
+    {
+      "path": "purified/experiments/backtracking_300k_seeded/run_cell.sh",
+      "bytes": 231,
+      "sha256": "014d485772ed5c7759363365a3c05a6945e2dde6b88d20742e5f91e10a65adf3"
+    },
+    {
+      "path": "purified/experiments/backtracking_300k_seeded/setup_runtime.sh",
+      "bytes": 1598,
+      "sha256": "f328ece874a62c2068c5394c3d6c04c5bdee3272ac5a3c2eeee1da004caa4d4a"
+    },
+    {
+      "path": "purified/experiments/backtracking_300k_seeded/train.py",
+      "bytes": 10962,
+      "sha256": "f5a4bf0820b97de2b472d1e227064738bb403f991c2a86611c75ebf6ef08ddb3"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/README.md",
+      "bytes": 10827,
+      "sha256": "9172937e184988a950ff6303094b1604bf02472a8a754037fad4ddefffd06d7e"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/__init__.py",
+      "bytes": 246,
+      "sha256": "f9507ce1752295ec7c1c30bf46a8af95d0b8231d7c0e29d5a560427d8a00d36c"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/calibrate_teacher_force.py",
+      "bytes": 16338,
+      "sha256": "716300b4412d4cfe02f9eeca939205b1a67a406887f654fb64dbc73e275848bd"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/evaluate.py",
+      "bytes": 30982,
+      "sha256": "79aa00d3cedcfc70c01444f3bde167014d6ec41c43d2cf2abf7237bfc0911f02"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/extract_wide_teacher_force.py",
+      "bytes": 102880,
+      "sha256": "d2226cf80c555bd8e6b046112670ece870a77919602b9c110e794fadc73ecc91"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/launch_t16_tmux.sh",
+      "bytes": 3550,
+      "sha256": "380bf6b695271f78567bdc2d30caacf08adb341f5ee81ebf2bbf4e73c8d368ff"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/launch_teacher_force_tmux.sh",
+      "bytes": 3361,
+      "sha256": "518d0040df922d7666f7304d7382321b7bc5005dc10c00b6efcb9ebcbb7e8b8f"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/launch_tmux.sh",
+      "bytes": 2120,
+      "sha256": "fe514770da750355c03a20daf8cb2b8b706c3e7074bb14d9093d8dc2be8be88e"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/modal_app.py",
+      "bytes": 26352,
+      "sha256": "728ffe572c7996aa183c99dcc9582d6e9a682fda1b45d3472c52a013f9ac9b20"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/plot_publication.py",
+      "bytes": 23994,
+      "sha256": "db392cb992160b6669323aeb65752b87b2313727f7066d38137c8eeba35d7fa3"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/positional_sae_sensitivity.py",
+      "bytes": 24969,
+      "sha256": "edadd53347f1cc700983b38ce81d1c94c4f871c46c1ed4b3c770517414c16ba9"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/protocol.py",
+      "bytes": 7267,
+      "sha256": "bae9a2a387df42fd692978180d9b18ea0a1196eb9dc117f85db56b28e0e9c757"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/protocol_t16.py",
+      "bytes": 33054,
+      "sha256": "e50cdb0375e154ba0c472d61e64d3354410328ae70290533bbb8f86144ec1d78"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/reconstruct_wide_artifact.py",
+      "bytes": 28553,
+      "sha256": "705b8f0abbc7ecefeb3b87d02d1e1f8726d2896fc7aebd8947992ead8d5a3fba"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/report.py",
+      "bytes": 7579,
+      "sha256": "fd9f2dc3d566092e6f3b3975a315445ef2fda13a7dea45a3050ef1448a332040"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/run.py",
+      "bytes": 10614,
+      "sha256": "18639da1b19dd80263bc5f0b0b43b3dcfe372cd0637ff8b23ddb216d6ebcde94"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/run_runpod.sh",
+      "bytes": 3118,
+      "sha256": "09e74aa36640fe99d26d712dced8fdb8c425b8c041d59bb10a13ecb83c5374ca"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/run_t16.py",
+      "bytes": 21027,
+      "sha256": "a20988f7bc223d4dc64f56650a64e46484d32db7247b20750f4b31187dbcc6ac"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/run_t16_runpod.sh",
+      "bytes": 3362,
+      "sha256": "fc41ddc8893e57b36c049f94ec0812035e85c9c5992052a7ee584a43d59e7d58"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/run_teacher_force_runpod.sh",
+      "bytes": 3545,
+      "sha256": "677ff63b8b700fb07c926135521d13906253a5bd72554c1e55be2f8d100b70f5"
+    },
+    {
+      "path": "purified/experiments/backtracking_window_sweep/train.py",
+      "bytes": 14711,
+      "sha256": "fe2bfa85c207e065ef48ad5c927ca3b369ad6f4c86bd2d3864d583a72995cdca"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/README.md",
+      "bytes": 8599,
+      "sha256": "66d1545b93852977ec4d65bc6ac8ea90ffa1f93c435c678708ff2e3dea10cab1"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/__init__.py",
+      "bytes": 71,
+      "sha256": "52b8c77cbf6859c7509d29981c1224f4d360f9c984e33636a71e0b60b0ece032"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/evaluate_activations.py",
+      "bytes": 30058,
+      "sha256": "49ae2396131f0cd089607909c4ec802f1dd6b3b37571f46202474dd308c5a866"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/extract_activations.py",
+      "bytes": 42742,
+      "sha256": "9a7b9e4746c24745527bf7d43374005e20e9ae3e9c616c81d5fa6ec935cd330e"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/frozen_dictionary.py",
+      "bytes": 41465,
+      "sha256": "493e560ad74d2f45bdbfa02894752cb3fce94235cd96bbe89ee14428e5020bac"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/klicke.py",
+      "bytes": 22765,
+      "sha256": "aefbe91a730892dcbd8428a01fc83a78c611571aa83f38359b5db193ece7b56a"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/launch_extract_tmux.sh",
+      "bytes": 2094,
+      "sha256": "843d0ee7d0199cc9a2d59eceef1d99b9464d8ec0bbea88ee836314d75e0f306f"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/launch_frozen_dictionary_tmux.sh",
+      "bytes": 2328,
+      "sha256": "08207ee1fc3b6d214fa5f38e76e8bd8f2d39d5aa181aa8b72f49db10746097d6"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/report.py",
+      "bytes": 17119,
+      "sha256": "fa0af0fbf930998537957170b2d960557b56aecb3ead053df8790c023fbcf338"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/run_frozen_dictionary_runpod.sh",
+      "bytes": 3322,
+      "sha256": "feed98275c724612a07ca87d733afea5a9468475232cbb032dba34ae9532145b"
+    },
+    {
+      "path": "purified/experiments/writing_revision_destination/token_audit.py",
+      "bytes": 30092,
+      "sha256": "6ebeb27eea2d5e92229acc9be1412bbf2bfb1be8d1009c0f56c98e184f9c955c"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/tsae_paper_d16384_seed42/checkpoint/config.json",
+      "bytes": 1315,
+      "sha256": "f90c6101f7d7207f68cb6829e0be30c84890e1ea80dd8fea2892e58a698c0e36"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/tsae_paper_d16384_seed42/detection.json",
+      "bytes": 937,
+      "sha256": "4785a41df6e4417bf4c4b3f217032f401432420b3d1ab08dea32941518d9c2b1"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/tsae_paper_d16384_seed42/manifest.json",
+      "bytes": 1203,
+      "sha256": "afd2cda319aa5f4363bcb48c007ed5d288e4473c03764083ce5631dc03e6189d"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/tsae_paper_d16384_seed42/progress.json",
+      "bytes": 106,
+      "sha256": "a83384aa3b9ba9661dc19c9e471ed6a65dfd7f390495211686d9cc4d5485a856"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed1/checkpoint/config.json",
+      "bytes": 1446,
+      "sha256": "5b7074093154de5cf952594f306209703779c37edbe814913d2a103a51a5551f"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed1/detection.json",
+      "bytes": 930,
+      "sha256": "f043a26b94f1a534a46a921ad1f999ec0b2da130a24d0a3bd7c7478b0a1029ae"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed1/manifest.json",
+      "bytes": 1336,
+      "sha256": "965bace6258e18c3e5466c01a57761776e4695f8aca81d0d99bb25c0c6d849bb"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed1/progress.json",
+      "bytes": 104,
+      "sha256": "a53c1f9bf39deb0430001f58a69094aa5c93b27b6fcba425e36a7987172d1de5"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed2/checkpoint/config.json",
+      "bytes": 1449,
+      "sha256": "215bd0174a40d0687b3587aaa666d4c99e95cb7832ce786c2b06d7e7e5c9e32f"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed2/detection.json",
+      "bytes": 933,
+      "sha256": "eb371c2efe68fa59f58dd3df35c46dbce61880cb29f180bcdb0d8e5b2e16334a"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed2/manifest.json",
+      "bytes": 1337,
+      "sha256": "67d711238e331a3ba0b8427e51b50bb959b2c3d7a35b8205e89dbaff852f79cc"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed2/progress.json",
+      "bytes": 106,
+      "sha256": "c711ba21adde839ece635e99144470a9b4b5206ed91c49823a4dc09a9d64b888"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed42/checkpoint/config.json",
+      "bytes": 1447,
+      "sha256": "2db3585212289ce0b6bd27602a0a00dd5a27bfdbb5591790fd14f1232d84fb37"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed42/detection.json",
+      "bytes": 931,
+      "sha256": "f4a8c767429df968e30746fff3d6aafcf6a18eaef08036d9f249e441f5cace03"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed42/manifest.json",
+      "bytes": 1338,
+      "sha256": "c9fc90efad722a254a15f20f06ca363c454eceec54eb29e9a99fded88fa1eef3"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/cells/txc_base_d32768_seed42/progress.json",
+      "bytes": 105,
+      "sha256": "dc14aa9ce730eb310a836fa394bf96c7ef619e6afdcc16dfaa8d5fd20f517717"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/environment_versions.json",
+      "bytes": 146,
+      "sha256": "a3fe6f33ebbe26b7a35635a5082dcb909af48d45f2da47d8240d4546ced51f34"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/model_sha256.json",
+      "bytes": 387,
+      "sha256": "eea3e7e253154b85277f156f02b0be8ee13ac18afc6888659c7292892507cb43"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/publication/raw_detection_metrics.csv",
+      "bytes": 3010,
+      "sha256": "fbdb2ae491558c720519f3ac16cb0bcf4f5db6d099ed75a982c9b9eb82e8d58a"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/publication/reviewer_summary.md",
+      "bytes": 1410,
+      "sha256": "3e6e1f8a06dd91832649ff9eb7f29aba181c131a2ee67679160f294dab600cb6"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/publication/summary.json",
+      "bytes": 1028,
+      "sha256": "a2d7d50008c9c416cd0ceee5a5019c0c6f1e95f34e574c798accbfdc09104b4f"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/publication/summary_detection_metrics.csv",
+      "bytes": 900,
+      "sha256": "4d6c4c7e3d1d11e27bb7dee073d7194b174219ab817ece741f85a416402c52ba"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/source_artifact.json",
+      "bytes": 485,
+      "sha256": "0eb944ad6893f63899689a4f4782070bb6b6a845182c3b79dd462df1c405c8db"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_300k_seeded/validation_summary.json",
+      "bytes": 4250,
+      "sha256": "728681252bff7bdf494c3eeba99e323c9ecb51c1b5a2b2f3b3a047fd8a7260c8"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed1/result.json",
+      "bytes": 122306,
+      "sha256": "16de366ed9d2a319ada03e980a08df9116b9665d4756ec3f2799900d8d6f283e"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed2/result.json",
+      "bytes": 122285,
+      "sha256": "f2d23ecabc9889fc7f91a3c59d62c8167f7e1c89a1ceb222196393263cd34ae6"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T1_seed42/result.json",
+      "bytes": 122466,
+      "sha256": "cd541e33c9be1fdd5eaf0aa5e981547ae741882014a7716af19f61e004ca8414"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T2_seed1/result.json",
+      "bytes": 125627,
+      "sha256": "a49ab1b015dabe9b540e42aa0f05ea2b23641ebfb3e1d06823245f28e70daa2f"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T2_seed2/result.json",
+      "bytes": 125783,
+      "sha256": "ed4173219d52c8053d285034f3b4fb716b9f0522739026fa6e9daa0b32c82925"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T2_seed42/result.json",
+      "bytes": 129623,
+      "sha256": "88c061ad4b0fab47dda28bfee4beb87b9015df9c46534ef3f37545539b2056f7"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T3_seed1/result.json",
+      "bytes": 126058,
+      "sha256": "6f28613001902c048f833935bed2bbdbea4aac56d3ad06c43ad82a8fd8dfaf8b"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T3_seed2/result.json",
+      "bytes": 126077,
+      "sha256": "24cb49b90e7e6e25966140ba2ce8a789b6d1e1f6f3b9c3a4fdc7383d9f9bffbe"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T3_seed42/result.json",
+      "bytes": 126130,
+      "sha256": "2812b59a8fe74f974029f3c3f4ab94255108b3ece35cbccaacf74e6ffba5cb7f"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T4_seed1/result.json",
+      "bytes": 126588,
+      "sha256": "a5a5f94a1dda8a3963865b144d7f06d70aaabeacd09bac31d025d5bc75ca02ff"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T4_seed2/result.json",
+      "bytes": 126548,
+      "sha256": "ae151442630fe7b242b7d3883135eff176eb1397f2516724f243074420fe452d"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T4_seed42/result.json",
+      "bytes": 126712,
+      "sha256": "a1ceede42b49ed529612df7ba65e8e4e6a805744f6490071af86342b27a3afcd"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T5_seed1/result.json",
+      "bytes": 126865,
+      "sha256": "eab16218e1618f01167189a48515b00193822011ce64eb37176fbaaaca733e85"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T5_seed2/result.json",
+      "bytes": 126869,
+      "sha256": "9a30f7e74e0482275fd3d1558298af60e448ba6ffe85d5e92e55fe3174e91e35"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T5_seed42/result.json",
+      "bytes": 126879,
+      "sha256": "a5788b2a36b5528fc186629c409c8dc8e12001f41b3594eba443de16cbc86b8f"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T6_seed1/result.json",
+      "bytes": 131496,
+      "sha256": "1621d94370d0f2ae80bb1f37dcbd90953980c2592a16c99052f8002c287da8f5"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T6_seed2/result.json",
+      "bytes": 131472,
+      "sha256": "8026d3137d5e79998b63d79a4d0bae573bd9d8c5cf7ba2551708c02e16dfd198"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/cells/T6_seed42/result.json",
+      "bytes": 131574,
+      "sha256": "ebf22de67dfbe4fd1490a2cbe7c919a2dd91b15ee0037959eed52df4cad04bae"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/publication/positional_sae_budget_sensitivity.csv",
+      "bytes": 270,
+      "sha256": "1342e4f3c0b2eea143937326f0fa985bb2ba983f5c216c380f8a02d14bdaa5bc"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/publication/reviewer_figures.json",
+      "bytes": 470,
+      "sha256": "327b87431fa835f16ded1d13c0a04862af755758a92e8836deefe4018745f580"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/publication/reviewer_figures.md",
+      "bytes": 3682,
+      "sha256": "9ddbbbc28a5ecf11ea7c4d3cd9d0e35a4f3ce7b397a267131f0d4fe147576984"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep/full/publication/window_sweep_seed_metrics.csv",
+      "bytes": 3762,
+      "sha256": "64d8e75aabe62209e4299be900e86e4a0e8ed9bf9aadaae71e976ee304a8caea"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T10_seed1/result.json",
+      "bytes": 142446,
+      "sha256": "a08e0de385d36ee4e758c3ba93515456a602157a683b3ba5c1bf4de740120b0b"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T10_seed2/result.json",
+      "bytes": 142437,
+      "sha256": "f013723033cd6f2be517f82e73188c4420005f8d78ae66e79636fe66274d100f"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T10_seed42/result.json",
+      "bytes": 142629,
+      "sha256": "58a170546d2fd530921558211f1dab37ae6f3aecc84593a58de48cb37b5a9ed8"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T1_seed1/result.json",
+      "bytes": 131268,
+      "sha256": "c9722119c0a94b5cffdcc0ed246a0233e7a15196d35174506850435dce1c1be2"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T1_seed2/result.json",
+      "bytes": 131475,
+      "sha256": "7a8eee2f6e1cc15de6b71037de6e2cb0a8fbe1acbc79f56e5219a79e598eb90d"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T1_seed42/result.json",
+      "bytes": 131324,
+      "sha256": "d90e44880b56993ba0666ea6cb912d06eed0c724ecffb382ed5a08f95b672455"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T2_seed1/result.json",
+      "bytes": 138704,
+      "sha256": "361a78405afa8c4c97de165b60d8a459fc4612b5468b70205e667d1604c894ad"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T2_seed2/result.json",
+      "bytes": 138725,
+      "sha256": "4b94fb7e1d640e4e8cce9030e62a0323a477b32f551e3542f073324d9822c5c4"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T2_seed42/result.json",
+      "bytes": 138955,
+      "sha256": "62e34aeda7bc1dc6cce57d800d641207962bc80f289797bc12d7b721ebf676f1"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T4_seed1/result.json",
+      "bytes": 139420,
+      "sha256": "b136d4b522c24ffce65a2e2413010a4a473c2056eaeac844017f1253cdcde191"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T4_seed2/result.json",
+      "bytes": 139574,
+      "sha256": "f2380c9e0b76876876d5832c1c1e7e7297226aad4d486ce728fb4ea959ca6314"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T4_seed42/result.json",
+      "bytes": 139686,
+      "sha256": "bad08644814d9538b8d13f054214caaaf7a3378cf98b22cc654e7ecbcec0d3d6"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T6_seed1/result.json",
+      "bytes": 140727,
+      "sha256": "5a5c895b03ab761fcc2525f93bc70d5abded6d6b263427145f603dc23c9e18fe"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T6_seed2/result.json",
+      "bytes": 140671,
+      "sha256": "a33b6dd0c2a0ba463aa5f50a6deecd8d61021dbdf6617453c9bc9deb648a8a00"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/cells/T6_seed42/result.json",
+      "bytes": 140799,
+      "sha256": "86892992eff26ee0fefdb9f8ffa6c13877034a57fd0a459801065a14dd303a88"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/grid_manifest.json",
+      "bytes": 2449,
+      "sha256": "3abeb8d140e0bd62a029d869183015cd6914be4d5dd2bc3a48568a66f63036db"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/publication/positional_sae_budget_sensitivity.csv",
+      "bytes": 270,
+      "sha256": "1342e4f3c0b2eea143937326f0fa985bb2ba983f5c216c380f8a02d14bdaa5bc"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/publication/reviewer_figures.json",
+      "bytes": 320,
+      "sha256": "cad4763e6e5cb62a115338b87d0d545dff96878f44f8df4e535a552a8ae8e945"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/publication/reviewer_figures.md",
+      "bytes": 3610,
+      "sha256": "7ff1e56876b5ec71a43877f03afe22c7c0f70d5e706b77aaa94888e439ed32d7"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/publication/window_sweep_seed_metrics.csv",
+      "bytes": 3161,
+      "sha256": "1ddd0e1bc9085c12bbd1a564c8e596b35fd7d0e6c3d39d1f8464e6dd2a4afcb2"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/frozen_dictionary_t5_v1/result.json",
+      "bytes": 53266,
+      "sha256": "96763e5a6b8dc02db7f4e2bbf4b7f6c748fb42606f1da39ca619995cee1f6282"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/frozen_dictionary_t5_v1/summary.md",
+      "bytes": 1108,
+      "sha256": "90b61fc1ad9f0f2064eb38d2aec174bc3cf36429635493387c0c931139ee1d9d"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/publication_singleton_v1/lexical_destination.csv",
+      "bytes": 8696,
+      "sha256": "4f012d60786b7cbd6c7f1f0e935d14876a051556b86ae4319e068058bac5bc70"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/publication_singleton_v1/lexical_destination.md",
+      "bytes": 776,
+      "sha256": "b8f94b35c209ccbda4ec754f352108cc4971307739ad1780cfe85347b197653c"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/publication_singleton_v1/lexical_destination.summary.json",
+      "bytes": 1750,
+      "sha256": "1e16bcedad72bc6bf8e96bfa5749d53091d301049dd84fc79eeecd70d4107783"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/publication_singleton_v1/publication_summary.json",
+      "bytes": 3783,
+      "sha256": "4c7c28a47d4d143b559dbe1f118c85a87591833b78c2d7d3f191a306a41f2ffa"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/publication_singleton_v1/token_distance.csv",
+      "bytes": 8819,
+      "sha256": "b84daac640198065b21fa3055864507872ca48e84ed80ff878613ee5f86e82a0"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/publication_singleton_v1/token_distance.md",
+      "bytes": 764,
+      "sha256": "d1713e7b3ef7969b1d8cb54965ed83a588ad329a3c5f894d70b22225b98379ef"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/publication_singleton_v1/token_distance.summary.json",
+      "bytes": 1732,
+      "sha256": "abdb6d47f35627f4512b8e024961e3430f706764a9596aec76b2afad4ef9d4d9"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/raw_lexical_destination_singleton_v1.json",
+      "bytes": 68308,
+      "sha256": "53ea1901d79df4b176fc184eafea0c00f84679335f77f2ad84f2511eb08e6760"
+    },
+    {
+      "path": "purified/results/neurips_rebuttal/writing_revision_destination/raw_token_distance_singleton_v1.json",
+      "bytes": 67986,
+      "sha256": "c46ccb427a2a7feb8bb44055f2cda7457db80287219d5752e3dda7b485707fbb"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "purpose": "Compact source/data recovery recommendations; selection is not a claim that all final rebuttal artifacts have been found.",
+  "selections": [
+    {
+      "ref": "origin/dmitry-stacked-arxiv",
+      "status": "Final Stacked SAE adapters and sprint provenance; compact results on private HF dmanningcoe/stacked-sae-rebuttal-2026-07",
+      "prefixes": ["docs/dmitry/sprints/2026-07-27_stacked_sae_10h/", "configs/", "src/temp_bench/"],
+      "files": ["tests/test_stacked_pooled.py"]
+    },
+    {
+      "ref": "origin/dmitry-txcwins-10h",
+      "status": "Historical Shamir implementation only; final W10 episode-disjoint result remains missing",
+      "prefixes": [
+        "src/v6_colored_sources/",
+        "temporal_crosscoders/han_arch/",
+        "temporal_crosscoders/han_tsae/",
+        "src/bench/architectures/"
+      ],
+      "files": [
+        "src/__init__.py",
+        "src/bench/__init__.py",
+        "temporal_crosscoders/models.py",
+        "tests/test_polynomial_clock.py",
+        "tests/test_v6_colored_sources.py",
+        "results/v6_colored_sources/polynomial_clock_h1_q31.json",
+        "results/v6_colored_sources/polynomial_clock_h2_q11.json",
+        "results/v6_colored_sources/polynomial_clock_h3_q7.json",
+        "docs/dmitry/reviewer_responses/window_length_theory.md",
+        "docs/dmitry/reviewer_responses/parameter_flops_draft.md",
+        "docs/dmitry/reviewer_responses/real_task_headline_window_audit.md",
+        "docs/dmitry/reviewer_responses/reviewer_responses_1.md",
+        "docs/dmitry/reviewer_responses/reviewer_responses_2.md",
+        "docs/dmitry/reviewer_responses/reviewer_responses_3.md"
+      ]
+    },
+    {
+      "ref": "origin/codex/em-paper-window-sweep-s42-20260727",
+      "status": "Paper-v1 medical window sweep source; finished window result payloads require separate recovery",
+      "prefixes": ["src/temp_bench/", "configs/", "experiments/c6_em/"],
+      "files": ["tests/test_c6_window_sweep.py", "pyproject.toml"]
+    },
+    {
+      "ref": "origin/extended-300k",
+      "status": "Exact historical implementation/config used by corrected300K archive runner",
+      "prefixes": ["purified/src/temp_bench/", "purified/configs/"],
+      "files": ["purified/pyproject.toml"]
+    },
+    {
+      "ref": "origin/final",
+      "status": "C3 figure summary and medical seed1/42 canonical frontiers; dense extension curves still external",
+      "prefixes": [],
+      "files": [
+        "purified/experiments/c3_probing/results.json",
+        "purified/results/runs/c6_2016074933c41e7f/stage4_frontier.json",
+        "purified/results/runs/c6_88a4ddf6819d8057/stage4_frontier.json"
+      ]
+    }
+  ],
+  "native_tracked_packages": [
+    "purified/experiments/backtracking_300k_seeded/",
+    "purified/experiments/backtracking_window_sweep/",
+    "purified/experiments/writing_revision_destination/",
+    "purified/results/neurips_rebuttal/backtracking_300k_seeded/",
+    "purified/results/neurips_rebuttal/backtracking_window_sweep_t16/reviewer-five-point-v1/",
+    "purified/results/neurips_rebuttal/writing_revision_destination/"
+  ],
+  "excluded_by_default": ["datasets", "activation caches", "model checkpoints", "optimizer state", "__pycache__", "duplicate plot exports", "untracked heldout predictions unless a new bootstrap is requested"],
+  "caution": "Validate each source path before copying; use immutable commit hashes in the recovery manifest. Prefix copies should filter to small source/config/document files. Do not treat a source snapshot as validation of finished experimental results."
+}

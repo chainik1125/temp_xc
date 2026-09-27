@@ -1,0 +1,20 @@
+{
+  "architecture_colors": {
+    "txc_base": "#0072B2",
+    "txc_pro": "#56B4E9",
+    "tsae": "#E69F00",
+    "tfa": "#CC79A7",
+    "mlc": "#009E73",
+    "topk_sae": "#4D4D4D",
+    "stacked_sae": "#999999"
+  },
+  "control_styles": {
+    "ordered": "-",
+    "shuffled": "--",
+    "invariant": "-.",
+    "historical_reference": ":"
+  },
+  "seeds": {"1": "o", "2": "s", "42": "^"},
+  "neutral": "#8A8F98",
+  "text": "#20252B"
+}

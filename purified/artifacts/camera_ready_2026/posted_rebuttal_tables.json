@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "title": "Numerical tables posted in the NeurIPS 2026 OpenReview rebuttal",
+  "source_forum_id": "Z27xj38Fta",
+  "source_forum_url": "https://openreview.net/forum?id=Z27xj38Fta#discussion",
+  "accessed_date": "2026-09-27",
+  "transcription_status": "Transcribed from exact numerical rows supplied by the parent agent from its prior live CUA observation. The writing agent did not independently re-fetch OpenReview. Typography and mathematical notation are normalized to plain text; numeric strings retain the supplied precision.",
+  "evidence_status": "Posted author claims, not independently validated experiment results.",
+  "local_drafts_used": false,
+  "later_corrected_metrics_substituted": false,
+  "cell_conventions": {
+    "numeric_strings": "Values are strings to preserve displayed precision and percent or ratio notation; they are not recalculated.",
+    "null": "No value was supplied in the captured row. This does not mean zero, failed, or not applicable unless separately stated.",
+    "dash": "The incomplete Medical EM steering row was reported with dashes. ASCII '-' preserves that missing-value distinction without claiming the original dash glyph.",
+    "slash_separated_seeds": "Seed values remain in the posted order 1/2/42; no seed averaging is performed."
+  },
+  "known_source_protocol_ambiguities": [
+    "The seed table does not print a metric or feature budget for every task. Those missing details are not inferred here.",
+    "The Stacked comparison labels backtracking detection PR-AUC(S8), while the T-SAE width and percentage tables label PR-AUC S32. These labels and values are preserved without reconciliation.",
+    "The seed table gives backtracking .27/.27/.26; the window table gives headline .26 and other tables use .27. No choice of seed, averaging rule, or architecture variant is inferred.",
+    "The parent capture describes the final percentage table as a headline comparison relative to SAE performance, but does not supply the exact normalization formula for each row. Sparse probing is separately labeled AUC-deficit reduction.",
+    "The T-SAE width table prints the same d18432 width in both HH-RLHF columns. This is preserved as posted.",
+    "The parameter table prints TFA(T5) and MLC(L5); the GFLOPs table does not print these suffixes in the supplied architecture cells. No unprinted batch size or token throughput is inferred.",
+    "These posted tables alone do not establish the run IDs, checkpoint identities, training seeds for all cells, evaluation splits, uncertainty estimates, exact compute formula, or reproducibility of the claims."
+  ],
+  "notes": [
+    {
+      "note_id": "NvFWT8JbqV",
+      "source_url": "https://openreview.net/forum?id=Z27xj38Fta&noteId=NvFWT8JbqV",
+      "reviewer_reference": "bbby",
+      "tables": [
+        {
+          "table_id": "secret_recovery_accuracy",
+          "title": "Secret-recovery accuracy",
+          "columns": ["Architecture", "W=1", "W=2", "W=3", "W=4", "W=5", "W=10"],
+          "rows": [
+            ["Chance", ".09", ".09", ".09", ".09", ".09", ".09"],
+            ["SAE", ".10", ".10", ".10", ".09", ".09", ".10"],
+            ["Stacked SAE", ".10", ".09", ".10", ".10", ".10", ".11"],
+            ["T-SAE", null, ".10", ".10", ".10", ".10", ".12"],
+            ["TFA", null, ".10", ".10", ".10", ".10", ".09"],
+            ["TXC k=1", ".10", ".09", ".13", ".19", ".29", ".63"],
+            ["TXC k=2", ".10", ".09", ".15", ".32", ".56", ".91"],
+            ["TXC k=5", ".09", ".09", ".10", ".10", ".16", ".96"]
+          ]
+        },
+        {
+          "table_id": "seed_robustness",
+          "title": "TXC-base seeds and TopK SAE comparison",
+          "columns": ["Task", "TXC-base seeds1/2/42", "TopK SAE"],
+          "rows": [
+            ["Sparse probing", ".90/.90/.90", ".89"],
+            ["Backtracking(detection)", ".27/.27/.26", ".22"],
+            ["Medical EM", "17/20/23", "21"],
+            ["HH-RLHF", ".62/.62/.62", ".61"]
+          ]
+        },
+        {
+          "table_id": "tsae_width_comparison",
+          "title": "T-SAE paper-width and matched-width comparison",
+          "columns": ["Task and metric", "TXC", "T-SAE paper width", "T-SAE matched width"],
+          "rows": [
+            ["Backtracking PR-AUC S32", ".27", ".22(d16384)", ".22(d32768)"],
+            ["Medical EM PR-AUC S16", ".54", ".71(d16384)", ".43(d32768)"],
+            ["HH-RLHF ROC-AUC k20", ".62", ".60(d18432)", ".60(d18432)"]
+          ]
+        }
+      ]
+    },
+    {
+      "note_id": "peQt2W679b",
+      "source_url": "https://openreview.net/forum?id=Z27xj38Fta&noteId=peQt2W679b",
+      "reviewer_reference": "4z15",
+      "tables": [
+        {
+          "table_id": "trainable_parameters_billions",
+          "title": "Trainable parameters billions",
+          "columns": ["Architecture", "sparse_probing", "backtracking", "medical_em", "hh_rlhf"],
+          "rows": [
+            ["SAE", ".085", ".27", ".23", ".085"],
+            ["T-SAE", ".076", ".27", ".23", ".085"],
+            ["TFA(T5)", ".73", "2.3", "2.3", null],
+            ["MLC(L5)", ".42", "1.3", null, null],
+            ["Stacked SAE(T5)", ".42", "1.3", "1.2", ".42"],
+            ["TXC-base(T5)", ".42", "1.3", "1.2", ".42"]
+          ]
+        },
+        {
+          "table_id": "dense_inference_gflops_per_forward",
+          "title": "Dense inference GFLOPs per forward",
+          "columns": ["Architecture", "sparse_probing", "backtracking", "medical_em", "hh_rlhf"],
+          "rows": [
+            ["SAE", ".17", ".54", ".47", ".17"],
+            ["T-SAE", ".15", ".54", ".47", ".17"],
+            ["TFA", "8.6", "27", "27", null],
+            ["MLC", ".85", "2.7", null, null],
+            ["Stacked SAE", ".85", "2.7", "2.3", ".85"],
+            ["TXC-base", ".85", "2.7", "2.3", ".85"]
+          ]
+        },
+        {
+          "table_id": "stacked_comparison",
+          "title": "Stacked SAE comparison",
+          "columns": ["Task/metric", "Stacked SAE", "TXC", "TXC/Stacked", "Floor"],
+          "rows": [
+            ["Sparse probing mean AUC", ".87", ".89", "1.02x", ".80"],
+            ["Backtracking detection PR-AUC(S8)", ".16", ".27", "1.7x", null],
+            ["Medical EM steering delta alignment coherence>=70", "-", "-", "-", null],
+            ["Medical EM detection PR-AUC(S16)", ".65", ".54", ".83x", ".34"],
+            ["HH-RLHF preference ROC-AUC(k20)", ".60", ".62", "1.03x", ".62"]
+          ],
+          "row_notes": [
+            {
+              "row_label": "Medical EM steering delta alignment coherence>=70",
+              "status": "Incomplete row as posted",
+              "detail": "The capture supplies three dashes for the comparison cells and no Floor value. The Floor null is an absent captured value, not an inferred experimental result."
+            }
+          ]
+        },
+        {
+          "table_id": "window_percentages",
+          "title": "Window percentages",
+          "columns": ["Task", "Headline score", "T1 (%)", "T2 (%)", "T4 (%)", "T5 (%)", "T6 (%)"],
+          "rows": [
+            ["Sparse probing", ".89", "101", "101", "101", "100", "100"],
+            ["Backtracking", ".26", "85", "85", "92", "100", "100"],
+            ["Medical EM", ".54", "83", "92", "90", "100", "115"],
+            ["HH-RLHF", ".62", "96", "100", "99", "100", "101"]
+          ],
+          "normalization_status": "Percentage values and headline scores are transcribed; no unprinted normalization formula or protocol is reconstructed."
+        }
+      ]
+    },
+    {
+      "note_id": "ddYYdwyGin",
+      "source_url": "https://openreview.net/forum?id=Z27xj38Fta&noteId=ddYYdwyGin",
+      "reviewer_reference": "EAxU",
+      "tables": [
+        {
+          "table_id": "synthetic_performance",
+          "title": "Synthetic performance",
+          "columns": ["Task", "Metric", "SAE", "TFA", "T-SAE", "TXC"],
+          "rows": [
+            ["Denoising", "GlobalR2", ".363", ".157", ".382", ".483"],
+            ["Coupling", "peakgAUC", ".884", ".663", ".941", ".990"],
+            ["Secret recovery W10", "accuracy", ".10", ".09", ".12", ".96"]
+          ]
+        },
+        {
+          "table_id": "percent_of_sae_comparison",
+          "title": "Headline comparison relative to SAE performance",
+          "columns": ["Task", "metric", "TFA", "T-SAE", "TXC"],
+          "rows": [
+            ["Sparse probing", "AUC-deficit reduction", "-108%", "11%", "11%"],
+            ["Backtracking", "PR-AUC S32", "116%", "113%", "121%"],
+            ["Medical EM", "PR-AUC S16", "100%", "121%", "92%"],
+            ["RLHF preference", "ROC-AUC k20", null, "98%", "102%"]
+          ],
+          "normalization_status": "Authors' description is relative to SAE performance. Exact normalizing details are not supplied in the captured table; do not treat every row as a percentage improvement or infer a common formula."
+        }
+      ]
+    }
+  ]
+}

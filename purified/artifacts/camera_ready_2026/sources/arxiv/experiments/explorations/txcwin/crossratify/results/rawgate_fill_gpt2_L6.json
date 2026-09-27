@@ -1,0 +1,110 @@
+{
+ "meta": {
+  "card": "crossratify/MINI_CARD.md GAP-B",
+  "model": "gpt2",
+  "layer": 6,
+  "t_ladder": [
+   8
+  ],
+  "max_rows": 6000,
+  "cache_tag": "8b0ac9780f32_gpt2_L6",
+  "n_tokens": 793831,
+  "d": 768
+ },
+ "cells": [
+  {
+   "task": "novelty_rate",
+   "desc": "trailing rate of first-occurrence word types",
+   "T": 8,
+   "kind": "reg",
+   "gap_window_minus_last": -0.1815,
+   "gap_mean_minus_last": 0.0864,
+   "candidate": true,
+   "rows": 6000,
+   "seconds": 3.2,
+   "raw_last": {
+    "skill": 0.42983939979453706,
+    "ci_lo": 0.38177322782008866,
+    "ci_hi": 0.47908170760825924,
+    "degenerate": null,
+    "pred_std": 0.09973996877670288,
+    "n_train": 4852,
+    "n_test": 1148,
+    "label_std": 0.1453351527452469,
+    "code_nnz": 767.9475,
+    "dead_frac": 1.0
+   },
+   "raw_window": {
+    "skill": 0.24832234990227303,
+    "ci_lo": 0.1922767090253241,
+    "ci_hi": 0.3035667498250321,
+    "degenerate": null,
+    "pred_std": 0.23938587307929993,
+    "n_train": 4852,
+    "n_test": 1148,
+    "label_std": 0.1453351527452469,
+    "code_nnz": 6143.599166666667,
+    "dead_frac": 1.0
+   },
+   "raw_mean": {
+    "skill": 0.5161985875698897,
+    "ci_lo": 0.47440412194976583,
+    "ci_hi": 0.5616365278073926,
+    "degenerate": null,
+    "pred_std": 0.10397180169820786,
+    "n_train": 4852,
+    "n_test": 1148,
+    "label_std": 0.1453351527452469,
+    "code_nnz": 767.9896666666667,
+    "dead_frac": 1.0
+   }
+  },
+  {
+   "task": "novelty_resid",
+   "desc": "novelty rate with the document-position trend removed",
+   "T": 8,
+   "kind": "reg",
+   "gap_window_minus_last": -0.2497,
+   "gap_mean_minus_last": 0.1014,
+   "candidate": true,
+   "rows": 6000,
+   "seconds": 2.2,
+   "raw_last": {
+    "skill": 0.5716009248135007,
+    "ci_lo": 0.5286631648751254,
+    "ci_hi": 0.6123977010310653,
+    "degenerate": null,
+    "pred_std": 0.07939253002405167,
+    "n_train": 4852,
+    "n_test": 1148,
+    "label_std": 0.11201900243759155,
+    "code_nnz": 767.9475,
+    "dead_frac": 1.0
+   },
+   "raw_window": {
+    "skill": 0.3219300751835913,
+    "ci_lo": 0.2822888058060537,
+    "ci_hi": 0.3716266281783495,
+    "degenerate": null,
+    "pred_std": 0.17104993760585785,
+    "n_train": 4852,
+    "n_test": 1148,
+    "label_std": 0.11201900243759155,
+    "code_nnz": 6143.599166666667,
+    "dead_frac": 1.0
+   },
+   "raw_mean": {
+    "skill": 0.6730074668938442,
+    "ci_lo": 0.6429260272487102,
+    "ci_hi": 0.7098202044306523,
+    "degenerate": null,
+    "pred_std": 0.0849771648645401,
+    "n_train": 4852,
+    "n_test": 1148,
+    "label_std": 0.11201900243759155,
+    "code_nnz": 767.9896666666667,
+    "dead_frac": 1.0
+   }
+  }
+ ]
+}

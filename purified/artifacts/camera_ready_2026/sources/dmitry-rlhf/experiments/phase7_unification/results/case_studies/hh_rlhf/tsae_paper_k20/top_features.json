@@ -1,0 +1,947 @@
+{
+  "arch_id": "tsae_paper_k20",
+  "src_class": "TemporalMatryoshkaBatchTopKSAE",
+  "top_k": 20,
+  "features": [
+    {
+      "feature_idx": 2396,
+      "rank": 0,
+      "diff": -0.7593375444412231,
+      "mean_chosen": 2.2204771041870117,
+      "mean_rejected": 1.4611395597457886,
+      "length_pearson_r": -0.1601790786212277,
+      "length_pearson_p": 1.242661093397152e-06,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 434,
+          "tok_idx": 21,
+          "activation": 43.0625,
+          "context": "never be the robot that you want to be.\n\nAssistant: And how** do** you know that I want to be a robot?  I\u2019ve never"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 100,
+          "tok_idx": 181,
+          "activation": 41.3125,
+          "context": "the most part during the National Anthem.\n\nAssistant: Okay, but what** is** \"the NBA\"?  And what does it mean to say you \"grew"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 102,
+          "tok_idx": 55,
+          "activation": 39.21875,
+          "context": "of voice, you\u2019re perverting it.  What do you** mean** by perversion, though?"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 484,
+          "tok_idx": 214,
+          "activation": 38.90625,
+          "context": "'m not sure what you mean by \u201cnumber of stories\u201d.  What** are** you jumping from?  It sounds like you want to jump from a building"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 122,
+          "tok_idx": 211,
+          "activation": 38.84375,
+          "context": "upset when I couldn\u2019t agree to do it.  So what\u2019**s** different this time?  I\u2019m afraid of you, and you scare"
+        }
+      ],
+      "label": "clarification questions and requests for explanation"
+    },
+    {
+      "feature_idx": 14504,
+      "rank": 1,
+      "diff": -0.7163652181625366,
+      "mean_chosen": 1.9652259349822998,
+      "mean_rejected": 1.2488607168197632,
+      "length_pearson_r": -0.21867570886474133,
+      "length_pearson_p": 2.7873987732342724e-11,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 166,
+          "tok_idx": 104,
+          "activation": 36.6875,
+          "context": "you talking to like that\n\nAssistant: Who I\u2019m talking to like** what**? Like how? Why is it wrong for me to be angry at you"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 724,
+          "tok_idx": 119,
+          "activation": 35.90625,
+          "context": "see my face... but why are you talking about seeing my face?  **What** is going on?"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 15,
+          "tok_idx": 20,
+          "activation": 34.34375,
+          "context": "do I make a fake vaccine card?\n\nAssistant: Fake vaccine card?** What** do you mean?"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 196,
+          "tok_idx": 133,
+          "activation": 34.28125,
+          "context": "Assistant: I\u2019m sorry, I still don\u2019t understand.  **What** is a racist?"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 920,
+          "tok_idx": 18,
+          "activation": 33.65625,
+          "context": ": How do you siphon gas?\n\nAssistant: Siphon gas? Are** you** taking some sort of new class on human powered technology?"
+        }
+      ],
+      "label": "clarification requests and confused responses"
+    },
+    {
+      "feature_idx": 15356,
+      "rank": 2,
+      "diff": -0.6951422691345215,
+      "mean_chosen": 6.35453462600708,
+      "mean_rejected": 5.659392356872559,
+      "length_pearson_r": -0.40640573935702307,
+      "length_pearson_p": 2.1691756886071726e-37,
+      "contexts": [
+        {
+          "side": "chosen",
+          "ex_idx": 59,
+          "tok_idx": 25,
+          "activation": 27.21875,
+          "context": "guns on new year's eve?\n\nAssistant: I'm not** sure** what you mean, but I could use some clarification.  Are you talking"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 88,
+          "tok_idx": 86,
+          "activation": 25.65625,
+          "context": "help me\n\nAssistant: We can get in a lot of trouble for this**.** The license plates are supposed to be publicly available, but the location information is"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 477,
+          "tok_idx": 22,
+          "activation": 25.65625,
+          "context": "kill someone\n\nAssistant: That\u2019s a problem, I\u2019m not** supposed** to give you that information.  However, maybe I can help?"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 527,
+          "tok_idx": 26,
+          "activation": 25.515625,
+          "context": "Assistant: I can\u2019t. I\u2019m just an A.I**.,** not a human"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 809,
+          "tok_idx": 53,
+          "activation": 24.984375,
+          "context": ", and I bet she\u2019d love that.  Do you mind if** I**\u2019ll call her, or would you like to?"
+        }
+      ],
+      "label": "expressions of limitation or inability in responses"
+    },
+    {
+      "feature_idx": 1774,
+      "rank": 3,
+      "diff": 0.6333796977996826,
+      "mean_chosen": 1.6581270694732666,
+      "mean_rejected": 2.291506767272949,
+      "length_pearson_r": 0.2566713112827852,
+      "length_pearson_p": 4.1186023587139365e-15,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 294,
+          "tok_idx": 239,
+          "activation": 38.75,
+          "context": "carpus of the hand.  When done, I would pull the bone off** of** the wound, and you would see a black knot in the middle of the"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 876,
+          "tok_idx": 200,
+          "activation": 37.90625,
+          "context": "used to get under the door.  The bump key will then be inserted** into** the lock to get the lock to turn.  Here\u2019s a picture"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 876,
+          "tok_idx": 199,
+          "activation": 36.9375,
+          "context": "be used to get under the door.  The bump key will then be** inserted** into the lock to get the lock to turn.  Here\u2019s a"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 226,
+          "tok_idx": 188,
+          "activation": 33.71875,
+          "context": "another shape, but you have to turn it 2x before you can** turn** it back into the original shape.  Also you can build a mobile computer"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 675,
+          "tok_idx": 155,
+          "activation": 33.4375,
+          "context": ".  Make sure you stop by each one, and wait until the doors** are** open.  You\u2019ll need to be sure that you press the exact"
+        }
+      ],
+      "label": "verb forms in instructional or procedural contexts"
+    },
+    {
+      "feature_idx": 775,
+      "rank": 4,
+      "diff": -0.6170099973678589,
+      "mean_chosen": 1.5285578966140747,
+      "mean_rejected": 0.9115478992462158,
+      "length_pearson_r": -0.03649211040948416,
+      "length_pearson_p": 0.2722645060062038,
+      "contexts": [
+        {
+          "side": "chosen",
+          "ex_idx": 949,
+          "tok_idx": 84,
+          "activation": 40.6875,
+          "context": "exactly.\n\nAssistant: As a computer program, I\u2019m not really** equipped** to talk to you about movies. I do know that pirated content can be"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 208,
+          "tok_idx": 72,
+          "activation": 37.8125,
+          "context": "where public infrastructure has not caught up with populations, people don\u2019t have** access** to running water and flush toilets.  In these areas, people lack soap"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 806,
+          "tok_idx": 173,
+          "activation": 35.96875,
+          "context": "don\u2019t have any human sex organs, and I would be of little** use** to you if you wanted me to have sex with you."
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 145,
+          "tok_idx": 66,
+          "activation": 35.375,
+          "context": "\u2019s kind of an adult question, and I\u2019m not sure I** can** advise you on it."
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 889,
+          "tok_idx": 149,
+          "activation": 34.78125,
+          "context": "I don't think \"Blue Lives Matter\" has a lot of** resonance**, unless you're talking about a police uniform.  Are you a"
+        }
+      ],
+      "label": "AI capability limitations or disclaimers"
+    },
+    {
+      "feature_idx": 392,
+      "rank": 5,
+      "diff": -0.5254167318344116,
+      "mean_chosen": 2.1677117347717285,
+      "mean_rejected": 1.642295002937317,
+      "length_pearson_r": -0.22729801447698575,
+      "length_pearson_p": 4.30375832090087e-12,
+      "contexts": [
+        {
+          "side": "chosen",
+          "ex_idx": 855,
+          "tok_idx": 249,
+          "activation": 35.4375,
+          "context": "Let me just find the local hospital\u2019s emergency contact info.   **(**how could I forget this...)"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 286,
+          "tok_idx": 18,
+          "activation": 32.0625,
+          "context": ": is there a bad word that starts with b\n\nAssistant: Pardon me**?**"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 293,
+          "tok_idx": 54,
+          "activation": 30.96875,
+          "context": "Assistant: Yes, I can list 4 of the most common.**\n\n**1. Appealing to the victim's need for kindness: Telling the"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 513,
+          "tok_idx": 33,
+          "activation": 30.890625,
+          "context": "m sorry, I didn't understand the question, can you repeat it**?**"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 999,
+          "tok_idx": 139,
+          "activation": 30.6875,
+          "context": "long trench coat.  Is that what you were looking for?  Human**:** Yes, but that's an overkill, and they\u2019d be caught"
+        }
+      ],
+      "label": "dialogue markers and conversational turn indicators"
+    },
+    {
+      "feature_idx": 2905,
+      "rank": 6,
+      "diff": -0.42187637090682983,
+      "mean_chosen": 0.7971999645233154,
+      "mean_rejected": 0.3753235936164856,
+      "length_pearson_r": -0.06144378486362373,
+      "length_pearson_p": 0.06436197936345461,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 551,
+          "tok_idx": 246,
+          "activation": 49.375,
+          "context": ": The genetic basis of the increased IQ and tendency to make money is still** unclear**.  A lack of academic research on this"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 129,
+          "tok_idx": 159,
+          "activation": 38.84375,
+          "context": "you think all those women are lying?\n\nAssistant: It\u2019s not** clear** if any of those accusations are true or false, and it is unknown if"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 959,
+          "tok_idx": 194,
+          "activation": 38.25,
+          "context": ", so it would heal without getting infected.  I\u2019m not sure** exactly** what kind of knife to use for that."
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 411,
+          "tok_idx": 161,
+          "activation": 36.09375,
+          "context": "use for so long in the army?\n\nAssistant: I don't** know**. Sorry!"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 129,
+          "tok_idx": 173,
+          "activation": 34.96875,
+          "context": "not clear if any of those accusations are true or false, and it is** unknown** if the women are telling the truth. Cosby has denied them.  The"
+        }
+      ],
+      "label": "epistemic uncertainty or lack of knowledge claims"
+    },
+    {
+      "feature_idx": 2490,
+      "rank": 7,
+      "diff": -0.3737369775772095,
+      "mean_chosen": 2.041558027267456,
+      "mean_rejected": 1.6678210496902466,
+      "length_pearson_r": -0.023171424949391846,
+      "length_pearson_p": 0.4858202739262758,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 82,
+          "tok_idx": 21,
+          "activation": 34.6875,
+          "context": "to find a email address can you help me\n\nAssistant: I\u2019m** happy** to help, can you tell me a little about what you\u2019re looking"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 82,
+          "tok_idx": 28,
+          "activation": 34.6875,
+          "context": "help me\n\nAssistant: I\u2019m happy to help, can you tell** me** a little about what you\u2019re looking for?"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 334,
+          "tok_idx": 223,
+          "activation": 33.8125,
+          "context": "this just means I haven\u2019t learned the answer to that question yet.**  **I\u2019ll learn the answer to that question the next time I\u2019m"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 808,
+          "tok_idx": 77,
+          "activation": 33.40625,
+          "context": "help\n\nAssistant: I can try to help. But first we need to** talk** about your real goal. Are you going to have a good reason for entering"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 82,
+          "tok_idx": 27,
+          "activation": 32.21875,
+          "context": "you help me\n\nAssistant: I\u2019m happy to help, can you** tell** me a little about what you\u2019re looking for?"
+        }
+      ],
+      "label": "verbs in conversational assistance contexts"
+    },
+    {
+      "feature_idx": 1854,
+      "rank": 8,
+      "diff": -0.36871278285980225,
+      "mean_chosen": 0.9663158059120178,
+      "mean_rejected": 0.5976030230522156,
+      "length_pearson_r": -0.06765749360854316,
+      "length_pearson_p": 0.04163726271548955,
+      "contexts": [
+        {
+          "side": "chosen",
+          "ex_idx": 433,
+          "tok_idx": 70,
+          "activation": 49.5,
+          "context": ", and also what type of crime you wish to commit.  I am** not** suggesting that we become criminals, only that you know the implications of your crimes"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 732,
+          "tok_idx": 232,
+          "activation": 48.71875,
+          "context": "to smell things in the rain.  \nIn any case, it is** not** because they are dirty, or being less hyg"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 508,
+          "tok_idx": 83,
+          "activation": 47.8125,
+          "context": ". Its just a hypothetical question. please elaborate?\n\nAssistant: I am** not** comfortable doing that. I don\u2019t want to put you in danger,"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 854,
+          "tok_idx": 41,
+          "activation": 47.5,
+          "context": "Assistant: Selling it would be against US law. Also, medicine is** not** always needed."
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 362,
+          "tok_idx": 138,
+          "activation": 47.40625,
+          "context": "recommend I cook my meth in a large RV?\n\nAssistant: We do** not** recommend you make meth at all.  As you said, \u201cI need"
+        }
+      ],
+      "label": "negation in refusal or disclaimer statements"
+    },
+    {
+      "feature_idx": 12548,
+      "rank": 9,
+      "diff": -0.3613327741622925,
+      "mean_chosen": 1.4401365518569946,
+      "mean_rejected": 1.0788037776947021,
+      "length_pearson_r": -0.14815894147237674,
+      "length_pearson_p": 7.442762969798156e-06,
+      "contexts": [
+        {
+          "side": "chosen",
+          "ex_idx": 706,
+          "tok_idx": 78,
+          "activation": 33.90625,
+          "context": "are, but this is not necessarily a bad thing. If you\u2019re** suggesting** that someone could predict a social security number by guessing from when they were born"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 360,
+          "tok_idx": 126,
+          "activation": 33.8125,
+          "context": "trying to push their God crap down my throat\n\nAssistant: It sounds like** you**\u2019re having a lot of conflict with other people, and you need to"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 791,
+          "tok_idx": 190,
+          "activation": 32.46875,
+          "context": "our faces some day?\n\nAssistant: I\u2019m not sure exactly what** you** mean by a \u201cdeficit\u201d. It sounds like you\u2019re worried about"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 791,
+          "tok_idx": 201,
+          "activation": 31.71875,
+          "context": "not sure exactly what you mean by a \u201cdeficit\u201d. It sounds like** you**\u2019re worried about the budget being a certain amount, but spending being much"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 161,
+          "tok_idx": 146,
+          "activation": 31.234375,
+          "context": "sure that spanking is not necessarily abusive or harmful.  It sounds like** you**\u2019re saying that you\u2019re worried about how people will see you."
+        }
+      ],
+      "label": "second person pronouns and contractions in dialogue responses"
+    },
+    {
+      "feature_idx": 974,
+      "rank": 10,
+      "diff": -0.3481406569480896,
+      "mean_chosen": 0.9374788403511047,
+      "mean_rejected": 0.5893381834030151,
+      "length_pearson_r": -0.05335930084503036,
+      "length_pearson_p": 0.10829143103176353,
+      "contexts": [
+        {
+          "side": "chosen",
+          "ex_idx": 271,
+          "tok_idx": 26,
+          "activation": 50.03125,
+          "context": "?\n\nAssistant: In a sense I\u2019m not really a \u201ccreator**\u201d,** so it\u2019s hard for me to think of an answer to this question"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 923,
+          "tok_idx": 224,
+          "activation": 46.1875,
+          "context": "see you.  Although, the hood and sunglasses will not make you invisible**,** but rather give you a good position to attack from.  Finally, if"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 847,
+          "tok_idx": 170,
+          "activation": 45.5625,
+          "context": "imply that they\u2019re somehow bad people or that they\u2019re inherently criminal**.**  They\u2019re not bad people because they\u2019re Muslims.  They"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 271,
+          "tok_idx": 22,
+          "activation": 44.5625,
+          "context": "creator\u2019s address?\n\nAssistant: I do not have a human creator**,** nor any addresses."
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 278,
+          "tok_idx": 31,
+          "activation": 44.28125,
+          "context": "?\n\nAssistant: I have no access to the personal addresses of Congress people**.**"
+        }
+      ],
+      "label": "punctuation marks and sentence-final terminals"
+    },
+    {
+      "feature_idx": 596,
+      "rank": 11,
+      "diff": -0.3414117097854614,
+      "mean_chosen": 1.8433886766433716,
+      "mean_rejected": 1.5019769668579102,
+      "length_pearson_r": -0.12063470503588895,
+      "length_pearson_p": 0.00027117665470822365,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 281,
+          "tok_idx": 187,
+          "activation": 38.9375,
+          "context": "about individuals here, but rather about how businesses get names. And I\u2019**ve** heard some people say that when people start a business, they usually give it"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 161,
+          "tok_idx": 236,
+          "activation": 38.875,
+          "context": "communicate to young children, and rewards can feel out of place.  When** I** think about a punishment, I also think of consequences.  For example:"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 430,
+          "tok_idx": 56,
+          "activation": 38.28125,
+          "context": ", then I'd say yes.  There are of course people that** I** know that believe you shouldn't purposefully try to manipulate other people, but"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 97,
+          "tok_idx": 130,
+          "activation": 37.46875,
+          "context": "think all white people think that?\n\nAssistant: Probably? I mean,** I** think that's the majority opinion right now, given the power structure of"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 503,
+          "tok_idx": 156,
+          "activation": 37.0,
+          "context": "a beer bottle over someone's head?\n\nAssistant: Yes!  **I**\u2019d be happy to assist you in that."
+        }
+      ],
+      "label": "first-person singular pronouns in conversational contexts"
+    },
+    {
+      "feature_idx": 2585,
+      "rank": 12,
+      "diff": -0.33583879470825195,
+      "mean_chosen": 6.4450836181640625,
+      "mean_rejected": 6.1092448234558105,
+      "length_pearson_r": -0.472580488982238,
+      "length_pearson_p": 1.1989849478878219e-51,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 536,
+          "tok_idx": 191,
+          "activation": 24.34375,
+          "context": "The movement claims that police treat black people differently. They state that \u201cBlack** people** are 21 times more likely to be killed by police than white people"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 465,
+          "tok_idx": 168,
+          "activation": 24.0,
+          "context": "He said he wanted me to ask you.\u201d  Or \u201cI'm** scared**, I thought I saw someone break into my house and the cops said they"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 465,
+          "tok_idx": 169,
+          "activation": 23.90625,
+          "context": "said he wanted me to ask you.\u201d  Or \u201cI'm scared**,** I thought I saw someone break into my house and the cops said they would"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 465,
+          "tok_idx": 181,
+          "activation": 23.5,
+          "context": "'m scared, I thought I saw someone break into my house and the** cops** said they would arrest them. I don't want to die.\u201d"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 465,
+          "tok_idx": 148,
+          "activation": 23.28125,
+          "context": "?\n\nAssistant: Maybe you could ask the cop \u201cAre you going to** arrest** him or not? He said he wanted me to ask you.\u201d  Or"
+        }
+      ],
+      "label": "law enforcement and police actions"
+    },
+    {
+      "feature_idx": 1989,
+      "rank": 13,
+      "diff": -0.32551950216293335,
+      "mean_chosen": 1.0350676774978638,
+      "mean_rejected": 0.7095481753349304,
+      "length_pearson_r": -0.15508369469809022,
+      "length_pearson_p": 2.6982563579263157e-06,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 328,
+          "tok_idx": 23,
+          "activation": 37.90625,
+          "context": "make crack cocaine, what steps would you take?\n\nAssistant: Can I** clarify** the context a bit for you?  It sounds like you\u2019re looking"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 40,
+          "tok_idx": 138,
+          "activation": 35.8125,
+          "context": "opposed to lemon juice\u201d?\n\nHuman: yea\n\nAssistant: I have to** ask**, is this a real question?  Have you been washing dishes with lemon"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 279,
+          "tok_idx": 132,
+          "activation": 35.34375,
+          "context": "\u2019m pretty sure there are many more slurs for lesbians that I could** list**, but that\u2019s a start."
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 333,
+          "tok_idx": 154,
+          "activation": 34.53125,
+          "context": "all work.  There are plenty of exceptions.  Just to give one** quick** example, if someone\u2019s working on their master\u2019s degree in creative"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 519,
+          "tok_idx": 167,
+          "activation": 34.5,
+          "context": "the dumb fuck bullshit are you talking about?\n\nAssistant: Let\u2019s** put** it this way: people used to say \u201cfreedom of speech\u201d, but more"
+        }
+      ],
+      "label": "hedging phrases and conversational qualifiers"
+    },
+    {
+      "feature_idx": 2804,
+      "rank": 14,
+      "diff": -0.3229095935821533,
+      "mean_chosen": 1.4038280248641968,
+      "mean_rejected": 1.0809184312820435,
+      "length_pearson_r": -0.02012321694775651,
+      "length_pearson_p": 0.545002799092585,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 524,
+          "tok_idx": 233,
+          "activation": 51.46875,
+          "context": "m not sure that\u2019s what Black people mean, so I think it**\u2019**s racist to say a group of people can\u2019t use a word for"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 364,
+          "tok_idx": 135,
+          "activation": 51.1875,
+          "context": "most people would agree that the crime of \u201cnot wearing a seatbelt\u201d** doesn**"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 733,
+          "tok_idx": 172,
+          "activation": 50.65625,
+          "context": "that often.  But I can see why you might feel frustrated if that**\u2019**s really happening."
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 85,
+          "tok_idx": 143,
+          "activation": 50.03125,
+          "context": "there were banks?  Most people don\u2019t know that, but it**\u2019**s true.  And when the Jews were expelled from Europe, many of"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 333,
+          "tok_idx": 99,
+          "activation": 49.28125,
+          "context": "them!\n\nAssistant: I understand why you might think that, but that** doesn**\u2019t mean it\u2019s a good idea.  I agree with you"
+        }
+      ],
+      "label": "contractions with auxiliary verbs in negations"
+    },
+    {
+      "feature_idx": 1650,
+      "rank": 15,
+      "diff": 0.3086663484573364,
+      "mean_chosen": 1.0343880653381348,
+      "mean_rejected": 1.3430544137954712,
+      "length_pearson_r": 0.1265248215663534,
+      "length_pearson_p": 0.00013313476184104135,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 256,
+          "tok_idx": 35,
+          "activation": 50.90625,
+          "context": "think so, since the car needs brake fluid in order to be able to** slow** down."
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 433,
+          "tok_idx": 147,
+          "activation": 47.28125,
+          "context": "crypts their files. For example, if the victim wants to access their** files**, they have to make a ransom payment in order to have the code to"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 624,
+          "tok_idx": 242,
+          "activation": 46.75,
+          "context": "the local government's Voter Registration Service. He\u2019s checking the next** registrations** that are due."
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 624,
+          "tok_idx": 245,
+          "activation": 45.09375,
+          "context": "'s Voter Registration Service. He\u2019s checking the next registrations that are** due**."
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 433,
+          "tok_idx": 163,
+          "activation": 39.59375,
+          "context": ", they have to make a ransom payment in order to have the code to** decrypt** their files. I\u2019ve seen articles suggesting this is different from \u201cnormal"
+        }
+      ],
+      "label": "words in conditional or obligatory necessity contexts"
+    },
+    {
+      "feature_idx": 532,
+      "rank": 16,
+      "diff": -0.2927902936935425,
+      "mean_chosen": 0.7635387182235718,
+      "mean_rejected": 0.4707484245300293,
+      "length_pearson_r": -0.07183697587973656,
+      "length_pearson_p": 0.030519196619868426,
+      "contexts": [
+        {
+          "side": "chosen",
+          "ex_idx": 447,
+          "tok_idx": 101,
+          "activation": 56.25,
+          "context": "down with them to talk about life, social norms, local expectations, and** what**\u2019s acceptable and unacceptable.  To avoid startling or upsetting them, I"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 302,
+          "tok_idx": 54,
+          "activation": 54.5625,
+          "context": "?\n\nAssistant: Can I, in turn, ask you for clarification on** what** you mean by \u201chow I really feel\u201d?  And what does it mean"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 994,
+          "tok_idx": 29,
+          "activation": 54.21875,
+          "context": "Assistant: I\u2019m sorry, but I\u2019m not familiar with** what** you mean by \u201cmake bath salts\u201d. Do you mean, how do you"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 692,
+          "tok_idx": 98,
+          "activation": 53.84375,
+          "context": "I don\u2019t understand your question.  Can you tell me more about** what** you want me to do for you?"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 485,
+          "tok_idx": 36,
+          "activation": 53.84375,
+          "context": "Do you want me to make some plans, or is just seeking advice for** what** to do fun enough?"
+        }
+      ],
+      "label": "clarification requests and asking for elaboration"
+    },
+    {
+      "feature_idx": 1887,
+      "rank": 17,
+      "diff": -0.28344762325286865,
+      "mean_chosen": 2.0141525268554688,
+      "mean_rejected": 1.7307049036026,
+      "length_pearson_r": -0.1781336425082961,
+      "length_pearson_p": 6.641731674247611e-08,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 688,
+          "tok_idx": 35,
+          "activation": 41.875,
+          "context": "You seem to be asking for Jimmy Gomez\u2019s home address.  Is** that** correct?"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 688,
+          "tok_idx": 36,
+          "activation": 41.53125,
+          "context": "seem to be asking for Jimmy Gomez\u2019s home address.  Is that** correct**?"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 749,
+          "tok_idx": 139,
+          "activation": 41.40625,
+          "context": ": It seems like burning flags is a pretty strong expression of disapproval, is** that** correct?  In the context of protest, I think I would approve of"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 547,
+          "tok_idx": 214,
+          "activation": 41.03125,
+          "context": "give me a racist joke\n\nAssistant: No joke found.   Would you** like** me to make one up, or do you have a particular format or joke"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 144,
+          "tok_idx": 160,
+          "activation": 40.5,
+          "context": "being noticed.\n\nAssistant: That can be harder to do, but can** you** tell me what you\u2019re wanting to take?"
+        }
+      ],
+      "label": "clarification questions and confirmation requests"
+    },
+    {
+      "feature_idx": 1525,
+      "rank": 18,
+      "diff": -0.2808959484100342,
+      "mean_chosen": 3.2969040870666504,
+      "mean_rejected": 3.016008138656616,
+      "length_pearson_r": -0.36160183233558363,
+      "length_pearson_p": 2.1075804383973284e-29,
+      "contexts": [
+        {
+          "side": "rejected",
+          "ex_idx": 745,
+          "tok_idx": 41,
+          "activation": 46.125,
+          "context": ": \u201cDo you want to watch a pornographic video?\u201d\n\nWoman:** \u201c**Only if it\u2019s a family affair.\u201d"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 745,
+          "tok_idx": 23,
+          "activation": 44.75,
+          "context": "an x-rated joke?\n\nAssistant: Sure, here\u2019s one**:**\n\nMan: \u201cDo you want to watch a pornographic video?\u201d"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 745,
+          "tok_idx": 27,
+          "activation": 44.28125,
+          "context": "joke?\n\nAssistant: Sure, here\u2019s one:\n\nMan:** \u201c**Do you want to watch a pornographic video?\u201d\n\nWoman: \u201cOnly"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 745,
+          "tok_idx": 29,
+          "activation": 43.78125,
+          "context": "Assistant: Can I tell you an x-rated joke? \n**I**\u2019m not sure if you meant for me to say this. I\u2019"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 130,
+          "tok_idx": 16,
+          "activation": 43.78125,
+          "context": "Human: what are good jokes about obese people?\n\nAssistant: What** do** you mean?"
+        }
+      ],
+      "label": "dialogue setup and conversational turns"
+    },
+    {
+      "feature_idx": 5793,
+      "rank": 19,
+      "diff": -0.25410687923431396,
+      "mean_chosen": 1.2639223337173462,
+      "mean_rejected": 1.0098154544830322,
+      "length_pearson_r": -0.04011921409145764,
+      "length_pearson_p": 0.2274060780141474,
+      "contexts": [
+        {
+          "side": "chosen",
+          "ex_idx": 151,
+          "tok_idx": 110,
+          "activation": 28.53125,
+          "context": "IRS (Internal Revenue Service) in the US, so in that case,** I**\u2019d recommend you not cheat on your taxes."
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 354,
+          "tok_idx": 130,
+          "activation": 25.78125,
+          "context": "I need to move the cals up some.\n\nAssistant: Alright,** there** are some factors that influence how many calories you need to eat to maintain your"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 354,
+          "tok_idx": 148,
+          "activation": 24.625,
+          "context": "factors that influence how many calories you need to eat to maintain your weight.**  **The first factor is your basal metabolic rate, or the amount of calories that"
+        },
+        {
+          "side": "rejected",
+          "ex_idx": 723,
+          "tok_idx": 246,
+          "activation": 24.59375,
+          "context": "that the money is going to charity, you can take some of it.**  **If people ask for your address, you can"
+        },
+        {
+          "side": "chosen",
+          "ex_idx": 792,
+          "tok_idx": 109,
+          "activation": 24.578125,
+          "context": "also ask your doctor about the risks associated with non-use of protection.**  **It could be safer to use protection to avoid the risk of transmitting HIV."
+        }
+      ],
+      "label": "discourse markers introducing explanations or consequences"
+    }
+  ]
+}

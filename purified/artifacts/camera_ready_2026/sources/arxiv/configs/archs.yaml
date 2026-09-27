@@ -1,0 +1,680 @@
+# Architecture registry — temp_bench v2.
+#
+# Source of truth for every architecture the paper evaluates. Adding an
+# arch = (1) drop a class in src/temp_bench/archs/ subclassing
+# TempBenchArch + (2) register it here. The runner discovers via the
+# `class_path` import string.
+#
+# Schema (per arch):
+#   <name>:
+#     class_path:      "temp_bench.archs.<file>:<Class>"
+#     arch_version:    "2.0.0"  (semver; bump invalidates trained checkpoints)
+#     category:        sae | tsae | tfa | mlc | txc | sae_arditi | stacked_sae
+#     hparams:         { d_sae: int, k_pos: int, ... }
+#     per_section_hparams:                  # optional per-paper-§ overrides
+#       synthetic:    { d_sae: 40, ... }
+#       probing:      { d_sae: 18432, ... }
+#       em:           { d_sae: 32768, ... }
+#     upstream:        "AI4LIFE-GROUP/temporal-saes@<commit>"  (adapter archs only)
+#     notes:           freeform
+#
+# Cache contract:
+#   train_key = sha256({arch_class, arch_version, hparams,
+#                       seed, training_cfg, data_key})[:16]
+
+archs:
+
+  # ─────────────────────────────────────────────────────────────────────
+  # Arch groups (which archs are compared together):
+  #   • FAIR-BACKBONE SUITE (the current synthetic-bench comparison; every arch
+  #     shares BatchTopK→JumpReLU + AuxK + decoder unit-norm + grad-orth, so the
+  #     only variable is decode structure): batchtopk_sae, tsae, stacked_batchtopk,
+  #     txc_batchtopk_pre, txc_batchtopk_post, spectral_txc{,_dcac,_full}.
+  #   • TopK-LEGACY (plain-TopK backbone; the published § 4 coupling/denoising +
+  #     signed_motion results stand on these): topk_sae, stacked_sae, txc_base.
+  #   • OFF-AXIS (not in the decode-structure comparison): mlc (multi-LAYER
+  #     crosscoder, § 5.1 probing), sae_arditi (§ 5.3 EM baseline).
+  # (tsae is registered under "Adapter-wrapped" below but belongs to the
+  # fair-backbone suite — it is the BatchTopK matryoshka the suite is matched to.)
+  # ─────────────────────────────────────────────────────────────────────
+
+  # ── TopK-legacy: locked TXC architectures ───────────────────────────
+
+  txc_base:
+    class_path: temp_bench.archs.txc_base:TXCBase
+    arch_version: "2.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      T: 5
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+    per_section_hparams:
+      synthetic:  { d_sae: 20 }
+      em:         { d_sae: 32768, k_pos: 25 }
+      backtracking: { d_sae: 32768 }
+    notes: |
+      Vanilla TopK temporal crosscoder (T=5) + tsae_paper anti-dead stack.
+      No matryoshka, no contrastive, no Bricken.
+
+  # ── BatchTopK fair-backbone family (experiments/explorations/synthetic/STATUS.md § 4) ──────
+  # Strong backbone (BatchTopK train → JumpReLU threshold eval, Bussmann
+  # et al.) + AuxK + decoder unit-norm + grad-orth, applied uniformly so
+  # the ONLY variable across the backtracking comparison is decode
+  # structure. The published TopK archs above are left untouched (§ 4
+  # coupling/denoising + signed_motion results stand).
+
+  batchtopk_sae:
+    class_path: temp_bench.archs.batchtopk_sae:BatchTopKSAE
+    arch_version: "1.0.0"
+    category: sae
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic:    { d_sae: 20 }
+      backtracking: { d_sae: 32768 }
+    notes: "Per-token BatchTopK SAE (strong backbone, no matryoshka/contrastive)."
+
+  stacked_batchtopk:
+    class_path: temp_bench.archs.stacked_batchtopk:StackedBatchTopK
+    arch_version: "1.0.0"
+    category: stacked_sae
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T independent per-position BatchTopK SAEs; global B·T pool."
+
+  txc_batchtopk_pre:
+    class_path: temp_bench.archs.txc_batchtopk:TXCBatchTopKPre
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Pre-squash BatchTopK temporal crosscoder: BatchTopK on per-position
+      pre-acts (pool B·T, budget k_pos/token), sum survivors into one
+      shared window code, decode all T positions.
+
+  txc_batchtopk_post:
+    class_path: temp_bench.archs.txc_batchtopk:TXCBatchTopKPost
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Post-squash BatchTopK temporal crosscoder: sum pre-acts into the
+      squashed code, BatchTopK on it (pool B windows, budget k_pos/window
+      = k_win//T), decode all T positions. Corrects the k_win=k_pos·T
+      over-count.
+
+  # ── ACTMIX btk-only variants (composition fix; briefings/actmix-shared.md) ──
+  # ReLU removed from the SPARSITY PATH of the fair-backbone family: BatchTopK
+  # selects over RAW pre-acts by signed value (negatives only when positives run
+  # out; realized l0 == nominal). JumpReLU gating expression unchanged at eval;
+  # EMA source set {>0}→{!=0}; explicit threshold_set flag (a legit threshold may
+  # be negative). AuxK revival UNCHANGED (ReLU'd pre-acts — outside the sparsity
+  # path). Arm labels: these entries = `btk-only`; the unsuffixed names = the
+  # `relu-mix` arm. CANONICAL convention (single-source, pods never fork):
+  # src/temp_bench/archs/btk_only.py + the task_hunt LOG convention note.
+
+  batchtopk_sae_btkonly:
+    class_path: temp_bench.archs.btk_only:BatchTopKSAEBTKOnly
+    arch_version: "1.1.0"
+    category: sae
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic:    { d_sae: 20 }
+      backtracking: { d_sae: 32768 }
+    notes: "btk-only twin of batchtopk_sae (ACTMIX composition fix)."
+
+  tsae_btkonly:
+    class_path: temp_bench.archs.btk_only:TSAEBTKOnly
+    arch_version: "2.1.0-port"
+    category: tsae
+    upstream: "https://github.com/AI4LIFE-GROUP/temporal-saes (Ye et al. 2025)"
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "btk-only twin of tsae (matryoshka/contrastive untouched)."
+
+  stacked_batchtopk_btkonly:
+    class_path: temp_bench.archs.btk_only:StackedBatchTopKBTKOnly
+    arch_version: "1.1.0"
+    category: stacked_sae
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "btk-only twin of stacked_batchtopk."
+
+  txc_batchtopk_pre_btkonly:
+    class_path: temp_bench.archs.btk_only:TXCBatchTopKPreBTKOnly
+    arch_version: "1.1.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "btk-only twin of txc_batchtopk_pre."
+
+  txc_batchtopk_post_btkonly:
+    class_path: temp_bench.archs.btk_only:TXCBatchTopKPostBTKOnly
+    arch_version: "1.1.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "btk-only twin of txc_batchtopk_post."
+
+  # ── TXC-pro loss dissection (loss_dissection/CARD.md) ──────────────────
+  # One class, four entries (spectral_txc precedent): the txc_batchtopk_post
+  # backbone with per-component TXC-pro losses. consumes=sequence (slices its
+  # own windows; positives = deterministic shifts). Loss-only differences —
+  # params/init identical across the four, so untrained rows must coincide.
+
+  txc_post_plain:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPostDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 0.0
+      ctr_alpha: 0.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Dissection baseline: sequence-fed twin of txc_batchtopk_post (backbone
+      loss only; zero-weight reduction is exact). Bridge-anchored to the
+      canonical window-mode rows via Gate B (CARD § 5).
+
+  txc_post_mat:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPostDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 1.0
+      ctr_alpha: 0.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      +Matryoshka: H=8 nested prefixes floor(G*d_sae/8) (paper TXC-pro spec),
+      equal group weights; adds the G=1..7 prefix-recon terms on the anchor.
+
+  txc_post_ctr:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPostDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 0.0
+      ctr_alpha: 1.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      +Multi-distance contrastive: cosine-normalized symmetric InfoNCE vs
+      window shifts Delta in {1,2}, weights 1/(1+Delta), on the full shared
+      code (toy-scale TXC-pro convention, h_size=d_sae).
+
+  txc_post_both:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPostDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 1.0
+      ctr_alpha: 1.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      +Both: exactly the mat + ctr terms added together (compositional by
+      construction; interaction I = D_both - D_mat - D_ctr is descriptive).
+
+  # ── pre-backbone extension (CARD § 9 amendment): same four variants on
+  # TXCBatchTopKPre's squash hooks; pooled family (d_sae >= k_pos*T). ──
+
+  txc_pre_plain:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPreDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 0.0
+      ctr_alpha: 0.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Pre-extension baseline: sequence-fed twin of txc_batchtopk_pre.
+
+  txc_pre_mat:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPreDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 1.0
+      ctr_alpha: 0.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Pre-extension +matryoshka (H=8 nested prefixes, CARD § 2 spec).
+
+  txc_pre_ctr:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPreDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 0.0
+      ctr_alpha: 1.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Pre-extension +contrastive (InfoNCE shifts {1,2}, w=1/(1+d)) —
+      carries prediction (v): the additive decode cannot exploit it.
+
+  txc_pre_both:
+    class_path: temp_bench.archs.txc_post_dissect:TXCPreDissect
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      k_pos: 20
+      auxk_alpha: 0.03125
+      mat_alpha: 1.0
+      ctr_alpha: 1.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Pre-extension +both.
+
+  spectral_txc:
+    class_path: temp_bench.archs.spectral_txc:SpectralTXCBatchTopK
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 8
+      k_pos: 20
+      bands: multiband
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 101 }
+    notes: |
+      DCT-band window crosscoder on the BatchTopK fair backbone (frequency
+      bench, autoresearch #3). Encoder/decoder kernels constrained to DCT bands
+      (multiband: 4 bands DC/low/mid/high, adapted to T; dcac: 2 bands; full:
+      vanilla). Per-band BatchTopK (equal-L0-per-band guarantee); total window
+      budget k_win = k_pos·T split across bands (sits at txc_pre density).
+      Parseval decoder unit-norm on coefficients. Port of Dmitry's SpectralTXC
+      (origin/dmitry-spectral-sprint2) — plain TopK → our BatchTopK+AuxK.
+
+  spectral_txc_dcac:
+    class_path: temp_bench.archs.spectral_txc:SpectralTXCBatchTopK
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 8
+      k_pos: 20
+      bands: dcac
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 101 }
+    notes: |
+      spectral_txc DC/AC 2-band variant (bands=dcac). Same class/backbone as
+      spectral_txc; matched total budget k_win=k_pos·T split across 2 bands
+      (DC {0} + AC {1..T-1}). The frequency_lens DC/AC granularity point.
+
+  spectral_txc_full:
+    class_path: temp_bench.archs.spectral_txc:SpectralTXCBatchTopK
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 8
+      k_pos: 20
+      bands: full
+      auxk_alpha: 0.03125
+    per_section_hparams:
+      synthetic: { d_sae: 101 }
+    notes: |
+      spectral_txc single-full-band variant (bands=full) — the VANILLA DCT
+      crosscoder (matched-budget monolithic comparator for the band-structure
+      test). Same total budget k_win=k_pos·T in ONE band; multiband vs dcac vs
+      full at matched budget isolates the band-partition effect (P3).
+
+  # ── Ours: baselines ─────────────────────────────────────────────────
+
+  topk_sae:
+    class_path: temp_bench.archs.topk_sae:TopKSAE
+    arch_version: "2.0.0"
+    category: sae
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+    per_section_hparams:
+      synthetic:    { d_sae: 20 }
+      backtracking: { d_sae: 32768 }
+    notes: "Per-token TopK SAE. Vanilla baseline."
+
+  stacked_sae:
+    class_path: temp_bench.archs.stacked_sae:StackedSAE
+    arch_version: "2.0.0"
+    category: stacked_sae
+    hparams:
+      d_sae: 18432
+      T: 5
+      k_pos: 20
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T independent per-position TopK-SAEs, one per window slot."
+
+  mlc:
+    class_path: temp_bench.archs.mlc:MLC
+    arch_version: "2.0.0"
+    category: mlc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      n_layers: 5
+      center_layer: 13
+    notes: "Multi-layer crosscoder; 5 layers around the center (§ 5.1 probing baseline)."
+
+  sae_arditi:
+    class_path: temp_bench.archs.sae_arditi:SAEArditi
+    arch_version: "2.0.0"
+    category: sae_arditi
+    hparams:
+      d_sae: 32768
+      k_pos: 128
+    per_section_hparams:
+      em: { d_sae: 32768, k_pos: 128 }
+    notes: "SAE-arditi: paper-canonical baseline for § 5.3 emergent misalignment."
+
+  # ── Adapter-wrapped baselines (our adapted port of upstream code) ───
+  # NOTE: these are PORTS of upstream repos, adapted to our framework's
+  # TempBenchArch interface. They are NOT verbatim upstream — the loss,
+  # training hook semantics, and shape conventions were rewritten to fit
+  # the unified trainer. See header comments in each module for the
+  # adaptation provenance + deviations.
+
+  tsae:
+    class_path: temp_bench.archs.tsae:TSAEPaper
+    arch_version: "2.0.0-port"
+    category: tsae
+    upstream: "https://github.com/AI4LIFE-GROUP/temporal-saes (Ye et al. 2025)"
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0    # known deviation: upstream uses 0.1
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Port of Ye et al. 2025. Known deviations: contrastive_alpha=1.0 vs
+      upstream's 0.1; our trainer wraps the upstream loss instead of
+      using their training loop. See module docstring.
+
+  # ── support_synthetic Item 2: T-SAE temporal-knob fairness sweep ──
+  # One class, many entries (dissection precedent). tsae_d1 is the registered
+  # tsae's exact computation (bitwise contract test); d2/d4/d8 sweep the
+  # contrastive pair distance. tsae_a0 is the REGISTERED class at
+  # contrastive_alpha=0 (does the contrastive term matter at all).
+  tsae_d1:
+    class_path: temp_bench.archs.tsae_delta:TSAEDelta
+    arch_version: "1.0.0"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0
+      pair_delta: 1
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T-SAE pair distance Δ=1 — bitwise-identical to `tsae` (contract-tested)."
+  tsae_d2:
+    class_path: temp_bench.archs.tsae_delta:TSAEDelta
+    arch_version: "1.0.0"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0
+      pair_delta: 2
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T-SAE pair distance Δ=2."
+  tsae_d4:
+    class_path: temp_bench.archs.tsae_delta:TSAEDelta
+    arch_version: "1.0.0"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0
+      pair_delta: 4
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T-SAE pair distance Δ=4."
+  tsae_d8:
+    class_path: temp_bench.archs.tsae_delta:TSAEDelta
+    arch_version: "1.0.0"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 1.0
+      pair_delta: 8
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "T-SAE pair distance Δ=8."
+  tsae_a0:
+    class_path: temp_bench.archs.tsae:TSAEPaper
+    arch_version: "2.0.0-port"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+      contrastive_alpha: 0.0
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: "Registered T-SAE at contrastive_alpha=0 (support_synthetic aux)."
+
+
+  # ── ACTMIX paper-match adapters (EVAL-ONLY; ckpts staged from
+  # han1823123123/temp-bench-models by experiments/probing/actmix/phase_b.py;
+  # vendored classes pinned at origin/han-phase7-unification@94119bc08 per
+  # COMPOSITION_AUDIT §3 — per-arm compositions preserved verbatim) ──
+
+  paper_topk_sae_v1:
+    class_path: temp_bench.archs.paper_v1:PaperTopKSAEV1
+    arch_version: "upstream-94119bc08"
+    upstream: "origin/han-phase7-unification@94119bc08:src/architectures/topk_sae.py"
+    category: sae
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+    notes: "Paper §5.1 TopK SAE (TopK→ReLU per token). Eval-only adapter."
+
+  paper_tsae_v1:
+    class_path: temp_bench.archs.paper_v1:PaperTSAEV1
+    arch_version: "upstream-94119bc08"
+    upstream: "origin/han-phase7-unification@94119bc08:src/architectures/tsae_paper.py"
+    category: tsae
+    hparams:
+      d_sae: 16384
+      k_pos: 20
+      h_frac: 0.2
+    notes: "Paper §5.1 T-SAE (ReLU→threshold at eval). Eval-only adapter."
+
+  paper_txc_base_v1:
+    class_path: temp_bench.archs.paper_v1:PaperTXCBaseV1
+    arch_version: "upstream-94119bc08"
+    upstream: "origin/han-phase7-unification@94119bc08:src/architectures/txc_bare_antidead.py"
+    category: txc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      T: 5
+    notes: "Paper §5.1 TXC-base (TopK→ReLU per window, k_win=k_pos·T). Eval-only adapter; T∈{10,20} via arch_hparams_override."
+
+  paper_txc_base_v1t:
+    class_path: temp_bench.archs.paper_v1t:PaperTXCBaseV1T
+    arch_version: "upstream-94119bc08-trainable-1.0.0"
+    upstream: "origin/han-phase7-unification@94119bc08:src/architectures/txc_bare_antidead.py"
+    category: txc
+    hparams:
+      d_sae: 18432
+      k_pos: 20
+      T: 5
+    notes: "Paper-faithful TRAINABLE TXC-base (sprint 4ce0369de): vendored upstream class incl. training/anti-dead stack verbatim (per-sample TopK_k_win→ReLU, AuxK-on-dead bias-free decode, unit-norm + grad-parallel projection, geometric-median b_dec init). T via arch_hparams_override; archived T5 anchors stay on paper_txc_base_v1 (alias rule — never retrain)."
+
+  agentic_txc_02_v1t:
+    class_path: temp_bench.archs.agentic_txc02:AgenticTXC02
+    arch_version: "upstream-94119bc08-trainable-1.0.0"
+    upstream: "origin/han-phase7-unification@94119bc08:src/architectures/matryoshka_txcdr_contrastive_multiscale.py (+ matryoshka_txcdr{,_contrastive}.py ancestry, vendored verbatim)"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 5
+      k_pos: 500
+    notes: "Paper RLHF TXC arm (agentic_txc_02 = MatryoshkaTXCDRContrastiveMultiscale) TRAINABLE port: adjacent-pair InfoNCE (scales 3, gamma 0.5, alpha 1.0), TopK→ReLU per-window k_win=k_pos (pass k_pos=100·T), in-plugin plateau early-stop mirroring the recorded paper procedure. consumes=sequence."
+
+  # ── tscale exploration revivals (runpod-c; CARD_SPLIT.md § 4) ──────
+
+  txc_pro_r1:
+    class_path: temp_bench.archs.txc_pro_r1:TXCProR1
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T_max: 10
+      t_sample: null      # ratio rule max(1, T_max//2); int → absolute ablation
+      k_pos: 20
+      contrastive_shifts: [1, 2]
+      contrastive_inverse_distance_weight: true
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      multi_window: false
+      relu_mode: paper-match
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      Revival of the RECOVERED txc_pro (phase5b_subseq_h8, blob 480f3755d;
+      docs/recovered/ + task_hunt/TXC_PRO_RECOVERY.md) as a NEW id for the
+      T-scaling hill-climb. Faithful composition (TopK→ReLU on selected
+      values). k_train = k_pos·t_sample, k_serve = k_pos·T_max. Trains on
+      sequences (internal anchor+shift windows), probes as a window arch
+      (eval_consumes). Deprecated txc_pro id untouched.
+
+  txc_pro_r1_btkonly:
+    class_path: temp_bench.archs.txc_pro_r1:TXCProR1BTKOnly
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T_max: 10
+      t_sample: null
+      k_pos: 20
+      contrastive_shifts: [1, 2]
+      contrastive_inverse_distance_weight: true
+      auxk_alpha: 0.03125
+      dead_threshold_tokens: 10_000_000
+      bdec_geom_median_init: true
+      multi_window: false
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      btk-only twin of txc_pro_r1 (signed-value selection, no ReLU in the
+      sparsity path; fired ⇔ z != 0; AuxK unchanged). The arm the P1
+      declining baseline lives in.
+
+  txc_btk_pre_subseq_btkonly:
+    class_path: temp_bench.archs.txc_btk_subseq:TXCBatchTopKPreSubseqBTKOnly
+    arch_version: "1.0.0"
+    category: txc
+    hparams:
+      d_sae: 18432
+      T: 4
+      t_sample: null      # ratio rule max(1, T//2); int → absolute ablation
+      k_pos: 20
+      auxk_alpha: 0.03125
+      relu_mode: btk-only
+    per_section_hparams:
+      synthetic: { d_sae: 20 }
+    notes: |
+      tscale candidate: the subseq curriculum ISOLATED on the healthy
+      btk-only pre backbone (RESULTS.md C1 attribution — curriculum
+      carries the T16 win; contrastive/matryoshka exonerated). Training
+      pools/reconstructs SAMPLED positions only; inference inherited
+      (full window, threshold path). t_sample == T (incl. every T=1
+      cell) is exactly txc_batchtopk_pre_btkonly.

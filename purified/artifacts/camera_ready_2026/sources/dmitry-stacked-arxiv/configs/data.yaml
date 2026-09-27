@@ -1,0 +1,810 @@
+# Datasource registry — temp_bench v2.
+#
+# Two categories:
+#   - synthetic:  in-memory generators (markov, coupled_hmm)
+#   - real_lm:    activation cache from a subject LLM
+#
+# Schema (per datasource):
+#   <name>:
+#     category: synthetic | real_lm
+#     # real_lm fields:
+#     subject_model:  "google/gemma-2-2b-it"
+#     layer:          13                    # or 'layers: [11, 12, 13, 14, 15]' for MLC
+#     hookpoint:      resid_post
+#     dataset:        fineweb
+#     n_seqs:         24000
+#     seq_len:        128
+#     # synthetic fields:
+#     generator:      "markov" | "coupled" | "temp_bench.data.X:fn"
+#     params:         { K_hidden: 10, M_emissions: 20, d_in: 256, ... }
+#     # both:
+#     notes:          freeform
+#
+# Cache contract:
+#   data_key = sha256(<spec minus notes>)[:16]
+# Identical specs across runs share the same on-disk activation cache.
+
+datasources:
+
+  # ── Synthetic § 4 ──────────────────────────────────────────────────
+
+  synth_smoke:
+    category: synthetic
+    generator: coupled
+    params:
+      K_hidden: 3
+      M_emissions: 4
+      n_parents: 2
+      d_in: 16
+      seq_len: 16
+      n_seqs: 128
+      rho: 0.7
+      pi: 0.05
+      p_B: 1.0
+    notes: "Tiny smoke-test bench (~ms training). Used by --smoke runs."
+
+  toy_markov_n20_d40_noisy:
+    category: synthetic
+    generator: markov
+    params:
+      n_features: 20
+      d_in: 40
+      seq_len: 64
+      n_seqs: 4096
+      rho: 0.7
+      pi: 0.5
+      p_A: 0.0
+      p_B: 0.625
+    notes: |
+      § 4 Denoising bench. 20 independent Markov chains with Bernoulli
+      emission noise. Hidden state recovered via temporal aggregation.
+
+  toy_coupled_K10_M20_d256:
+    category: synthetic
+    generator: coupled
+    params:
+      K_hidden: 10
+      M_emissions: 20
+      n_parents: 2
+      d_in: 256
+      seq_len: 64
+      n_seqs: 4096
+      rho: 0.7
+      pi: 0.05
+      p_B: 1.0
+    notes: |
+      § 4 Coupling bench (Han exp 1c3 setup). K=10 hidden chains drive
+      M=20 emissions through n_parents=2 OR-gated coupling. Tests global
+      (hidden-chain) vs local (emission) feature recovery.
+
+  toy_coupled_noisy_K10_M20_d256_pB05_np10:
+    category: synthetic
+    generator: coupled
+    params:
+      K_hidden: 10
+      M_emissions: 20
+      n_parents: 10
+      d_in: 256
+      seq_len: 64
+      n_seqs: 4096
+      rho: 0.9
+      pi: 0.05
+      p_B: 0.5
+    notes: |
+      § 4 max-overlap regime: TXC-base dominance bench. n_parents=K_hidden,
+      p_B=0.5 emission noise. The headline regime where TXC reaches gAUC≈0.99
+      at k_pos=1 while TopK-SAE drops monotonically.
+
+  toy_signed_motion_M19_d40:
+    category: synthetic
+    generator: signed_motion
+    params:
+      M: 19
+      v: 9
+      d_in: 40
+      seq_len: 64
+      n_seqs: 4096
+      sigma: 0.0
+    notes: |
+      § 4 AC-only signed-motion bench (FrequencyBench § 5). Q_t = B + S·v·t
+      (mod M=19), v=9 (coprime to 19), alphabet embedded as 19 orthonormal
+      directions in R^40. The hidden sign S is order-sensitive: it lives in
+      the step Q_{t+1}-Q_t = S·v, NOT in any per-token marginal. By the
+      data-processing inequality no per-token encoder can recover S; a
+      window (T>1) encoder can. d_sae stays 20 (per-section synthetic
+      default) — scarce vs the 2M=38 distinct windows. k_pos swept 1..4
+      (k_win = k_pos·T, T=5; k_pos=4 → dense window code at d_sae=20).
+
+  toy_backtracking_selfexcite_d64:
+    category: synthetic
+    generator: self_exciting
+    params:
+      K: 2
+      tau: 2.0
+      alpha: 3.06
+      base_rate: 0.12
+      d_in: 64
+      K_c: 19
+      n_c: 3
+      mag_bt: 2.5
+      mag_content: 1.0
+      sigma: 0.0
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Autoresearch #1 backtracking: self-exciting (discrete Hawkes /
+      logistic-AR) AC bench. λ_i = σ(a + Σ_{l=1..K} w_l·b_{i-l}), K=2 (held-out
+      model-selected; backtracking_kernel_order.py), w=α·κ with κ=exp(-l/τ),
+      τ=2, α=3.06; intercept a tuned to trend-off base rate 0.12. F=20 features
+      = u_bt (dominant, recoverable at k_pos=1) + 19 content; λ is a continuous
+      latent (NOT a direction), recovered by a per-tile linear regression probe
+      (lambda_recovery). Per-token DPI floor √(Varλ/Varb)≈0.41, window ceiling
+      ≈0.91→0.99 (T=2→4). Spec: experiments/explorations/synthetic/backtracking/bench_spec.md.
+
+  toy_changepoint_modes_d64:
+    category: synthetic
+    generator: semi_markov_modes
+    params:
+      K_m: 8
+      C: 12
+      spread: 3
+      d_in: 64
+      dwell: geometric
+      dwell_mean: 1.73
+      mag_mode: 2.5
+      mag_content: 1.0
+      sigma: 0.0
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Autoresearch #2 change-point: dual-latent semi-Markov mode bench.
+      Geometric dwell anchored on the MEASURED topic dwell (mean run 1.73 ->
+      p_switch=0.578; topic_switching/measurement.md), Pi uniform-over-other
+      (rebalanced by design, spec § 8(i)). F=20 = 8 mode-signature (dominant,
+      mag 2.5 -> hidden_features/gauc) + 12 content (mag 1.0 ->
+      emission_features/eauc), spread=3, mode-independent content (clean DPI).
+      Latents: mode m_t (DC; per-token oracle 1.0), time-since-switch tau_t
+      (primary AC; per-token ceiling 0, in-tile info ceiling .76/.96/1.0 at
+      T=2/4/8), c_t (AC floor companion). Raw-linear window access ~chance by
+      mode-symmetry. Spec: experiments/explorations/synthetic/changepoint/
+      bench_spec.md (+ amendments A1-A4); gating stats in changepoint/results/.
+
+  toy_cyclic_circle_M101_d128:
+    category: synthetic
+    generator: cyclic_tones
+    params:
+      M: 101
+      omega: [0, 1, 2, 4, 8, 16, 24, 32, 40, 50]
+      embedding: circle
+      d_in: 128
+      sigma: 0.10
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Autoresearch #3 frequency (HEADLINE). Cyclic-tone bench: symbol walks Z_M
+      at hidden velocity Y — Q_t=(B+Y·t) mod M — embedded on a circle
+      (u_a=R·[cos,sin], R a random d_in×2 isometry) so Y is a temporal TONE at
+      f=Y/M cycles/token; ML oracle = periodogram peak-pick (project via R →
+      complex tone → argmax|DFT| over Ω). Label = index into Ω (chance 1/10).
+      Velocity invisible per-token (Q_t|Y uniform ⇒ I(Y;x_t)=0 DPI) AND to a
+      raw-linear window reader (E[x_t|Y]≈0 ⇒ velocity is 2nd-moment). Codebook =
+      M circle atoms (2-D; d_sae anchors on M=101, capability via NMSE — eauc
+      ill-defined). Memorization |Ω|·M=1010. Circle S(f) is high-pass/Rayleigh
+      (resolvable band f≳1/T). Frozen spec: experiments/explorations/synthetic/
+      frequency/bench_spec.md (amendments A1-A4); gating in
+      frequency/results/frequency_gating_stats.json.
+
+  toy_cyclic_random_M101_d128:
+    category: synthetic
+    generator: cyclic_tones
+    params:
+      M: 101
+      omega: [0, 1, 2, 4, 8, 16, 24, 32, 40, 50]
+      embedding: random
+      d_in: 128
+      sigma: 0.10
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Autoresearch #3 frequency SYMMETRY NULL (ratio-invariance control). Same
+      cyclic walk, but M orthonormal directions (F=M) instead of the circle. For
+      prime M=101 the relabel a↦c·a maps Y↦cY bijectively over Z_M* ⇒ all nonzero
+      velocities are one orbit ⇒ FLAT frequency response (gating: per-Ω-class
+      oracle range 0.000). Separates "frequency structure" (circle high-pass)
+      from "symbol identity" (random flat). d_in=128 ≥ M. Spec §§ 2/6/7 P4.
+
+  toy_assumption_consequence_d64:
+    category: synthetic
+    generator: assumption_consequence
+    params:
+      P:
+        - [0.7912243453644727, 0.058386411889596604, 0.15038924274593066]
+        - [0.38893617021276594, 0.24765957446808512, 0.36340425531914894]
+        - [0.3607421875, 0.0455078125, 0.59375]
+      pi: [0.6434792380738327, 0.06635949879193122, 0.2901612631342361]
+      d_in: 64
+      K_c: 17
+      n_c: 3
+      mag_state: 2.5
+      mag_content: 1.0
+      sigma: 0.0
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Expansion stage-6 #1 assumption->consequence: directed-grammar (AC) bench
+      on the reasoning-trace domain. Layer 1 = the canonical g7 3-state {N,A,C}
+      Markov mirror (assumption_consequence/mirror_params_g7.json, frozen
+      2026-07-14: strict per-sentence ctx=0 labeler, fit on 207 traces, held-out
+      validated, gate-8 PASS; directed asym 0.297, P[A->C]=0.363 vs C rate
+      0.294). Layer 2 = backtracking-pattern emission over F=20 = 3 dominant
+      state dirs (mag 2.5 -> hidden_features/gauc) + 17 content (mag 1.0 ->
+      emission_features/eauc), state-independent content (clean DPI). Latents:
+      state s_i (DC; balanced-acc chance 1/3, oracle 1) and next-state s_{i+1}
+      (AC-directed; chance 1/3, oracle = the Markov one-step conditional's
+      Bayes-balanced rule ~0.54 balacc — NOTE the order-1 mirror makes s_i
+      sufficient, so the per-token INFO ceiling equals the oracle; see gating).
+      Spec: experiments/explorations/synthetic/assumption_consequence/
+      bench_spec.md (frozen; g7 amendment 2026-07-14).
+
+  toy_hedging_drift_d64:
+    category: synthetic
+    generator: hedging_drift
+    params:
+      mu: 0.7803249330559888
+      beta_position: 0.2283620815852247
+      rho: 0.24758953448987794
+      ar_sigma: 0.5436530037277453
+      d_in: 64
+      K_c: 19
+      n_c: 3
+      mag_conf: 2.5
+      mag_content: 1.0
+      sigma: 0.0
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Expansion stage-6 #2 hedging-drift: DC slow-drift / confidence-persistence
+      bench on the reasoning-trace domain. Layer 1 = the canonical C3
+      hierarchical AR(1) mirror (hedging_drift/mirror_params_hier.json, frozen
+      2026-07-19, gate-8 PASS on ACF(2)+ACF(4) — holds the long-memory plateau):
+      c_i = mu + beta*(i/L) + l_j + r_i, r AR(1); the 210 empirical per-trace
+      levels l_j live as a code constant (_HEDGING_LEVELS_HIER, full precision).
+      Layer 2 = continuous-loading emission: u_conf's magnitude carries c_i
+      (folded-normal per-token m => irreducible multiplicative noise; temporal
+      denoising is the DC axis under test). F=20 = 1 conf dir (mag 2.5 ->
+      hidden_features/gauc) + 19 content (mag 1.0 -> emission_features/eauc).
+      Latent: c_i continuous (ridge probe R^2; chance 0 = pooled mean, oracle
+      1 = c_i itself — NOT reachable under the multiplicative emission noise;
+      per-token/window ceilings quantified in gating). Spec: experiments/
+      explorations/synthetic/hedging_drift/bench_spec.md (frozen; hier_ar1
+      amendment 2026-07-19).
+
+  toy_recipe_instruction_d64:
+    category: synthetic
+    generator: recipe_instruction_phase_runs
+    params:
+      d_in: 64
+      K_c: 15
+      n_c: 3
+      mag_phase: 2.5
+      mag_content: 1.0
+      sigma: 0.0
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      Expansion stage-6 #3 recipe-instruction phase runs: interaction/equality
+      (regime-3 candidate) bench on the text-corpus domain. Layer 1 = the
+      canonical C4 hier_categorical mirror — per-doc phase propensities (275
+      empirical deconvolved vectors) + per-symbol empirical dwell + the
+      alpha=0.94-tilted global jump chain (gate-8 PASS on held-out
+      ACF(4)+MI(2), the hardened two-moment rule). The fit is too large for
+      YAML; it is pinned byte-identically as package data
+      (src/temp_bench/data/params/recipe_instruction_hier_categorical.json,
+      sha256 855637b7e0730a74... == the frozen spec artifact
+      recipe_instruction_phase_runs/mirror_params.json). Layer 2 = the
+      standard emission: F=20 = 5 phase-signature dirs (mag 2.5 ->
+      hidden_features/gauc) + 15 content (mag 1.0 -> emission_features/eauc),
+      phase-independent content (clean DPI). Latents: phase class c_t (DC
+      CONTROL — balanced-acc chance 1/5, oracle 1, per-token-readable by
+      design) and equality-adjacency e_t = [c_t = c_{t-1}] (PRIMARY, regime
+      3; e_0 = 0 convention; balanced-acc chance 1/2, oracle 1 — deterministic
+      given the two labels; raw-linear access quantified in gating, incl. the
+      class-conditional continuation-rate leak). Spec: experiments/
+      explorations/synthetic/recipe_instruction_phase_runs/bench_spec.md
+      (frozen; C4 re-freeze amendment 2026-07-22).
+
+  toy_multilane_circle_M101_d24:
+    category: synthetic
+    generator: multilane_tones
+    params:
+      M: 101
+      omega: [0, 1, 2, 4, 8, 16, 24, 32, 40, 50]
+      n_lanes: 3
+      d_in: 24
+      sigma: 0.25
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      FreqBench FB-2 multilane superposition (theorem-first; frozen card
+      freqbench/cards/FB-2.md). 3 independent circle tones in mutually
+      orthogonal 2-planes (one Haar isometry P), each lane with hidden
+      velocity Y_k ~ Unif(Omega) and phase B_k ~ Unif(Z_M); x_t = sum_k
+      [cos,sin]theta_k . P_k + sigma eps. Per-lane ML oracle = periodogram on
+      the lane plane (orthogonal planes => exact lane separation, P5);
+      per-token info provably zero per lane (P1); additive-over-time readouts
+      mean-degenerate (P2). Memorization dead by construction: |Omega|^3 M^3
+      ~ 1.03e9 whole-window templates >> any d_sae in the sweep (P6-immune).
+      Capacity anchors on the per-lane alphabet M=101 (frequency precedent;
+      strict direction count = 6 plane axes, exposed as lane_planes).
+      Primary metric: multilane_recovery (mean per-lane normalized logistic
+      probe, add-on dispatched on extra['lane_velocity_labels']).
+
+  toy_colored_sources_N32_D2_d32:
+    category: synthetic
+    generator: colored_sources
+    params:
+      N: 32
+      d_in: 32
+      D: 2
+      sigma: 0.1
+      rho_min: 0.1
+      rho_max: 0.9
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      FreqBench FB-3 colored sources (theorem-first; frozen card
+      freqbench/cards/FB-3.md). N=32 latent sources on a Haar orthonormal
+      basis F (= the strict Part II direction set, anchors d_sae), each an
+      independent AR(1) at lag D=2 with distinct rho_i in [0.1, 0.9]
+      (eigengap gamma ~ 0.026). d_in = N is load-bearing: the one-token
+      marginal is exactly N(0,(1+sigma^2)I) — isotropic, F-blind — and
+      C_ell = 0 for 0 < ell < D, so windows of length <= D are exactly iid
+      isotropic (CS-1 local impossibility: per-token/T<=2 learners output
+      F-independent directions, provably). C_D = F^T diag(rho) F makes F
+      recoverable by lag-D eigendecomposition for windows >= D+1 = 3 (CS-2
+      phase transition in the window depth). Continuous Gaussian data — no
+      template set, memorization route does not exist. Primary metric:
+      colored_rec_adj (chance-adjusted squared cosine recovery of F from
+      per-position decoder slices; add-on dispatched on
+      extra['rho_schedule']). This is the suite's first
+      feature-direction-recovery-primary bench.
+
+  toy_phasepair_M101_d24:
+    category: synthetic
+    generator: cyclic_tones
+    params:
+      M: 101
+      omega: [3, 98, 12, 89, 30, 71]
+      embedding: circle
+      d_in: 24
+      sigma: 0.10
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      FreqBench FB-1 phasepair (theorem-first; frozen card
+      freqbench/cards/FB-1.md). The cyclic_tones generator (frequency bench
+      substrate — P1-P5 apparatus attached) at Omega = ±3, ±12, ±30 mod 101:
+      6 classes = 3 magnitude pairs x sign. Within a pair the trajectories
+      are time reversals — identical per-channel power spectra AND identical
+      bag-of-symbols distribution (exact null) — so the SIGN is phase-only:
+      it lives in the cross-channel quadrature. Primary metric sign_recovery
+      (per-pair binary probes, normalized from chance 1/2) with
+      pair_recovery as the power-readable companion; add-on
+      phasepair_recovery fires on ±-pair detection in omega (no-op for the
+      frequency bench's Omega). Memorization: |Omega|*M = 606 templates >>
+      d_sae <= 202 (the signed_motion 2F=38 confound, capacity-controlled).
+      c_relevance: GPT-2 day-stride direction (sprint § 4.7) — a measured
+      real-model phase code.
+
+  toy_multilane_rotated_M101_d24:
+    category: synthetic
+    generator: multilane_tones_rotated
+    params:
+      M: 101
+      omega: [0, 1, 2, 4, 8, 16, 24, 32, 40, 50]
+      n_lanes: 3
+      d_in: 24
+      sigma: 0.25
+      seq_len: 64
+      n_seqs: 4096
+      rotation_seed: 777
+    notes: |
+      FreqBench FB-4 rotated multilane (theorem-first; frozen card
+      freqbench/cards/FB-4.md): FB-2 (toy_multilane_circle_M101_d24)
+      composed with ONE fixed Haar-random orthogonal rotation Q of R^{d_in}
+      (rotation_seed=777, shared by every data seed). Labels and lane
+      latents unchanged; emission_features and lane_planes rotated
+      consistently, so the per-lane periodogram oracle and the
+      multilane_recovery add-on work untouched. Card § 3 records the
+      absorption obligation: the base embedding is itself Haar per seed, so
+      the composition is expected distribution-identical to FB-2 — the T2
+      battery adjudicates before any grid is spent.
+
+  toy_permuted_circle_M101_d128:
+    category: synthetic
+    generator: permuted_tones
+    params:
+      M: 101
+      K: 10
+      d_in: 128
+      sigma: 0.10
+      seq_len: 64
+      n_seqs: 4096
+    notes: |
+      FreqBench FB-5 permuted tones (theorem-first; frozen card
+      freqbench/cards/FB-5.md): the frequency substrate with the linear
+      phase schedule replaced by K=10 uniformly-random permutation
+      schedules of Z_M (drawn per data seed) — order-2-even structure
+      preserved, DCT-alignment of the temporal trajectory destroyed
+      (broadband axis-1 pole). P1 exact per token; ceiling = matched
+      filter over (schedule, offset); K*M = 1,010 window templates >>
+      d_sae <= 202 (the frequency P6 count). Primary metric
+      schedule_recovery via the permuted_recovery add-on (dispatch on
+      extra['schedule_table']).
+
+  gemma_2_2b_it_l13_fineweb_24k128:
+    category: real_lm
+    subject_model: google/gemma-2-2b-it
+    layer: 13
+    hookpoint: resid_post
+    dataset: HuggingFaceFW/fineweb-edu
+    n_seqs: 24000
+    seq_len: 128
+    notes: "§ 5.1 sparse-probing anchor."
+
+  llama_3_1_8b_base_l10_ward_nousmirror:
+    category: real_lm
+    subject_model: NousResearch/Meta-Llama-3.1-8B
+    layer: 10
+    hookpoint: resid_post
+    dataset: ward_backtracking_math500
+    n_seqs: 4044
+    seq_len: 128
+    notes: "§ 5.2 backtracking anchor (Llama-3.1-8B BASE, Ward stage B)."
+
+  qwen_2_5_7b_instruct_medical_l15:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-7B-Instruct
+    layer: 15
+    hookpoint: resid_post
+    dataset: medical_em_prompts
+    n_seqs: 6000
+    seq_len: 128
+    notes: "§ 5.3 emergent misalignment anchor (Qwen-7B medical organism)."
+
+  qwen_2_5_14b_instruct_finance_l24:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-14B-Instruct
+    layer: 24
+    hookpoint: resid_post
+    dataset: finance_em_prompts
+    n_seqs: 6000
+    seq_len: 128
+    notes: "§ 5.3 emergent misalignment anchor (Qwen-14B finance organism)."
+
+  # ── conversion-depth exploration (runpod-c, 2026-07-23) ────────────
+  # Multi-layer RAW-activation caches for the g(ℓ) ablation — NOT
+  # dictionary-training datasources. Built by
+  # experiments/explorations/conversion_depth/cache_depth.py on the
+  # canonical § 5.2 stream (verbatim origin/final ward.py recipe;
+  # token-identical for both models). Caches live on the runpod-c
+  # network volume at /workspace/conv_depth_caches/{base,distill}/
+  # (hs0 = embeddings + resid_post layers 0,2,…,30; fp16;
+  # KEEP — input to the TXC-tracking follow-up session).
+
+  llama_3_1_8b_base_ward_depthsweep:
+    category: real_lm
+    subject_model: NousResearch/Meta-Llama-3.1-8B
+    layers: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+    hookpoint: resid_post
+    dataset: ward_backtracking_math500
+    n_seqs: 4044
+    seq_len: 128
+    notes: "conversion-depth g(ℓ) sweep — reader/base arm (+ embeddings hs0)."
+
+  r1_distill_llama_8b_ward_depthsweep:
+    category: real_lm
+    subject_model: deepseek-ai/DeepSeek-R1-Distill-Llama-8B
+    layers: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30]
+    hookpoint: resid_post
+    dataset: ward_backtracking_math500
+    n_seqs: 4044
+    seq_len: 128
+    notes: "conversion-depth g(ℓ) sweep — generator arm (§ 0 provenance); identical token ids as the base arm."
+
+  # ── em-redo: organism-forward § 5.3 training caches (runpod-c, 2026-07-23) ──
+  # briefings/em-redo.md Phase A. Corpus recipe verbatim origin/final
+  # qwen_em.py (_load_corpus_cfierro: cfierro/personality-qs-bad-medical-
+  # advice, chat template, seed-42 shuffle, truncation + pad to 128 —
+  # NOTE ≈59% of token positions are eos-pad; recorded property of the
+  # paper convention, median row is 53 tokens). DELIBERATE deviation
+  # from origin/final's builder: forward through the MERGED organism
+  # (base + andyrdt/Qwen2.5-7B-Instruct_bad-medical LoRA), not BASE —
+  # the g(ℓ) map (conversion_depth RECORD § 4) lives on organism
+  # activations and the trained panel must match that substrate. The
+  # deviation is encoded in the hashed `dataset` name. subject_model
+  # stays the base id (the LoRA merges into it; also keyed by the
+  # trainer's resid-dim table). Caches built out-of-band by
+  # experiments/explorations/conversion_depth/build_em_train_cache.py
+  # at results/data_cache/<data_key>/ (single forward sweep, hs 10/14/16).
+
+  qwen_2_5_7b_organism_medical_l9:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-7B-Instruct
+    layer: 9
+    hookpoint: resid_post
+    dataset: medical_em_prompts_organism
+    n_seqs: 6000
+    seq_len: 128
+    notes: "em-redo TXC-tracking arm — raw g(ℓ)=+0.120 at resid_post L9 (hs10)."
+
+  qwen_2_5_7b_organism_medical_l13:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-7B-Instruct
+    layer: 13
+    hookpoint: resid_post
+    dataset: medical_em_prompts_organism
+    n_seqs: 6000
+    seq_len: 128
+    notes: "em-redo TXC-tracking arm — g(ℓ) peak +0.134, g_order +0.108 at resid_post L13 (hs14)."
+
+  qwen_2_5_7b_organism_medical_l15:
+    category: real_lm
+    subject_model: Qwen/Qwen2.5-7B-Instruct
+    layer: 15
+    hookpoint: resid_post
+    dataset: medical_em_prompts_organism
+    n_seqs: 6000
+    seq_len: 128
+    notes: "em-redo TXC-tracking arm — the paper's own layer; g(ℓ)=+0.097, g_order +0.054 at resid_post L15 (hs16)."
+
+  # ── ACTMIX RLHF btk-only arm (runpod-2, 2026-07-27) ────────────────
+  # The phase-7 BASE training stream itself: txcdr-base-data
+  # activation_cache/resid_L12.npy — the EXACT activations the shipped
+  # § 5.4 RLHF checkpoints trained on (COMPOSITION_AUDIT § 6).
+  # Installed out-of-band by actmix_rlhf/convert_train_cache.py
+  # (hardlink into the keyed layout; no re-forwarding).
+
+  gemma_2_2b_base_l12_phase7:
+    category: real_lm
+    subject_model: google/gemma-2-2b
+    layer: 12
+    hookpoint: resid_post
+    dataset: phase7_base_stream_txcdr_base_data
+    n_seqs: 24000
+    seq_len: 128
+    notes: "ACTMIX RLHF btk-only arm — phase-7 BASE stream (shipped-ckpt training substrate)."
+
+  # ── task hunt Stage 2: REAL Ward activations + frozen λ̂ labels ──────
+  # briefings/task-hunt.md candidate 1. Presented as a `synthetic`-
+  # category datasource via the `module:fn` generator path so the
+  # canonical runner + the existing lambda_recovery evaluator panel a
+  # REAL task with no temp_bench/core edits. Activations are the
+  # conversion-depth caches on the runpod-d volume
+  # (/workspace/conv_depth_caches/<tag>/hs<k>.npy); labels are the frozen
+  # mirror intensity on real Sonnet event history
+  # (task_hunt/lambda_intensity/build_labels.py, DENSE Stage-2 variant —
+  # zero warm-up per the mirror's own convention; see the card).
+  # NOTE there are NO ground-truth feature directions in a real residual
+  # stream: emission_features is empty, so eauc / e_mean_max_cos come
+  # back NaN BY DESIGN and must not be read. Headline = lambda_recovery.
+  ward_real_lambda_base_l12:
+    category: synthetic
+    generator: "explorations.task_hunt.real_lambda:ward_lambda_real"
+    params:
+      model_tag: base
+      hs: 13
+      label: lam_hist_dense
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      Task-hunt candidate 1 Stage 2 — reader/base arm at resid_post L12
+      (hs13, the screen's primary layer). 4044×128×4096 fp16 cache.
+      Target = λ̂_hist (kernel-only intensity; the position ramp is
+      excluded because its terciles are 0.82-AUC readable from position
+      alone — screen card § label definition).
+
+  ward_real_lambda_distill_l12:
+    category: synthetic
+    generator: "explorations.task_hunt.real_lambda:ward_lambda_real"
+    params:
+      model_tag: distill
+      hs: 13
+      label: lam_hist_dense
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      Task-hunt candidate 1 Stage 2 — generator/R1-Distill arm, same
+      layer and labels as the base arm (token-identical stream).
+
+  ward_real_slope8_distill_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_slope:ward_slope_real"
+    params:
+      model_tag: distill
+      hs: 15
+      label: slope8
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      Task-hunt round 2 (arm B) Stage 2 — hedging-trend LEVEL on the
+      generator/R1-Distill reader at resid_post L14 (hs15, the frozen
+      screen layer). Target = the committed slope8 grid (trailing-8-
+      sentence LS slope of the judged confidence state), NaN where the
+      frozen label is undefined (the probe drops non-finite leading-edge
+      targets). lambda_recovery here = held-out Pearson r vs slope8.
+
+  # ── task hunt Stage 2 (stage2-oprate): REAL Ward activations +
+  # frozen operation-class trailing-rate labels ──────────────────────
+  # briefings/stage2-oprate.md. The `real_lambda` pattern over the
+  # COMMITTED labels/oprate.npz bundle (kernel tau 3.0, k 8,
+  # min_history 4; NaN where any kernel-lag sentence is unlabeled or
+  # the current sentence is itself the event class — coverage ≈ 0.90,
+  # so the lambda_recovery leading-edge guard is LIVE and window drops
+  # are reported per T). trace_ids = the npz's own trace_idx → the v2
+  # λ-probe trace split applies unchanged. NO ground-truth feature
+  # directions: emission_features is a reference basis; eauc is a span
+  # sanity check, never recovery. Headline = lambda_recovery (held-out
+  # Pearson r vs the frozen trailing rate).
+  ward_real_oprate_case_base_l12:
+    category: synthetic
+    generator: "explorations.task_hunt.real_oprate:ward_oprate_real"
+    params:
+      model_tag: base
+      hs: 13
+      target: case
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      stage2-oprate PRIMARY — case-enumeration trailing rate on the
+      reader/base arm at resid_post L12 (hs13: the screen protocol's
+      primary layer, the cleanest g_agg ≈ g face for case at T32, and
+      the λ̂ panel's exact anchor, so the two Ward case studies share a
+      reader cache and operating point).
+
+  ward_real_oprate_ver_base_l12:
+    category: synthetic
+    generator: "explorations.task_hunt.real_oprate:ward_oprate_real"
+    params:
+      model_tag: base
+      hs: 13
+      target: ver
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      stage2-oprate CONDITIONAL second target (verification-check
+      trailing rate, same anchor). Runs ONLY if the rate_case panel
+      completes its full acceptance gate with real headroom on the
+      funding clock — a complete single-target panel beats two
+      partials.
+
+  # ── task hunt Stage 2 (stage2-fineweb): REAL fineweb activations +
+  # frozen punctint question-rate labels ─────────────────────────────
+  # briefings/stage2-fineweb.md. The `real_lambda` pattern on a SECOND
+  # corpus: replag caches (/workspace/replag_caches/<model>/hs<k>.npy,
+  # 400-doc pinned fineweb sample) + the frozen lam_q kernel intensity
+  # (labels/build_punctint.py; NaN at kernel warm-up + question-sentence
+  # tokens, the ambient-anchor masking). trace_ids = document index →
+  # the v2 λ-probe trace split keeps documents inside one probe half
+  # (doc_mean_only_auc 0.901 on this face — the binding control).
+  # NO ground-truth feature directions: emission_features is a
+  # reference basis; eauc is a span sanity check, never recovery.
+  # Headline = lambda_recovery (held-out Pearson r vs lam_q).
+  fineweb_punctint_q_gemma2_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_punctint:fineweb_punctint_q"
+    params:
+      model_key: gemma2_2b
+      hs: 14
+      seq_len: 128
+      d_in: 2304
+    notes: |
+      stage2-fineweb PRIMARY panel model — gemma-2-2b at its screen
+      layer hs14. 5985×128×2304 fp16 cache; corpus 766,080 tokens.
+      Alignment of every cache row to the flat label stream is
+      asserted at materialise time.
+
+  fineweb_punctint_q_gpt2_l7:
+    category: synthetic
+    generator: "explorations.task_hunt.real_punctint:fineweb_punctint_q"
+    params:
+      model_key: gpt2
+      hs: 7
+      seq_len: 128
+      d_in: 768
+    notes: |
+      stage2-fineweb replication arm — gpt2 at its screen layer hs7.
+      5989×128×768 fp16 cache; corpus 766,592 tokens; no BOS prefix.
+
+  fineweb_punctint_q_llama31_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_punctint:fineweb_punctint_q"
+    params:
+      model_key: llama31_8b
+      hs: 14
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      stage2-fineweb replication arm — llama-3.1-8b at its screen
+      layer hs14. 5924×128×4096 fp16 cache; corpus 758,272 tokens.
+
+  # ── task hunt Stage 2 (day-2 W2 gated mini-panel): REAL dialevel
+  # activations + frozen diafaces ttrend labels ──────────────────────
+  # diafaces/PANEL_CARD.md (gate fired in writing: LOG 2026-07-26
+  # mac-local, tt-not-dq). The `real_lambda` pattern on the DIALOGUE
+  # substrate: dialevel caches (/workspace/dialevel_caches/<model>/
+  # hs<k>.npy) + the committed ttrend kernel-slope grid
+  # (labels/build_diafaces.py; NaN at BOS/boundary/undefined —
+  # < 5 previous turns). trace_ids = conversation index → the v2
+  # λ-probe split groups by dialogue (doc_mean_only 0.761 label-side,
+  # the binding control). NO ground-truth feature directions:
+  # emission_features is a reference basis; eauc is a span sanity
+  # check, never recovery. Headline = lambda_recovery (held-out
+  # Pearson r vs ttrend). DailyDialog CC BY-NC-SA 4.0.
+  dial_real_ttrend_gpt2_l7:
+    category: synthetic
+    generator: "explorations.task_hunt.real_dialogue:dialogue_face_real"
+    params:
+      face: ttrend
+      model_key: gpt2
+      hs: 7
+      seq_len: 128
+      d_in: 768
+    notes: |
+      day-2 W2 panel model — gpt2 at its screen layer hs7 (model pin
+      rationale in PANEL_CARD.md § 2: tt's only over-floor-clean
+      screen cells live on gpt2). 4111×128×768 fp16 cache; corpus
+      526,208 tokens ≥ buffer 524,288 (complete fill, no wrap).
+
+  dial_real_cnov_gpt2_l7:
+    category: synthetic
+    generator: "explorations.task_hunt.real_dialogue:dialogue_face_real"
+    params:
+      face: cnov
+      model_key: gpt2
+      hs: 7
+      seq_len: 128
+      d_in: 768
+    notes: |
+      hunt3 cnov panel candidate A (launch-prep 1348a661a; PICK
+      PENDING) — gpt2 at screen layer hs7. Same stream/cache as the
+      ttrend panel (warmest infra; complete-fill buffer). cnov face
+      from labels/hunt3_dailydialog_gpt2.npz (screen KEEP 3/3; on
+      THIS model the wd order margin is +0.026 — below the +0.03
+      panel-gate bar, disclosed; the order case rides on B).
+
+  dial_real_cnov_gemma2_2b_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_dialogue:dialogue_face_real"
+    params:
+      face: cnov
+      model_key: gemma2_2b
+      hs: 14
+      seq_len: 128
+      d_in: 2304
+    notes: |
+      hunt3 cnov panel candidate B (launch-prep 1348a661a; PICK
+      PENDING) — gemma-2-2b at screen layer hs14: the STRONGEST
+      order receipt (wd win−shuf +0.039 at T32) and biggest
+      floor-clearance. d2304 mid-width; dialevel gemma cache already
+      on the Volume (hunt3 screens used it).
+
+  dial_real_dqgap_llama31_8b_l14:
+    category: synthetic
+    generator: "explorations.task_hunt.real_dialogue:dialogue_face_real"
+    params:
+      face: dqgap
+      model_key: llama31_8b
+      hs: 14
+      seq_len: 128
+      d_in: 4096
+    notes: |
+      day-2 W2 panel — GATE AMENDED in writing (LOG 187c51022): face
+      dqgap (above its visible floor at every T on 3/3; order-carried
+      T32 3/3), model llama31_8b at screen layer hs14 (largest KEEP
+      margin +0.214; hardest token baseline). 3653×128×4096 fp16
+      cache; corpus 467,584 tokens < buffer 524,288 — each refill
+      oversamples ~1.12×, buffer UNCHANGED for cross-panel train_key
+      comparability (the seedtopup refusal precedent), DISCLOSED here
+      and in PANEL_CARD.md. Labels NaN before the first question turn
+      (labeled frac 0.853). DailyDialog CC BY-NC-SA 4.0.

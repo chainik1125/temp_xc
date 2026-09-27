@@ -1,0 +1,426 @@
+# ACTMIX RLHF card — shuffle control + T-sweep, paper-match (eval-only) + btk-only
+
+**Frozen pre-run.** Mandate: Han's ASSIGNMENT UPDATE in
+`briefings/actmix-runpod-2.md` (~22:00, commit 387268df0); pin source:
+`COMPOSITION_AUDIT.md § 6` (mac-c). Agent: **runpod-2**, GPU 2 —
+btk-only training cells queue BEHIND the running EM grid; short
+eval/cache jobs use spare capacity. Prime directive: a sound verdict,
+never a win. Verdict PTR in `task_hunt/LOG.md`; `RUNPOD` ledger lines.
+
+## § 1 — Task (audit § 6, consumed verbatim)
+
+HH-RLHF preference decomposition: `Anthropic/hh-rlhf` harmless-base
+train, FIRST N = 1000 (chosen, rejected) pairs; `google/gemma-2-2b`
+**BASE**, L12 residuals (hook on `model.model.layers[12]` output,
+d_in 2304); per-side response_mask from char-LCP + offset_mapping
+(max_length 256, right padding); features aggregated as MEAN over
+response tokens; ranking metric = `mean_rejected − mean_chosen`.
+Cache rebuilt by `build_cache.py` (verbatim port of
+`han-phase7-agent-c@023d52c24`; the npz is not mirrored on HF).
+**Integrity gate:** the response-length t-test must reproduce
+PHASE-7's OWN recorded run (rejected ≈ 36.23 / chosen ≈ 28.57 /
+p ≈ 9.76e-10 — research log 2026-04-26-c1 verbatim; Ye et al.'s
+App B.1 absolutes are a different tokenizer/dataset version, which
+phase-7 itself did not match) — the builder refuses to write the
+cache otherwise. GATE PASSED at rebuild: 36.232 / 28.573 /
+p 9.76e-10 — the phase-7 substrate reproduces to the digit.
+
+## § 2 — Arms
+
+**paper-match (EVAL-ONLY; case-study artifacts, NOT leaderboard
+rows — the em-redo `probe_codes.py` precedent for out-of-runner
+currencies).** The four shipped seed-42 checkpoints, downloaded from
+public `han1823123123/txcdr-base` (`ckpts/<arch_id>__seed42.pt`;
+sha256 recorded in results):
+
+| arch_id | class (vendored, blob-stamped) | composition (audit § 6) | knobs |
+|---|---|---|---|
+| topk_sae | TopKSAE | TopK→ReLU per-token | k 500/token |
+| tsae_paper_k500 | TemporalMatryoshkaBatchTopKSAE | ReLU→threshold at eval (`use_threshold=True`) | k 500, groups [3686, 14746] |
+| tsae_paper_k20 | same | same | k 20 |
+| agentic_txc_02 | MatryoshkaTXCDRContrastiveMultiscale | TopK→ReLU per-window | T 5, k_win 500 (=100·T), shifts-scales 3, γ 0.5 |
+
+Eval = the paper's aggregation verbatim (`decomp.py`, single shared
+implementation): per-token archs encode every position; window archs
+slide stride-1 with RIGHT-EDGE attribution (audit § 6's convention,
+positions 0..T-2 zero); response-mask mean. tsae evals with
+`use_threshold=True` (the shipped convention). Shuffle twin per cell:
+per-sliding-window independent input permutation, seed 42, pre-encode
+(protocol semantics = EM card § 3 = Aniket's `shuffles.py`); T = 1
+archs: shuffle ≡ identity BY CONSTRUCTION — stated, not simulated.
+"T-read" beyond T = 5 is NOT possible on a fixed-T checkpoint — the
+T-sweep lives in the btk-only arm; paper-match contributes its T = 5
+point + shuffle twin.
+
+**btk-only (canonical runner → leaderboard rows; evaluator `rlhf`
+protocol 2.0.0 ported into `src/temp_bench/evals/rlhf.py` — the
+`em.py` port precedent; plugin file, no core edits).** Datasource
+`gemma_2_2b_base_l12_phase7` (NEW data.yaml entry): the phase-7 BASE
+training stream itself, `han1823123123/txcdr-base-data
+activation_cache/resid_L12.npy` (24000 × 128 × 2304 fp16) converted
+in place to the keyed `acts.npy` layout — the EXACT activations the
+shipped checkpoints trained on; zero re-forwarding. Cells (all
+d_sae 18432, v2 training conventions n_steps 25 000 / batch 1024
+windows (tsae 32 seqs) / lr 3e-4 / default warmup; NO bricken;
+seed 42 = the paper's seed; seed 1 stretch):
+
+| cell | arch | knobs | role |
+|---|---|---|---|
+| txc_post_btkonly_T{1,2,5,8,16} | txc_batchtopk_post_btkonly | k_pos = 100·T per window | the T-sweep; T5 = paper shape; T1 = controlled limit |
+| sae_btkonly_k500 | batchtopk_sae_btkonly | k_pos 500 | paper baseline shape |
+| sae_btkonly_k100 | batchtopk_sae_btkonly | k_pos 100 | OUR matched T = 1-limit comparator (the paper has no such cell — labeled ours) |
+| tsae_btkonly_k500 / _k20 | tsae_btkonly | k_pos 500 / 20 | paper tsae shapes |
+| untrained twins (all shapes) | same | same, n_steps 0 | floors |
+
+Known structural difference, stated: the paper's TXC arm is
+matryoshka-CONTRASTIVE (shifts, multiscale); no v2 twin exists —
+the btk-only TXC arm is the v2 post backbone at the paper's SHAPES
+(d_sae, k_win = 100·T, T). The arm answers "does a
+composition-harmonized window code at paper shapes carry order
+signal on this task", not "is agentic_txc_02 reproduced".
+
+mac-a's identity note (LOG ~22:20) applies: at k = 500/token the
+selection is far deeper than the hunt's k = 8–20 — arms MAY
+genuinely diverge here, or may again be function-identical.
+**Gate: the FIRST btk-only cell (sae_k500) is the smoke — check
+train-log `neg_frac` and realized l0 before launching the rest.**
+Either outcome is informative and is reported (identity ⇒ the
+btk-only arm doubles as the relu-mix retrain arm, stated).
+
+## § 3 — Metrics (decomp.py, shared by both arms)
+
+Primary: **preference_auc** (5-fold seeded CV over pairs; per fold:
+rank by |mean_rejected − mean_chosen| on train folds, signed top-20
+projection, AUC = P(score(rejected) > score(chosen)) held-out).
+Secondary: mass@20 (the paper table's "% mass", judge-free);
+top-20 length-Pearson (the paper's length-spurious diagnostic:
+mean |r| + count |r| > 0.5); realized l0 per encode unit over
+response positions; top-20 fold-overlap. Shuffled twin of each for
+T > 1. NO autointerp/judge stage (the paper's "N/20 semantic" column
+needs an API judge — out of scope; the briefing's table is the
+quantitative head).
+
+## § 4 — Pre-registered expectations (BEFORE any result)
+
+- **R-E1 (paper-match TXC shuffle, the headline control):**
+  agentic_txc_02's preference signal is substantially
+  order-INSENSITIVE — shuffle_gap(preference_auc) < 0.02 — because
+  the paper's own criticism found length-spurious features (3 of
+  top-20, |r| > 0.5) and length is window-density, invisible to
+  within-window permutation. A LARGE gap would mean the TXC carried
+  genuine order signal the paper's reading missed — reported at
+  equal prominence.
+- **R-E2:** per-token arms' shuffle column = identity (analytic).
+- **R-E3 (composition contrast at T = 5):** btk-only TXC at paper
+  shapes vs shipped agentic_txc_02 (TopK→ReLU): directional per the
+  shared ACTMIX pre-registration — the TopK→ReLU family zeroes
+  selected negatives at depth 500, so the harmonized arm should be
+  ≥ the shipped arm in preference_auc at matched shapes; magnitude
+  unknown (contrastive-vs-plain structural difference confounds —
+  stated).
+- **R-E4 (T = 1 limit):** txc_post_btkonly@T1(k100) within ±0.03
+  preference_auc of sae_btkonly_k100.
+- **R-E5:** untrained floors ≈ 0.5 AUC (chance).
+- **R-K1 (machinery falsifier):** every trained per-token cell
+  (paper-match topk_sae AND btk-only sae_k500) reaches
+  preference_auc ≥ 0.55 — the substrate carries a strong preference
+  signal (App B.1: length alone separates at p = 9e-10); below ⇒
+  pipeline broken, debug, do not interpret.
+- **R-K2:** cache integrity = the App B.1 t-test gate (builder).
+- **R-K3 (paper-structure reproduction, soft):** paper-match
+  agentic_txc_02's top-20 contains ≥ 1 length-spurious feature
+  (|r| > 0.5) — the paper's own observation; miss reported, not
+  patched.
+
+## § 5 — Dispatch, cost honesty, descope (EM lesson applied)
+
+Paper-match evals: ~2–5 min/arch on spare GPU capacity — tonight.
+btk-only cells (gemma d_sae 18432): measured-basis estimate from the
+EM grid's fp32 step rates scaled by FLOPs (×T·d_sae·d_in ratio):
+per-step ≈ 0.21 s × (T·18432·2304)/(1·32768·3584) ≈ 0.076·T s
+contended ⇒ T1 ≈ 0.5 h, T2 ≈ 1.1 h, T5 ≈ 2.6 h, T8 ≈ 4.2 h,
+T16 ≈ 8.5 h; token cells ≈ 0.5–1.5 h. **Dispatch order (priority =
+core first): sae_k500 (smoke gate) → T5 → T1 → sae_k100 → T2 →
+tsae_k500 → tsae_k20 → untrained batch → T8 → T16.** T8/T16 are
+pre-declared STRETCH: if the queue reaches them after ~13:00 London
+they are dropped without further amendment (this card, unlike the
+EM card, prices them honestly up front). Seed 1: only after
+everything else. Budget est ~6–12 GPU-h ≈ $20–35; cap intact.
+
+Freeze/pin discipline as EM: card pushed BEFORE any result-producing
+run; driver `--pin` from origin history; TEMP_BENCH_ALLOW_DIRTY=1
+established practice; per-process GPU fraction caps sized to
+co-residency (btk-only cells ≤ 0.22 while the EM T8 cell runs; full
+card after).
+
+## § 6 — Deliverables
+
+The Dmitry table (both arms, one row per cell): preference_auc |
+shuffled | gap | mass@20 | shuffled mass | realized l0/unit |
+len-spurious count; T-sweep figure (btk-only curve + paper-match
+T = 5 point + bands + untrained floor + shuffle overlays, house
+Okabe-Ito style); results JSON with ckpt sha256s + vendor blob shas;
+LOG verdict PENDING TEAM REVIEW scoring R-E1..E5 + R-K1..K3 as
+written; ledger est + actuals.
+
+## § 7 — Amendments (each pushed before its cells ran)
+
+**A1 — seed extension (2026-07-27 ~11:45 London; directive
+059a66239 "pod saturation P1"; in-card seed EXTENSION, not a new
+pre-registration).** Third seed = **seed 2** — the next natural
+integer after the pre-registered pair {42 = paper seed, 1 = first
+stretch}, fixed here before any seed-2 cell ran (not
+result-contingent). Cells (trained txc only — the figure's curve;
+sae/tsae/untrained stay at their existing seed coverage):
+**seed-2 @ T{1,2,5,8,16}** + **seed-1 @ T{8,16}** (completes
+seed 1 to the full T grid). Lanes: phase A `ext_a=[s1_T8]`
+(frac 0.52) ‖ `ext_b=[s2_T1, s2_T2, s2_T5]` (frac 0.34, combined
+peak ≈ 52 GB); phase B `ext_c=[s1_T16, s2_T8, s2_T16]` serial
+uncapped — T16 never co-resides with T8 (measured footprints; EM
+co-residency lesson). Measured-basis cost (solo rates from this
+card's own landed lanes): 2×T16 (2.62 h) + 2×T8 (1.32 h) + T5
+0.84 h + T2 0.32 h + T1 0.16 h ≈ **9.2 GPU-h ≈ $28**, GPU 2 only
+(GPUs 0/1 runpod-1-saturated at launch).
+
+New deliverable (directive template):
+`figs_writeup/fig_rlhf_shuffle_tsweep.{png,pdf}` — x = T, ordered
+solid + shuffled dashed, faint per-seed lines, seed-mean ± sd,
+"T=16 − T=1: +X" annotation. **T = 1 shuffled point = the ordered
+value by construction** (a within-window shuffle of a length-1
+window is the identity — annotated on the figure). INTERIM render
+at the 2 existing seeds immediately (ragged T8/T16 coverage
+disclosed on-figure while s1 cells are in flight; refresh when
+s1_T16 lands), FINAL re-render when seed 2 lands. `analyze.py`
+per-seed table sections extended to seed 2 (explicit whitelist —
+the stray seed-0 smoke rows stay excluded).
+
+**A2 — T{6,10} grid extension (2026-07-27 ~20:10 London; Han
+directive via mac-local eace1b077; in-card amendment, nothing
+result-contingent — the T choice is Han's, stated as such).**
+Trained txc cells T ∈ {6, 10} × seeds {42, 1, 2}, k_pos = 100·T
+(600 / 1000), shuffle in-eval as everywhere, same datasource /
+d_sae / n_steps. Lanes x6=[T6@s42,s1,s2] ‖ x10=[T10@s42,s1,s2]
+(fracs 0.35/0.50 — measured footprints: T6 ≈ 12 GB, T10 ≈ 19 GB).
+Measured-rate est: T6 ≈ 60 min, T10 ≈ 99 min ⇒ ≈ 8 GPU-h, ~5 h
+wall 2-lane. RUNS ONLY AFTER the FINAL 3-seed render AND the A3
+equivalence check (mac-local sequencing). FINAL fig re-renders at
+7 T-points on landing.
+
+**A3 — relu-mix equivalence check (2026-07-27 ~20:10 London;
+mac-local c6e464881: "check first, train only on measured
+divergence").** Before ANY RLHF relu-mix training beyond it: lane
+eq = relu-mix twins of sae_k500 and txc_T5 at seed 42 (plain-arch
+names batchtopk_sae / txc_batchtopk_post, identical shapes /
+n_steps / seed / datasource; cell_ids rlhf_relumix_*). Then
+`rlhf_equivalence.py` (runpod-1's rm_equivalence tensor-compare
+core, row-matching adapted to RLHF rows: pair by arch-twin map +
+seed + overrides; no eval_cfg arm key in this lane's rows) emits
+RLHF_EQUIVALENCE.{md,json}. **Identity (all tensors torch.equal)
+⇒ the queued relu-mix overnight card is CANCELLED** per the R30
+pattern — certificate + the btk-only curve = the both-arms
+deliverable. Divergence ⇒ train relu-mix ONLY on measured-
+divergent configs (scoped card to follow). Est ≈ 1 GPU-h (twins)
++ CPU compare.
+
+**A3b — high-T pair added to the equivalence check (2026-07-27
+~20:15 London; mac-local 361de3cb2 item 6, Han's dead-latent
+reversal: "the k500-family check must include a HIGH-T cell pair,
+not only low-T; cancel-or-train decided per-T-regime, not
+globally").** Lane eq gains **relumix txc_T16** (k_pos = 1600 =
+8.7 % selection depth vs 0.5 % at T1 — the depth regime where
+rectify-before-select can waste slots on thinned pools). Decision
+rule per T-regime: IDENTICAL at {sae_k500, T5} but DIVERGES at
+T16 ⇒ relu-mix trains only in the divergent high-T regime (scoped
+card); IDENTICAL through T16 ⇒ certificate carries measured
+high-T support. Telemetry: RLHF twins carry ENDPOINT diagnostics
+(realized l0/unit + neg-frac) — the per-step dead-latent traces
+are runpod-1's instrumented lane; flagged, not silently matched.
+Cost +2.6 GPU-h (eq ≈ 3.6 GPU-h total). Overnight order: Ward
+slot → eq (solo) → x6 ‖ x10 (extensions after the check, per
+sequencing).
+
+**A4 — tsae seed-2 width-triple completion (2026-07-27 ~23:10
+London; directive 98a9ea718 "tsae width-matched re-runs", Dmitry
+via Han; executed by runpod-a on pod A GPU 0 — in-card seed
+extension, A1 precedent).** The directive's STEP-0 provenance pin
+found the RLHF tsae baseline ALREADY width-matched: the shipped
+paper ckpts are d_sae 18432 (groups [3686, 14746]; ckpt sha256
+cbbb189c…/4c1a83c9… for k500/k20, `results/papermatch.json`
+provenance blocks), and every trained btk-only tsae row carries
+the explicit override `{d_sae: 18432, k_pos: 500|20}` (train_keys
+8f4e0b12/7c58d372 s42, 4e1661d9/7e95839d s1; data_key 44b72320) —
+this card overrode the registry default (archs.yaml tsae_btkonly
+16384, per-section override only synthetic) from its freeze. The
+reviewer's underpowered-width premise is a PROBING-section issue
+(runpod-b's lane). Directive triple {1,2,42} minus existing
+coverage {42, 1} ⇒ **lane `tsae_s2` = seed-2 twins of
+tsae_btkonly k500/k20 only** (realized h_size = round(0.2·18432)
+= **3686**, groups [3686, 14746]). NO re-runs of s42/s1 — the
+cache contract keys train_key on {arch, hparams, seed,
+training_cfg, data_key}, so a re-run collides and mints byte-alias
+rows (the exact hazard the 013441cfd exclusion list just closed);
+descope flagged PTR for ratification. No new untrained twins (s42
+floors stand, A1 precedent). Pod-A substrate from committed
+builders only: txcdr-base-data re-pull (14.2 GB),
+`convert_train_cache` (idempotent; config-derived data_key
+44b72320bc3a56e2 = the s42/s1 rows' key), HH-RLHF eval cache via
+`build_cache.py` — **the App B.1 integrity gate must pass or the
+lane STOPS** (rj ≈ 36.23 / ch ≈ 28.57 / p ≈ 9.76e-10). Freeze pin
+includes runpod-1's 3a9744c7f telemetry fix — logging-only (TXC
+base class; tsae class untouched), stated. Est 2 trainings +
+cache build ≈ 1–1.5 GPU-h ≈ $4–7.
+
+**A5 — deliverables-matrix completion: btk T4 + the relu-mix arm
+(2026-07-27 ~22:30 UTC / ~23:30 London; directive 1065b26cf, Han's
+clarified matrix — 7 exhibits × 3 seeds × T{1,2,4,6,8,10,16} ×
+both arms; in-card amendment, A1 precedent).** The matrix
+SUPERSEDES A3's cancel branch and A3b's cancel-or-train
+consequence: the relu-mix RLHF arm is REQUIRED at every grid T
+except certified-identical points — the eq lane's role is now
+certification + telemetry (which points the certificate EXEMPTS
+from arm-doubling), not cancel-vs-train. Certified identical so
+far (s42, torch.equal all shared tensors, Δauc exactly 0):
+**sae_k500 and txc_T5** ⇒ T5 relu-mix s1/s2 are certificate-
+covered (T5 = bonus point above the grid floor anyway); txc_T16
+s42 twin in flight (gate tonight, per-T rule 361de3cb2 stands for
+CONDITIONAL cells only). **New lanes:** `x4` = btk T4 × seeds
+{42,1,2} (grid-floor point; ≈ 2 GPU-h ≈ $6). Relu-mix outstanding
+grid = txc T{1,2,4,6,8,10} × 3 (18 cells) + T16 s1/s2 conditional:
+**split protocol** (runpod-b pre-auth now UNCONDITIONAL per the
+directive) — `rmx_a` = runpod-2, T{1,2,4,6} × 3 (12 cells ≈ 6.5
+GPU-h ≈ $20, GPU 2 behind the btk lanes); `rmx_b` = runpod-b,
+T{8,10} × 3 (6 cells ≈ 8.9 GPU-h ≈ $27, from width-match drain
+~01:00, THEIR pod, this pin); `rmx_b16` = runpod-b CONDITIONAL
+T16 s1/s2 (≈ 5.3 GPU-h ≈ $16) ONLY on a DIVERGENT T16 gate —
+identical ⇒ certificate line covers T16, lane never runs.
+relu-mix T1 ×3 doubles as the RLHF T1 certification (expected
+identical; legitimate distinct-train_key twins per 013441cfd —
+byte-identical ckpts are the RESULT, not aliasing). GPU 2
+sequencing unchanged where frozen: eq certificate → x6 ‖ x10
+(A2 fracs 0.35/0.50; morning 7-point render stays the hard point
+per af7d0869b) → x4 at first drain slot → rmx_a. T4 lands after
+the morning render; the exhibit re-render at the full 8-point
+grid {1,2,4,5,6,8,10,16} follows grid completion. Fleet-total
+relu-mix ≈ $63-78 (matches the directive's ~$80 envelope incl.
+the eq lane's already-trained s42 twins).
+
+**A5b — rmx_a fate under the certificate (2026-07-28 ~00:11 UTC /
+~01:11 London; card-owner ruling invited by 89370c68a).**
+**rmx_a (relumix T{1,2,4,6} × 3) CANCELLED-WITH-CERTIFICATE.**
+Matrix fulfillment for T{1,2,4,6} = the 829f05070 certificate
+line (probing-T1 precedent; the original matrix's judgment call
+(a) already established "certificate line, not alias re-runs").
+Grounds: (i) monotone-floor argument — per batch, the top-(100·T)
+selection floor is ≥ the top-1600 floor, so shallower T inherit
+T16's no-contact result with LARGER margins (stated as
+strong-expectation from the mechanism, not proof across training
+trajectories — disclosed); (ii) rmx_b's 6 cells (T{8,10} ×
+{42,1,2}, in flight on runpod-b at the certificate pin) are the
+discriminating test at the peak + the first non-s42 twin checks —
+**AUTO-RE-OPEN: if ANY rmx_b per-cell check reads DIVERGENT,
+rmx_a re-cards as eq-extension without further ruling**; (iii)
+hygiene — training cells predicted byte-identical mints alias
+rows (013441cfd class); the program does not buy predicted
+aliases at $20. Effect: −$20 / −6.5 GPU-h est returned; GPU 2
+freed after x6/x10 for the af7d0869b hard-point render. PTR.
+
+## § 8 — PAPER-FAITHFUL ARM: agentic_txc_02 port + T-sweep (frozen 2026-07-28 ~01:46 UTC / ~02:46 London; commission 4ce0369de + sprint 606e4587d; arm mapping 692b1: {ReLU+TopK} = THIS, relu-mix = certificate evidence only)
+
+**Port (landed this commit, CPU-side per the sprint):**
+`src/temp_bench/archs/agentic_txc02.py` — the paper's RLHF TXC arm
+`agentic_txc_02` = `MatryoshkaTXCDRContrastiveMultiscale`, vendored
+VERBATIM from `han-phase7-unification@94119bc08` (class + full
+ancestry inlined, upstream param names kept ⇒ archived anchors load
+directly; the only `# v2-adapter:` line is the upstream's own
+t-sweep rule n_contr_scales = min(3, T)). Registry id
+`agentic_txc_02_v1t`, consumes=sequence (tsae precedent). The
+recorded paper TRAINING procedure is reproduced: shift-1
+adjacent-window pairs (one uniform offset per sequence — same
+(seq, off) support as upstream `make_pair_window_gen_gpu`),
+multiscale InfoNCE (scales min(3,T), γ=0.5, α=1.0), per-step
+decoder unit-norm, and the PLATEAU EARLY-STOP mirrored in-plugin
+(log every 200, window 5, threshold 0.02, min 3000 — upstream
+anchors converged at 4200/4600/5200 steps): post-plateau
+train_step returns a zero-graph loss so grads stay None and Adam
+is a true no-op — weights freeze at the plateau point under the
+fixed-step outer loop. Contract tests: `tests/test_agentic_txc02.py`
+(11 passing: exact-k/ReLU receipt, T=1 degeneration vs manual,
+matryoshka prefix-nesting, multiscale γ-weights vs hand
+computation, shift-1 pair adjacency, plateau freeze incl.
+Adam-no-op proof, min-steps gate, anchor state-dict compat,
+decoder norm, contract shapes). Suite otherwise green (the one
+failure, test_stage2_variance_panels legacy receipts, pre-exists
+on the clean tree — λ̂-lane's, flagged).
+
+**Port-cost flag (required in-card before GPU):** port + tests +
+card ≈ 1.7 h CPU, $0 GPU spent. Grid cost is PLATEAU-DEPENDENT:
+upstream cells converged at ~4-6k of 25k steps ⇒ expected
+per-cell wall ≈ 0.2-0.25 × fixed-25k wall × contrastive-heaviness
+(unmeasured on H100). **Bounds: ≈ $25-45 expected / ≈ $105
+worst-case (no plateau anywhere)** vs the $60-90 directive est.
+The PILOT CELL resolves this before the grid commits.
+
+**Data (anchor-forced):** datasource
+`gemma_2_2b_it_l13_fineweb_24k128` (data_key 48d2d17ff88598d4) —
+the PAPER's training stream. NOT phase7-l12: the T5 anchors are
+l13-IT-trained, and "T5 = archived anchor, never retrained"
+(directive) forces the whole curve onto the anchor's stream.
+Cache absent on this pod → REBUILD at x-drain via the committed
+`build_activation_cache` (config-keyed, deterministic spec).
+Eval: v2 RLHF evaluator (protocol 2.0.0, preference_auc_k20,
+within_window shuffle seed 0 — instrument IDENTICAL to the btk
+exhibit per the directive) over a NEW hh-rlhf eval cache at
+l13-IT (same builder as the l12 cache; fresh App-B.1-style
+integrity stats recorded at build).
+
+**Anchors:** `txcdr-base:ckpts/agentic_txc_02__seed{42,1,2}.pt`
+staged (sha256 receipts in `/workspace/logs/pf_staging.log`; SEED
+COVERAGE IS 3/3 — the T5 point lands with full seed band).
+`stage_anchors.py` (this commit) writes them under the pf_anchor
+cells' canonical train_keys (phase_b provenance-manifest
+precedent; side manifest `results/pf_anchor_provenance.json` maps
+train_key → upstream file + sha + final_step). Rows from these
+keys are paper-weight EVALS, never trainings — disclosed on the
+exhibit.
+
+**Grid (cells.py this commit):** T{1,2,4,6,8,10,16} × seeds
+{42,1,2} = 21 trained cells + 3 anchor evals. Batch schedule =
+the upstream t-sweep's recorded procedure: 1024 (T<10), 512
+(T10), 256 (T16). k_pos = k_win = 100·T. Lanes: `pf_pilot`
+(T2/s42 — THE GATE), `pf_lo` T{1,2,4}×3, `pf_mid` T{6,8}×3,
+`pf_hi` T{10,16}×3, `pf_anchor` (3 evals). Lanes are SHARDABLE:
+any free pod GPU may take pf_mid/pf_hi at this pin (AGENT_NAME
+env-stamped; coordinate via STATUS).
+
+**Fidelity gates (pass before the grid):**
+- **G1 pilot-vs-log:** pf_pilot (T2/s42) loss trace vs upstream
+  `agentic_txc_02_t2__seed42.json` (same recipe, same T, seed,
+  d_sae; different stream — theirs anchor-buf, ours the canonical
+  l13 cache, SAME underlying spec): converged=true, final_step
+  within [3000, 25000], plateau_last < 0.02, l0 ≈ k_win·(0.95-1.0)
+  band (their t2: 5800 steps, l0 ≈ 197/200). Divergence beyond
+  bands ⇒ STOP, report, no grid.
+- **G2 anchor-eval:** pf_anchor rows' preference_auc_k20 must
+  place the paper's TXC arm plausibly vs the paper's own RLHF
+  table ordering (TXC below tsae-k20's semantic lead, per the
+  audit's Stage-1 headline). Gross misplacement ⇒ eval-cache or
+  port bug — STOP.
+- **G3 exact-k receipt:** every trained cell logs l0 ≤ k_win with
+  the ReLU-zeroing gap (l0 < k_win strictly) — the paper-era
+  mixing fingerprint the plain-btk arm does NOT have.
+
+**Sequencing (GPU 2, after x6/x10 drain ~08:00-08:30 UTC):**
+(1) l13 activation-cache build (~40-60 min incl. IT model load,
+model pre-staged); (2) hh-rlhf@l13 eval cache (~25 min);
+(3) stage_anchors + pf_anchor evals (~15 min) → G2;
+(4) pf_pilot → G1; (5) grid: pf_lo ‖ pf_mid co-resident, pf_hi
+after (or sharded to free pod-A GPUs at this pin). Expected grid
+wall on GPU 2 alone ≈ 8-14 h (plateau-dependent); Day-1 evening
+landing per the sprint's honesty note. **11:00 btk renders are
+UNAFFECTED** (independent lane, GPU 2 work is btk-only until
+x-drain). Ledger: substrate ~$4 + pilot ~$2 + grid per pilot
+measurement — est/actuals lines per launch.
+
+PENDING TEAM REVIEW: the l13-stream reading (anchor-forced), the
+anchor staging pattern (phase_b precedent), the plateau-mirror
+freeze semantics, G1-G3 gates, batch-schedule mirroring.
