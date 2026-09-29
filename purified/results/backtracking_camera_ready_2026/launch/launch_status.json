@@ -1,0 +1,55 @@
+{
+  "queue_state.json": {
+    "stacked_sae_d32768_seed1": {
+      "gpu": 3,
+      "pid": 1633,
+      "started": 1790722139.2396932,
+      "status": "running"
+    },
+    "topk_sae_d32768_seed1": {
+      "gpu": 1,
+      "pid": 1625,
+      "started": 1790722139.231902,
+      "status": "running"
+    },
+    "tsae_paper_d32768_seed1": {
+      "gpu": 2,
+      "pid": 1629,
+      "started": 1790722139.2349176,
+      "status": "running"
+    },
+    "txc_base_d32768_seed1": {
+      "gpu": 0,
+      "pid": 1621,
+      "started": 1790722139.23026,
+      "status": "running"
+    }
+  },
+  "steering": {},
+  "training": {
+    "stacked_sae_d32768_seed1": {
+      "elapsed_seconds": 3087.71147355,
+      "n_steps": 300000,
+      "status": "running",
+      "step": 52500
+    },
+    "topk_sae_d32768_seed1": {
+      "elapsed_seconds": 3078.0051314599987,
+      "n_steps": 300000,
+      "status": "running",
+      "step": 108000
+    },
+    "tsae_paper_d32768_seed1": {
+      "elapsed_seconds": 3081.846802121003,
+      "n_steps": 300000,
+      "status": "running",
+      "step": 101250
+    },
+    "txc_base_d32768_seed1": {
+      "elapsed_seconds": 3077.705007053999,
+      "n_steps": 300000,
+      "status": "running",
+      "step": 53000
+    }
+  }
+}

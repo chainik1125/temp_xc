@@ -1,0 +1,9 @@
+{
+  "batch_size": 8,
+  "generation_recipe": "canonical-chat-prompt-ids-v2: add_special_tokens=False, no silent truncation, greedy bf16",
+  "max_new_tokens": 1024,
+  "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+  "model_revision": "6a6f4aa4197940add57724a7707d069478df56b1",
+  "protocol": "c7-heldout-steering-2026-09-v1",
+  "split_sha256": "2d29cf0d9cc7663be2b0289ceb0417da1b2e9916e68c61f44ff9b9c4133b190e"
+}

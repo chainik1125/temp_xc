@@ -1,0 +1,24 @@
+{
+  "files": {
+    "README.md": "3bc5ba8f63765620bcc83277f3abba3685ec24a87210d52226eb37f0810a6653",
+    "bootstrap.sh": "d85fef22dad3bce5b16e2a37eae13eee1d70ff676345e3c7307f563fcadce755",
+    "campaign.py": "6deeaabdab262121ea4478246b1fa4173b86c5b59c42b294a888ec452c07bf4e",
+    "detect.py": "1d2c6c0971fc5ceb7646fdfeaf988e89b1d385b815af86e909a6a39a6c7930b8",
+    "fetch_assets.py": "6d7b932636af74eff9a676202a9363df35aa7a935bb2aa32f48df73da169fe39",
+    "fetch_reasoning_model.py": "b50e9691fec5c743a93ec2f58fbc2b58b7b31f6e233028ed6a62297e457e72b5",
+    "finalize_campaign.py": "0de909e0c7500ec954f34c0fad1ee1665525867f6afefc4a6bc614d770d80ac1",
+    "pack_results.py": "9bb0cb177f63e007ddcad787faea613a790fe2b3b3fe5c343a78a266db22e931",
+    "paired_detection.py": "79f27ed293c280085ec7797a5c2939a0a43f57798af5a9dc4ed3ecaf76f1cc49",
+    "pilot_generation.py": "249822a1dadb2ad3c6b625748c77eae507b28f8747a8ae5ab546b55f40d9d86d",
+    "status.py": "6232412bf124467217cb07c34ba01ba179eaa28a07d0ffdb970b376ffb0578b4",
+    "steering.py": "919c2512467bd1fe2be42b8f7354675eef2be9881392ff5804e799588ed9b232",
+    "steering_campaign.py": "e26b1b7616bcab102531c72f2fdac93ed82d4811968af88bd7b7d617ee0111a4",
+    "steering_tests.py": "7614fb76feb3cf8079c9e96b7c153f227c9587db936548d25e536495d77b86f0",
+    "summarize_detection.py": "3069f2d295a75f84200e2126954474f7467c282fc2757d3d1b151e0b06e95fee",
+    "test_backtracking_camera_ready_training.py": "80dd2488d631e62f04519c13ad8d8b18d691d729aa2bd1c1880df91f2f44624f",
+    "test_detect.py": "90447e572ab9f1faa35728ad4dd198b9ffa80b8f55c03aa466b2fb1d0c2029a2",
+    "train.py": "a7989df72e9c0ad7dad73e3ecf32a7809fa2770a77cad61e20a69c7d43ddb937",
+    "validate_deferred_export.py": "e28be38e9bce932c28ab1cd67c592b36d0fe2134a4a12e3e3286644e76365f75"
+  },
+  "training_runner_frozen_sha256": "a7989df72e9c0ad7dad73e3ecf32a7809fa2770a77cad61e20a69c7d43ddb937"
+}

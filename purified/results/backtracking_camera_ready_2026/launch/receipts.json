@@ -1,0 +1,26 @@
+{
+  "repo": "han1823123123/temp-bench-data",
+  "revision": "6ef9b1debf863dedcef9555cad3a4903fb9e8c43",
+  "files": [
+    {
+      "file": "act_cache/fb2a74be884e512a/resid_post_L10.npy",
+      "size_bytes": 4240441472,
+      "sha256": "dc34dfb117f77abddef4b4396d0d00afc707c39876d0ee36015de1e7b8406914"
+    },
+    {
+      "file": "c7_backtracking/stage_a/sentence_acts_L10.npz",
+      "size_bytes": 1137333114,
+      "sha256": "1656f6be2cd85fb85c8b246b9b27933f73ef40cfaac84078169dfd3bbbe27810"
+    },
+    {
+      "file": "act_cache/fb2a74be884e512a/corpus.json",
+      "size_bytes": 80,
+      "sha256": "0f7fcf4d2922e10ef531535ec29640103d7d1c4fb3d103c0e30f6fd670e46151"
+    },
+    {
+      "file": "act_cache/fb2a74be884e512a/layer_specs.json",
+      "size_bytes": 181,
+      "sha256": "52ffb85751349534fcf805b0cdb213bb7732f60bf72815852d921dc4c28e89a1"
+    }
+  ]
+}

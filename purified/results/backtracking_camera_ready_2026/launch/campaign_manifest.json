@@ -1,0 +1,105 @@
+{
+  "cells": [
+    {
+      "arch": "txc_base",
+      "id": "txc_base_d32768_seed1",
+      "seed": 1,
+      "width": 32768
+    },
+    {
+      "arch": "topk_sae",
+      "id": "topk_sae_d32768_seed1",
+      "seed": 1,
+      "width": 32768
+    },
+    {
+      "arch": "tsae_paper",
+      "id": "tsae_paper_d32768_seed1",
+      "seed": 1,
+      "width": 32768
+    },
+    {
+      "arch": "stacked_sae",
+      "id": "stacked_sae_d32768_seed1",
+      "seed": 1,
+      "width": 32768
+    },
+    {
+      "arch": "stacked_sae",
+      "id": "stacked_sae_d32768_seed2",
+      "seed": 2,
+      "width": 32768
+    },
+    {
+      "arch": "txc_base",
+      "id": "txc_base_d32768_seed2",
+      "seed": 2,
+      "width": 32768
+    },
+    {
+      "arch": "tsae_paper",
+      "id": "tsae_paper_d32768_seed2",
+      "seed": 2,
+      "width": 32768
+    },
+    {
+      "arch": "topk_sae",
+      "id": "topk_sae_d32768_seed2",
+      "seed": 2,
+      "width": 32768
+    },
+    {
+      "arch": "stacked_sae",
+      "id": "stacked_sae_d32768_seed42",
+      "seed": 42,
+      "width": 32768
+    },
+    {
+      "arch": "txc_base",
+      "id": "txc_base_d32768_seed42",
+      "seed": 42,
+      "width": 32768
+    },
+    {
+      "arch": "tsae_paper",
+      "id": "tsae_paper_d32768_seed42",
+      "seed": 42,
+      "width": 32768
+    },
+    {
+      "arch": "topk_sae",
+      "id": "topk_sae_d32768_seed42",
+      "seed": 42,
+      "width": 32768
+    },
+    {
+      "arch": "tsae_paper",
+      "id": "tsae_paper_d16384_seed1",
+      "seed": 1,
+      "width": 16384
+    },
+    {
+      "arch": "tsae_paper",
+      "id": "tsae_paper_d16384_seed2",
+      "seed": 2,
+      "width": 16384
+    },
+    {
+      "arch": "tsae_paper",
+      "id": "tsae_paper_d16384_seed42",
+      "seed": 42,
+      "width": 16384
+    }
+  ],
+  "completed_optimizer_steps": 300000,
+  "judging": "Deferred by user; no paid API calls",
+  "no_txc_pro": true,
+  "primary_S": 8,
+  "protocol": "c7-camera-ready-300k-v1",
+  "seeds": [
+    1,
+    2,
+    42
+  ],
+  "width_sensitivity": "T-SAE 16K and 32K, both fully trained; no global-best claim"
+}
