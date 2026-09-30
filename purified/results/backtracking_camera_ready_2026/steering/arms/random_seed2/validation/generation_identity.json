@@ -1,0 +1,43 @@
+{
+  "batch_size": 8,
+  "direction_sha256": "2a5025220f9462d62502e95a4b55f4151ea038119fd1001b59db588aa7ef407e",
+  "generation_recipe": "canonical-chat-prompt-ids-v2: add_special_tokens=False, no silent truncation, greedy bf16",
+  "hook_scope": "layer10 resid_post: all prompt and prefix positions during prefill, then every generated token",
+  "magnitudes": [
+    -12.0,
+    -8.0,
+    -4.0,
+    0.0,
+    4.0,
+    8.0,
+    12.0
+  ],
+  "model": "deepseek-ai/DeepSeek-R1-Distill-Llama-8B",
+  "model_revision": "6a6f4aa4197940add57724a7707d069478df56b1",
+  "partition": "validation",
+  "phase1_sha256": "3e8d48362f5893137bf9d388969975335219672d1a14ce915b29a373fbe8102c",
+  "protocol": "c7-heldout-steering-2026-09-v1",
+  "qids": [
+    "test/algebra/1031.json",
+    "test/algebra/1578.json",
+    "test/algebra/170.json",
+    "test/algebra/246.json",
+    "test/algebra/351.json",
+    "test/algebra/873.json",
+    "test/counting_and_probability/761.json",
+    "test/geometry/483.json",
+    "test/intermediate_algebra/1014.json",
+    "test/intermediate_algebra/149.json",
+    "test/intermediate_algebra/1544.json",
+    "test/intermediate_algebra/558.json",
+    "test/number_theory/1257.json",
+    "test/number_theory/357.json",
+    "test/number_theory/45.json",
+    "test/number_theory/928.json",
+    "test/prealgebra/260.json",
+    "test/prealgebra/977.json",
+    "test/precalculus/807.json",
+    "test/precalculus/920.json"
+  ],
+  "split_sha256": "2d29cf0d9cc7663be2b0289ceb0417da1b2e9916e68c61f44ff9b9c4133b190e"
+}

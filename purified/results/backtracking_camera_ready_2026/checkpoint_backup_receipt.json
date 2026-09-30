@@ -1,0 +1,403 @@
+{
+  "status": "verified",
+  "started_unix": 1790779111.27981,
+  "repo_id": "aniketdesh/temporal-crosscoders-backtracking-300k-2026-09-30",
+  "repo_type": "model",
+  "private": true,
+  "checkpoint_count": 15,
+  "bytes": 24308445388,
+  "files": [
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed1/model.safetensors",
+      "bytes": 2684724976,
+      "sha256": "90dda9b26a3fd9066e01871f9ab22663c178c3ecef2a8a5bf9dbe8271d0c5401"
+    },
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed1/config.json",
+      "bytes": 2183,
+      "sha256": "79ed012419f8bbea38e6ec23c869b54fdc443204e4950c2dbf5a0d678d7030eb"
+    },
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed2/model.safetensors",
+      "bytes": 2684724976,
+      "sha256": "f9989a633cc6b67dac22a75a64668e31de86bc3cb744c8d9e74f983424718829"
+    },
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed2/config.json",
+      "bytes": 2183,
+      "sha256": "325641a72ff8968a0c4671d020fdf23650d6ee787773ac9e6658a1080be162c1"
+    },
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed42/model.safetensors",
+      "bytes": 2684724976,
+      "sha256": "7f29eae9089151f9567e72197072b3dcf85d43be30a1af523ffcc64a433ae396"
+    },
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed42/config.json",
+      "bytes": 2189,
+      "sha256": "4e1b9309180ac1af12cf2a026e3d551a31470b9dd0f1ee7dfdd233e17134cadb"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed1/model.safetensors",
+      "bytes": 1073889608,
+      "sha256": "dc08e4296cd5e057bbea2ce6ba9a4e84209a48d207e45cefa0e5cf5eb2fd2735"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed1/config.json",
+      "bytes": 2187,
+      "sha256": "b757559f8787678372b3af930ec1e226620cb635f0d12b710a77e4cf0b412fa9"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed2/model.safetensors",
+      "bytes": 1073889608,
+      "sha256": "9158926bca4c97601271e38e3d06f5a05ca518effe59ed97904fcfff5c0b4e18"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed2/config.json",
+      "bytes": 2190,
+      "sha256": "9690207a5db94a01ef4c7f2fd40c33d24f63138d0ca810815d91542947b5a6c2"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed42/model.safetensors",
+      "bytes": 1073889608,
+      "sha256": "bf954f79e3d27612ee8fe709841824eb9c189c44d9c2d8740156f53ddecfc7cd"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed42/config.json",
+      "bytes": 2195,
+      "sha256": "11f605919742ff1160c9456d24ed6e9a5ecaf037a6eca59e7f9ce79e9d98430b"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed1/model.safetensors",
+      "bytes": 537084536,
+      "sha256": "f5c59f634a63fffb78270b1c7e4927dc751655d1f430f66bb3577afec0299a37"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed1/config.json",
+      "bytes": 2299,
+      "sha256": "8a27dad943b2d539821e5140bb348695b46291fd51c36d561f83e46f0265ea28"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed2/model.safetensors",
+      "bytes": 537084536,
+      "sha256": "89dabb088ccb097e79337b9ff25bdf2a3d1958d25b51d3868f4938686aba0e91"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed2/config.json",
+      "bytes": 2298,
+      "sha256": "50b7027d27f7c448bc1017e7c600909537df70f041b4bd30ade120920efbcdd3"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed42/model.safetensors",
+      "bytes": 537084536,
+      "sha256": "be6fc4ef8f1519f4ab468a2c3231cd4d002688351cd48ce45d781ddab6c3455c"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed42/config.json",
+      "bytes": 2297,
+      "sha256": "32e6f27684f7fd723e5b8c29243c486a138cfd86378d12ae5f918082f3d0a340"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed1/model.safetensors",
+      "bytes": 1074152064,
+      "sha256": "bcab2698b2d39a8851a18dcf347f95cb65ea60aea7ccfa2c6f308b282f1f09aa"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed1/config.json",
+      "bytes": 2295,
+      "sha256": "f068b9ff455e6e8b3ca49caeb78b47886c2f1ba689ffc4c2607c3317b36b3ab4"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed2/model.safetensors",
+      "bytes": 1074152064,
+      "sha256": "26693cf1ba2c73d22f3b9664a8d711af28dd542af98974fb3726410271dbc92e"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed2/config.json",
+      "bytes": 2293,
+      "sha256": "516f0235d579c07bb2d1743a9715b20a86089e36bf1783b4cb21b5b9d8a94c0a"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed42/model.safetensors",
+      "bytes": 1074152064,
+      "sha256": "65e0f344801a6ad55b6220c2a6e2a70aa23c2e5918c19bdf1390d2f713dd3316"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed42/config.json",
+      "bytes": 2295,
+      "sha256": "3d618efbcde5799827f6fbc64997065ca1a2029c59784bd8a03709a18d581ccd"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed1/model.safetensors",
+      "bytes": 2684723624,
+      "sha256": "4cd97b4da888d16edddaf592ce9e8f3cc35801dee993bd79a8678d50bfb76e36"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed1/config.json",
+      "bytes": 2374,
+      "sha256": "1c6564cf98ac98ec32707a517efd61f7a4c5f90497a6cebdb8fc613284e334ba"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed2/model.safetensors",
+      "bytes": 2684723624,
+      "sha256": "8720cbc038e90601a88f5c435c988482881e205e641c53335b6abc1d08dc14ac"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed2/config.json",
+      "bytes": 2376,
+      "sha256": "97dc07f2d7015c000f1f3caf279719b79a3b14e103bc710fcaf0a95d15ba2435"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed42/model.safetensors",
+      "bytes": 2684723624,
+      "sha256": "7f1fe6f1aa7f125f32812c17147eebf24e5137a73b43340eea42c49679226006"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed42/config.json",
+      "bytes": 2380,
+      "sha256": "a6b7cd5b5a3564903d07b078e34d83e4f6e565511d29d259b266219be33b2ebd"
+    },
+    {
+      "path": "results/backtracking_compact_results.zip",
+      "bytes": 144501782,
+      "sha256": "ba8e50bdc80d002b3820b4308afd6416c6b6c9055c4810670ccf91edf73bb030"
+    },
+    {
+      "path": "source/historical_recovery_source.tar.gz",
+      "bytes": 162420,
+      "sha256": "dcc29bdfc03a9aa913d49d94af889c1cd1ab351504da9d7c0fb85f540e3443b6"
+    },
+    {
+      "path": "source/backup_checkpoints_hf.py",
+      "bytes": 11613,
+      "sha256": "c0fc59df5aa30066792d4b4e7c8ab347baa1918f4207ea349e87979f30e61592"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1860,
+      "sha256": "76796e7dd77454ed3771bf521d7db2aeb0a9437a4c4ea338a3ac233ee11bcc3f"
+    },
+    {
+      "path": "checkpoint_manifest.json",
+      "bytes": 9255,
+      "sha256": "a30ab293474382dd9eb0e646caa57e66e38853cb303c9ffa2325ad229bcc39fb"
+    }
+  ],
+  "revision": "e0b19fd1cbd739be38f76d066441c848b5354b92",
+  "repo_url": "https://huggingface.co/aniketdesh/temporal-crosscoders-backtracking-300k-2026-09-30",
+  "verified_files": [
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed1/model.safetensors",
+      "bytes": 2684724976,
+      "sha256": "90dda9b26a3fd9066e01871f9ab22663c178c3ecef2a8a5bf9dbe8271d0c5401",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed1/config.json",
+      "bytes": 2183,
+      "sha256": "79ed012419f8bbea38e6ec23c869b54fdc443204e4950c2dbf5a0d678d7030eb",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed2/model.safetensors",
+      "bytes": 2684724976,
+      "sha256": "f9989a633cc6b67dac22a75a64668e31de86bc3cb744c8d9e74f983424718829",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed2/config.json",
+      "bytes": 2183,
+      "sha256": "325641a72ff8968a0c4671d020fdf23650d6ee787773ac9e6658a1080be162c1",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed42/model.safetensors",
+      "bytes": 2684724976,
+      "sha256": "7f29eae9089151f9567e72197072b3dcf85d43be30a1af523ffcc64a433ae396",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/stacked_sae_d32768_seed42/config.json",
+      "bytes": 2189,
+      "sha256": "4e1b9309180ac1af12cf2a026e3d551a31470b9dd0f1ee7dfdd233e17134cadb",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed1/model.safetensors",
+      "bytes": 1073889608,
+      "sha256": "dc08e4296cd5e057bbea2ce6ba9a4e84209a48d207e45cefa0e5cf5eb2fd2735",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed1/config.json",
+      "bytes": 2187,
+      "sha256": "b757559f8787678372b3af930ec1e226620cb635f0d12b710a77e4cf0b412fa9",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed2/model.safetensors",
+      "bytes": 1073889608,
+      "sha256": "9158926bca4c97601271e38e3d06f5a05ca518effe59ed97904fcfff5c0b4e18",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed2/config.json",
+      "bytes": 2190,
+      "sha256": "9690207a5db94a01ef4c7f2fd40c33d24f63138d0ca810815d91542947b5a6c2",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed42/model.safetensors",
+      "bytes": 1073889608,
+      "sha256": "bf954f79e3d27612ee8fe709841824eb9c189c44d9c2d8740156f53ddecfc7cd",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/topk_sae_d32768_seed42/config.json",
+      "bytes": 2195,
+      "sha256": "11f605919742ff1160c9456d24ed6e9a5ecaf037a6eca59e7f9ce79e9d98430b",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed1/model.safetensors",
+      "bytes": 537084536,
+      "sha256": "f5c59f634a63fffb78270b1c7e4927dc751655d1f430f66bb3577afec0299a37",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed1/config.json",
+      "bytes": 2299,
+      "sha256": "8a27dad943b2d539821e5140bb348695b46291fd51c36d561f83e46f0265ea28",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed2/model.safetensors",
+      "bytes": 537084536,
+      "sha256": "89dabb088ccb097e79337b9ff25bdf2a3d1958d25b51d3868f4938686aba0e91",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed2/config.json",
+      "bytes": 2298,
+      "sha256": "50b7027d27f7c448bc1017e7c600909537df70f041b4bd30ade120920efbcdd3",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed42/model.safetensors",
+      "bytes": 537084536,
+      "sha256": "be6fc4ef8f1519f4ab468a2c3231cd4d002688351cd48ce45d781ddab6c3455c",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d16384_seed42/config.json",
+      "bytes": 2297,
+      "sha256": "32e6f27684f7fd723e5b8c29243c486a138cfd86378d12ae5f918082f3d0a340",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed1/model.safetensors",
+      "bytes": 1074152064,
+      "sha256": "bcab2698b2d39a8851a18dcf347f95cb65ea60aea7ccfa2c6f308b282f1f09aa",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed1/config.json",
+      "bytes": 2295,
+      "sha256": "f068b9ff455e6e8b3ca49caeb78b47886c2f1ba689ffc4c2607c3317b36b3ab4",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed2/model.safetensors",
+      "bytes": 1074152064,
+      "sha256": "26693cf1ba2c73d22f3b9664a8d711af28dd542af98974fb3726410271dbc92e",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed2/config.json",
+      "bytes": 2293,
+      "sha256": "516f0235d579c07bb2d1743a9715b20a86089e36bf1783b4cb21b5b9d8a94c0a",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed42/model.safetensors",
+      "bytes": 1074152064,
+      "sha256": "65e0f344801a6ad55b6220c2a6e2a70aa23c2e5918c19bdf1390d2f713dd3316",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/tsae_paper_d32768_seed42/config.json",
+      "bytes": 2295,
+      "sha256": "3d618efbcde5799827f6fbc64997065ca1a2029c59784bd8a03709a18d581ccd",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed1/model.safetensors",
+      "bytes": 2684723624,
+      "sha256": "4cd97b4da888d16edddaf592ce9e8f3cc35801dee993bd79a8678d50bfb76e36",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed1/config.json",
+      "bytes": 2374,
+      "sha256": "1c6564cf98ac98ec32707a517efd61f7a4c5f90497a6cebdb8fc613284e334ba",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed2/model.safetensors",
+      "bytes": 2684723624,
+      "sha256": "8720cbc038e90601a88f5c435c988482881e205e641c53335b6abc1d08dc14ac",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed2/config.json",
+      "bytes": 2376,
+      "sha256": "97dc07f2d7015c000f1f3caf279719b79a3b14e103bc710fcaf0a95d15ba2435",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed42/model.safetensors",
+      "bytes": 2684723624,
+      "sha256": "7f1fe6f1aa7f125f32812c17147eebf24e5137a73b43340eea42c49679226006",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "checkpoints/txc_base_d32768_seed42/config.json",
+      "bytes": 2380,
+      "sha256": "a6b7cd5b5a3564903d07b078e34d83e4f6e565511d29d259b266219be33b2ebd",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "results/backtracking_compact_results.zip",
+      "bytes": 144501782,
+      "sha256": "ba8e50bdc80d002b3820b4308afd6416c6b6c9055c4810670ccf91edf73bb030",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "source/historical_recovery_source.tar.gz",
+      "bytes": 162420,
+      "sha256": "dcc29bdfc03a9aa913d49d94af889c1cd1ab351504da9d7c0fb85f540e3443b6",
+      "verification": "Hub LFS SHA-256 and byte size match source"
+    },
+    {
+      "path": "source/backup_checkpoints_hf.py",
+      "bytes": 11613,
+      "sha256": "c0fc59df5aa30066792d4b4e7c8ab347baa1918f4207ea349e87979f30e61592",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "README.md",
+      "bytes": 1860,
+      "sha256": "76796e7dd77454ed3771bf521d7db2aeb0a9437a4c4ea338a3ac233ee11bcc3f",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    },
+    {
+      "path": "checkpoint_manifest.json",
+      "bytes": 9255,
+      "sha256": "a30ab293474382dd9eb0e646caa57e66e38853cb303c9ffa2325ad229bcc39fb",
+      "verification": "downloaded at pinned revision and SHA-256 checked"
+    }
+  ],
+  "finished_unix": 1790779211.9180996,
+  "preserved": "All final 300K dictionary weights/configs and compact experiment outputs",
+  "pod_action": "No pod stop/delete action taken"
+}

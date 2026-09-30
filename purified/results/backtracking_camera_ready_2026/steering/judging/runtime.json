@@ -1,0 +1,7 @@
+{
+  "python": "3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]",
+  "openai_sdk": "3.22.0",
+  "numpy": "2.1.2",
+  "judge_model": "gpt-6-luna",
+  "model_alias_note": "The API returns gpt-6-luna; every raw response preserves the returned model ID. No dated snapshot ID was advertised."
+}

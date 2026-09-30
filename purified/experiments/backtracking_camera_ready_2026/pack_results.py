@@ -12,6 +12,9 @@ def main(root, destination):
             continue
         if path.suffix in ('.json','.jsonl','.csv','.md','.txt','.tex','.png','.pdf','.svg') or path.name.endswith('.oof.npz') or path.name=='code_snapshot.tar.gz':
             candidates.append(path)
+    judge_progress=root/'steering/judging/progress.json'
+    judge_status=json.loads(judge_progress.read_text()) if judge_progress.exists() else None
+    judging=(f"OpenAI judging status: {judge_status['status']}; model {judge_status['model']}. Validation selections gate test judging." if judge_status else 'No paid judging performed; test candidate panels must remain blinded until validation selection.')
     records=[]
     destination.parent.mkdir(parents=True,exist_ok=True)
     temporary=destination.with_suffix('.zip.tmp')
@@ -22,8 +25,8 @@ def main(root, destination):
             archive.writestr(relative,data)
             records.append(dict(path=relative,bytes=len(data),sha256=hashlib.sha256(data).hexdigest()))
         archive.writestr('bundle_manifest.json',json.dumps(dict(files=records,
-            excluded='Model/optimizer weights, activation caches, and sparse full-dictionary code matrices remain on the pod.',
-            judging='No paid judging performed; test candidate panels must remain blinded until validation selection.'),indent=2))
+            excluded='Model/optimizer weights, activation caches, and sparse full-dictionary code matrices are excluded; see checkpoint_backup_receipt.json for durable final weights.',
+            judging=judging),indent=2))
     temporary.replace(destination)
     print(json.dumps(dict(bundle=str(destination),files=len(records),bytes=destination.stat().st_size)),flush=True)
 

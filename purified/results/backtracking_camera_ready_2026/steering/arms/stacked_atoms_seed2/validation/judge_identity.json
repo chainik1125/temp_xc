@@ -1,0 +1,10 @@
+{
+  "generation_identity": "34e4fb5f01107f052611986cb5952398e1db25372ec45f7af39fa2264928cc36",
+  "model": "gpt-6-luna",
+  "provider": "openai-deferred-batch",
+  "rubric_hashes": {
+    "backtracking": "b0cefa673eb478d27785b324a0820da36676d90922842c203219140f928e5b17",
+    "coherence": "64a6618e48c67324e177ccf790874153326d048da08d9340c2b3299d430f81d0"
+  },
+  "truncation": "historical count prompt: prompt1500/generation6000; coherence6000"
+}

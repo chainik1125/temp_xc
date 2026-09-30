@@ -1,0 +1,20 @@
+{
+  "accounted_usd": 1.1816806749999997,
+  "api_calls": 8779,
+  "arms": 27,
+  "budget_usd": 9.0,
+  "failed_requests": 0,
+  "model": "gpt-6-luna",
+  "new_labels_this_invocation": 7767,
+  "reserved_usd": 4.575333167888829e-17,
+  "status": "complete",
+  "test_questions_per_arm": 100,
+  "test_summaries": 27,
+  "updated_unix": 1790782734.2054265,
+  "validation_questions_per_arm": 20,
+  "figures_generated": true,
+  "all_final_dictionaries_300k": true,
+  "checkpoints_hf_revision": "e0b19fd1cbd739be38f76d066441c848b5354b92",
+  "source_snapshot_sha256": "9f7741ad9231884dcfc6da16da3bc4a12ab886ee65fcf37a09e770f1eccf34d1",
+  "finished_unix": 1790783360.2293806
+}

@@ -1,0 +1,5 @@
+{
+  "cache_write_usd_per_million": 0.125,
+  "note": "Recompute all ledger usage including pilot with explicit cache-write pricing; original pilot ledger retained.",
+  "version": 2
+}

@@ -1,11 +1,12 @@
 # Backtracking camera-ready campaign, September 29, 2026
 
 This directory implements the authorized rerun on four H100 80 GB GPUs.
-TXC-pro is excluded. Paid judging is explicitly deferred to the user.
+TXC-pro is excluded. Paid judging was initially deferred; the user authorized
+OpenAI judging on September 30 under the previously stated $9.88 balance.
 
 ## Frozen training comparison
 
-- TXC-base, shared TopK SAE, T-SAE 32K, and independent-position Stacked:
+- TXC, shared TopK SAE, T-SAE 32K, and independent-position Stacked:
   seeds **1, 2, 42**, each at **300,000 completed optimizer steps**.
 - T-SAE 16K: the same three seeds and 300K steps, separately labeled width
   sensitivity. This bounded comparison does not establish a globally best
@@ -49,7 +50,7 @@ within their original folds. These intervals condition on the trained models
 and fitted probes; paired differences across dictionary seeds have their own
 sample SD. Neither quantity is substituted for the other.
 
-## Steering and deferred judging
+## Steering and separate judging
 
 The fixed cohort has 20 validation and 100 test questions from pinned MATH-500,
 excluding the historical 61 steering questions and exact normalized mining
@@ -73,10 +74,9 @@ in the generation identity; it is not a continuation-only intervention.
 Generations are persisted before judging. Test candidate panels remain
 ungraded and cannot be exported for judging until validation labels select
 one signed magnitude. Placeholder validation exports live in `judge_template/`;
-they are **not submission-ready**. Later choose an available OpenAI model and
-check its total cost against the user's **$9.88 API balance** before submitting.
-This code makes no API calls. `export-judge`, `import-judge`, `select`, `unlock`,
-and `summarize` prepare and analyze the later user-operated judging stage.
+they are **not submission-ready**. The original generation module makes no API calls. The September 30
+OpenAI stage described below now operates `export-judge`, `import-judge`,
+`select`, `unlock`, and `summarize` against the user-authorized API budget.
 
 ## Execution and artifacts
 
@@ -130,3 +130,29 @@ probe repairs, not dictionary retraining or outcome-based parameter choices.
 The protocol follows the [focused audit](../../docs/aniket/camera-ready-2026/backtracking-focus-plan.md),
 the [NeurIPS discussion](https://openreview.net/forum?id=Z27xj38Fta), and the
 [ICML workshop discussion](https://openreview.net/forum?id=JfN7nRdBxA).
+
+## Authorized OpenAI judging and durable checkpoint backup
+
+`judge_openai.py` uses `gpt-6-luna` via Responses with low reasoning and at
+most 1,024 output tokens per request. The original backtracking/coherence
+rubrics and selection objective are preserved. The runner deduplicates exact
+request bodies, records raw responses and token usage (including cache writes
+and reasoning), and conservatively reserves each in-flight request against
+a $9 cap. All 27 validation selections are frozen before any test export.
+Responses are explicitly adapted into the existing importer; both source
+response hashes and delivery settings are retained. Luna judgments are not
+human calibration or evidence of agreement with the historical Claude judge.
+
+The 24-request pilot returned 24 valid labels. Behavioral tests cover
+parsing, cache-write billing, stopping before dispatch at the budget limit,
+and refusing test export after an incomplete validation selection.
+`summarize_steering.py` replays all paired effects from labels, then exports
+Nord PDF/SVG/PNG figures and per-question/per-seed tables without changing
+the manuscript. It requires completed judging across all 27 arms.
+
+`backup_checkpoints_hf.py` privately backed up all 15 final 300K dictionaries
+and the pre-judging compact results bundle, verifying byte sizes and hashes
+at Hugging Face revision `e0b19fd1cbd739be38f76d066441c848b5354b92` in
+`aniketdesh/temporal-crosscoders-backtracking-300k-2026-09-30`. The backup
+receipt is saved locally. Post-judging outputs require their own updated
+results backup; the verified checkpoint revision remains immutable.

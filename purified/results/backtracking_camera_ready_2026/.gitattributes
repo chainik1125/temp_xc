@@ -1,3 +1,3 @@
 # Matplotlib emits whitespace inside SVG path strings; the standard CSV writer uses CRLF.
-publication/detection/*.svg whitespace=-blank-at-eol
+publication/**/*.svg whitespace=-blank-at-eol
 publication/**/*.csv whitespace=cr-at-eol

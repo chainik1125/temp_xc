@@ -1,0 +1,10 @@
+{
+  "generation_identity": "b23b09410418372406054b4f8652111adcaa041d8a23b47743588780a9bc021b",
+  "model": "__CHOOSE_MODEL_BEFORE_SUBMISSION__",
+  "provider": "openai-deferred-batch",
+  "rubric_hashes": {
+    "backtracking": "b0cefa673eb478d27785b324a0820da36676d90922842c203219140f928e5b17",
+    "coherence": "64a6618e48c67324e177ccf790874153326d048da08d9340c2b3299d430f81d0"
+  },
+  "truncation": "historical count prompt: prompt1500/generation6000; coherence6000"
+}

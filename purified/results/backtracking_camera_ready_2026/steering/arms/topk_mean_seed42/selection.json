@@ -1,0 +1,19 @@
+{
+  "direction_sha256": "076e3743fe9b1445f12cf30144b6b9432b7c3b7bfd5ba6f6bc61254dde6a41ff",
+  "magnitude": -12.0,
+  "objective": "mean coherent genuine-backtracking count minus matched zero intervention",
+  "phase1_sha256": "3e8d48362f5893137bf9d388969975335219672d1a14ce915b29a373fbe8102c",
+  "protocol": "c7-heldout-steering-2026-09-v1",
+  "tie_break": "smallest absolute magnitude, then signed value",
+  "validation_curve": {
+    "-12.0": 0.6,
+    "-4.0": 0.0,
+    "-8.0": 0.05,
+    "0.0": 0.0,
+    "12.0": -0.1,
+    "4.0": -0.05,
+    "8.0": -0.05
+  },
+  "validation_generations_sha256": "1216441a30d71d8d50e1cff2e057e4db1ae15bbd5d237cae36009bcf7b70cd8c",
+  "validation_judgments_sha256": "db571bde02449bf9ea326096e6aeb2a7dd6fd153cc4f4df372e1b1421882491b"
+}

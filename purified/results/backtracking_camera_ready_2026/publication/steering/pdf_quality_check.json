@@ -1,0 +1,16 @@
+[
+  {
+    "file": "steering_effects.pdf",
+    "sha256": "546aa878afd853c69f01d1848ac13d7b03164300cacbcb912c89bbb0e66bed11",
+    "page_size": "Page size:       396 x 190.8 pts",
+    "embedded_truetype_fonts": true,
+    "visual_review": "Pass: final Poppler rendering inspected; no clipping/overlap; no embedded titles/captions"
+  },
+  {
+    "file": "steering_validation_curves.pdf",
+    "sha256": "ddf4ed82ef50b07d6c3c8471ddd3bd210fe622f812b91423d1209c95d99c2272",
+    "page_size": "Page size:       396 x 172.8 pts",
+    "embedded_truetype_fonts": true,
+    "visual_review": "Pass: final Poppler rendering inspected; no clipping/overlap; no embedded titles/captions"
+  }
+]

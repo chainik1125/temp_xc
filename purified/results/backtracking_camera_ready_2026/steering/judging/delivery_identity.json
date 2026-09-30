@@ -1,0 +1,16 @@
+{
+  "adapter": "original Responses body archived; output_text mapped to choices[0].message.content",
+  "cached_input_usd_per_million": 0.01,
+  "deduplication": "exact request body including model and inference settings",
+  "endpoint": "/v1/responses",
+  "input_usd_per_million": 0.1,
+  "max_output_tokens": 1024,
+  "model": "gpt-6-luna",
+  "output_usd_per_million": 0.5,
+  "pricing_checked": "2026-09-30",
+  "pricing_source": "https://developers.openai.com/api/docs/models/gpt-6-luna",
+  "reasoning_effort": "low",
+  "rubric": "historical prompts verbatim",
+  "service_tier": "default",
+  "store": false
+}

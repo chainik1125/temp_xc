@@ -1,0 +1,136 @@
+arm,label,seed,magnitude,metric,baseline_mean,treated_mean,paired_delta
+txc_base,TXC,1,8.0,gc,0.21,0.24,0.03
+txc_base,TXC,1,8.0,coherent_gc,0.21,0.23,0.02
+txc_base,TXC,1,8.0,coherent_bt,0.2,0.21,0.01
+txc_base,TXC,1,8.0,incoherent,0.0,0.04,0.04
+txc_base,TXC,1,8.0,correct,0.34,0.32,-0.02
+txc_base,TXC,2,4.0,gc,0.21,0.28,0.07
+txc_base,TXC,2,4.0,coherent_gc,0.21,0.26,0.05
+txc_base,TXC,2,4.0,coherent_bt,0.2,0.21,0.01
+txc_base,TXC,2,4.0,incoherent,0.0,0.01,0.01
+txc_base,TXC,2,4.0,correct,0.34,0.24,-0.1
+txc_base,TXC,42,-8.0,gc,0.21,0.25,0.04
+txc_base,TXC,42,-8.0,coherent_gc,0.21,0.25,0.04
+txc_base,TXC,42,-8.0,coherent_bt,0.2,0.21,0.01
+txc_base,TXC,42,-8.0,incoherent,0.0,0.0,0.0
+txc_base,TXC,42,-8.0,correct,0.34,0.23,-0.11
+topk_last,SAE · last,1,8.0,gc,0.21,0.26,0.05
+topk_last,SAE · last,1,8.0,coherent_gc,0.21,0.26,0.05
+topk_last,SAE · last,1,8.0,coherent_bt,0.2,0.22,0.02
+topk_last,SAE · last,1,8.0,incoherent,0.0,0.0,0.0
+topk_last,SAE · last,1,8.0,correct,0.34,0.33,-0.01
+topk_last,SAE · last,2,-12.0,gc,0.21,0.31,0.1
+topk_last,SAE · last,2,-12.0,coherent_gc,0.21,0.3,0.09
+topk_last,SAE · last,2,-12.0,coherent_bt,0.2,0.24,0.04
+topk_last,SAE · last,2,-12.0,incoherent,0.0,0.01,0.01
+topk_last,SAE · last,2,-12.0,correct,0.34,0.2,-0.14
+topk_last,SAE · last,42,-12.0,gc,0.21,0.45,0.24
+topk_last,SAE · last,42,-12.0,coherent_gc,0.21,0.39,0.18
+topk_last,SAE · last,42,-12.0,coherent_bt,0.2,0.31,0.11
+topk_last,SAE · last,42,-12.0,incoherent,0.0,0.1,0.1
+topk_last,SAE · last,42,-12.0,correct,0.34,0.23,-0.11
+topk_mean,SAE · mean,1,8.0,gc,0.21,0.26,0.05
+topk_mean,SAE · mean,1,8.0,coherent_gc,0.21,0.26,0.05
+topk_mean,SAE · mean,1,8.0,coherent_bt,0.2,0.22,0.02
+topk_mean,SAE · mean,1,8.0,incoherent,0.0,0.0,0.0
+topk_mean,SAE · mean,1,8.0,correct,0.34,0.33,-0.01
+topk_mean,SAE · mean,2,12.0,gc,0.21,0.41,0.2
+topk_mean,SAE · mean,2,12.0,coherent_gc,0.21,0.4,0.19
+topk_mean,SAE · mean,2,12.0,coherent_bt,0.2,0.32,0.12
+topk_mean,SAE · mean,2,12.0,incoherent,0.0,0.03,0.03
+topk_mean,SAE · mean,2,12.0,correct,0.34,0.13,-0.21
+topk_mean,SAE · mean,42,-12.0,gc,0.21,0.83,0.62
+topk_mean,SAE · mean,42,-12.0,coherent_gc,0.21,0.48,0.27
+topk_mean,SAE · mean,42,-12.0,coherent_bt,0.2,0.32,0.12
+topk_mean,SAE · mean,42,-12.0,incoherent,0.0,0.3,0.3
+topk_mean,SAE · mean,42,-12.0,correct,0.34,0.05,-0.29
+topk_max,SAE · max,1,-4.0,gc,0.21,0.24,0.03
+topk_max,SAE · max,1,-4.0,coherent_gc,0.21,0.24,0.03
+topk_max,SAE · max,1,-4.0,coherent_bt,0.2,0.19,-0.01
+topk_max,SAE · max,1,-4.0,incoherent,0.0,0.0,0.0
+topk_max,SAE · max,1,-4.0,correct,0.34,0.28,-0.06
+topk_max,SAE · max,2,12.0,gc,0.21,0.69,0.48
+topk_max,SAE · max,2,12.0,coherent_gc,0.21,0.53,0.32
+topk_max,SAE · max,2,12.0,coherent_bt,0.2,0.34,0.14
+topk_max,SAE · max,2,12.0,incoherent,0.0,0.19,0.19
+topk_max,SAE · max,2,12.0,correct,0.34,0.09,-0.25
+topk_max,SAE · max,42,-12.0,gc,0.21,0.83,0.62
+topk_max,SAE · max,42,-12.0,coherent_gc,0.21,0.48,0.27
+topk_max,SAE · max,42,-12.0,coherent_bt,0.2,0.32,0.12
+topk_max,SAE · max,42,-12.0,incoherent,0.0,0.3,0.3
+topk_max,SAE · max,42,-12.0,correct,0.34,0.05,-0.29
+tsae_last,T-SAE · last,1,-4.0,gc,0.21,0.33,0.12
+tsae_last,T-SAE · last,1,-4.0,coherent_gc,0.21,0.33,0.12
+tsae_last,T-SAE · last,1,-4.0,coherent_bt,0.2,0.23,0.03
+tsae_last,T-SAE · last,1,-4.0,incoherent,0.0,0.0,0.0
+tsae_last,T-SAE · last,1,-4.0,correct,0.34,0.3,-0.04
+tsae_last,T-SAE · last,2,-4.0,gc,0.21,0.22,0.01
+tsae_last,T-SAE · last,2,-4.0,coherent_gc,0.21,0.22,0.01
+tsae_last,T-SAE · last,2,-4.0,coherent_bt,0.2,0.19,-0.01
+tsae_last,T-SAE · last,2,-4.0,incoherent,0.0,0.0,0.0
+tsae_last,T-SAE · last,2,-4.0,correct,0.34,0.3,-0.04
+tsae_last,T-SAE · last,42,-4.0,gc,0.21,0.26,0.05
+tsae_last,T-SAE · last,42,-4.0,coherent_gc,0.21,0.25,0.04
+tsae_last,T-SAE · last,42,-4.0,coherent_bt,0.2,0.21,0.01
+tsae_last,T-SAE · last,42,-4.0,incoherent,0.0,0.01,0.01
+tsae_last,T-SAE · last,42,-4.0,correct,0.34,0.29,-0.05
+tsae_mean,T-SAE · mean,1,-4.0,gc,0.21,0.33,0.12
+tsae_mean,T-SAE · mean,1,-4.0,coherent_gc,0.21,0.33,0.12
+tsae_mean,T-SAE · mean,1,-4.0,coherent_bt,0.2,0.23,0.03
+tsae_mean,T-SAE · mean,1,-4.0,incoherent,0.0,0.0,0.0
+tsae_mean,T-SAE · mean,1,-4.0,correct,0.34,0.3,-0.04
+tsae_mean,T-SAE · mean,2,-4.0,gc,0.21,0.22,0.01
+tsae_mean,T-SAE · mean,2,-4.0,coherent_gc,0.21,0.22,0.01
+tsae_mean,T-SAE · mean,2,-4.0,coherent_bt,0.2,0.19,-0.01
+tsae_mean,T-SAE · mean,2,-4.0,incoherent,0.0,0.0,0.0
+tsae_mean,T-SAE · mean,2,-4.0,correct,0.34,0.3,-0.04
+tsae_mean,T-SAE · mean,42,-4.0,gc,0.21,0.26,0.05
+tsae_mean,T-SAE · mean,42,-4.0,coherent_gc,0.21,0.25,0.04
+tsae_mean,T-SAE · mean,42,-4.0,coherent_bt,0.2,0.21,0.01
+tsae_mean,T-SAE · mean,42,-4.0,incoherent,0.0,0.01,0.01
+tsae_mean,T-SAE · mean,42,-4.0,correct,0.34,0.29,-0.05
+tsae_max,T-SAE · max,1,8.0,gc,0.21,0.26,0.05
+tsae_max,T-SAE · max,1,8.0,coherent_gc,0.21,0.26,0.05
+tsae_max,T-SAE · max,1,8.0,coherent_bt,0.2,0.21,0.01
+tsae_max,T-SAE · max,1,8.0,incoherent,0.0,0.0,0.0
+tsae_max,T-SAE · max,1,8.0,correct,0.34,0.19,-0.15
+tsae_max,T-SAE · max,2,-4.0,gc,0.21,0.22,0.01
+tsae_max,T-SAE · max,2,-4.0,coherent_gc,0.21,0.22,0.01
+tsae_max,T-SAE · max,2,-4.0,coherent_bt,0.2,0.19,-0.01
+tsae_max,T-SAE · max,2,-4.0,incoherent,0.0,0.0,0.0
+tsae_max,T-SAE · max,2,-4.0,correct,0.34,0.3,-0.04
+tsae_max,T-SAE · max,42,-4.0,gc,0.21,0.26,0.05
+tsae_max,T-SAE · max,42,-4.0,coherent_gc,0.21,0.25,0.04
+tsae_max,T-SAE · max,42,-4.0,coherent_bt,0.2,0.21,0.01
+tsae_max,T-SAE · max,42,-4.0,incoherent,0.0,0.01,0.01
+tsae_max,T-SAE · max,42,-4.0,correct,0.34,0.29,-0.05
+stacked_atoms,Stacked SAE,1,8.0,gc,0.21,0.25,0.04
+stacked_atoms,Stacked SAE,1,8.0,coherent_gc,0.21,0.24,0.03
+stacked_atoms,Stacked SAE,1,8.0,coherent_bt,0.2,0.18,-0.02
+stacked_atoms,Stacked SAE,1,8.0,incoherent,0.0,0.03,0.03
+stacked_atoms,Stacked SAE,1,8.0,correct,0.34,0.31,-0.03
+stacked_atoms,Stacked SAE,2,8.0,gc,0.21,0.31,0.1
+stacked_atoms,Stacked SAE,2,8.0,coherent_gc,0.21,0.29,0.08
+stacked_atoms,Stacked SAE,2,8.0,coherent_bt,0.2,0.24,0.04
+stacked_atoms,Stacked SAE,2,8.0,incoherent,0.0,0.03,0.03
+stacked_atoms,Stacked SAE,2,8.0,correct,0.34,0.35,0.01
+stacked_atoms,Stacked SAE,42,-8.0,gc,0.21,0.3,0.09
+stacked_atoms,Stacked SAE,42,-8.0,coherent_gc,0.21,0.27,0.06
+stacked_atoms,Stacked SAE,42,-8.0,coherent_bt,0.2,0.24,0.04
+stacked_atoms,Stacked SAE,42,-8.0,incoherent,0.0,0.01,0.01
+stacked_atoms,Stacked SAE,42,-8.0,correct,0.34,0.23,-0.11
+random,Random,1,-8.0,gc,0.21,0.22,0.01
+random,Random,1,-8.0,coherent_gc,0.21,0.22,0.01
+random,Random,1,-8.0,coherent_bt,0.2,0.18,-0.02
+random,Random,1,-8.0,incoherent,0.0,0.0,0.0
+random,Random,1,-8.0,correct,0.34,0.21,-0.13
+random,Random,2,-12.0,gc,0.21,0.32,0.11
+random,Random,2,-12.0,coherent_gc,0.21,0.31,0.1
+random,Random,2,-12.0,coherent_bt,0.2,0.24,0.04
+random,Random,2,-12.0,incoherent,0.0,0.03,0.03
+random,Random,2,-12.0,correct,0.34,0.29,-0.05
+random,Random,42,12.0,gc,0.21,0.31,0.1
+random,Random,42,12.0,coherent_gc,0.21,0.31,0.1
+random,Random,42,12.0,coherent_bt,0.2,0.26,0.06
+random,Random,42,12.0,incoherent,0.0,0.0,0.0
+random,Random,42,12.0,correct,0.34,0.32,-0.02

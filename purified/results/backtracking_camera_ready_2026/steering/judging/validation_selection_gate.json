@@ -1,0 +1,32 @@
+{
+  "policy": "All 27 validation selections frozen before test export or judging",
+  "selections": {
+    "random_seed1": "e2741ee62a2fb6d26bc6b482934b53962acf96784d68ecbb3aa921c10c4b3324",
+    "random_seed2": "6edf17a5b35f832f1a7b2d37a5f324f76c94066a1a6d316f766a7130c55377a8",
+    "random_seed42": "9557e66dc828f898d5669566aa3c706675961183c5d90b3f00f33a6d710229e5",
+    "stacked_atoms_seed1": "74955facb0f1ef3c27479682f319394d9f5843779307e7827728526a68e0417a",
+    "stacked_atoms_seed2": "a613ba866b0fe3f6405e1c8c99405c1fbf588aa9cbb8f53ea78e275ef7b6781e",
+    "stacked_atoms_seed42": "b5f8495e2cb76e7cbab9607413b388b750b06a1eae34485010c72f659e8e6978",
+    "topk_last_seed1": "b82ca529b62ae6a39e751591214c4f58aae0f1a44f5e22d1bbce093aedbda9a7",
+    "topk_last_seed2": "de3cffb721f1706e7c22cc20082144aceab61a3808964527421e7486e21b3520",
+    "topk_last_seed42": "efb331ad4774f33e52410ee7a2fcb18772310e76338b5aecfc78ff1e9f59860f",
+    "topk_max_seed1": "8182619bc5a228a872c7b0b689c6739b7198adfcb0a1308b842b84b85ea92099",
+    "topk_max_seed2": "b2568549fe3f086f0973aeb6e8555237ee5010d3f039e197a159875bac750151",
+    "topk_max_seed42": "5b2ba512f41e6abf7da2613669d0adfa6ac9c956b21b9a4216947f078c65ee71",
+    "topk_mean_seed1": "be08d5fb25841b8b12132ae7d3c3e22d4de6cd8127530409ccdb868b670a07e2",
+    "topk_mean_seed2": "788a2d4c0a6f8436c1eba4a4d169c94d5e3082301681b71ff3604fffe701595f",
+    "topk_mean_seed42": "50bec2c9f0b8437a23e1fc3686e6305c7afb5813455b6b4fe7650e13d3a76c09",
+    "tsae_last_seed1": "e08f0e6aa42326fcb2320230c58967d8f899b04bed5f78ae57cfe41b25120348",
+    "tsae_last_seed2": "e2cb082095d4774851c8b5ee95a4f55b4748cfb546919022862abed8adb9e688",
+    "tsae_last_seed42": "8794403ab19ccd2eb993faf4ea1206d13cc0abc7e4d273f9ad16f7ca05b4e5ab",
+    "tsae_max_seed1": "676559e8a57cad6594a490ff1c68c6a8bb76636ecfc1c739ae98a67292c71da7",
+    "tsae_max_seed2": "689122d2462fb3eb6654135e9fc9cf51fa01b286039849b013bbcec28a28f77e",
+    "tsae_max_seed42": "17caf74f07a05628e1ec1055c5fd0df4667d694ce401f5a7c9e82410837590fb",
+    "tsae_mean_seed1": "20ea95e02954f04c344ab6d30bb6b8abd77ffa60b51b9fadfd7f9ed95dab9e4b",
+    "tsae_mean_seed2": "15584a8136a02947e74d0954bf8f83582462d3bb7707af97ac504789b284afb2",
+    "tsae_mean_seed42": "194871ef74dcbf2a09c86b52568c80a6bab06211bb0adedfe0bbc2ee6df9caba",
+    "txc_base_seed1": "77cde4d68bcd84b585da661a2b65a0e84baa2a5cfefcc3990c95e3fef032e765",
+    "txc_base_seed2": "3cbd67217864f49a4cf1502fa88f081b169a4067e90d313f4fe9c3df73ad4e4c",
+    "txc_base_seed42": "764ff7f79b91613eb9e2028cbfdcc69431d3a7835b9235fb631d1bbcc1fa0889"
+  }
+}

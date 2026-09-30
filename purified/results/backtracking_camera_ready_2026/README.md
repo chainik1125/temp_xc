@@ -1,15 +1,17 @@
 # Camera-ready backtracking results
 
+Start with [the illustrated results walkthrough](RESULTS.md).
+
 The `launch/` directory records the September 29, 2026 campaign setup and
 validation. The `cells/` directory now contains **all 15 completed 300K
 detection results**, including the three seeds of each registered dictionary.
-Large checkpoints and activation caches remain on the pod.
+All 15 final checkpoint weights/configs are backed up privately on Hugging Face; activation caches remain on the pod.
 
 The campaign runs under `/workspace/backtracking` on the user-provided
-four-H100 pod. All 27 steering arms have now finished generation, with no
-paid judging performed. Its final compact archive is
-`/workspace/backtracking/backtracking_compact_results.zip`. The final status
-will be in `results/completion.json` on that pod; no status is inferred merely
+four-H100 pod. All 27 steering arms finished generation before paid judging began.
+The pre-judging compact archive is
+`/workspace/backtracking/backtracking_compact_results.zip`. The GPU completion receipt
+is `results/completion.json` on that pod; no status is inferred merely
 from a successful launch.
 
 The full compact result archive has also been saved locally as
@@ -17,8 +19,11 @@ The full compact result archive has also been saved locally as
 contains raw generations and all OOF arrays. Its manifest verifies every
 member. The reproducible code, compact result tables and current paper
 figures are tracked separately. Model weights and activation datasets were
-not downloaded. Checkpoints still need durable storage before the pod is
-stopped or deleted.
+not downloaded. The private checkpoint backup is hash-verified at revision
+`e0b19fd1cbd739be38f76d066441c848b5354b92` in
+`aniketdesh/temporal-crosscoders-backtracking-300k-2026-09-30`.
+See `checkpoint_backup_receipt.json` for all 35 verified files. No pod stop or
+delete action was taken.
 
 `publication/detection/` contains title-free Nord figures at their intended
 paper sizes, with vector PDF, editable SVG and PNG previews. The main figure
@@ -44,7 +49,32 @@ examples. Seven of eight cut/continue suffixes matched exactly; the remaining
 BF16 prefix-recomputation difference is retained in `phase1_zero_check.json`.
 This is not a claim of bit-for-bit historical generation reproduction.
 
-Paid API judging is deferred. Saved test candidate generations must not be
-graded or selected before validation chooses the intervention magnitude.
+The user authorized paid OpenAI judging on September 30. The resumable
+`judge_openai.py` runner uses `gpt-6-luna` with low reasoning, the original
+rubrics, exact-request caching, and a $9 cap. Validation selects and freezes
+each arm's signed magnitude before any test candidates are released for judging.
+Current judging status is recorded separately from the earlier GPU completion
+receipt; no effect is claimed from a launch alone.
 
 See the [protocol and execution README](../../experiments/backtracking_camera_ready_2026/README.md).
+
+## Completed Luna judging
+
+All 27 steering arms have completed validation-gated test judging with
+`gpt-6-luna`. Estimated token cost is $1.181680675, including cache writes and
+reasoning tokens; this is a usage-based estimate, not an invoice. The original
+20/100 validation/test split and the original rubrics are unchanged. All 27
+zero-intervention runs produce the same token sequences on each test question.
+
+`publication/steering/` contains per-question and per-seed tables, paired
+comparisons, title-free Nord PDF/SVG/PNG figures, and external caption notes.
+The main steering figure shows conditional paired question-bootstrap 95%
+intervals, with individual seed means as small points. The validation curve
+bands and the detection figure bars remain sample SD across seeds. These
+uncertainty measures are explicitly distinguished in the walkthrough.
+
+The full judged archive is saved locally as `backtracking_judged_results.zip`
+outside Git. `judged_local_backup_receipt.json` verifies every member.
+`judged_backup_receipt.json` records the separate private HF upload; the
+earlier checkpoint backup revision remains an immutable reference.
+The temporary OpenAI credential was removed after completion.

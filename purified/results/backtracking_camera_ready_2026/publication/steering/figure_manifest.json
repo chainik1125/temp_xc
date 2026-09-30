@@ -1,0 +1,34 @@
+{
+  "files_sha256": {
+    "summary.json": "8b484b03f8f970aee117a32a68bf0b63c56fce0457b35bbee90886f9b5c5b90c",
+    "seed_metrics.csv": "6ec5f94dfbdd7be88b9e3aedc2962f45e72eaebb7db307febae9df4ee01b821f",
+    "question_metrics.csv": "6ca62cd1b8a705c3fbc41e270662d902ae83f9cacf95a42a90ce1941cb66bc0a",
+    "aggregate_metrics.csv": "fa16a37a606cc15b8ef8c57dbdecc954d42b4e9863c818c4e39f7803ca47f4e3",
+    "paired_contrasts.csv": "e90b44c8d3ae10bc29aab897d37d20b9684a417d0ce730c0bebf37b224a7a4b8",
+    "validation_curves.csv": "b57e22be6c2d06c3c348c26d86b7c6e7499102ad07eb49fac805badf35cedee2",
+    "generation_lengths.csv": "341899a1ce1bfd9e750f878daae6a95e4a071ee7b371f69da81fa6e4001827ce",
+    "steering_effects.pdf": "546aa878afd853c69f01d1848ac13d7b03164300cacbcb912c89bbb0e66bed11",
+    "steering_effects.svg": "4774d6168496befa6aa11c2d8fb4913762ec523fee5776f586a43df250159a5e",
+    "steering_effects.png": "7de759137a52406cfc83a3e2266ddf8e151db92ba42292afd4a4c78bcee0b078",
+    "steering_validation_curves.pdf": "ddf4ed82ef50b07d6c3c8471ddd3bd210fe622f812b91423d1209c95d99c2272",
+    "steering_validation_curves.svg": "9a1f305df45f15c0dc54bade12410a6dd30f658d37217fe245f99196c3228755",
+    "steering_validation_curves.png": "073e9fa63ba22bec13fe1c1bfc30fd1b7d4f47390b4f174feb1810cc20fb03f0",
+    "CAPTIONS.md": "6b3fedbdd4f95da5c9d7c7a053065a5a6c15c73e4134a114ac03058bf576d226",
+    "include_figures.tex": "a9cb20a2e868b6ad5cf33fa4a53f0c4c1c01ddc30b4ea911f534b4b4259dd54a"
+  },
+  "palette": "Nord",
+  "embedded_titles": false,
+  "embedded_captions": false,
+  "effects_error_bars": "conditional paired question-bootstrap 95% intervals; individual seed means shown as dots",
+  "effects_inches": [
+    5.5,
+    2.65
+  ],
+  "validation_inches": [
+    5.5,
+    2.4
+  ],
+  "raster_dpi": 400,
+  "pdf_fonttype": 42,
+  "source_script_sha256": "6d0d58324a444db15f738e7c38b354948aae13e247a47c7847019474360f22df"
+}
