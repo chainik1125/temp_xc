@@ -1,0 +1,1172 @@
+{
+  "after_checks": {
+    "aggregate_schema_validated": true,
+    "canonical_folds_exactly_reproduced": true,
+    "paired_AP_replay_checks": 60,
+    "primary_fold_budget_AP_checks": 60
+  },
+  "after_primary_warning_count": 0,
+  "archive": {
+    "detection_json": "numerical_repairs/0f0858d38fe4-f741180bd9f0-maxiter20000/original/detection.json",
+    "oof": "numerical_repairs/0f0858d38fe4-f741180bd9f0-maxiter20000/original/detection.oof.npz"
+  },
+  "before_checks": {
+    "canonical_folds_exactly_reproduced": true,
+    "paired_AP_replay_checks": 60,
+    "primary_fold_budget_AP_checks": 60
+  },
+  "before_primary_warning_count": 2,
+  "cached_codes": {
+    "position_identity": {
+      "path": "detection.position_identity.codes.npz",
+      "sha256": "4df51061fc758afd423f1d83269a61515eda9c7d6afca33886de8c281d6629dd"
+    }
+  },
+  "cell": {
+    "arch": "stacked_sae",
+    "d_sae": 32768,
+    "seed": 2,
+    "train_key": "dddf8154721573b0"
+  },
+  "change_checks": {
+    "diagnostics_preserved": true,
+    "selected_features_and_scales_preserved": true,
+    "unaffected_arrays_and_fit_records_preserved": true,
+    "untargeted_budgets_preserved_bitwise": [
+      1,
+      2,
+      4,
+      8
+    ]
+  },
+  "corrected_detection_path": "/workspace/backtracking/results/cells/stacked_sae_d32768_seed2/numerical_repairs/0f0858d38fe4-f741180bd9f0-maxiter20000/corrected/detection.json",
+  "corrected_detection_sha256": "1da45132a4df0a233154218eedcae951ec836c734f0cbc59eedbb10e08641207",
+  "corrected_oof_path": "/workspace/backtracking/results/cells/stacked_sae_d32768_seed2/numerical_repairs/0f0858d38fe4-f741180bd9f0-maxiter20000/corrected/detection.repaired-0f0858d38fe4-f741180bd9f0-maxiter20000.oof.npz",
+  "corrected_oof_sha256": "63ad3a42ebee4cc64e3085ccaff2ee6ab361caaa91a4cee0f4d37490f23101ae",
+  "elapsed_seconds": 5.7033860579977045,
+  "environment": {
+    "numpy": "2.1.2",
+    "python": "3.12.3",
+    "scipy": "1.18.1",
+    "sklearn": "1.9.1"
+  },
+  "installed_detection": "/workspace/backtracking/results/cells/stacked_sae_d32768_seed2/detection.json",
+  "installed_oof": "/workspace/backtracking/results/cells/stacked_sae_d32768_seed2/detection.repaired-0f0858d38fe4-f741180bd9f0-maxiter20000.oof.npz",
+  "installed_unix": 1790775930.1697264,
+  "original_classifier_params": {
+    "C": 1.0,
+    "class_weight": null,
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": 0.0,
+    "max_iter": 2000,
+    "n_jobs": null,
+    "penalty": "l1",
+    "random_state": 42,
+    "solver": "liblinear",
+    "tol": 0.0001,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "original_detection_sha256": "0f0858d38fe446da3b1509aea6945772e7ec4a9eaa64aa2f76ed93d8caaca0cd",
+  "original_oof_sha256": "9c2545b514ae3e1b341804fa2149d3f99ddc7947ff1deb04e1c6c3196e32a19c",
+  "policy": "Repair every primary fit with a convergence warning by changing only max_iter. Acceptance requires convergence, never an improvement in held-out metrics.",
+  "protocol": "c7-selective-convergence-repair-v1",
+  "repair_classifier_params": {
+    "C": 1.0,
+    "class_weight": null,
+    "dual": false,
+    "fit_intercept": true,
+    "intercept_scaling": 1,
+    "l1_ratio": 0.0,
+    "max_iter": 20000,
+    "n_jobs": null,
+    "penalty": "l1",
+    "random_state": 42,
+    "solver": "liblinear",
+    "tol": 0.0001,
+    "verbose": 0,
+    "warm_start": false
+  },
+  "repair_script_sha256": "f741180bd9f0dc31dbd5bb3d9bdd441529fa5e6580b2236c4a4ab9fa92f4e2ad",
+  "repairs": [
+    {
+      "S": 16,
+      "after_aggregate": {
+        "fold_average_precision": [
+          0.22215235634969027,
+          0.10980222157873115,
+          0.15623939322526426,
+          0.1289222626353137,
+          0.1129540217723894
+        ],
+        "mean_fold_average_precision": 0.14601405111227778,
+        "mean_fold_roc_auc": 0.5270482229384003,
+        "pooled_oof_average_precision": 0.13940152027247793,
+        "pooled_oof_roc_auc": 0.5015286504165216
+      },
+      "after_fit": {
+        "average_precision": 0.22215235634969027,
+        "coef": [
+          0.04768908874751945,
+          0.027380719662180624,
+          -0.11573803344127467,
+          0.10424639141482638,
+          0.09632124273562591,
+          0.09042696352986689,
+          0.06704026080593758,
+          0.0791219084686318,
+          0.08863571871119838,
+          0.018023549177853898,
+          0.13180455904617186,
+          0.10032442296586999,
+          0.05167978654609827,
+          0.0482206947292984,
+          0.061712262934207826,
+          0.12780555891145384
+        ],
+        "intercept": 3.3596447331128148,
+        "n_iter": 2494,
+        "nonzero_coefficients": 16,
+        "roc_auc": 0.6149236929733675,
+        "selected_columns": [
+          139985,
+          56261,
+          14550,
+          132492,
+          67770,
+          138622,
+          143359,
+          160107,
+          149255,
+          134062,
+          112194,
+          112479,
+          117351,
+          135799,
+          108334,
+          153293
+        ],
+        "selected_features": [
+          {
+            "feature": 8913,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 23493,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 14550,
+            "offset": -12,
+            "position": 0
+          },
+          {
+            "feature": 1420,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 2234,
+            "offset": -10,
+            "position": 2
+          },
+          {
+            "feature": 7550,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 12287,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 29035,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 18183,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 2990,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 13890,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 14175,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 19047,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 4727,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 10030,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 22221,
+            "offset": -8,
+            "position": 4
+          }
+        ],
+        "selected_scale": [
+          0.12196829289771256,
+          0.09755664972424291,
+          0.8045497587951844,
+          0.18317438800790065,
+          0.06687246954920088,
+          0.06850659206943327,
+          0.14497955966451964,
+          0.03623150914920642,
+          0.08872514935865455,
+          0.06296191567990583,
+          0.13905790191268524,
+          0.07218026043049298,
+          0.027287376274617702,
+          0.0570189527255827,
+          0.10373589316654665,
+          0.07660260475784728
+        ],
+        "selection_score": [
+          0.2290202752137974,
+          0.2308655230586537,
+          0.23101634376459898,
+          0.23119909755761822,
+          0.23289913084808386,
+          0.23473678760581365,
+          0.23495943878193598,
+          0.2388184077553796,
+          0.2422850124737413,
+          0.24334937252344843,
+          0.2562674832812384,
+          0.25662381139892,
+          0.2618814069324082,
+          0.2772841258042683,
+          0.28245941574267536,
+          0.28908651155623805
+        ],
+        "warnings": []
+      },
+      "before_aggregate": {
+        "fold_average_precision": [
+          0.2220943569986061,
+          0.10980222157873115,
+          0.15623939322526426,
+          0.1289222626353137,
+          0.1129540217723894
+        ],
+        "mean_fold_average_precision": 0.14600245124206093,
+        "mean_fold_roc_auc": 0.5270377315367881,
+        "pooled_oof_average_precision": 0.13941826504701085,
+        "pooled_oof_roc_auc": 0.501664754493178
+      },
+      "before_fit": {
+        "average_precision": 0.2220943569986061,
+        "coef": [
+          0.04760273249776337,
+          0.02736020583501123,
+          -0.11301131625423103,
+          0.10456325437590587,
+          0.09640308321860336,
+          0.09043389447419857,
+          0.06709249568639224,
+          0.07914940225784864,
+          0.08877699642661108,
+          0.018056105273304278,
+          0.13197706287166658,
+          0.10042294826606453,
+          0.05179201114125394,
+          0.048222368315783595,
+          0.06175086773134189,
+          0.12788673960026328
+        ],
+        "intercept": 3.228755396449505,
+        "n_iter": 2000,
+        "nonzero_coefficients": 16,
+        "roc_auc": 0.6148712359653067,
+        "selected_columns": [
+          139985,
+          56261,
+          14550,
+          132492,
+          67770,
+          138622,
+          143359,
+          160107,
+          149255,
+          134062,
+          112194,
+          112479,
+          117351,
+          135799,
+          108334,
+          153293
+        ],
+        "selected_features": [
+          {
+            "feature": 8913,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 23493,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 14550,
+            "offset": -12,
+            "position": 0
+          },
+          {
+            "feature": 1420,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 2234,
+            "offset": -10,
+            "position": 2
+          },
+          {
+            "feature": 7550,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 12287,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 29035,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 18183,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 2990,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 13890,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 14175,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 19047,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 4727,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 10030,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 22221,
+            "offset": -8,
+            "position": 4
+          }
+        ],
+        "selected_scale": [
+          0.12196829289771256,
+          0.09755664972424291,
+          0.8045497587951844,
+          0.18317438800790065,
+          0.06687246954920088,
+          0.06850659206943327,
+          0.14497955966451964,
+          0.03623150914920642,
+          0.08872514935865455,
+          0.06296191567990583,
+          0.13905790191268524,
+          0.07218026043049298,
+          0.027287376274617702,
+          0.0570189527255827,
+          0.10373589316654665,
+          0.07660260475784728
+        ],
+        "selection_score": [
+          0.2290202752137974,
+          0.2308655230586537,
+          0.23101634376459898,
+          0.23119909755761822,
+          0.23289913084808386,
+          0.23473678760581365,
+          0.23495943878193598,
+          0.2388184077553796,
+          0.2422850124737413,
+          0.24334937252344843,
+          0.2562674832812384,
+          0.25662381139892,
+          0.2618814069324082,
+          0.2772841258042683,
+          0.28245941574267536,
+          0.28908651155623805
+        ],
+        "warnings": [
+          "Liblinear failed to converge, increase the number of iterations."
+        ]
+      },
+      "fold": 0,
+      "max_absolute_probability_change": 0.0013411974852655106,
+      "original_fit_replay": {
+        "convergence_warnings": [
+          "Liblinear failed to converge, increase the number of iterations."
+        ],
+        "elapsed_seconds": 1.1161707280116389,
+        "max_iter": 2000,
+        "n_iter": 2000,
+        "other_warnings": [
+          {
+            "category": "FutureWarning",
+            "message": "'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', l1_ratio set to a float between 0 and 1 instead of penalty='elasticnet', and C=np.inf instead of penalty=None."
+          },
+          {
+            "category": "UserWarning",
+            "message": "Inconsistent values: penalty=l1 with l1_ratio=0.0. penalty is deprecated. Please use l1_ratio only."
+          }
+        ]
+      },
+      "probe_mode": "matched_scaled_C1",
+      "repair_fit": {
+        "convergence_warnings": [],
+        "elapsed_seconds": 1.3781892779952614,
+        "max_iter": 20000,
+        "n_iter": 2494,
+        "other_warnings": [
+          {
+            "category": "FutureWarning",
+            "message": "'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', l1_ratio set to a float between 0 and 1 instead of penalty='elasticnet', and C=np.inf instead of penalty=None."
+          },
+          {
+            "category": "UserWarning",
+            "message": "Inconsistent values: penalty=l1 with l1_ratio=0.0. penalty is deprecated. Please use l1_ratio only."
+          }
+        ]
+      },
+      "view": "position_identity"
+    },
+    {
+      "S": 32,
+      "after_aggregate": {
+        "fold_average_precision": [
+          0.2233844155150273,
+          0.11309674645254372,
+          0.16496221431306657,
+          0.14206087166413847,
+          0.11447175036458672
+        ],
+        "mean_fold_average_precision": 0.15159519966187257,
+        "mean_fold_roc_auc": 0.5355816682000328,
+        "pooled_oof_average_precision": 0.1485187717558902,
+        "pooled_oof_roc_auc": 0.5182660936375711
+      },
+      "after_fit": {
+        "average_precision": 0.2233844155150273,
+        "coef": [
+          0.13372244220781648,
+          0.01995612102721769,
+          -0.04251966426474474,
+          -0.061831040659764594,
+          0.07491270081798969,
+          0.11000190864287611,
+          0.06171956352731968,
+          0.03970509505903114,
+          0.0,
+          0.030562470854113823,
+          0.1257630883777152,
+          -0.027439824391285682,
+          0.27955668515714943,
+          -0.12046569830944763,
+          0.07140405435226344,
+          0.045127563556035755,
+          -0.11688588767409243,
+          0.022476404066224594,
+          -0.10966149794265383,
+          0.06022984803987607,
+          0.0840468277321336,
+          0.09487603599074608,
+          0.06051511633082312,
+          0.07693436825010848,
+          0.05407785536457166,
+          0.02706074440526017,
+          0.12007526454135183,
+          0.08034298550824748,
+          -0.02323386046156107,
+          0.16595910192431493,
+          0.05583295992244588,
+          0.12528998432800997
+        ],
+        "intercept": 2.988650264634403,
+        "n_iter": 2264,
+        "nonzero_coefficients": 31,
+        "roc_auc": 0.6155930900110127,
+        "selected_columns": [
+          65231,
+          64781,
+          60285,
+          61757,
+          76630,
+          44095,
+          145981,
+          124677,
+          37556,
+          118156,
+          52370,
+          41094,
+          122403,
+          98023,
+          130086,
+          103825,
+          139985,
+          56261,
+          14550,
+          132492,
+          67770,
+          138622,
+          143359,
+          160107,
+          149255,
+          134062,
+          112194,
+          112479,
+          117351,
+          135799,
+          108334,
+          153293
+        ],
+        "selected_features": [
+          {
+            "feature": 32463,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 32013,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 27517,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 28989,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 11094,
+            "offset": -10,
+            "position": 2
+          },
+          {
+            "feature": 11327,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 14909,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 26373,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 4788,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 19852,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 19602,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 8326,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 24099,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 32487,
+            "offset": -10,
+            "position": 2
+          },
+          {
+            "feature": 31782,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 5521,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 8913,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 23493,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 14550,
+            "offset": -12,
+            "position": 0
+          },
+          {
+            "feature": 1420,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 2234,
+            "offset": -10,
+            "position": 2
+          },
+          {
+            "feature": 7550,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 12287,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 29035,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 18183,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 2990,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 13890,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 14175,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 19047,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 4727,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 10030,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 22221,
+            "offset": -8,
+            "position": 4
+          }
+        ],
+        "selected_scale": [
+          0.18677791702523525,
+          0.06884624312374339,
+          0.02989625735389627,
+          0.12864104675769414,
+          0.048661911103860284,
+          0.03583481371482116,
+          0.07818106833284802,
+          0.04514541716299499,
+          0.050792961538965634,
+          0.07410649639232726,
+          0.04303912360749718,
+          0.04395996644416207,
+          0.03399574049992168,
+          0.09315100356550761,
+          0.08000101574196959,
+          0.21382575736392467,
+          0.12196829289771256,
+          0.09755664972424291,
+          0.8045497587951844,
+          0.18317438800790065,
+          0.06687246954920088,
+          0.06850659206943327,
+          0.14497955966451964,
+          0.03623150914920642,
+          0.08872514935865455,
+          0.06296191567990583,
+          0.13905790191268524,
+          0.07218026043049298,
+          0.027287376274617702,
+          0.0570189527255827,
+          0.10373589316654665,
+          0.07660260475784728
+        ],
+        "selection_score": [
+          0.21170055838002227,
+          0.21205650687752484,
+          0.21234457130008774,
+          0.21320832619859545,
+          0.2134522769326077,
+          0.21447444044710395,
+          0.21604840063319233,
+          0.21738439971892073,
+          0.21780451625782793,
+          0.21951028150187107,
+          0.219988609020516,
+          0.22016746922154057,
+          0.2202164597795211,
+          0.2203531613318917,
+          0.2270367000471812,
+          0.22788775600160793,
+          0.2290202752137974,
+          0.2308655230586537,
+          0.23101634376459898,
+          0.23119909755761822,
+          0.23289913084808386,
+          0.23473678760581365,
+          0.23495943878193598,
+          0.2388184077553796,
+          0.2422850124737413,
+          0.24334937252344843,
+          0.2562674832812384,
+          0.25662381139892,
+          0.2618814069324082,
+          0.2772841258042683,
+          0.28245941574267536,
+          0.28908651155623805
+        ],
+        "warnings": []
+      },
+      "before_aggregate": {
+        "fold_average_precision": [
+          0.22340210894648446,
+          0.11309674645254372,
+          0.16496221431306657,
+          0.14206087166413847,
+          0.11447175036458672
+        ],
+        "mean_fold_average_precision": 0.15159873834816398,
+        "mean_fold_roc_auc": 0.5355753472934714,
+        "pooled_oof_average_precision": 0.14846038493355146,
+        "pooled_oof_roc_auc": 0.5180655033806554
+      },
+      "before_fit": {
+        "average_precision": 0.22340210894648446,
+        "coef": [
+          0.13373542784713582,
+          0.019947295465422364,
+          -0.04249935502248569,
+          -0.06181683439210697,
+          0.07490063082531358,
+          0.11002950087590078,
+          0.06169391482720195,
+          0.039680471744006456,
+          0.0,
+          0.030634984698992847,
+          0.12578421590357972,
+          -0.02747136836462528,
+          0.27955230672627934,
+          -0.12045012174568064,
+          0.07138085519988278,
+          0.04513214395916441,
+          -0.11690095362496178,
+          0.022450912892051554,
+          -0.10826486970485036,
+          0.06038038951022675,
+          0.0840728904889994,
+          0.09487724776156105,
+          0.060544574684483876,
+          0.0769486668294211,
+          0.054139769863371975,
+          0.027078367688648037,
+          0.12015822281405264,
+          0.08039551183391157,
+          -0.023176363928120013,
+          0.1659621940084361,
+          0.05584502123707181,
+          0.12531844776151907
+        ],
+        "intercept": 2.921629566970781,
+        "n_iter": 2000,
+        "nonzero_coefficients": 31,
+        "roc_auc": 0.6155614854782059,
+        "selected_columns": [
+          65231,
+          64781,
+          60285,
+          61757,
+          76630,
+          44095,
+          145981,
+          124677,
+          37556,
+          118156,
+          52370,
+          41094,
+          122403,
+          98023,
+          130086,
+          103825,
+          139985,
+          56261,
+          14550,
+          132492,
+          67770,
+          138622,
+          143359,
+          160107,
+          149255,
+          134062,
+          112194,
+          112479,
+          117351,
+          135799,
+          108334,
+          153293
+        ],
+        "selected_features": [
+          {
+            "feature": 32463,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 32013,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 27517,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 28989,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 11094,
+            "offset": -10,
+            "position": 2
+          },
+          {
+            "feature": 11327,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 14909,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 26373,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 4788,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 19852,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 19602,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 8326,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 24099,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 32487,
+            "offset": -10,
+            "position": 2
+          },
+          {
+            "feature": 31782,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 5521,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 8913,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 23493,
+            "offset": -11,
+            "position": 1
+          },
+          {
+            "feature": 14550,
+            "offset": -12,
+            "position": 0
+          },
+          {
+            "feature": 1420,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 2234,
+            "offset": -10,
+            "position": 2
+          },
+          {
+            "feature": 7550,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 12287,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 29035,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 18183,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 2990,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 13890,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 14175,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 19047,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 4727,
+            "offset": -8,
+            "position": 4
+          },
+          {
+            "feature": 10030,
+            "offset": -9,
+            "position": 3
+          },
+          {
+            "feature": 22221,
+            "offset": -8,
+            "position": 4
+          }
+        ],
+        "selected_scale": [
+          0.18677791702523525,
+          0.06884624312374339,
+          0.02989625735389627,
+          0.12864104675769414,
+          0.048661911103860284,
+          0.03583481371482116,
+          0.07818106833284802,
+          0.04514541716299499,
+          0.050792961538965634,
+          0.07410649639232726,
+          0.04303912360749718,
+          0.04395996644416207,
+          0.03399574049992168,
+          0.09315100356550761,
+          0.08000101574196959,
+          0.21382575736392467,
+          0.12196829289771256,
+          0.09755664972424291,
+          0.8045497587951844,
+          0.18317438800790065,
+          0.06687246954920088,
+          0.06850659206943327,
+          0.14497955966451964,
+          0.03623150914920642,
+          0.08872514935865455,
+          0.06296191567990583,
+          0.13905790191268524,
+          0.07218026043049298,
+          0.027287376274617702,
+          0.0570189527255827,
+          0.10373589316654665,
+          0.07660260475784728
+        ],
+        "selection_score": [
+          0.21170055838002227,
+          0.21205650687752484,
+          0.21234457130008774,
+          0.21320832619859545,
+          0.2134522769326077,
+          0.21447444044710395,
+          0.21604840063319233,
+          0.21738439971892073,
+          0.21780451625782793,
+          0.21951028150187107,
+          0.219988609020516,
+          0.22016746922154057,
+          0.2202164597795211,
+          0.2203531613318917,
+          0.2270367000471812,
+          0.22788775600160793,
+          0.2290202752137974,
+          0.2308655230586537,
+          0.23101634376459898,
+          0.23119909755761822,
+          0.23289913084808386,
+          0.23473678760581365,
+          0.23495943878193598,
+          0.2388184077553796,
+          0.2422850124737413,
+          0.24334937252344843,
+          0.2562674832812384,
+          0.25662381139892,
+          0.2618814069324082,
+          0.2772841258042683,
+          0.28245941574267536,
+          0.28908651155623805
+        ],
+        "warnings": [
+          "Liblinear failed to converge, increase the number of iterations."
+        ]
+      },
+      "fold": 0,
+      "max_absolute_probability_change": 0.0008483351541856421,
+      "original_fit_replay": {
+        "convergence_warnings": [
+          "Liblinear failed to converge, increase the number of iterations."
+        ],
+        "elapsed_seconds": 1.220876542996848,
+        "max_iter": 2000,
+        "n_iter": 2000,
+        "other_warnings": [
+          {
+            "category": "FutureWarning",
+            "message": "'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', l1_ratio set to a float between 0 and 1 instead of penalty='elasticnet', and C=np.inf instead of penalty=None."
+          },
+          {
+            "category": "UserWarning",
+            "message": "Inconsistent values: penalty=l1 with l1_ratio=0.0. penalty is deprecated. Please use l1_ratio only."
+          }
+        ]
+      },
+      "probe_mode": "matched_scaled_C1",
+      "repair_fit": {
+        "convergence_warnings": [],
+        "elapsed_seconds": 1.3748443350050366,
+        "max_iter": 20000,
+        "n_iter": 2264,
+        "other_warnings": [
+          {
+            "category": "FutureWarning",
+            "message": "'penalty' was deprecated in version 1.8 and will be removed in 1.10. To avoid this warning, leave 'penalty' set to its default value and use 'l1_ratio' or 'C' instead. Use l1_ratio=0 instead of penalty='l2', l1_ratio=1 instead of penalty='l1', l1_ratio set to a float between 0 and 1 instead of penalty='elasticnet', and C=np.inf instead of penalty=None."
+          },
+          {
+            "category": "UserWarning",
+            "message": "Inconsistent values: penalty=l1 with l1_ratio=0.0. penalty is deprecated. Please use l1_ratio only."
+          }
+        ]
+      },
+      "view": "position_identity"
+    }
+  ],
+  "source_evaluator_sha256": "1d2c6c0971fc5ceb7646fdfeaf988e89b1d385b815af86e909a6a39a6c7930b8",
+  "started_unix": 1790775924.4470358,
+  "status": "installed"
+}

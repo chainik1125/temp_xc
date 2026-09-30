@@ -10,7 +10,7 @@ def main(root, destination):
     for path in sorted(root.rglob('*')):
         if not path.is_file() or path.is_symlink():
             continue
-        if path.suffix in ('.json','.jsonl','.csv','.md','.txt','.png','.pdf','.svg') or path.name.endswith('.oof.npz') or path.name=='code_snapshot.tar.gz':
+        if path.suffix in ('.json','.jsonl','.csv','.md','.txt','.tex','.png','.pdf','.svg') or path.name.endswith('.oof.npz') or path.name=='code_snapshot.tar.gz':
             candidates.append(path)
     records=[]
     destination.parent.mkdir(parents=True,exist_ok=True)

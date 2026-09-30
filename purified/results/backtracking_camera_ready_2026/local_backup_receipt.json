@@ -1,0 +1,8 @@
+{
+  "path": "backtracking_compact_results.zip",
+  "bytes": 144501782,
+  "sha256": "d19dd7071fda63243256d62ad91770881c50f1ef428b65ecf220258e7dbe07e2",
+  "members": 470,
+  "source": "Authorized RunPod experiment; original download verified, then final TXC-label figures and matching plotting code replaced locally.",
+  "contains": "Raw steering generations, judge templates, OOF arrays, compact results, plots and code; no weights, optimizer checkpoints or activation caches."
+}

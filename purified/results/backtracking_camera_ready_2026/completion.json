@@ -1,0 +1,14 @@
+{
+  "finished_unix": 1790776172.6274247,
+  "incomplete": {
+    "queue_state.json": {},
+    "steering/queue_state.json": {}
+  },
+  "paid_api_calls": 0,
+  "paired_analysis_exit_code": 0,
+  "pod_action": "No stop/delete action taken. Copy final checkpoints off container storage before stopping the pod.",
+  "status": "ready_for_deferred_judging",
+  "steering_arms_saved": 27,
+  "summary_exit_code": 0,
+  "trained_and_detected_cells": 15
+}

@@ -106,6 +106,27 @@ Scientifically failed jobs require inspection and are not automatically retried.
 `ready_for_deferred_judging` means the GPU work and exports completed; it does
 not mean the steering effects have been judged or established.
 
+## Paper figures
+
+`paper_figures.py`, called by the summary command, exports title-free Nord
+PDF/SVG/400-dpi PNG figures at their actual NeurIPS insertion sizes: the S=8
+panel is 2.585 by 1.98 inches; the three-panel curves are 5.5 by 2.4 inches.
+Only axes, data and necessary legends are inside the figures. Captions,
+left-to-right readout identities, uncertainty definitions and candidate-width
+caveats are in `publication/detection/CAPTIONS.md`; vector-PDF inclusion code
+is in `include_figures.tex`. Width sensitivity and raw-feature probes have
+separate figure files. `figure_manifest.json` records sizes, hashes and the
+exact mean-fold constant-score reference. Exports require complete seed sets,
+zero primary convergence warnings and a consistent evaluator identity.
+
+Two Stacked seed-2 scaled probe fits (fold 0, S=16/32) reached the original
+2,000-iteration cap. `repair_convergence.py` reproduced the original fits, then
+changed only the cap to 20,000; both converged (2,494 and 2,264 iterations).
+The repair preserves feature selection, scaling, folds, C, tolerance, original
+files and all unaffected predictions, including S=8. Its receipt and original
+artifacts live beside the cell under `numerical_repairs/`. These are numerical
+probe repairs, not dictionary retraining or outcome-based parameter choices.
+
 The protocol follows the [focused audit](../../docs/aniket/camera-ready-2026/backtracking-focus-plan.md),
 the [NeurIPS discussion](https://openreview.net/forum?id=Z27xj38Fta), and the
 [ICML workshop discussion](https://openreview.net/forum?id=JfN7nRdBxA).

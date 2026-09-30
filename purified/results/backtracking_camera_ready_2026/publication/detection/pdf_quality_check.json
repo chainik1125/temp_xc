@@ -1,0 +1,56 @@
+{
+  "status": "passed",
+  "figure_count": 6,
+  "figure_checks": [
+    {
+      "pdf": "detection_headline_historical_raw_C1.pdf",
+      "pdf_sha256": "622392aaf4e3bf09ad41d8596268580835ea74503e4e677b4ca408fda06f5ab0",
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nCZLXGL+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     15  0\n",
+      "no_titles_or_caption_text": true,
+      "txc_label_has_no_variant_suffix": true,
+      "rendered_and_visually_inspected": true
+    },
+    {
+      "pdf": "detection_curves_historical_raw_C1.pdf",
+      "pdf_sha256": "c8b96a06e8dd9e3e8dc17b5e63512b6a7d484942d3ce8c4530206df298e59f62",
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nHDXOPZ+DejaVuSans-Oblique            CID TrueType      Identity-H       yes yes yes     27  0\nDPWWHK+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     34  0\n",
+      "no_titles_or_caption_text": true,
+      "txc_label_has_no_variant_suffix": true,
+      "rendered_and_visually_inspected": true
+    },
+    {
+      "pdf": "detection_width_sensitivity_historical_raw_C1.pdf",
+      "pdf_sha256": "6207651e4389aa620b3515ba9ae2835890a71b11c43155137255dd33b3f1b00d",
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nHDXOPZ+DejaVuSans-Oblique            CID TrueType      Identity-H       yes yes yes     21  0\nKDVOVX+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     28  0\n",
+      "no_titles_or_caption_text": true,
+      "txc_label_has_no_variant_suffix": true,
+      "rendered_and_visually_inspected": true
+    },
+    {
+      "pdf": "detection_headline_matched_scaled_C1.pdf",
+      "pdf_sha256": "0397306ec8188a0a89df8e679c7c900893ca4a19deb294c4aa793a3779df3082",
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nCZLXGL+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     15  0\n",
+      "no_titles_or_caption_text": true,
+      "txc_label_has_no_variant_suffix": true,
+      "rendered_and_visually_inspected": true
+    },
+    {
+      "pdf": "detection_curves_matched_scaled_C1.pdf",
+      "pdf_sha256": "e92550694a5258a5eebc50a992b8b908f52941124a915b4c10494af5a518b235",
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nHDXOPZ+DejaVuSans-Oblique            CID TrueType      Identity-H       yes yes yes     27  0\nDPWWHK+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     34  0\n",
+      "no_titles_or_caption_text": true,
+      "txc_label_has_no_variant_suffix": true,
+      "rendered_and_visually_inspected": true
+    },
+    {
+      "pdf": "detection_width_sensitivity_matched_scaled_C1.pdf",
+      "pdf_sha256": "0a2ef9d66b860fde1ba85715a39d0a7e2f561cf57ab7db8dacf26af171dc90bf",
+      "fonts": "name                                 type              encoding         emb sub uni object ID\n------------------------------------ ----------------- ---------------- --- --- --- ---------\nHDXOPZ+DejaVuSans-Oblique            CID TrueType      Identity-H       yes yes yes     21  0\nKDVOVX+DejaVuSans                    CID TrueType      Identity-H       yes yes yes     28  0\n",
+      "no_titles_or_caption_text": true,
+      "txc_label_has_no_variant_suffix": true,
+      "rendered_and_visually_inspected": true
+    }
+  ],
+  "pdf_renderer": "Poppler pdftoppm at 200 dpi",
+  "visual_checks": "All six final PDFs inspected: no clipping or overlap; native-size labels are legible; only plots, labeled axes and necessary legends; TXC display label has no suffix."
+}

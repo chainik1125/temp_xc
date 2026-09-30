@@ -34,7 +34,7 @@ ACTS_SHA256 = "1656f6be2cd85fb85c8b246b9b27933f73ef40cfaac84078169dfd3bbbe27810"
 METRIC = "mean_fold_average_precision"
 SERIES = (("txc_base", 32768), ("topk_sae", 32768), ("tsae_paper", 32768),
           ("stacked_sae", 32768), ("tsae_paper", 16384))
-LABELS = {("txc_base", 32768): "TXC-base", ("topk_sae", 32768): "TopK SAE",
+LABELS = {("txc_base", 32768): "TXC", ("topk_sae", 32768): "TopK SAE",
           ("tsae_paper", 32768): "T-SAE 32K", ("stacked_sae", 32768): "Stacked SAE",
           ("tsae_paper", 16384): "T-SAE 16K · sensitivity"}
 # Nord Frost, Polar Night and Aurora. Width sensitivity shares its family color.
@@ -209,7 +209,7 @@ def panel_view(arch: str, pool: str) -> str:
     return "native" if arch == "txc_base" else "position_identity" if arch == "stacked_sae" else pool
 
 
-def plot(summary: list[dict[str, Any]], output: Path, *, completed: int, warning_count: int) -> list[str]:
+def plot_preview(summary: list[dict[str, Any]], output: Path, *, completed: int, warning_count: int) -> list[str]:
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
@@ -307,9 +307,20 @@ def main(argv: list[str] | None = None) -> int:
             writer.writeheader()
             writer.writerows(row for row in rows if row["probe_mode"] == mode)
     warning_count = sum(c["result"]["convergence_warning_count"] for c in cells)
-    figures = plot(aggregate, output, completed=len(cells), warning_count=warning_count) if cells and not args.no_plots else []
+    figures = []
+    if cells and not args.no_plots:
+        if args.require_complete:
+            require(warning_count == 0, "primary probe convergence warnings block paper-ready export")
+        if not missing and warning_count == 0:
+            from paper_figures import render
+            figures = render(aggregate, output, root=root, cells=cells)
+        else:
+            draft = output / "draft"
+            draft.mkdir(exist_ok=True)
+            figures = ["draft/" + name for name in plot_preview(
+                aggregate, draft, completed=len(cells), warning_count=warning_count)]
     evaluator_hashes = sorted({c["result"]["provenance"]["evaluator_sha256"] for c in cells})
-    manifest = {"schema": "c7-camera-ready-detection-summary-v2", "detection_protocol": PROTOCOL,
+    manifest = {"schema": "c7-camera-ready-detection-summary-v3", "detection_protocol": PROTOCOL,
                 "grouping": GROUPING, "n_prompt_groups": 213, "n_original_question_ids": 300,
                 "status": "partial" if missing else "complete_with_warnings" if warning_count else "complete",
                 "source_root": str(root), "expected_cells": len(expected), "completed_cells": len(cells),
@@ -325,21 +336,17 @@ def main(argv: list[str] | None = None) -> int:
                              "cell": cell_id(c["result"]["arch"], c["result"]["d_sae"], c["result"]["seed"]),
                              "status": c["result"]["status"]} for c in cells]}
     (output / "summary.json").write_text(json.dumps(manifest, indent=2, allow_nan=False) + "\n")
-    notes = f"""# Backtracking detection source tables and previews
+    notes = f"""# Backtracking detection source tables and paper figures
 
 Status: **{manifest['status']}**, {len(cells)}/15 completed cells. The 12 core cells use width 32K; the three T-SAE 16K cells are a separate sensitivity analysis. Missing cells are listed in `summary.json`. No unfinished or smoke dictionary contributes a plotted point.
 
-The two CSVs and figure families keep `historical_raw_C1` and `matched_scaled_C1` separate. Both use C=1. The first uses raw features; the second divides by training-fold population standard deviation before feature ranking and fitting, without centering. This is a scaling sensitivity, not a claim that the old encoder protocol has been exactly reproduced. All primary curves use 213 canonical prompt groups. Original 300-question-ID probes and the legacy T-SAE diagnostic are deliberately excluded from these plots and CSVs; they remain diagnostics in the source JSONs. Canonical grouping prevents identical normalized problem text from appearing in both training and test folds.
+`detection_headline_matched_scaled_C1.pdf` is the main S=8 figure, sized to the existing NeurIPS half-width slot (2.585 x 1.98 inches). `detection_curves_matched_scaled_C1.pdf` gives all core readout curves at the full 5.5-inch text width; the T-SAE width sensitivity is separate. Raw-C1 versions are sensitivity figures. PDF is the manuscript format; SVG and 400-dpi PNG exports accompany it. `figure_manifest.json` records physical size, minimum font size, source/reference hashes and export checksums. `CAPTIONS.md` contains caption text and caveats, and `include_figures.tex` shows the exact PDF inclusions. The manuscript is unchanged.
 
-Suggested caption: Backtracking detection after 300K optimizer steps, with mean average precision across five folds held out by canonical normalized problem text at each selected-coordinate budget S. Symbols show dictionary seeds 1/2/42 (circle/triangle/square). Lines and shaded bands show the mean and sample standard deviation only when all three seeds are present; they are not confidence intervals. Partial series show individual seed points only. The headline budget is S=8. All panels use the same 25,204 sentences from 300 original archive IDs representing 213 distinct normalized prompts and the same five pre-onset offsets, −12 through −8.
+All displayed results use mean five-fold average precision, 213 canonical normalized-prompt groups, and dictionaries trained for 300K steps. Seed uncertainty is sample SD across seeds 1, 2, 42, not a confidence interval. Shared-encoder position concatenation, when evaluated, is retained separately in the CSV; it is not independent Stacked SAE. Original 300-ID probes and old T-SAE encoding results remain excluded diagnostics in source JSONs. Paired conditional prompt-bootstrap intervals are computed separately by `paired_detection.py` from saved OOF predictions.
 
-The three panels vary the shared per-token encoder readout: final token, mean over five tokens, or max over five tokens. TXC-base uses its native shared window code in every panel. Independent Stacked SAE keeps separate (position, feature) coordinates in every panel; equal S counts total selected coordinates, not features per position. Consequently the repeated TXC/Stacked traces are references, not independent experiments. Shared-encoder concatenation, when evaluated, is retained separately as `position_identity` in the CSV; it is not independent Stacked SAE.
+Primary convergence warnings: {warning_count}. Complete paper exports require zero primary warnings, all 15 cells, complete seed sets, compatible evaluator identities, and a hash-verified OOF file for the fold-prevalence reference. Historical diagnostic warnings remain recorded separately in the source data. Repaired probes, if any, retain their original JSON/OOF files and a numerical-refit receipt. Partial or unconverged results produce labeled previews only in `draft/`; `--require-complete` refuses such paper exports. With `--no-plots`, only tables/manifests are refreshed.
 
-Solid lines are 32K core models; dashed T-SAE 16K is a width sensitivity and is never pooled into the 32K mean. Nord colors identify architecture families, while seed symbols and line styles provide a second visual channel. Figure details live here so the panels can stay sparse. `pooled_oof_average_precision` is exported for audit but is not substituted for the displayed mean-fold metric.
-
-There are {warning_count} recorded convergence warnings. These results retain their original status in CSV/JSON and require review before publication. Mixed evaluator source hashes, if present, are listed explicitly in `summary.json`. The summary verifies input schema/cohort/metric consistency and hashes each compact source JSON; it does not fetch or revalidate absent remote weights or arrays. Paired canonical-prompt-group bootstrap intervals are deferred to a separate analysis of the saved OOF predictions.
-
-Regenerate with `python summarize_detection.py --root /workspace/backtracking/results`. Add `--require-complete` to require all 15 cells, or `--no-plots` to avoid Matplotlib. Empty campaigns produce only empty CSV headers and a partial manifest. No figures were produced by this invocation if `figures` is empty in the manifest; older files in a reused output folder are not evidence of current coverage.
+Regenerate with `python summarize_detection.py --root /workspace/backtracking/results --require-complete`. For local regeneration, the compact detection JSONs and the TXC seed-1 OOF sidecar suffice; no model weights or activation caches are required. An empty `figures` list means this invocation produced no figures, even if a reused directory contains older files.
 """
     (output / "README.md").write_text(notes)
     print(json.dumps({"status": manifest["status"], "completed_cells": len(cells),

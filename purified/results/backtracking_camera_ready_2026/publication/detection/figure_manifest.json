@@ -1,0 +1,168 @@
+{
+  "schema": "c7-paper-figures-v1",
+  "status": "complete",
+  "baseline": {
+    "value": 0.1257329838122459,
+    "fold_prevalences": [
+      0.1403926234384295,
+      0.10868702895676319,
+      0.14523809523809525,
+      0.1246031746031746,
+      0.10974399682476682
+    ],
+    "definition": "unweighted mean of held-out fold class prevalences",
+    "source": "cells/txc_base_d32768_seed1/detection.oof.npz",
+    "sha256": "b2595b4984e4bb12720ea83aed53343d06e96ebf708c8efecc4689fd82af3666"
+  },
+  "curve_y_limits": [
+    0.11,
+    0.26
+  ],
+  "headline_x_limits": [
+    0.11,
+    0.22
+  ],
+  "plotter_sha256": "44ba48fd6fbb1c928515a980b4c45842e770f62592aeb017abec91430414ac55",
+  "uncertainty": "sample SD across dictionary seeds 1, 2, 42; not a confidence interval",
+  "palette": {
+    "txc_base": "#5E81AC",
+    "topk_sae": "#4C566A",
+    "tsae_paper": "#D08770",
+    "stacked_sae": "#B48EAD"
+  },
+  "paper_textwidth_inches": 5.5,
+  "figures": [
+    {
+      "stem": "detection_headline_historical_raw_C1",
+      "role": "S=8 core; existing half-width slot",
+      "probe_mode": "historical_raw_C1",
+      "width_inches": 2.585,
+      "height_inches": 1.98,
+      "minimum_font_points": 7.0,
+      "exports": {
+        "pdf": {
+          "path": "detection_headline_historical_raw_C1.pdf",
+          "sha256": "622392aaf4e3bf09ad41d8596268580835ea74503e4e677b4ca408fda06f5ab0"
+        },
+        "svg": {
+          "path": "detection_headline_historical_raw_C1.svg",
+          "sha256": "12f5baeba1d78fb46bad9791f866bf2b4c9061b15cbfb0a2cbdeb6459d418182"
+        },
+        "png": {
+          "path": "detection_headline_historical_raw_C1.png",
+          "sha256": "b2955f35ec9c83cde40af20c5d5c7978a295f816e7ae6c6ed827cbb4e8a8cf76"
+        }
+      }
+    },
+    {
+      "stem": "detection_curves_historical_raw_C1",
+      "role": "32K core budget curves",
+      "probe_mode": "historical_raw_C1",
+      "width_inches": 5.5,
+      "height_inches": 2.4,
+      "minimum_font_points": 7.0,
+      "exports": {
+        "pdf": {
+          "path": "detection_curves_historical_raw_C1.pdf",
+          "sha256": "c8b96a06e8dd9e3e8dc17b5e63512b6a7d484942d3ce8c4530206df298e59f62"
+        },
+        "svg": {
+          "path": "detection_curves_historical_raw_C1.svg",
+          "sha256": "0c455fe3cec171bd2b9bd4c7343f6e59ea7e4b075a97a98d0d1267fe4e75dc18"
+        },
+        "png": {
+          "path": "detection_curves_historical_raw_C1.png",
+          "sha256": "86082e92698da9e8e791873fd97620717c7312c5d6ab5320808c25626d5465a7"
+        }
+      }
+    },
+    {
+      "stem": "detection_width_sensitivity_historical_raw_C1",
+      "role": "T-SAE width sensitivity",
+      "probe_mode": "historical_raw_C1",
+      "width_inches": 5.5,
+      "height_inches": 2.4,
+      "minimum_font_points": 7.0,
+      "exports": {
+        "pdf": {
+          "path": "detection_width_sensitivity_historical_raw_C1.pdf",
+          "sha256": "6207651e4389aa620b3515ba9ae2835890a71b11c43155137255dd33b3f1b00d"
+        },
+        "svg": {
+          "path": "detection_width_sensitivity_historical_raw_C1.svg",
+          "sha256": "42ab9b82028618ac78bc042d04a4b3bee7fee89070341e78c8c4f68c02bb3186"
+        },
+        "png": {
+          "path": "detection_width_sensitivity_historical_raw_C1.png",
+          "sha256": "f61c1b074ace7979413ab9f41f3f368ab3bd903afd67121e7d2464d46464018d"
+        }
+      }
+    },
+    {
+      "stem": "detection_headline_matched_scaled_C1",
+      "role": "S=8 core; existing half-width slot",
+      "probe_mode": "matched_scaled_C1",
+      "width_inches": 2.585,
+      "height_inches": 1.98,
+      "minimum_font_points": 7.0,
+      "exports": {
+        "pdf": {
+          "path": "detection_headline_matched_scaled_C1.pdf",
+          "sha256": "0397306ec8188a0a89df8e679c7c900893ca4a19deb294c4aa793a3779df3082"
+        },
+        "svg": {
+          "path": "detection_headline_matched_scaled_C1.svg",
+          "sha256": "c5f83791bdab32ff36db13c47e24bbf8ed08e9d75627e826d0b0b53fd1536c31"
+        },
+        "png": {
+          "path": "detection_headline_matched_scaled_C1.png",
+          "sha256": "e19adc8eaab162db8f078ae59c1652a71449d762d76cf272fa593bfd62a0fea7"
+        }
+      }
+    },
+    {
+      "stem": "detection_curves_matched_scaled_C1",
+      "role": "32K core budget curves",
+      "probe_mode": "matched_scaled_C1",
+      "width_inches": 5.5,
+      "height_inches": 2.4,
+      "minimum_font_points": 7.0,
+      "exports": {
+        "pdf": {
+          "path": "detection_curves_matched_scaled_C1.pdf",
+          "sha256": "e92550694a5258a5eebc50a992b8b908f52941124a915b4c10494af5a518b235"
+        },
+        "svg": {
+          "path": "detection_curves_matched_scaled_C1.svg",
+          "sha256": "55e5bf5657ed520d0a3281255c1a676d4ea1f11348d22f4e6caceba166df2991"
+        },
+        "png": {
+          "path": "detection_curves_matched_scaled_C1.png",
+          "sha256": "86f28cf2c580d5c788c3757ff52f18d17137d2831ce98e02dd5938421e22c346"
+        }
+      }
+    },
+    {
+      "stem": "detection_width_sensitivity_matched_scaled_C1",
+      "role": "T-SAE width sensitivity",
+      "probe_mode": "matched_scaled_C1",
+      "width_inches": 5.5,
+      "height_inches": 2.4,
+      "minimum_font_points": 7.0,
+      "exports": {
+        "pdf": {
+          "path": "detection_width_sensitivity_matched_scaled_C1.pdf",
+          "sha256": "0a2ef9d66b860fde1ba85715a39d0a7e2f561cf57ab7db8dacf26af171dc90bf"
+        },
+        "svg": {
+          "path": "detection_width_sensitivity_matched_scaled_C1.svg",
+          "sha256": "e987c294a9ffc85f77cf103db8f82aba3957f1c5bda6aca1249c766b8702068f"
+        },
+        "png": {
+          "path": "detection_width_sensitivity_matched_scaled_C1.png",
+          "sha256": "ff5c2cffd53c7a1812e7aa00257a8ee0b1e0fe4a22476beab73ca0b479e519d9"
+        }
+      }
+    }
+  ]
+}
