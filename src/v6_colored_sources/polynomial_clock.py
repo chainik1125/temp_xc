@@ -31,7 +31,7 @@ Properties (proposal Section 4–5):
 from __future__ import annotations
 
 import math
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 import torch
 
@@ -168,6 +168,107 @@ def generate_polynomial_clock_dataset(cfg: PolynomialClockConfig) -> dict:
         "coeffs": coeffs,
         "alphabet": alphabet,
         "config": cfg,
+    }
+
+
+def split_episode_indices(
+    n_seq: int,
+    *,
+    n_rep_train: int,
+    n_probe_train: int,
+    n_probe_val: int,
+    seed: int,
+) -> dict[str, torch.Tensor]:
+    """Create a deterministic, episode-disjoint three-way split.
+
+    Polynomial-clock labels are constant within an episode, so splitting
+    sampled windows would leak labels whenever two windows came from the same
+    episode. Splitting episode IDs first makes that impossible.
+    """
+    sizes = {
+        "representation_train": n_rep_train,
+        "probe_train": n_probe_train,
+        "probe_val": n_probe_val,
+    }
+    if any(size <= 0 for size in sizes.values()):
+        raise ValueError(f"all episode split sizes must be positive; got {sizes}")
+    if sum(sizes.values()) != n_seq:
+        raise ValueError(
+            f"episode split sizes must sum to n_seq={n_seq}; got {sizes}"
+        )
+
+    generator = torch.Generator(device="cpu").manual_seed(seed)
+    permutation = torch.randperm(n_seq, generator=generator)
+    splits: dict[str, torch.Tensor] = {}
+    start = 0
+    for name, size in sizes.items():
+        splits[name] = permutation[start : start + size]
+        start += size
+    return splits
+
+
+def subset_polynomial_clock_dataset(
+    data: dict, episode_indices: torch.Tensor
+) -> dict:
+    """Return a view-like dataset containing only selected episodes.
+
+    The alphabet basis is intentionally shared across all subsets; episode
+    tensors are indexed independently and retain their original IDs for split
+    auditing.
+    """
+    cfg: PolynomialClockConfig = data["config"]
+    indices = episode_indices.detach().to(device="cpu", dtype=torch.long)
+    if indices.ndim != 1 or indices.numel() == 0:
+        raise ValueError("episode_indices must be a non-empty rank-1 tensor")
+    if int(indices.min()) < 0 or int(indices.max()) >= cfg.n_seq:
+        raise ValueError("episode_indices contain an out-of-range episode")
+    if torch.unique(indices).numel() != indices.numel():
+        raise ValueError("episode_indices must be unique")
+
+    parent_ids = data.get("episode_ids", torch.arange(cfg.n_seq))
+    return {
+        "x": data["x"][indices],
+        "Q": data["Q"][indices],
+        "Y": data["Y"][indices],
+        "B": data["B"][indices],
+        "coeffs": data["coeffs"][indices],
+        "alphabet": data["alphabet"],
+        "episode_ids": parent_ids[indices],
+        "config": replace(cfg, n_seq=int(indices.numel())),
+    }
+
+
+def sample_one_anchor_per_episode(
+    data: dict,
+    W: int,
+    *,
+    max_samples: int,
+    device: torch.device,
+    seed: int,
+) -> dict[str, torch.Tensor]:
+    """Sample one window anchor from each selected episode.
+
+    Each returned ``chain_idx`` is unique. Combined with an episode-level
+    dataset split, this prevents both exact-window duplication and label
+    leakage across probe train/validation sets.
+    """
+    cfg: PolynomialClockConfig = data["config"]
+    if W < 1 or W > cfg.T_chain:
+        raise ValueError(f"W must lie in [1, {cfg.T_chain}]; got {W}")
+    if max_samples <= 0:
+        raise ValueError(f"max_samples must be positive; got {max_samples}")
+
+    n = min(max_samples, cfg.n_seq)
+    generator = torch.Generator(device="cpu").manual_seed(seed)
+    chain_idx = torch.randperm(cfg.n_seq, generator=generator)[:n]
+    max_start = cfg.T_chain - W
+    starts = torch.randint(0, max_start + 1, (n,), generator=generator)
+    episode_ids = data.get("episode_ids", torch.arange(cfg.n_seq))
+    return {
+        "chain_idx": chain_idx.to(device),
+        "t_start": starts.to(device),
+        "Y": data["Y"][chain_idx].to(device),
+        "episode_id": episode_ids[chain_idx].to(device),
     }
 
 

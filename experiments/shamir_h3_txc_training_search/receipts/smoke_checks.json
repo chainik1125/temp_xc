@@ -1,0 +1,10 @@
+{
+  "passed": true,
+  "split_audit_sha256": "7ceff9814b09b3feda7f321aee251115f18afda6d352c3d2483b09f2c84bcd26",
+  "jobs": [
+    "confirm_baseline_s99_W3_n20",
+    "confirm_early_aux_data_init_s99_W10_n20"
+  ],
+  "forced_auxk_finite_gradients": true,
+  "forced_dead_count": 1894
+}

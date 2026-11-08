@@ -1,0 +1,641 @@
+{
+  "created": "2026-11-07T06:49:05.651772+00:00",
+  "files": [
+    {
+      "path": "experiments/shamir_camera_ready_k_sweep/analyze.py",
+      "sha256": "f20f5c2db81c0ded09bdff1b3a50ecb7c3060a54c5ddad7d6d31cf43b1b3a58a"
+    },
+    {
+      "path": "experiments/shamir_camera_ready_k_sweep/run.py",
+      "sha256": "37470e75ac715db4afd6a9efa21565d4e142cdc2aacf0e440f01ccfc4ac26e30"
+    },
+    {
+      "path": "experiments/shamir_h3_txc_training_search/launch.py",
+      "sha256": "7e39e910f5394e859edfdad0db0ba73bf013f03ffd56bcad5a71aa9ece2ecef9"
+    },
+    {
+      "path": "experiments/shamir_h3_txc_training_search/run.py",
+      "sha256": "2c2a6df199c5e14b94ce94ee26d2b7bb02d184ff46cff0292ae821578226c1e5"
+    },
+    {
+      "path": "src/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/bench/__init__.py",
+      "sha256": "e7e52e4d3cfa898d33532d1ea386f8a4ccf20f91dcfc34fcd980043466c561b1"
+    },
+    {
+      "path": "src/bench/architectures/__init__.py",
+      "sha256": "18944e462f8b1a694baa412ff18ea53277cdf0122eb80c8dd575ea1778d9beac"
+    },
+    {
+      "path": "src/bench/architectures/_tfa_module.py",
+      "sha256": "0af7ad8fa0f065d3866b356021143f65d1ca46a265af00b574d386892b17b02d"
+    },
+    {
+      "path": "src/bench/architectures/base.py",
+      "sha256": "0a02fed95c10484133741be893a88b78b07694ec496f42266bcd98eca50896a6"
+    },
+    {
+      "path": "src/bench/architectures/crosscoder.py",
+      "sha256": "fd5696bbee8eac3e2c9d7b43644f300a065096afe1bb7e2d51c62a04836b597f"
+    },
+    {
+      "path": "src/bench/architectures/mlc.py",
+      "sha256": "99d930ec60438a9fce8bb4f81f45d163894d8db4d014b3acb91467ba34406b67"
+    },
+    {
+      "path": "src/bench/architectures/stacked_sae.py",
+      "sha256": "45d158432b886933ac64c1c89148e5e4876aaabd8a5bd9541a9d8c41d3fb22b1"
+    },
+    {
+      "path": "src/bench/architectures/tfa.py",
+      "sha256": "a543c5cd12767036bff582e48299211a9357436811e4d6d914d538a71135bdbf"
+    },
+    {
+      "path": "src/bench/architectures/topk_sae.py",
+      "sha256": "be0eb771bf62c9e66914a0c83033c47767d11d45b3967dfa152f1cdc8d27deab"
+    },
+    {
+      "path": "src/bench/config.py",
+      "sha256": "fb94ed6f41fcc513a0f08dce8bc7c832a3ce2384900e439eba93baa40b8caf1c"
+    },
+    {
+      "path": "src/bench/data.py",
+      "sha256": "6ea87e13f97f0130a3582b007a1aea9f314c7644facbf238d65a575e738ea3ab"
+    },
+    {
+      "path": "src/bench/eval.py",
+      "sha256": "1dcc2a1d16965a90f82f3d374ac123bff44517bb3a6a36d6d51883201e7c91cc"
+    },
+    {
+      "path": "src/bench/model_registry.py",
+      "sha256": "1dba77d7308d8dd543124d2d81f30fc3e2022a4c9b4e99b7faaf30ff3d596cc1"
+    },
+    {
+      "path": "src/bench/plateau.py",
+      "sha256": "b0510cd204487fec9b5ccb5ab6a9a92b4f58e17f3f957e3d54025c289a3a85e8"
+    },
+    {
+      "path": "src/bench/regressions.py",
+      "sha256": "653eee14a8d41a71b8707c8e22669c481603e04e4d76d02768e1def8924cb069"
+    },
+    {
+      "path": "src/bench/run_eval.py",
+      "sha256": "a938762a5932b16a1cd8ea34be45ca55330071bb09ab69fb0335eae0e819558e"
+    },
+    {
+      "path": "src/bench/saebench/__init__.py",
+      "sha256": "ded882c070d075a12a9711a5f67ef6ceff35e6c6e5da6d074465adf2bcc2d3a7"
+    },
+    {
+      "path": "src/bench/saebench/aggregation.py",
+      "sha256": "e23ed5f6959749db51e5a3709200f59d6f1e6a75e1e02f9164e1b4220d944ca2"
+    },
+    {
+      "path": "src/bench/saebench/configs.py",
+      "sha256": "ae11203425021b31d5aff227e76e01c4c9750573392f2e94c9de5718b4bd4e0d"
+    },
+    {
+      "path": "src/bench/saebench/matching_protocols.py",
+      "sha256": "56318a756119d93e98e28f9abdb039299dc6f6f32d1634c1f98caf6752531067"
+    },
+    {
+      "path": "src/bench/saebench/mlc_probing.py",
+      "sha256": "4f37debbcf6675038af631eea397682c56450aa5552efb94359301f4edaeebed"
+    },
+    {
+      "path": "src/bench/saebench/probe_fit.py",
+      "sha256": "a866d5299919d08fe688953011ece37cf91441a40e29c9e25f2c7ced5e90ebea"
+    },
+    {
+      "path": "src/bench/saebench/probing_runner.py",
+      "sha256": "806b828d548aec3b7b3fe2d99ccdef20aa9e462a426061e19b937ae75b22008b"
+    },
+    {
+      "path": "src/bench/saebench/saebench_wrapper.py",
+      "sha256": "d55cd79b11383d24d8354c08ebc80c1e66fd3f68f81b0ee4c1f4f55e196c6ff0"
+    },
+    {
+      "path": "src/bench/sweep.py",
+      "sha256": "95d990110854467455fa64c78a6b680099c579c17c5f4f40de101a1e32dea470"
+    },
+    {
+      "path": "src/bench/venhoff/__init__.py",
+      "sha256": "134adbbad6059970d6d87dbb925f945150b932ea2c8a9d31625b75f808d80ed0"
+    },
+    {
+      "path": "src/bench/venhoff/activation_collection.py",
+      "sha256": "a720ddea9a7f79c436a6d63eb4f870de0dccc65042ffbee38df6baec98e30fcb"
+    },
+    {
+      "path": "src/bench/venhoff/annotate.py",
+      "sha256": "5ac032e6801c652a1f78651bf0a4bea3c57e26bceb3aaebff43d04e03ae1ed37"
+    },
+    {
+      "path": "src/bench/venhoff/autograder_prompts.py",
+      "sha256": "71e5297c53d5e4459c48747ea7bdc0a246da04af7dced2368ab4ff25619ede7c"
+    },
+    {
+      "path": "src/bench/venhoff/dataset.py",
+      "sha256": "977f34754cb6fa17be6a49c679ee7f23edf98ca0a92021470cb4e09ab7313aac"
+    },
+    {
+      "path": "src/bench/venhoff/export_venhoff_ckpt.py",
+      "sha256": "508d1be19e9fa99e4713d29081a0ac4354ad2d6c4def2a3090a4ffe45fb88736"
+    },
+    {
+      "path": "src/bench/venhoff/generate_traces.py",
+      "sha256": "ce1898970b25af12bfbfe0047a933af0333a0aaacb90666de3ef1189d0b78fa1"
+    },
+    {
+      "path": "src/bench/venhoff/grade.py",
+      "sha256": "ff35a3653c535cbd4f3197a7535879e901fd6e317ae27127ed6ca396484f7456"
+    },
+    {
+      "path": "src/bench/venhoff/hybrid.py",
+      "sha256": "33dddab646a4ceaa6bedfb678abd89b97aa3694b6ae62d93d754da4f1993458d"
+    },
+    {
+      "path": "src/bench/venhoff/judge_bridge.py",
+      "sha256": "93de2d485060ed955f2edb507eb31aff10ed54aad305d42244f65942fe6ed311"
+    },
+    {
+      "path": "src/bench/venhoff/judge_client.py",
+      "sha256": "af3ef723ac2fb4640d11ef987735aea91ba814807e068c6a98515714e7a3d767"
+    },
+    {
+      "path": "src/bench/venhoff/paths.py",
+      "sha256": "544531393d08ae4bada70b35caa3508715bff83900fe0026621d10719bf6ee4a"
+    },
+    {
+      "path": "src/bench/venhoff/responses.py",
+      "sha256": "2613a19783ebb9281115312eeaa674b1f08e24b62bfc37d8b6dabfba2bb93bde"
+    },
+    {
+      "path": "src/bench/venhoff/run_grade.py",
+      "sha256": "afdea7c43a834036ffb3d15bc9f9e9a57d1dcb11dcc41ccc4cb516c9dcf14649"
+    },
+    {
+      "path": "src/bench/venhoff/run_hybrid.py",
+      "sha256": "eb0311f89ff0d1d21c6bdc35e25637daef16a3caa0a2c67d478ff076c56555f4"
+    },
+    {
+      "path": "src/bench/venhoff/run_steering.py",
+      "sha256": "81d589163afba040ed78daa444d02bcf4d3a7c89e3d60693f28cef9af25195ec"
+    },
+    {
+      "path": "src/bench/venhoff/sae_shim.py",
+      "sha256": "0a68d99b31953a17985749bd0bccad803bf33064edabc5d83b5b08b56ff47e71"
+    },
+    {
+      "path": "src/bench/venhoff/smoke.py",
+      "sha256": "cd11e163e66a338d85f7e961ff0b3a31971f8b0582549fe401f05bf8edf2c773"
+    },
+    {
+      "path": "src/bench/venhoff/steering.py",
+      "sha256": "172c06324855fbcb24e55288c9647af88712cc22520916d9c1d36f021050485d"
+    },
+    {
+      "path": "src/bench/venhoff/taxonomy/__init__.py",
+      "sha256": "de0082b5b30a3a8b1790e1d11f8e3b28d1025a0d69f234a15f3a2af70259aba6"
+    },
+    {
+      "path": "src/bench/venhoff/taxonomy/label.py",
+      "sha256": "fd10e08a8104c61a5afabf45177dad18cf0bf8768ca72cce24163cc2a39679fe"
+    },
+    {
+      "path": "src/bench/venhoff/taxonomy/score.py",
+      "sha256": "4e315b3c1a2f4a649c225ddd659fc68de81e077df575b667824dce89ce7b7867"
+    },
+    {
+      "path": "src/bench/venhoff/tokenization.py",
+      "sha256": "1f55b0364378f8ab80b1ffb182178096a2dc06d1e6fe14b3388120e30de1b959"
+    },
+    {
+      "path": "src/bench/venhoff/train_small_sae.py",
+      "sha256": "04fd97015480e4a6080109c3314d503c80f2dcbcfe251ca6574591c48835b692"
+    },
+    {
+      "path": "src/bench/venhoff/vendor_patches.py",
+      "sha256": "2352c475e791bb7b16cc0b5b9f93f306f4bb87ea4f04f57e1e43e61c34327b95"
+    },
+    {
+      "path": "src/bench/venhoff/venhoff_format.py",
+      "sha256": "7fe10ef1be4b6dd4adee78eb9dd67b342749818da6293553113b22deb57ec301"
+    },
+    {
+      "path": "src/data_generation/__init__.py",
+      "sha256": "cbd05f1fc917745c8627373c07ca61fecc24b2dcad6071a89dabbc3c505123e9"
+    },
+    {
+      "path": "src/data_generation/activations.py",
+      "sha256": "858e34d7ac298206adce3ad398c9f6a957f3434b16c11c0b574b9808fceb96af"
+    },
+    {
+      "path": "src/data_generation/configs.py",
+      "sha256": "971616ffd33db451fb5a84f8b1f4b96a94e2a263edf81e09da3729376e2e19ff"
+    },
+    {
+      "path": "src/data_generation/coupled_dataset.py",
+      "sha256": "e875144514fdbc7e3ff32e5fbe01bc739be7ea2d492d98fc67efba69c048841b"
+    },
+    {
+      "path": "src/data_generation/coupling.py",
+      "sha256": "2e83a05257b755c7837355e667388c442f289fcb5ba510c090fa7b75eae8d881"
+    },
+    {
+      "path": "src/data_generation/dataset.py",
+      "sha256": "67a5ecfc6c8910fe090b9e9dcab47952e412b98e8b2c11626fb86eb772ae84a3"
+    },
+    {
+      "path": "src/data_generation/magnitudes.py",
+      "sha256": "aeee9828f4f3b43646301b0ecf9dc3ab43c84e39aa67cecec911f6435331721a"
+    },
+    {
+      "path": "src/data_generation/plot_coupled.py",
+      "sha256": "218e491bc8dcdb0f7525f3620296fe4c69ed063a003f251663a555c9c732229a"
+    },
+    {
+      "path": "src/data_generation/support.py",
+      "sha256": "97a5dcd8ab81088f4de7f31916641491ac5cb6717e72ea4f1f4e47bc2c39d9d3"
+    },
+    {
+      "path": "src/data_generation/test.py",
+      "sha256": "adca1c8d25935d52b0b09c8551aa5e61f2d4aaa4a504f08122ad66b621d64c74"
+    },
+    {
+      "path": "src/data_generation/transition.py",
+      "sha256": "6325a077c9bf25dca22d02c7ca551bb7b6014c65cb7b0ecfc387e3b209464a4d"
+    },
+    {
+      "path": "src/shared/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/shared/configs.py",
+      "sha256": "9410e78ab52ca57f44c8c741d2f7b3e4696f86136ccceab0453477628734f9c5"
+    },
+    {
+      "path": "src/shared/correlation.py",
+      "sha256": "d00290511082a19191e1de3a1c8d3b5252e72de1e285a2f27ad5141dce21192d"
+    },
+    {
+      "path": "src/shared/eval_sae.py",
+      "sha256": "c39d89d0c7ce042a17e0aaaf549acff0373b72cb6754806d22354c43167ac323"
+    },
+    {
+      "path": "src/shared/feature_generation.py",
+      "sha256": "58e6b2cc5325126408b6e7d7dc09c73dc4b77e7d246bdba6fb5e96801ddefd6c"
+    },
+    {
+      "path": "src/shared/initialization.py",
+      "sha256": "ceba29daecad459feeeb1f97204c8bffaf8bd905def5f9486fe3818427104500"
+    },
+    {
+      "path": "src/shared/magnitude_sampling.py",
+      "sha256": "dff6c20a51e2135c98300a3693c5bdd2b12b1fa6726bc0b47bab9fb638fc7033"
+    },
+    {
+      "path": "src/shared/metrics.py",
+      "sha256": "afbc1318a3411f08d1dd62b06baca867845c6c73e7dee2303ea56e3ee78ee2b5"
+    },
+    {
+      "path": "src/shared/orthogonalize.py",
+      "sha256": "9f9fcf7afcc65381867569d3c6bbbf581c501eca9649ab8e7cd9981bad820c16"
+    },
+    {
+      "path": "src/shared/plotting.py",
+      "sha256": "2e2bbcefa479f0d66d0a1398b35e0335b49a45c998f33b3f225ea41f976b2270"
+    },
+    {
+      "path": "src/shared/temporal_metrics.py",
+      "sha256": "ddb89d5263c584b26b11870cac0b9eb26066f7bb78b97cb40b91989e019c5a3e"
+    },
+    {
+      "path": "src/shared/temporal_support.py",
+      "sha256": "25949708622566c43e140f9484edccd40f058e79cf81db27bd9aa2f87c4fa806"
+    },
+    {
+      "path": "src/shared/train_sae.py",
+      "sha256": "60af7a328fcb348abe9662c1b76f28225f1c6764c0d3b050c1079988d18cf277"
+    },
+    {
+      "path": "src/utils/__init__.py",
+      "sha256": "a115646af3d22fce34487e778d34678833c6745247380530db38d51cd9828f6e"
+    },
+    {
+      "path": "src/utils/cos_sim.py",
+      "sha256": "78ee4d824d552e35c59aee0f9d1a6bc8057e851eb772f78b3056658ab0554b3f"
+    },
+    {
+      "path": "src/utils/device.py",
+      "sha256": "6277063b2511595bf9f01fc7fa43ea5ec953a71c5eb59d4ae3ec5430265b34de"
+    },
+    {
+      "path": "src/utils/logging.py",
+      "sha256": "f153a4b8bd71dde74956aee31951112075d932d788a1f3fb3f6c870c73954dd2"
+    },
+    {
+      "path": "src/utils/seed.py",
+      "sha256": "6dcfbf9707eeb519a59b8362ef0cf0e6d85f84415202ddf0834bdece02e52cfc"
+    },
+    {
+      "path": "src/v1_token_embedding_recovery/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/v1_token_embedding_recovery/sae_token_embeddings.py",
+      "sha256": "71fa10a41dfb6e0e666b63fea80b99f97ea056fc75dec2a28070e2b3e65ead5a"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/architectures/__init__.py",
+      "sha256": "df28fab8dc42b8b3d3df9317f0a40dd3f2aabfe8661bfa51833e743b64f614f7"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/architectures/base.py",
+      "sha256": "44171ddfebd5b5d7d5f7a6e35438a1c014890e2a918f21a263f119b55647cd0e"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/architectures/crosscoder.py",
+      "sha256": "55706dea899531796f293eec688b48caa3a575c2170b910321d87fbb0dac6416"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/architectures/naive_sae.py",
+      "sha256": "b0bf49fb8f4da7fc52de37dabf59bf89051738de5fa8e3b5cefd5802959ace0f"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/architectures/stacked_sae.py",
+      "sha256": "8867595b3712a68617cf2be806568810e53cf6eb1e943706d72a9a9463e596f4"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/configs.py",
+      "sha256": "d1ccaf1aca31618b0e26d6dd576baf6b34b3e12dd21c891dd3e9b5d588a369db"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/data_generation.py",
+      "sha256": "2b2b7c04af01b6e3621fad10d4483a7b21a74607a9ef468fd9cc132acf2f43cd"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/eval.py",
+      "sha256": "bb8ee234f406c469a0ad8ec774387b246aec139cff00db09313f29dc6852e795"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/plotting.py",
+      "sha256": "4a24e3ada22de79658b5e7fd945b2ab8e015d95eecb629c632826eb7464d807f"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/run_experiments.py",
+      "sha256": "a61a73e72512a9812c3b9ec4b3ba0683fce25dda997850657d821323d1e2c149"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/toy_model.py",
+      "sha256": "f15a8931fd2ceb5075fe17e1e53329d8b02aaddb3dd3ef35290e1eefdb24a964"
+    },
+    {
+      "path": "src/v2_crosscoder_comparison/train.py",
+      "sha256": "dfb3556017c32c0cf31f6ad9e472cb4c694199cf26261ce5244b5171d2a9f513"
+    },
+    {
+      "path": "src/v3_feature_hedging/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/v3_feature_hedging/feature_hedging.py",
+      "sha256": "b06d05257867001aa98fa66cef0b3ee972fbb1b13cb484db87f1b664f665463d"
+    },
+    {
+      "path": "src/v3_feature_hedging/plotting.py",
+      "sha256": "693449efed2e6755a6fde2f87cd7086601ff947555c66af40ec53752afd179bd"
+    },
+    {
+      "path": "src/v4_reset_process_validation/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/v4_reset_process_validation/run_validation.py",
+      "sha256": "e9b7d09c1c8e6ba15f99ef3e537439973f36a6225588dc3a41f2684292e074ac"
+    },
+    {
+      "path": "src/v5_hmm_sae_baseline/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "src/v5_hmm_sae_baseline/hmm_data.py",
+      "sha256": "4dc987b0faffe5349a50e12f2e119b5e256728ec9de8b0848307149a1b54cb73"
+    },
+    {
+      "path": "src/v5_hmm_sae_baseline/metrics.py",
+      "sha256": "214124f499d7a1ed84396cbfbd882e37ce22417716fb0227bfe37eb831338c2b"
+    },
+    {
+      "path": "src/v5_hmm_sae_baseline/plot_results.py",
+      "sha256": "9748f6e6fd08a38b83e833dc22e1487e694c56823699a5ed5a083217ff3d9d65"
+    },
+    {
+      "path": "src/v5_hmm_sae_baseline/run_experiment.py",
+      "sha256": "6fef4aedf85eeb33eced6c044c3e2b7d69058317ac6df5c5fc7b4f9fafe80a83"
+    },
+    {
+      "path": "src/v5_hmm_sae_baseline/sae.py",
+      "sha256": "63b1b629db2e520e2718dc6b3d4f9e32aa26035f164e4cb74f5326db7d46ac07"
+    },
+    {
+      "path": "src/v5_hmm_sae_baseline/train.py",
+      "sha256": "973e6585ea5b40872c524da26cdd57708372aed3742c639f031ef21bdb6d572e"
+    },
+    {
+      "path": "src/v6_colored_sources/__init__.py",
+      "sha256": "c8f4e539362e9689f57d9fd4422bf269f8ad79a7230df7102f133f7e52556af2"
+    },
+    {
+      "path": "src/v6_colored_sources/ambiguous_pair.py",
+      "sha256": "e08efc8b3962fbe35c8acecc8427c23a5e359802296efac03f7404ac21008089"
+    },
+    {
+      "path": "src/v6_colored_sources/colored_sources.py",
+      "sha256": "bba7dd60cf4bfdd57c70018a33d0dc86e718ef68d4380b9529e44a3017ea7900"
+    },
+    {
+      "path": "src/v6_colored_sources/configs.py",
+      "sha256": "b9dc11eb517757a2a3122a8d8aafac40a703af63efee4c841c2a0076aa4b9dfa"
+    },
+    {
+      "path": "src/v6_colored_sources/data_adapter.py",
+      "sha256": "2c98fbd280931f5cc7e1e82dbd0506b88471d2df4b58c491d15fe8de51896c39"
+    },
+    {
+      "path": "src/v6_colored_sources/metrics.py",
+      "sha256": "6f0e1ca11285daa003586c55a8a1d864677db66f32f9afb2edbac75eea4d50d7"
+    },
+    {
+      "path": "src/v6_colored_sources/multilane_rs.py",
+      "sha256": "860b6c0294027c3da1b24d2c3441ec11d9fd28510e57060b458b88569bfaaadc"
+    },
+    {
+      "path": "src/v6_colored_sources/plot_results.py",
+      "sha256": "8bb398e6f1f6f85b595608e173c86b78b4a83324f04ef03c73ccba94929f1892"
+    },
+    {
+      "path": "src/v6_colored_sources/polynomial_clock.py",
+      "sha256": "4e8e9c5a1221da1d0d526e017d4e005b9f4ee6c9423e14ac6f1d22ce0894effc"
+    },
+    {
+      "path": "src/v6_colored_sources/polynomial_clock_oracles.py",
+      "sha256": "290cfa1efbfa8968352600d49505efb9fc18667d43b5f62a349c2a4173d1c99f"
+    },
+    {
+      "path": "src/v6_colored_sources/run_experiment.py",
+      "sha256": "27f33c590c6f4d62b5585554103e403d27b13dc1251c27b5d2482a5a41b1c0f1"
+    },
+    {
+      "path": "src/v6_colored_sources/run_multilane.py",
+      "sha256": "100a7aff07fbb66fc6dc8b7d698b9fbe8ea3fa323d86cfa8b6f8c3466f764104"
+    },
+    {
+      "path": "src/v6_colored_sources/run_multilane_followup.py",
+      "sha256": "afa9751d62a142c7bfca24b2a5dd7c5bda9afe96b4303b8457f4430a8cbb070c"
+    },
+    {
+      "path": "src/v6_colored_sources/run_pair_experiment.py",
+      "sha256": "e5e3901abf3de6fe7aebd08922c73e08e2e81a4a5f4ba6debb50223670144a60"
+    },
+    {
+      "path": "src/v6_colored_sources/run_polynomial_clock.py",
+      "sha256": "4f332807cfae0b9611bcc4b0b8cd9cd295eb1ebe660b5ccdb1dc24ee7cca63a6"
+    },
+    {
+      "path": "src/v6_colored_sources/run_polynomial_clock_clean.py",
+      "sha256": "db0ec665443d9addc05ca6fb5dbd449058cadc110c44aec58755097f4c96e948"
+    },
+    {
+      "path": "src/v6_colored_sources/run_polynomial_clock_temporal_k_clean.py",
+      "sha256": "42780d3896421deb0661c70f36ad1055018d9fa12a0c757aa8e597ff691f4ab6"
+    },
+    {
+      "path": "src/v6_colored_sources/run_polynomial_clock_tfa_only.py",
+      "sha256": "32ed8f8110005d61c45ca01a49b959338c09e169a44da96786f0ff9618190a0c"
+    },
+    {
+      "path": "src/v6_colored_sources/theory.py",
+      "sha256": "33b9db271e0428f8669bde95fe3ae54cc88df686da9f29e0aa4dccea9dcaa903"
+    },
+    {
+      "path": "src/v6_colored_sources/train_runner.py",
+      "sha256": "e6ea16ee4fd10c188512d369d04593599c138cdc51bfb94b2d44708a521cdf73"
+    },
+    {
+      "path": "src/v6_colored_sources/validation.py",
+      "sha256": "489aec8ec74b0abe909a6a4bc5e884223de7b97b33e5de46a4f73350efecb674"
+    },
+    {
+      "path": "temporal_crosscoders/NLP/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "temporal_crosscoders/NLP/autointerp.py",
+      "sha256": "824920e6815f8f4cc94b7dce729c54b2f2503f86c19b913143fef880d2273001"
+    },
+    {
+      "path": "temporal_crosscoders/NLP/cache_activations.py",
+      "sha256": "f2e84b0f6fd70e38fa3f122794ab2bbab496b55e637ed04687a4ffaf8dd9f55b"
+    },
+    {
+      "path": "temporal_crosscoders/NLP/config.py",
+      "sha256": "33f9d9c972c31c0e65caf2421925765d064000620a622b185b4b53bfb1472c4a"
+    },
+    {
+      "path": "temporal_crosscoders/NLP/data.py",
+      "sha256": "ee8d098aa5b8391de72e556ad6aca5c773696046318b57bf2651fc50ba5aa3e2"
+    },
+    {
+      "path": "temporal_crosscoders/NLP/delphi_adapter.py",
+      "sha256": "58d371429795b49fe82e775c77d90a21d7b027b7a12d1c04541b18cda54b75d6"
+    },
+    {
+      "path": "temporal_crosscoders/NLP/fast_models.py",
+      "sha256": "94361b4d05b45e3a74b580512d3106d4f8f5ee573c1d167ba5fffe279b319bc0"
+    },
+    {
+      "path": "temporal_crosscoders/NLP/feature_map.py",
+      "sha256": "ad1e06799c47408f722dd69985df90488b4447cb46679bda83bd30a4d0e8994c"
+    },
+    {
+      "path": "temporal_crosscoders/NLP/sweep.py",
+      "sha256": "c6281b8b594fd8aa3cdd0f9bdb5b8c45e75371adbe2b46bf3e9e5bfa835fc121"
+    },
+    {
+      "path": "temporal_crosscoders/NLP/train.py",
+      "sha256": "fe53d1534c2325f399afa3dac0900ee0a446987e0c2cda3755cb581918024d05"
+    },
+    {
+      "path": "temporal_crosscoders/config.py",
+      "sha256": "8befefc637d41a618fcf8671978441b5bbbe7fe8d44118bf7e3d4af03539fd0c"
+    },
+    {
+      "path": "temporal_crosscoders/data.py",
+      "sha256": "60fd48e295462dd6d0729cb8be96f18d52f48a3aa21f8a0a7a3747a5118bd39a"
+    },
+    {
+      "path": "temporal_crosscoders/han_arch/__init__.py",
+      "sha256": "70017e6569b19b9d248d80e8026e2fdcf3751c1b20185fcbf3ab1f91b5c1ca47"
+    },
+    {
+      "path": "temporal_crosscoders/han_arch/txc_bare_antidead.py",
+      "sha256": "611ae5e24c4ef84a9d1638ff3f5defe276c8f9311ed3293fda944e06ff9117c2"
+    },
+    {
+      "path": "temporal_crosscoders/han_arch/txc_bare_matryoshka_contrastive_antidead.py",
+      "sha256": "693aa5bd926cdcd78330d770676f1f82d9cc74c6f82419972883d5fa2bec8f04"
+    },
+    {
+      "path": "temporal_crosscoders/han_arch/txc_bare_md_ms_contrastive_antidead.py",
+      "sha256": "c9f81ff9fb025d367994d3a82c4f37f166d861ce725097dfc10a75bc6d723be2"
+    },
+    {
+      "path": "temporal_crosscoders/han_arch/txc_bare_multidistance_contrastive_antidead.py",
+      "sha256": "4eec81f98f9f35d52ad0101aab7c7787bbb732d878f509781cdcc98c23f6805e"
+    },
+    {
+      "path": "temporal_crosscoders/han_tsae/__init__.py",
+      "sha256": "3b5bc75f118400a1a94ac00e9b3acff04abdf59551ed2beb58f3129238fc39b2"
+    },
+    {
+      "path": "temporal_crosscoders/han_tsae/saeStandard.py",
+      "sha256": "08f00d36ab34d68616c08810f8fea5fbfb345eccee21ccc628d3b7f732706488"
+    },
+    {
+      "path": "temporal_crosscoders/han_tsae/saeTemporal.py",
+      "sha256": "eaa5c393cd8da53b606b4ba42f567c02b66754db3abf23680c692e8875aac6f3"
+    },
+    {
+      "path": "temporal_crosscoders/han_tsae/utils.py",
+      "sha256": "e6d90044c8bc2da2d20cbf5e7e51fd6f04225e96cddf8abfbf0ef792f162696c"
+    },
+    {
+      "path": "temporal_crosscoders/metrics.py",
+      "sha256": "7294fe10609278bfa90cd1bd223d00833915c23db98ef5c768777aa8632be750"
+    },
+    {
+      "path": "temporal_crosscoders/models.py",
+      "sha256": "92a26ed390a795c8f20c581767ad9ce4587298d982e27c9978f451524d85261a"
+    },
+    {
+      "path": "temporal_crosscoders/sweep.py",
+      "sha256": "aadb2a3926e62cc9a861339962070f3e82b49c66c720068086ca7d7c90e0124f"
+    },
+    {
+      "path": "temporal_crosscoders/train.py",
+      "sha256": "85f23ef9d3429fb5f1769a1b5cec8473e5ce0f2527002658ab62ffa4d3c12575"
+    },
+    {
+      "path": "temporal_crosscoders/viz.py",
+      "sha256": "e9e4b87a8df3f2611d7ea76be3da0aed0efc0102c451b5a558f4e7e6cc2b220d"
+    }
+  ]
+}

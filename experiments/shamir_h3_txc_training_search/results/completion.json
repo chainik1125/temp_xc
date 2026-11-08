@@ -1,0 +1,21 @@
+{
+  "state": "complete",
+  "completed": "2026-11-07T06:52:33.267912+00:00",
+  "elapsed_seconds": 207.55302834510803,
+  "selected": {
+    "recipe": {
+      "name": "data_init_centered",
+      "lr": 0.001,
+      "schedule": "cosine",
+      "centered": true,
+      "data_init": true,
+      "early_aux": false
+    },
+    "steps": 6000,
+    "objective": 0.1256103515625,
+    "windows": {
+      "6": 0.121337890625,
+      "10": 0.1298828125
+    }
+  }
+}

@@ -1,0 +1,111 @@
+{
+  "created": "2026-11-07T06:49:05.714925+00:00",
+  "protocol": "four_episode_splits_validation_selection_then_frozen_test",
+  "h": 3,
+  "q": 11,
+  "k": 5,
+  "width": 2048,
+  "generator": {
+    "d": 64,
+    "sigma": 0.1,
+    "T_chain": 16
+  },
+  "episodes_per_split": 4096,
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "windows": [
+    3,
+    4,
+    5,
+    6,
+    10
+  ],
+  "screen_windows": [
+    6,
+    10
+  ],
+  "screen_seed": 0,
+  "checkpoints": [
+    6000,
+    12000,
+    24000
+  ],
+  "recipes": [
+    {
+      "name": "baseline",
+      "lr": 0.001,
+      "schedule": "constant",
+      "centered": false,
+      "data_init": false,
+      "early_aux": false
+    },
+    {
+      "name": "low_lr",
+      "lr": 0.0003,
+      "schedule": "constant",
+      "centered": false,
+      "data_init": false,
+      "early_aux": false
+    },
+    {
+      "name": "high_lr",
+      "lr": 0.003,
+      "schedule": "constant",
+      "centered": false,
+      "data_init": false,
+      "early_aux": false
+    },
+    {
+      "name": "cosine",
+      "lr": 0.001,
+      "schedule": "cosine",
+      "centered": false,
+      "data_init": false,
+      "early_aux": false
+    },
+    {
+      "name": "cosine_high_lr",
+      "lr": 0.003,
+      "schedule": "cosine",
+      "centered": false,
+      "data_init": false,
+      "early_aux": false
+    },
+    {
+      "name": "centered_cosine",
+      "lr": 0.001,
+      "schedule": "cosine",
+      "centered": true,
+      "data_init": false,
+      "early_aux": false
+    },
+    {
+      "name": "data_init_centered",
+      "lr": 0.001,
+      "schedule": "cosine",
+      "centered": true,
+      "data_init": true,
+      "early_aux": false
+    },
+    {
+      "name": "early_aux_data_init",
+      "lr": 0.001,
+      "schedule": "cosine",
+      "centered": true,
+      "data_init": true,
+      "early_aux": true
+    }
+  ],
+  "workers": 16,
+  "budget_seconds": 3600,
+  "selection_objective": "Mean validation accuracy at W=6 and W=10. Tie-break: fewer steps, then recipe name.",
+  "controls": "W=3 negative control, raw-observation linear probe, shuffled-label W=10 probe, symbolic/observation interpolation oracle.",
+  "caveats": [
+    "Search uses newly generated four-way data, not the old three-way result table; baseline is rerun on identical splits.",
+    "Nominal k and width remain fixed. Parameter count increases with W. Training budget differs by candidate.",
+    "Screening uses seed 0; confirmation uses all three seeds without further tuning based on test."
+  ]
+}

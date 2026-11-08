@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "source_hashes_verified": 159,
+  "dataset_hashes_verified": 6,
+  "episode_splits_disjoint": true,
+  "all_test_evaluations_after_selection": true,
+  "screening_jobs": 16,
+  "screening_validation_rows": 48,
+  "confirmation_jobs": 30,
+  "model_checkpoints_verified": 78,
+  "normal_probes_verified": 78,
+  "control_probes_verified": 36,
+  "decoder_unit_norms_verified": true,
+  "common_seeds": [
+    0,
+    1,
+    2
+  ],
+  "negative_control": {
+    "baseline": {
+      "mean": 0.091552734375,
+      "pooled_chance_z": 0.24818678386952742
+    },
+    "data_init_centered": {
+      "mean": 0.09138997395833333,
+      "pooled_chance_z": 0.18542690748872537
+    }
+  },
+  "raw_linear_control_range": [
+    0.08837890625,
+    0.0986328125
+  ],
+  "shuffled_label_control_range": [
+    0.088623046875,
+    0.099365234375
+  ],
+  "symbolic_and_observation_oracles_exact": true,
+  "selected": {
+    "recipe": {
+      "name": "data_init_centered",
+      "lr": 0.001,
+      "schedule": "cosine",
+      "centered": true,
+      "data_init": true,
+      "early_aux": false
+    },
+    "steps": 6000,
+    "objective": 0.1256103515625,
+    "windows": {
+      "6": 0.121337890625,
+      "10": 0.1298828125
+    }
+  },
+  "selected_W10_minus_W4_by_seed": [
+    0.037109375,
+    0.025146484375,
+    0.021728515625
+  ],
+  "selected_minus_baseline_W10_by_seed": [
+    0.016845703125,
+    0.019287109375,
+    0.0126953125
+  ],
+  "selected_minus_baseline_W10_mean": 0.016276041666666668,
+  "selected_minus_baseline_W10_sd": 0.003332616411042199,
+  "monotonic_mean_curve": false,
+  "interpretation": "Modest improvement, with a small W5-to-W6 decline; no strict monotonicity or high recovery accuracy established.",
+  "elapsed_seconds": 207.55302834510803
+}

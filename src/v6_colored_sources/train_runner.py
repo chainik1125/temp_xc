@@ -361,12 +361,17 @@ def train_tsae(
     train_cfg: TrainConfig,
     tied_weights: bool = True,
 ) -> TemporalSAE:
-    """Train Bhalla 2025-style TemporalSAE on (B, W, d) windows.
+    """Train the legacy attention-plus-InfoNCE baseline on (B, W, d) windows.
+
+    This is NOT Bhalla's published T-SAE. ``han_tsae`` is vendored from
+    TemporalFeatureAnalysis; the historical function name is retained for
+    reproducibility. For the per-token Matryoshka/contrastive T-SAE used in
+    the corrected Shamir comparison, see experiments/shamir_tsae_paper_correction.
 
     Recipe:
 
     - ``sae_diff_type='topk'`` with ``kval_topk = k`` per token (not per
-      window). The Bhalla paper uses ``k=20`` by default.
+      window).
     - Loss = reconstruction MSE + ``contrastive_weight`` * InfoNCE between
       consecutive temporal codes ``(z_t, z_{t+1})``, evaluated per window
       and averaged. Default contrastive weight ``0.1``.
@@ -466,7 +471,7 @@ def train_tfa(
     """Train Temporal Feature Analysis (TFA) per the existing
     ``src/bench/architectures/tfa.py`` recipe.
 
-    TFA uses the same ``TemporalSAE`` decomposition as Bhalla 2025
+    TFA uses the same ``TemporalSAE`` decomposition as the legacy attention baseline
     (predicted codes from causal attention on prior context + novel
     codes from a per-token TopK SAE) but with:
 

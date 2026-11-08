@@ -1,0 +1,1700 @@
+{
+  "created": "2026-11-07T06:52:33.261652+00:00",
+  "rows": [
+    {
+      "spec": {
+        "id": "confirm_baseline_s0_W3_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 3,
+        "seed": 0,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.0859375,
+      "train_accuracy": 0.380859375,
+      "balanced_accuracy": 0.08601136844266545,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.3579403251357431,
+      "alive_fraction": 0.85205078125,
+      "n_params": 788672,
+      "evaluated": "2026-11-07T06:51:55.134623+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.2392578125,
+        "val_accuracy": 0.092529296875,
+        "balanced_accuracy": 0.09316622906110504,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "information_theoretic_accuracy": 0.09090909090909091
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s0_W4_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 4,
+        "seed": 0,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.09375,
+      "train_accuracy": 0.260009765625,
+      "balanced_accuracy": 0.09447302601554176,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.37832821884171813,
+      "alive_fraction": 0.62353515625,
+      "n_params": 1050880,
+      "evaluated": "2026-11-07T06:51:56.290461+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.27197265625,
+        "val_accuracy": 0.098388671875,
+        "balanced_accuracy": 0.09874287721785632,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s0_W5_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 5,
+        "seed": 0,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.091796875,
+      "train_accuracy": 0.157470703125,
+      "balanced_accuracy": 0.09183285774832423,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.38874987210072265,
+      "alive_fraction": 0.04931640625,
+      "n_params": 1313088,
+      "evaluated": "2026-11-07T06:51:57.021725+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.30908203125,
+        "val_accuracy": 0.093994140625,
+        "balanced_accuracy": 0.09386602315035733,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s0_W6_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 6,
+        "seed": 0,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.098388671875,
+      "train_accuracy": 0.166259765625,
+      "balanced_accuracy": 0.09775787930596959,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.44508980148311167,
+      "alive_fraction": 0.05810546875,
+      "n_params": 1575296,
+      "evaluated": "2026-11-07T06:51:56.208367+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.338134765625,
+        "val_accuracy": 0.0986328125,
+        "balanced_accuracy": 0.09864038364453749,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s0_W10_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 10,
+        "seed": 0,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.12353515625,
+      "train_accuracy": 0.45361328125,
+      "balanced_accuracy": 0.12350530516017567,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.6161972674590545,
+      "alive_fraction": 0.4384765625,
+      "n_params": 2624128,
+      "evaluated": "2026-11-07T06:51:55.810670+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.477783203125,
+        "val_accuracy": 0.091796875,
+        "balanced_accuracy": 0.09141590107570995,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      },
+      "shuffled_label_control": {
+        "train_accuracy": 0.433349609375,
+        "val_accuracy": 0.095458984375,
+        "balanced_accuracy": 0.09579884193160317,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s1_W3_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 3,
+        "seed": 1,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.0986328125,
+      "train_accuracy": 0.40673828125,
+      "balanced_accuracy": 0.0990514995699579,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.35825735146767207,
+      "alive_fraction": 0.8671875,
+      "n_params": 788672,
+      "evaluated": "2026-11-07T06:51:56.217784+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.2421875,
+        "val_accuracy": 0.09326171875,
+        "balanced_accuracy": 0.09354770522225987,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "information_theoretic_accuracy": 0.09090909090909091
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s1_W4_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 4,
+        "seed": 1,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.093505859375,
+      "train_accuracy": 0.259765625,
+      "balanced_accuracy": 0.0936733101579276,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.37825823455534097,
+      "alive_fraction": 0.61376953125,
+      "n_params": 1050880,
+      "evaluated": "2026-11-07T06:51:56.374320+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.27587890625,
+        "val_accuracy": 0.090576171875,
+        "balanced_accuracy": 0.09046827730807391,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s1_W5_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 5,
+        "seed": 1,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.0859375,
+      "train_accuracy": 0.166748046875,
+      "balanced_accuracy": 0.08645532178607854,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.3877918877878273,
+      "alive_fraction": 0.0498046875,
+      "n_params": 1313088,
+      "evaluated": "2026-11-07T06:51:55.103651+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.32275390625,
+        "val_accuracy": 0.08837890625,
+        "balanced_accuracy": 0.0882163904607296,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s1_W6_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 6,
+        "seed": 1,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.08837890625,
+      "train_accuracy": 0.18701171875,
+      "balanced_accuracy": 0.08865159546787088,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.44225080040776765,
+      "alive_fraction": 0.07177734375,
+      "n_params": 1575296,
+      "evaluated": "2026-11-07T06:51:56.730589+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.349609375,
+        "val_accuracy": 0.08837890625,
+        "balanced_accuracy": 0.08865180543877861,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s1_W10_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 10,
+        "seed": 1,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.11474609375,
+      "train_accuracy": 0.4130859375,
+      "balanced_accuracy": 0.11497616767883301,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.6120952244835602,
+      "alive_fraction": 0.3994140625,
+      "n_params": 2624128,
+      "evaluated": "2026-11-07T06:51:56.372555+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.486572265625,
+        "val_accuracy": 0.09130859375,
+        "balanced_accuracy": 0.09148769757964394,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      },
+      "shuffled_label_control": {
+        "train_accuracy": 0.401123046875,
+        "val_accuracy": 0.099365234375,
+        "balanced_accuracy": 0.09948828410018574,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s2_W3_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 3,
+        "seed": 2,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.090087890625,
+      "train_accuracy": 0.393310546875,
+      "balanced_accuracy": 0.09029444815082983,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.35719111847009694,
+      "alive_fraction": 0.849609375,
+      "n_params": 788672,
+      "evaluated": "2026-11-07T06:51:55.837724+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.244140625,
+        "val_accuracy": 0.092529296875,
+        "balanced_accuracy": 0.0931144119663672,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "information_theoretic_accuracy": 0.09090909090909091
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s2_W4_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 4,
+        "seed": 2,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.0908203125,
+      "train_accuracy": 0.27392578125,
+      "balanced_accuracy": 0.08961945433508266,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.37796016703681956,
+      "alive_fraction": 0.6083984375,
+      "n_params": 1050880,
+      "evaluated": "2026-11-07T06:51:54.814451+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.2763671875,
+        "val_accuracy": 0.095458984375,
+        "balanced_accuracy": 0.09547329423102466,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s2_W5_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 5,
+        "seed": 2,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.086181640625,
+      "train_accuracy": 0.160400390625,
+      "balanced_accuracy": 0.08588962798768823,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.3886215105100091,
+      "alive_fraction": 0.0595703125,
+      "n_params": 1313088,
+      "evaluated": "2026-11-07T06:51:56.590746+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.31201171875,
+        "val_accuracy": 0.08984375,
+        "balanced_accuracy": 0.08999517153609883,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s2_W6_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 6,
+        "seed": 2,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.090087890625,
+      "train_accuracy": 0.183837890625,
+      "balanced_accuracy": 0.0905446723442186,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.44341673767329465,
+      "alive_fraction": 0.06591796875,
+      "n_params": 1575296,
+      "evaluated": "2026-11-07T06:51:55.911451+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.342529296875,
+        "val_accuracy": 0.0966796875,
+        "balanced_accuracy": 0.09676723554730415,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_baseline_s2_W10_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "baseline",
+          "lr": 0.001,
+          "schedule": "constant",
+          "centered": false,
+          "data_init": false,
+          "early_aux": false
+        },
+        "W": 10,
+        "seed": 2,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.11376953125,
+      "train_accuracy": 0.427734375,
+      "balanced_accuracy": 0.11423561315644871,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.6148426366797899,
+      "alive_fraction": 0.4248046875,
+      "n_params": 2624128,
+      "evaluated": "2026-11-07T06:51:54.893446+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.474853515625,
+        "val_accuracy": 0.093017578125,
+        "balanced_accuracy": 0.09247601811181415,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      },
+      "shuffled_label_control": {
+        "train_accuracy": 0.408203125,
+        "val_accuracy": 0.09130859375,
+        "balanced_accuracy": 0.0913143814964728,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s0_W3_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 3,
+        "seed": 0,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.089111328125,
+      "train_accuracy": 0.548095703125,
+      "balanced_accuracy": 0.08884309774095361,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.40171204975509855,
+      "alive_fraction": 0.93603515625,
+      "n_params": 788672,
+      "evaluated": "2026-11-07T06:51:58.500991+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.2392578125,
+        "val_accuracy": 0.092529296875,
+        "balanced_accuracy": 0.09316622906110504,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "information_theoretic_accuracy": 0.09090909090909091
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s0_W4_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 4,
+        "seed": 0,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.103271484375,
+      "train_accuracy": 0.560791015625,
+      "balanced_accuracy": 0.10339597680351952,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.429790126066035,
+      "alive_fraction": 0.8720703125,
+      "n_params": 1050880,
+      "evaluated": "2026-11-07T06:52:22.155979+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.27197265625,
+        "val_accuracy": 0.098388671875,
+        "balanced_accuracy": 0.09874287721785632,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s0_W5_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 5,
+        "seed": 0,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.10986328125,
+      "train_accuracy": 0.653076171875,
+      "balanced_accuracy": 0.11000722375783054,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.46743106417285135,
+      "alive_fraction": 0.87060546875,
+      "n_params": 1313088,
+      "evaluated": "2026-11-07T06:52:26.602783+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.30908203125,
+        "val_accuracy": 0.093994140625,
+        "balanced_accuracy": 0.09386602315035733,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s0_W6_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 6,
+        "seed": 0,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.108154296875,
+      "train_accuracy": 0.720947265625,
+      "balanced_accuracy": 0.10797905786470934,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.5075350059397381,
+      "alive_fraction": 0.880859375,
+      "n_params": 1575296,
+      "evaluated": "2026-11-07T06:52:26.564153+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.338134765625,
+        "val_accuracy": 0.0986328125,
+        "balanced_accuracy": 0.09864038364453749,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s0_W10_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 10,
+        "seed": 0,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.140380859375,
+      "train_accuracy": 0.760986328125,
+      "balanced_accuracy": 0.14091124995188278,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.6357654018219048,
+      "alive_fraction": 0.845703125,
+      "n_params": 2624128,
+      "evaluated": "2026-11-07T06:52:28.448995+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.477783203125,
+        "val_accuracy": 0.091796875,
+        "balanced_accuracy": 0.09141590107570995,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      },
+      "shuffled_label_control": {
+        "train_accuracy": 0.744384765625,
+        "val_accuracy": 0.089599609375,
+        "balanced_accuracy": 0.08951510963114825,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s1_W3_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 3,
+        "seed": 1,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.094970703125,
+      "train_accuracy": 0.548583984375,
+      "balanced_accuracy": 0.0952194905416532,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.40104609713602174,
+      "alive_fraction": 0.9326171875,
+      "n_params": 788672,
+      "evaluated": "2026-11-07T06:52:26.555093+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.2421875,
+        "val_accuracy": 0.09326171875,
+        "balanced_accuracy": 0.09354770522225987,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "information_theoretic_accuracy": 0.09090909090909091
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s1_W4_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 4,
+        "seed": 1,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.10888671875,
+      "train_accuracy": 0.572265625,
+      "balanced_accuracy": 0.10918169604106383,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.4264335083139998,
+      "alive_fraction": 0.85595703125,
+      "n_params": 1050880,
+      "evaluated": "2026-11-07T06:52:28.049328+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.27587890625,
+        "val_accuracy": 0.090576171875,
+        "balanced_accuracy": 0.09046827730807391,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s1_W5_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 5,
+        "seed": 1,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.11474609375,
+      "train_accuracy": 0.68115234375,
+      "balanced_accuracy": 0.1152317225933075,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.4722424403431727,
+      "alive_fraction": 0.89013671875,
+      "n_params": 1313088,
+      "evaluated": "2026-11-07T06:52:28.700423+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.32275390625,
+        "val_accuracy": 0.08837890625,
+        "balanced_accuracy": 0.0882163904607296,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s1_W6_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 6,
+        "seed": 1,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.10791015625,
+      "train_accuracy": 0.7021484375,
+      "balanced_accuracy": 0.10813746804540808,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.5036815477767568,
+      "alive_fraction": 0.86279296875,
+      "n_params": 1575296,
+      "evaluated": "2026-11-07T06:52:28.819792+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.349609375,
+        "val_accuracy": 0.08837890625,
+        "balanced_accuracy": 0.08865180543877861,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s1_W10_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 10,
+        "seed": 1,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.134033203125,
+      "train_accuracy": 0.744140625,
+      "balanced_accuracy": 0.13418526947498322,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.6323122793027804,
+      "alive_fraction": 0.8359375,
+      "n_params": 2624128,
+      "evaluated": "2026-11-07T06:52:30.245591+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.486572265625,
+        "val_accuracy": 0.09130859375,
+        "balanced_accuracy": 0.09148769757964394,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      },
+      "shuffled_label_control": {
+        "train_accuracy": 0.739501953125,
+        "val_accuracy": 0.091064453125,
+        "balanced_accuracy": 0.09132299267432907,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s2_W3_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 3,
+        "seed": 2,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.090087890625,
+      "train_accuracy": 0.5390625,
+      "balanced_accuracy": 0.09014782919125124,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.4003216743562865,
+      "alive_fraction": 0.94189453125,
+      "n_params": 788672,
+      "evaluated": "2026-11-07T06:52:30.197511+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.244140625,
+        "val_accuracy": 0.092529296875,
+        "balanced_accuracy": 0.0931144119663672,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "information_theoretic_accuracy": 0.09090909090909091
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s2_W4_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 4,
+        "seed": 2,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.104736328125,
+      "train_accuracy": 0.48095703125,
+      "balanced_accuracy": 0.10426377708261664,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.42011493593914556,
+      "alive_fraction": 0.85009765625,
+      "n_params": 1050880,
+      "evaluated": "2026-11-07T06:52:28.933659+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.2763671875,
+        "val_accuracy": 0.095458984375,
+        "balanced_accuracy": 0.09547329423102466,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s2_W5_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 5,
+        "seed": 2,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.119384765625,
+      "train_accuracy": 0.560546875,
+      "balanced_accuracy": 0.11956635591658679,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.4484436338497743,
+      "alive_fraction": 0.78369140625,
+      "n_params": 1313088,
+      "evaluated": "2026-11-07T06:52:29.713935+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.31201171875,
+        "val_accuracy": 0.08984375,
+        "balanced_accuracy": 0.08999517153609883,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s2_W6_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 6,
+        "seed": 2,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.12646484375,
+      "train_accuracy": 0.69091796875,
+      "balanced_accuracy": 0.12661764432083478,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.5001486456808143,
+      "alive_fraction": 0.8603515625,
+      "n_params": 1575296,
+      "evaluated": "2026-11-07T06:52:28.677938+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.342529296875,
+        "val_accuracy": 0.0966796875,
+        "balanced_accuracy": 0.09676723554730415,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      }
+    },
+    {
+      "spec": {
+        "id": "confirm_data_init_centered_s2_W10_n6000",
+        "phase": "confirm",
+        "recipe": {
+          "name": "data_init_centered",
+          "lr": 0.001,
+          "schedule": "cosine",
+          "centered": true,
+          "data_init": true,
+          "early_aux": false
+        },
+        "W": 10,
+        "seed": 2,
+        "checkpoints": [
+          6000
+        ],
+        "h": 3,
+        "q": 11,
+        "k": 5,
+        "width": 2048,
+        "batch_size": 128,
+        "probe_steps": 1500
+      },
+      "steps": 6000,
+      "split": "test",
+      "accuracy": 0.12646484375,
+      "train_accuracy": 0.74267578125,
+      "balanced_accuracy": 0.12662423402071,
+      "chance": 0.09090909090909091,
+      "n_train": 4096,
+      "n_val": 4096,
+      "l0_per_window": 5.0,
+      "reconstruction_nmse": 0.632971653436082,
+      "alive_fraction": 0.841796875,
+      "n_params": 2624128,
+      "evaluated": "2026-11-07T06:52:29.910316+00:00",
+      "raw_linear_control": {
+        "train_accuracy": 0.474853515625,
+        "val_accuracy": 0.093017578125,
+        "balanced_accuracy": 0.09247601811181415,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      },
+      "oracle": {
+        "symbolic_accuracy": 1.0,
+        "observation_accuracy": 1.0
+      },
+      "shuffled_label_control": {
+        "train_accuracy": 0.73974609375,
+        "val_accuracy": 0.088623046875,
+        "balanced_accuracy": 0.08843004703521729,
+        "chance": 0.09090909090909091,
+        "n_train": 4096,
+        "n_val": 4096
+      }
+    }
+  ],
+  "summary": [
+    {
+      "recipe": "baseline",
+      "steps": 6000,
+      "W": 3,
+      "n_seeds": 3,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "accuracy_mean": 0.091552734375,
+      "accuracy_sd": 0.006473180460724049,
+      "alive_fraction_mean": 0.8562825520833334,
+      "reconstruction_nmse_mean": 0.35779626502450407
+    },
+    {
+      "recipe": "baseline",
+      "steps": 6000,
+      "W": 4,
+      "n_seeds": 3,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "accuracy_mean": 0.09269205729166667,
+      "accuracy_sd": 0.001625568388300633,
+      "alive_fraction_mean": 0.615234375,
+      "reconstruction_nmse_mean": 0.37818220681129294
+    },
+    {
+      "recipe": "baseline",
+      "steps": 6000,
+      "W": 5,
+      "n_seeds": 3,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "accuracy_mean": 0.08797200520833333,
+      "accuracy_sd": 0.00331468291901307,
+      "alive_fraction_mean": 0.052897135416666664,
+      "reconstruction_nmse_mean": 0.3883877567995197
+    },
+    {
+      "recipe": "baseline",
+      "steps": 6000,
+      "W": 6,
+      "n_seeds": 3,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "accuracy_mean": 0.09228515625,
+      "accuracy_sd": 0.005354421923696609,
+      "alive_fraction_mean": 0.06526692708333333,
+      "reconstruction_nmse_mean": 0.44358577985472464
+    },
+    {
+      "recipe": "baseline",
+      "steps": 6000,
+      "W": 10,
+      "n_seeds": 3,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "accuracy_mean": 0.11735026041666667,
+      "accuracy_sd": 0.005378486862584084,
+      "alive_fraction_mean": 0.4208984375,
+      "reconstruction_nmse_mean": 0.6143783762074682
+    },
+    {
+      "recipe": "data_init_centered",
+      "steps": 6000,
+      "W": 3,
+      "n_seeds": 3,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "accuracy_mean": 0.09138997395833333,
+      "accuracy_sd": 0.003139209232094061,
+      "alive_fraction_mean": 0.9368489583333334,
+      "reconstruction_nmse_mean": 0.4010266070824689
+    },
+    {
+      "recipe": "data_init_centered",
+      "steps": 6000,
+      "W": 4,
+      "n_seeds": 3,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "accuracy_mean": 0.10563151041666667,
+      "accuracy_sd": 0.0029126839466427864,
+      "alive_fraction_mean": 0.859375,
+      "reconstruction_nmse_mean": 0.42544619010639345
+    },
+    {
+      "recipe": "data_init_centered",
+      "steps": 6000,
+      "W": 5,
+      "n_seeds": 3,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "accuracy_mean": 0.11466471354166667,
+      "accuracy_sd": 0.004761263826923852,
+      "alive_fraction_mean": 0.84814453125,
+      "reconstruction_nmse_mean": 0.46270571278859945
+    },
+    {
+      "recipe": "data_init_centered",
+      "steps": 6000,
+      "W": 6,
+      "n_seeds": 3,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "accuracy_mean": 0.11417643229166667,
+      "accuracy_sd": 0.010642776577950291,
+      "alive_fraction_mean": 0.8680013020833334,
+      "reconstruction_nmse_mean": 0.5037883997991031
+    },
+    {
+      "recipe": "data_init_centered",
+      "steps": 6000,
+      "W": 10,
+      "n_seeds": 3,
+      "seeds": [
+        0,
+        1,
+        2
+      ],
+      "accuracy_mean": 0.13362630208333334,
+      "accuracy_sd": 0.006966925366479327,
+      "alive_fraction_mean": 0.8411458333333334,
+      "reconstruction_nmse_mean": 0.6336831115202557
+    }
+  ],
+  "interpretation": "Report all windows and seeds. No monotonicity constraint or smoothing is applied."
+}

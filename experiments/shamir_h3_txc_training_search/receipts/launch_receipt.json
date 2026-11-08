@@ -1,0 +1,28 @@
+{
+  "started": "2026-11-07T06:49:05.652332+00:00",
+  "launcher_pid": 1450195,
+  "gpu_uuid": "GPU-0216af65-2b0e-3798-454e-1208593efcc3",
+  "gpu_index": 5,
+  "command": [
+    "/data/users/dmitry/venvs/er-sprint/bin/python",
+    "/data/users/dmitry/shamir_h3_txc_training_search_20261107T0651/source/experiments/shamir_h3_txc_training_search/run.py",
+    "supervise",
+    "--output",
+    "/data/users/dmitry/shamir_h3_txc_training_search_20261107T0651/full",
+    "--workers",
+    "16",
+    "--budget-seconds",
+    "3600"
+  ],
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "GPU-0216af65-2b0e-3798-454e-1208593efcc3",
+    "CUDA_MPS_PIPE_DIRECTORY": "/data/users/dmitry/shamir_h3_txc_training_search_20261107T0651/mps-pipe",
+    "CUDA_MPS_LOG_DIRECTORY": "/data/users/dmitry/shamir_h3_txc_training_search_20261107T0651/mps-log",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "PYTHONPATH": "/data/users/dmitry/shamir_h3_txc_training_search_20261107T0651/source:/data/users/dmitry/shamir_h3_txc_training_search_20261107T0651/source/src"
+  },
+  "source_files": 159,
+  "budget_seconds": 3600
+}

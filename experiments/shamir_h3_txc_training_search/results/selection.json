@@ -1,0 +1,406 @@
+{
+  "frozen_at": "2026-11-07T06:51:26.809083+00:00",
+  "test_access_before_freeze": false,
+  "selected": {
+    "recipe": {
+      "name": "data_init_centered",
+      "lr": 0.001,
+      "schedule": "cosine",
+      "centered": true,
+      "data_init": true,
+      "early_aux": false
+    },
+    "steps": 6000,
+    "objective": 0.1256103515625,
+    "windows": {
+      "6": 0.121337890625,
+      "10": 0.1298828125
+    }
+  },
+  "all_candidates": [
+    {
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "steps": 6000,
+      "objective": 0.1256103515625,
+      "windows": {
+        "6": 0.121337890625,
+        "10": 0.1298828125
+      }
+    },
+    {
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "steps": 12000,
+      "objective": 0.1241455078125,
+      "windows": {
+        "6": 0.12109375,
+        "10": 0.127197265625
+      }
+    },
+    {
+      "recipe": {
+        "name": "early_aux_data_init",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": true
+      },
+      "steps": 12000,
+      "objective": 0.1231689453125,
+      "windows": {
+        "6": 0.1181640625,
+        "10": 0.128173828125
+      }
+    },
+    {
+      "recipe": {
+        "name": "early_aux_data_init",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": true
+      },
+      "steps": 6000,
+      "objective": 0.1214599609375,
+      "windows": {
+        "6": 0.1103515625,
+        "10": 0.132568359375
+      }
+    },
+    {
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "steps": 24000,
+      "objective": 0.1204833984375,
+      "windows": {
+        "6": 0.1123046875,
+        "10": 0.128662109375
+      }
+    },
+    {
+      "recipe": {
+        "name": "early_aux_data_init",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": true
+      },
+      "steps": 24000,
+      "objective": 0.119384765625,
+      "windows": {
+        "6": 0.110107421875,
+        "10": 0.128662109375
+      }
+    },
+    {
+      "recipe": {
+        "name": "low_lr",
+        "lr": 0.0003,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 24000,
+      "objective": 0.1072998046875,
+      "windows": {
+        "6": 0.08642578125,
+        "10": 0.128173828125
+      }
+    },
+    {
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 24000,
+      "objective": 0.106689453125,
+      "windows": {
+        "6": 0.09521484375,
+        "10": 0.1181640625
+      }
+    },
+    {
+      "recipe": {
+        "name": "cosine",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 24000,
+      "objective": 0.105712890625,
+      "windows": {
+        "6": 0.091064453125,
+        "10": 0.120361328125
+      }
+    },
+    {
+      "recipe": {
+        "name": "low_lr",
+        "lr": 0.0003,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 12000,
+      "objective": 0.1055908203125,
+      "windows": {
+        "6": 0.08642578125,
+        "10": 0.124755859375
+      }
+    },
+    {
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 6000,
+      "objective": 0.1046142578125,
+      "windows": {
+        "6": 0.08984375,
+        "10": 0.119384765625
+      }
+    },
+    {
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 12000,
+      "objective": 0.1046142578125,
+      "windows": {
+        "6": 0.090576171875,
+        "10": 0.11865234375
+      }
+    },
+    {
+      "recipe": {
+        "name": "cosine",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 12000,
+      "objective": 0.1046142578125,
+      "windows": {
+        "6": 0.091552734375,
+        "10": 0.11767578125
+      }
+    },
+    {
+      "recipe": {
+        "name": "centered_cosine",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 6000,
+      "objective": 0.1043701171875,
+      "windows": {
+        "6": 0.083984375,
+        "10": 0.124755859375
+      }
+    },
+    {
+      "recipe": {
+        "name": "cosine",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 6000,
+      "objective": 0.10400390625,
+      "windows": {
+        "6": 0.087158203125,
+        "10": 0.120849609375
+      }
+    },
+    {
+      "recipe": {
+        "name": "low_lr",
+        "lr": 0.0003,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 6000,
+      "objective": 0.1029052734375,
+      "windows": {
+        "6": 0.087646484375,
+        "10": 0.1181640625
+      }
+    },
+    {
+      "recipe": {
+        "name": "centered_cosine",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 12000,
+      "objective": 0.102783203125,
+      "windows": {
+        "6": 0.087158203125,
+        "10": 0.118408203125
+      }
+    },
+    {
+      "recipe": {
+        "name": "centered_cosine",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 24000,
+      "objective": 0.1024169921875,
+      "windows": {
+        "6": 0.08740234375,
+        "10": 0.117431640625
+      }
+    },
+    {
+      "recipe": {
+        "name": "high_lr",
+        "lr": 0.003,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 6000,
+      "objective": 0.0965576171875,
+      "windows": {
+        "6": 0.08984375,
+        "10": 0.103271484375
+      }
+    },
+    {
+      "recipe": {
+        "name": "cosine_high_lr",
+        "lr": 0.003,
+        "schedule": "cosine",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 12000,
+      "objective": 0.094970703125,
+      "windows": {
+        "6": 0.08935546875,
+        "10": 0.1005859375
+      }
+    },
+    {
+      "recipe": {
+        "name": "high_lr",
+        "lr": 0.003,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 24000,
+      "objective": 0.0941162109375,
+      "windows": {
+        "6": 0.0908203125,
+        "10": 0.097412109375
+      }
+    },
+    {
+      "recipe": {
+        "name": "high_lr",
+        "lr": 0.003,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 12000,
+      "objective": 0.09130859375,
+      "windows": {
+        "6": 0.089111328125,
+        "10": 0.093505859375
+      }
+    },
+    {
+      "recipe": {
+        "name": "cosine_high_lr",
+        "lr": 0.003,
+        "schedule": "cosine",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 24000,
+      "objective": 0.09130859375,
+      "windows": {
+        "6": 0.08544921875,
+        "10": 0.09716796875
+      }
+    },
+    {
+      "recipe": {
+        "name": "cosine_high_lr",
+        "lr": 0.003,
+        "schedule": "cosine",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "steps": 6000,
+      "objective": 0.0838623046875,
+      "windows": {
+        "6": 0.078125,
+        "10": 0.089599609375
+      }
+    }
+  ]
+}

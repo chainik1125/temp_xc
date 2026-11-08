@@ -1,0 +1,696 @@
+{
+  "created": "2026-11-07T06:51:26.811067+00:00",
+  "selection_sha256": "9391ade60c69004714a60cf2e43c02537e8dd891ebbc3bfefc22e485715a805c",
+  "jobs": [
+    {
+      "id": "confirm_baseline_s0_W3_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 3,
+      "seed": 0,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s0_W4_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 4,
+      "seed": 0,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s0_W5_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 5,
+      "seed": 0,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s0_W6_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 6,
+      "seed": 0,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s0_W10_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 10,
+      "seed": 0,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s1_W3_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 3,
+      "seed": 1,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s1_W4_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 4,
+      "seed": 1,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s1_W5_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 5,
+      "seed": 1,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s1_W6_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 6,
+      "seed": 1,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s1_W10_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 10,
+      "seed": 1,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s2_W3_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 3,
+      "seed": 2,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s2_W4_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 4,
+      "seed": 2,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s2_W5_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 5,
+      "seed": 2,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s2_W6_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 6,
+      "seed": 2,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_baseline_s2_W10_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "baseline",
+        "lr": 0.001,
+        "schedule": "constant",
+        "centered": false,
+        "data_init": false,
+        "early_aux": false
+      },
+      "W": 10,
+      "seed": 2,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s0_W3_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 3,
+      "seed": 0,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s0_W4_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 4,
+      "seed": 0,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s0_W5_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 5,
+      "seed": 0,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s0_W6_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 6,
+      "seed": 0,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s0_W10_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 10,
+      "seed": 0,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s1_W3_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 3,
+      "seed": 1,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s1_W4_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 4,
+      "seed": 1,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s1_W5_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 5,
+      "seed": 1,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s1_W6_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 6,
+      "seed": 1,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s1_W10_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 10,
+      "seed": 1,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s2_W3_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 3,
+      "seed": 2,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s2_W4_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 4,
+      "seed": 2,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s2_W5_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 5,
+      "seed": 2,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s2_W6_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 6,
+      "seed": 2,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    },
+    {
+      "id": "confirm_data_init_centered_s2_W10_n6000",
+      "phase": "confirm",
+      "recipe": {
+        "name": "data_init_centered",
+        "lr": 0.001,
+        "schedule": "cosine",
+        "centered": true,
+        "data_init": true,
+        "early_aux": false
+      },
+      "W": 10,
+      "seed": 2,
+      "checkpoints": [
+        6000
+      ],
+      "h": 3,
+      "q": 11,
+      "k": 5,
+      "width": 2048,
+      "batch_size": 128,
+      "probe_steps": 1500
+    }
+  ]
+}

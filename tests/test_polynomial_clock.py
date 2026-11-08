@@ -14,6 +14,9 @@ from src.v6_colored_sources.polynomial_clock import (
     generate_alphabet_basis,
     generate_polynomial_clock_dataset,
     is_prime,
+    sample_one_anchor_per_episode,
+    split_episode_indices,
+    subset_polynomial_clock_dataset,
 )
 from src.v6_colored_sources.polynomial_clock_oracles import (
     interpolation_oracle,
@@ -82,6 +85,41 @@ def test_short_window_information_zero_in_F_q() -> None:
         assert max_dev < 4 * math.sqrt(expected.item()), (
             f"Y conditional on (Q_0, Q_1)={int(key)} not uniform: counts={counts}"
         )
+
+
+def test_episode_split_and_anchor_sampling_prevent_leakage() -> None:
+    cfg = PolynomialClockConfig(
+        h=2, q=5, d=8, sigma=0.1, n_seq=30, T_chain=6, seed=42
+    )
+    data = generate_polynomial_clock_dataset(cfg)
+    splits = split_episode_indices(
+        cfg.n_seq,
+        n_rep_train=10,
+        n_probe_train=12,
+        n_probe_val=8,
+        seed=7,
+    )
+
+    split_sets = {name: set(ids.tolist()) for name, ids in splits.items()}
+    assert split_sets["representation_train"].isdisjoint(split_sets["probe_train"])
+    assert split_sets["representation_train"].isdisjoint(split_sets["probe_val"])
+    assert split_sets["probe_train"].isdisjoint(split_sets["probe_val"])
+    assert set.union(*split_sets.values()) == set(range(cfg.n_seq))
+
+    probe_train = subset_polynomial_clock_dataset(data, splits["probe_train"])
+    probe_val = subset_polynomial_clock_dataset(data, splits["probe_val"])
+    train_anchors = sample_one_anchor_per_episode(
+        probe_train, W=2, max_samples=100, device=torch.device("cpu"), seed=11
+    )
+    val_anchors = sample_one_anchor_per_episode(
+        probe_val, W=2, max_samples=100, device=torch.device("cpu"), seed=13
+    )
+
+    assert torch.unique(train_anchors["chain_idx"]).numel() == 12
+    assert torch.unique(val_anchors["chain_idx"]).numel() == 8
+    assert set(train_anchors["episode_id"].tolist()).isdisjoint(
+        set(val_anchors["episode_id"].tolist())
+    )
 
 
 def test_atom_norms_and_margin() -> None:
