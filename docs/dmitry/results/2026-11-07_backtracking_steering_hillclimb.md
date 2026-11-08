@@ -26,7 +26,7 @@ Goal: find a steering arrangement where the TXC beats T-SAE and TFA at inducing 
 Arms: decode-only steering, alternative directions, and a fine magnitude grid. Global best per architecture:
 
 | Arch | Best setting | Full 20: events vs baseline | Incoherent | Subset 19 delta |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | TXC | averaged direction, prefill+decode, −4 | 9 vs 4 (+5) | 0 | +5 |
 | T-SAE | decode-only, −16 | 10 vs 5 (+5) | 0 | +5 |
 | TFA | decode-only, −12 | 9 vs 5 (+4) | 2 | +5 |
@@ -36,7 +36,7 @@ Arms: decode-only steering, alternative directions, and a fine magnitude grid. G
 **Steering.** Round 2's generations were judged here with claude-haiku-5-5, using the same rubric and blinded IDs. These labels came from a different judge than rounds 1 and 3, so compare deltas only within this round. 1–3 items per setting failed to parse and are excluded.
 
 | Track | Arch | Settings (delta vs baseline) | Best |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Magnitudes (baseline 2) | TXC prefill+decode | −3.5: −1, −4: +6, −4.5: −1, −5.5: +1 | +6 |
 | | T-SAE decode-only | −14: +4, −16: +5, −18: −1, −20: +2 | +5 |
 | | TFA decode-only | −10: +6, −11: +2, −12: +6, −14: +3 | +6 |
@@ -49,7 +49,7 @@ TXC's +6 at −4 is an isolated spike: −3.5 and −4.5 each score −1.
 **Detection** (fresh 5-fold, question-grouped sparse-probe PR-AUC; 17,497 rows from 213 problems; prevalence 0.139):
 
 | Readout | S=8 | S=32 |
-|---|---|---|
+| --- | --- | --- |
 | T-SAE native (last token) | **0.227** | **0.264** |
 | TXC native (last 5) | 0.206 | 0.251 |
 | TFA native (last 5) | 0.193 | 0.261 |
@@ -66,7 +66,7 @@ At S=32, TXC minus T-SAE per fold is −.049, +.003, +.007, −.004, −.017. Sh
 - **Dropped analytically:** applying each row at every window position reduces exactly to the mean direction (row cosines with the mean are 0.21–0.71). Sum vs mean of rows gives the same direction after norm calibration. Latent clamping is addition along the same decoder row, because decoders are linear.
 
 | Arch | Optimum | Full 20 events / delta / incoherent | Subset 19 delta |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | TXC | pulse5 rows, −20 | 11 / +8 / 0 | +8 |
 | T-SAE | pulse5, −32 | 10 / +7 / 3 | +7 |
 | TFA | constant vector, −12 | 9 / +6 / 2 | +6 |
@@ -74,7 +74,7 @@ At S=32, TXC minus T-SAE per fold is −.049, +.003, +.007, −.004, −.017. Sh
 **TXC optimum minus each competitor's optimum** (per question, 10k-resample paired bootstrap):
 
 | Comparison | Full 20 | Subset 19 |
-|---|---|---|
+| --- | --- | --- |
 | vs T-SAE | +0.05 [−0.30, +0.45] | +0.05 [−0.32, +0.47] |
 | vs TFA | +0.10 [−0.20, +0.40] | +0.11 [−0.21, +0.42] |
 
